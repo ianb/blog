@@ -4,7 +4,7 @@
 AUTHOR = u'Ian Bicking'
 SITENAME = u'Ian Bicking: a blog'
 SITEURL = 'http://ianbicking.org'
-FEED_DOMAIN = "http://ianbicking.org"
+#FEED_DOMAIN = "http://ianbicking.org"
 
 TIMEZONE = 'US/Central'
 DATE_FORMATS = {
@@ -17,6 +17,10 @@ PAGE_SAVE_AS = "{slug}.html"
 DIRECT_TEMPLATES = ('blog/index', 'tags', 'categories', 'archives')
 PAGINATED_DIRECT_TEMPLATES = ['blog/index']
 ARTICLE_EXCLUDES = ["pages", "old"]
+FEED_ATOM = "feeds/atom.xml"
+CATEGORY_FEED_ATOM = "feeds/%s.atom.xml"
+FEED_MAX_ITEMS = 20
+
 
 def FORMAT_DATE(date):
     d = date.strftime("%A, %B ")

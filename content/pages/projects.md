@@ -207,10 +207,8 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 <dt><a href="https://pypi.python.org/pypi/DevAuth/0.1">DevAuth</a></dt>
 <dd>A small WSGI tool to try to protect "developer" backdoor access to web applications, in a generalized way.</dd>
 
-<!--
 <dt><a href="FIXME">EmailIt</a></dt>
 <dd>A small application to email a page to a person, kind of "share by email".  Uses lxml to capture a page in a way that can be embedded in an email.</dd>
--->
 
 <dt><a href="http://blog.ianbicking.org/2007/09/12/flatatompub/">FlatAtomPub</a></dt>
 <dd>An Atompub server library.  Atompub <em>was</em> supposed to be the culmination of <a href="https://en.wikipedia.org/wiki/Representational_state_transfer">REST</a> thinking.  This was my attempt to assimilate those ideas.  No one ever actually cared about Atompub though, go figure?  This was an interesting experiment, but never useful.</dd>
@@ -218,10 +216,8 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 <dt><a href="http://pythonpaste.org/ohm/">OHM</a></dt>
 <dd>The Object HTTP Mapper.  An attempt to create an ORM-like layer for exposing objects over HTTP.  ORMs are a little suspicious, OHM was even more suspicious.  These days I'm pretty <em>over</em> REST, mostly because attempts like this to embrace REST were so unsatisfying.</dd>
 
-<!--
 <dt><a href="FIXME">TaggerClient</a> and <a href="FIXME">TaggerStore</a></dt>
 <dd>An attempt to create a generalized tagging library.  Part of a concept of postmodern, ad hoc, and eclectic components making up a web site. </dd>
--->
 
 <dt><a href="http://svn.pythonpaste.org/Paste/VaingloriousEye/trunk/">VaingloriousEye</a></dt>
 <dd>My best project name ever.  This was a little piece of WSGI middleware (a wrapper you could apply around an application) to give live referrer statistics, so you could obsess over who came to your site.</dd>
@@ -235,10 +231,8 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 <dt><a href="http://pythonpaste.org/wsgioverlay/">WSGIOverlay</a></dt>
 <dd>An experiment with <a href="http://disruptive-innovations.com/zoo/20040830/HTMLoverlays.html">HTML Overlays</a>, kind of a microformat-style way of applying a template to a site, using simple directives to lay the content of a page over a template.  Deliverance was a far more complete implementation of the idea, and one that didn't require application cooperation, but this is the more refined and simple implementation of the idea.</dd>
 
-<!--
 <dt><a href="FIXME">htranscluder</a></dt>
 <dd>This allowed server-side <a href="http://en.wikipedia.org/wiki/Transclusion">transclusion</a> using the microformat <code>&lt;a href="resource" rel="include"&gt;content&lt;/a&gt;</code> - and when requested the content would be magically substituted directly in the page.</dd>
--->
 
 <dt><a href="http://pythonpaste.org/wsgiproxy/">WSGIProxy</a></dt>
 <dd>This would become <code>webob.client</code>.  This is a way of taking a WSGI request and sending it to another server.</dd>
@@ -309,9 +303,7 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 <dt><a href="http://blog.ianbicking.org/twill-in-javascript.html">Twill/Javascript</a></dt>
 <dd><a href="http://twill.idyll.org/">Twill</a> is an old timey functional testing DSL for web applications.  This was an attempt to use the same DSL in the browser for functional testing.</dd>
 
-<!--
 <dt><a href="FIXME">WebClippy</a></dt>
 <dd>An attempt to provide instructional overlays, so multi-step instructions on how to use a web page could be created.</dd>
--->
 
 </dl>

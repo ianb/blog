@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
 
 set -e
+echo -n "regenerating..."
 ~/.virtualenvs/blog/bin/pelican content/ -o output/ -s pelicanconf.py "$@"
+echo done.
+
+if [ "$1" != "-q" ] ; then
+    echo -n "rsyncing..."
+    rsync -r output/ blog.ianbicking.org:ianbicking.org/
+    echo done.
+fi
