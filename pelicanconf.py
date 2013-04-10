@@ -3,7 +3,7 @@
 
 AUTHOR = u'Ian Bicking'
 SITENAME = u'Ian Bicking: a blog'
-SITEURL = 'http://ianbicking.org'
+SITEURL = 'http://www.ianbicking.org'
 #FEED_DOMAIN = "http://ianbicking.org"
 
 TIMEZONE = 'US/Central'
@@ -20,6 +20,7 @@ ARTICLE_EXCLUDES = ["pages", "old"]
 FEED_ATOM = "feeds/atom.xml"
 CATEGORY_FEED_ATOM = "feeds/%s.atom.xml"
 FEED_MAX_ITEMS = 20
+RELATIVE_URLS = False
 
 
 def FORMAT_DATE(date):
