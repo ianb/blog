@@ -300,6 +300,9 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 
 <dl>
 
+<dt><a href="https://github.com/mozilla/receiptverifier">receiptverifier</a></dt>
+<dd>I'm not sure if this is "retired" per se, but it's not very active.  This is a library to do client verification of [Open Web App](https://developer.mozilla.org/en-US/docs/Apps) receipts.  It's not very exciting, but it does do a heck of a lot of error handling. It was an exercise in thoroughness.</dd>
+
 <dt><a href="http://blog.ianbicking.org/twill-in-javascript.html">Twill/Javascript</a></dt>
 <dd><a href="http://twill.idyll.org/">Twill</a> is an old timey functional testing DSL for web applications.  This was an attempt to use the same DSL in the browser for functional testing.</dd>
 
