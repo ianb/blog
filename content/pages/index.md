@@ -18,11 +18,11 @@ My list of online personas:
 - [@ianbicking on Twitter](https://twitter.com/ianbicking)
 - [LinkedIn](http://www.linkedin.com/in/ianbicking) (I still have no idea what this is useful for)
 - [Tripit](https://www.tripit.com/people/ianb) (I'm happy to connect to people... on the odd chance someone comes to Minneapolis?)
-- [Facebook](https://www.facebook.com/ianbicking) (this would be by personal/non-professional persona)
+- [Facebook](https://www.facebook.com/ianbicking) (this would be my personal/non-professional persona)
 - [ianb on github](https://github.com/ianb/) (also a largely obsolete account on [Bitbucket](https://bitbucket.org/ianb))
-- [gittip](https://www.gittip.com/ianbicking/)
+- [gittip](https://www.gittip.com/ianbicking/), which could perhaps offset at least my project domain name costs
 - `ianbicking` on FreeNode or irc.mozilla.org
 
 Not online, my mobile number is **773-870-0645**, and I will rely on you to use that appropriately (never really been a problem so far; do recruiters count?)  And my address is **3015 10th Ave. S, Minneapolis, MN 55407**.  Just in case you want to send me a fruit basket.
 
-This blog is powered by [Pelican](http://getpelican.com/).  The theme was based on [cebong](http://github.com/getpelican/pelican-themes).
+This blog is powered by [Pelican](http://getpelican.com/).  The theme was based on [cebong](http://github.com/getpelican/pelican-themes). The entire thing is on [github](https://github.com/ianb/blog).
