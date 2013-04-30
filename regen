@@ -1,11 +1,21 @@
 #!/usr/bin/env bash
 
 set -e
+
+quiet=""
+output="output"
+if [ "$1" = "-q" ] ; then
+    shift
+    quiet="1"
+    output="output-local"
+    export OVERRIDE_SITEURL=http://blog.localhost
+fi
+
 echo -n "regenerating..."
-~/.virtualenvs/blog/bin/pelican content/ -o output/ -s pelicanconf.py "$@"
+~/.virtualenvs/blog/bin/pelican content/ -o $output -s pelicanconf.py "$@"
 echo done.
 
-if [ "$1" != "-q" ] ; then
+if [ "$quiet" = "" ] ; then
     echo -n "rsyncing..."
     rsync -r output/ blog.ianbicking.org:ianbicking.org/
     echo done.

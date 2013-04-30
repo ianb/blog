@@ -41,7 +41,7 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 <dd>Sometimes when I want to try out an idea, I throw it in this directory.  There's a grab bag of experiments here.</dd>
 
 <dt><a href="https://github.com/mozilla/receiptverifier">receiptverifier</a></dt>
-<dd>A small library to confirm Open Web App purchase receipts.</dd>
+<dd>Not very active right now.  This is a library to do client verification of [Open Web App](https://developer.mozilla.org/en-US/docs/Apps) receipts.  It's not very exciting, but it does do a heck of a lot of error handling. It was an exercise in thoroughness.</dd>
 
 <dt><a href="https://github.com/ianb/whrandom">whrandom</a></dt>
 <dd>A small Javascript library for a pseudo-random generator.</dd>
@@ -80,7 +80,7 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 <dl>
 
 <dt><a href="https://crate.io/?q=Ian+Bicking&page=3&has_releases=on">crate.io packages</a></dt>
-<dd>You can see a list of my Python packages on crate.io by looking for my name.</dd>
+<dd>You can see a list of my Python packages on crate.io by looking for my name.  As of April 2013, the collective list of Python packages that I have authored have been downloaded from PyPI (the Python Package Index) over 12 million times.</dd>
 
 <dt><a href="https://github.com/mozilla/browsermirror">Browser Mirror</a></dt>
 <dd>This project has largely been superceded by <a href="https://towtruck.mozillalabs.com">TowTruck.</a>.  This is like a screensharing system, except it works with the DOM instead of pixels - the page you are viewing is transmitted to the other party, but not a "live" page, literally just the things you see.  Things like clicks are transmitted back to the original browser.  Just like screensharing...?  Started out as a "this can't possibly work" project, but then it kind of worked.</dd>
@@ -207,7 +207,7 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 <dt><a href="https://pypi.python.org/pypi/DevAuth/0.1">DevAuth</a></dt>
 <dd>A small WSGI tool to try to protect "developer" backdoor access to web applications, in a generalized way.</dd>
 
-<dt><a href="FIXME">EmailIt</a></dt>
+<dt><a href="https://github.com/ianb/emailit">EmailIt</a></dt>
 <dd>A small application to email a page to a person, kind of "share by email".  Uses lxml to capture a page in a way that can be embedded in an email.</dd>
 
 <dt><a href="http://blog.ianbicking.org/2007/09/12/flatatompub/">FlatAtomPub</a></dt>
@@ -230,9 +230,6 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 
 <dt><a href="http://pythonpaste.org/wsgioverlay/">WSGIOverlay</a></dt>
 <dd>An experiment with <a href="http://disruptive-innovations.com/zoo/20040830/HTMLoverlays.html">HTML Overlays</a>, kind of a microformat-style way of applying a template to a site, using simple directives to lay the content of a page over a template.  Deliverance was a far more complete implementation of the idea, and one that didn't require application cooperation, but this is the more refined and simple implementation of the idea.</dd>
-
-<dt><a href="FIXME">htranscluder</a></dt>
-<dd>This allowed server-side <a href="http://en.wikipedia.org/wiki/Transclusion">transclusion</a> using the microformat <code>&lt;a href="resource" rel="include"&gt;content&lt;/a&gt;</code> - and when requested the content would be magically substituted directly in the page.</dd>
 
 <dt><a href="http://pythonpaste.org/wsgiproxy/">WSGIProxy</a></dt>
 <dd>This would become <code>webob.client</code>.  This is a way of taking a WSGI request and sending it to another server.</dd>
@@ -300,13 +297,13 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 
 <dl>
 
-<dt><a href="https://github.com/mozilla/receiptverifier">receiptverifier</a></dt>
-<dd>I'm not sure if this is "retired" per se, but it's not very active.  This is a library to do client verification of [Open Web App](https://developer.mozilla.org/en-US/docs/Apps) receipts.  It's not very exciting, but it does do a heck of a lot of error handling. It was an exercise in thoroughness.</dd>
-
 <dt><a href="http://blog.ianbicking.org/twill-in-javascript.html">Twill/Javascript</a></dt>
 <dd><a href="http://twill.idyll.org/">Twill</a> is an old timey functional testing DSL for web applications.  This was an attempt to use the same DSL in the browser for functional testing.</dd>
 
-<dt><a href="FIXME">WebClippy</a></dt>
+<dt><a href="http://svn.colorstudy.com/home/ianb/WebClippy">WebClippy</a></dt>
 <dd>An attempt to provide instructional overlays, so multi-step instructions on how to use a web page could be created.</dd>
+
+<dt><a href="http://svn.colorstudy.com/home/ianb/htranscluder">htranscluder</a></dt>
+<dd>This did client-side <a href="http://en.wikipedia.org/wiki/Transclusion">transclusion</a> using the microformat <code>&lt;a href="resource" rel="include"&gt;content&lt;/a&gt;</code></dd>
 
 </dl>

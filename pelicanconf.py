@@ -6,6 +6,10 @@ SITENAME = u'Ian Bicking: a blog'
 SITEURL = 'http://www.ianbicking.org'
 #FEED_DOMAIN = "http://ianbicking.org"
 
+import os
+if os.environ.get("OVERRIDE_SITEURL"):
+    SITEURL = os.environ["OVERRIDE_SITEURL"]
+
 TIMEZONE = 'US/Central'
 DATE_FORMATS = {
     "en": "%A, %d %B, %Y",

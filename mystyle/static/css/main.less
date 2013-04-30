@@ -22,6 +22,10 @@
 @mono-font: "Droid Sans Mono", monospace;
 @headline-font: "Headland One", Times, serif;
 
+@content-width: 760px;
+@body-width: 800px;
+@mobile: ~"(max-width: 768px)";
+//@mobile: ~"screen";
 
 /***** Global *****/
 /* Body */
@@ -36,7 +40,8 @@
 @color: #2e2e23;
 // Color of <code>:
 @code-color: #000;
-@code-background: lighten(@background, 20%);
+//@code-background: lighten(@background, 20%);
+@code-background: @background;
 // Links:
 @link-color: #a61f03;
 @link-visited-color: #044c68;
@@ -225,7 +230,11 @@ div.note {
 .body {
     clear: both;
     margin: 0 auto;
-    width: 800px;
+    max-width: @body-width;
+    @media @mobile {
+        max-width: auto;
+        width: auto;
+    }
 }
 img.right, figure.right {
     float: right;
@@ -240,15 +249,13 @@ img.left, figure.left {
 	Header
 *****************/
 #banner {
-	margin: 0 auto;
-	padding: 2.5em 0 0 0;
-    /*border-bottom: 3px solid #434333;*/
+	padding: 0.5em 0 0 0;
     border-bottom: 3px solid #636353;
 
 	/* Banner */
 	h1 {
+        margin-top: 0;
         font-size: 51px;
-        line-height: 0;
 	    a:link, a:visited {
             text-align: center;
 		    color: @banner-link-color;
@@ -273,14 +280,22 @@ img.left, figure.left {
 		background:transparent;
 		padding: 0;
 		text-align: center;
-		width: 800px;
+		max-width: @body-width;
         font-style:italic;
 		border-radius: 5px;
+        @media @mobile {
+            max-width: auto;
+            width: auto;
+        }
 
 	    ul {
             list-style: none;
             margin: 0 auto;
-            width: 800px;
+            max-width: @body-width;
+            @media @mobile {
+                max-width: auto;
+                width: auto;
+            }
         }
 	    li {
             float: left;
@@ -315,9 +330,14 @@ img.left, figure.left {
 	margin-bottom: 2em;
 	overflow: hidden;
 	padding: 20px;
-	width: 760px;
-
+	max-width: @content-width;
 	border-radius: 10px;
+
+    @media @mobile {
+        width: auto;
+        max-width: auto;
+        padding: 10px;
+    }
 
     figure {
 	    border: 2px solid #eee;
@@ -358,8 +378,12 @@ img.left, figure.left {
 	margin-bottom: 2em;
 	overflow: hidden;
 	padding: 20px 20px;
-	width: 760px;
-	border-radius: 10px;
+	max-width: @content-width;
+
+    @media @mobile {
+        max-width: auto;
+        width: auto;
+    }
 }
 
 /*
@@ -373,6 +397,14 @@ img.left, figure.left {
     right: 5px;
 	width: @sidebar-width - 25px;
     color: #e1e8ba;
+
+    @media @mobile {
+        position: static;
+        width: auto;
+        top: 0;
+        right: 0;
+        background-color: @sidebar-background;
+    }
 
     ul {
         list-style: none;
@@ -443,9 +475,13 @@ img.left, figure.left {
 
 } // end #extras
 
+
+
 #main-container {
     background: @background;
+    padding-right: 0.3em;
 }
+
 #main-wrapper1 {
     background: @sidebar-color-3;
     padding-right: 22px;
@@ -453,13 +489,27 @@ img.left, figure.left {
     padding-bottom: 10px;
     border-bottom: 13px solid @sidebar-color-4;
     margin-right: @sidebar-width;
+    @media @mobile {
+        margin-right: 0;
+        padding-right: 5px;
+        padding-bottom: 2px;
+        border-right: 5px solid @sidebar-color-4;
+        border-bottom: 2px solid @sidebar-color-4;
+    }
 }
+
 #main-wrapper2 {
     background: @sidebar-color-1;
     padding-right: 22px;
     border-right: 22px solid @sidebar-color-2;
     padding-bottom: 10px;
     border-bottom: 10px solid @sidebar-color-2;
+    @media @mobile {
+        padding-right: 5px;
+        padding-bottom: 2px;
+        border-right: 5px solid @sidebar-color-2;
+        border-bottom: 2px solid @sidebar-color-2;
+    }
 }
 
 /*
@@ -473,7 +523,7 @@ img.left, figure.left {
 	overflow: hidden;
 	padding: 20px;
 	text-align: right;
-	width: 760px;
+	max-width: @content-width;
 
 	border-radius: 10px;
 
@@ -523,7 +573,7 @@ li:last-child .hentry, #content > .hentry {border: 0; margin: 0;}
 .entry-title {
     /*text-align: center;*/
     font-size: 31px;
-    font-style: italic;
+    //font-style: italic;
     margin-bottom: 10px;
     margin-top: 0;
 }
@@ -536,6 +586,10 @@ li:last-child .hentry, #content > .hentry {border: 0; margin: 0;}
     padding-right: 3px;
     font-size: 90%;
     color: @published-color;
+    #post-list & {
+        // the published date looks a bit weird in the category list
+        padding-right: 20px;
+    }
 }
 
 .hentry {
