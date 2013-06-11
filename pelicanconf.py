@@ -25,6 +25,7 @@ FEED_ATOM = "feeds/atom.xml"
 CATEGORY_FEED_ATOM = "feeds/%s.atom.xml"
 FEED_MAX_ITEMS = 20
 RELATIVE_URLS = False
+STATIC_PATHS = ["media"]
 
 
 def FORMAT_DATE(date):
