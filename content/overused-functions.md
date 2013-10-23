@@ -39,3 +39,5 @@ The advantage of the first function is that blocks of code are strict. You execu
 And I have to wonder: are some of these basic patterns of "good" code there because we have poor tools for code organization? We express too many things with functions and methods and classes (and perhaps modules) because that's all we have.  But those are full of unintended semantic meaning.
 
 Anyone have examples of languages that have found novel ways of keeping code organized?
+
+[(Also there are comments on G+)](https://plus.google.com/u/0/+IanBicking/posts/ajbi8QFDWD1)
