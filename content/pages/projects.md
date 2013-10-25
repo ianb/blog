@@ -16,7 +16,7 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 
 <dl>
 
-<dt><a href="https://towtruck.mozillalabs.com"><strong>TowTruck</strong></a></dt>
+<dt><a href="https://togetherjs.com"><strong>TogetherJS</strong></a> (formerly TowTruck)</dt>
 <dd>My current project at Mozilla.  This is a service to enable real-time collaboration on any site.</dd>
 
 <dt><a href="http://doctestjs.org">doctest.js</a></dt>
@@ -40,9 +40,6 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 <dt><a href="http://svn.colorstudy.com/home/ianb/recipes">Misc recipes</a></dt>
 <dd>Sometimes when I want to try out an idea, I throw it in this directory.  There's a grab bag of experiments here.</dd>
 
-<dt><a href="https://github.com/mozilla/receiptverifier">receiptverifier</a></dt>
-<dd>Not very active right now.  This is a library to do client verification of [Open Web App](https://developer.mozilla.org/en-US/docs/Apps) receipts.  It's not very exciting, but it does do a heck of a lot of error handling. It was an exercise in thoroughness.</dd>
-
 <dt><a href="https://github.com/ianb/whrandom">whrandom</a></dt>
 <dd>A small Javascript library for a pseudo-random generator.</dd>
 
@@ -54,6 +51,9 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 
 <dt><a href="https://github.com/ianb/git-sync">git-sync</a></dt>
 <dd>A small script to use git more like rsync for the purpose of deployment.  Motivation explained some in <a href="http://blog.ianbicking.org/2012/02/14/git-as-sync-not-source-control-as-deployment/">this post</a>.</dd>
+
+<dt><a href="https://github.com/mozilla/receiptverifier">receiptverifier</a></dt>
+<dd>Not very active right now.  This is a library to do client verification of <a href="https://developer.mozilla.org/en-US/docs/Apps">Open Web App</a> receipts.  It's not very exciting, but it does do a heck of a lot of error handling. It was an exercise in thoroughness. Maintained by other people now.</dd>
 
 </dl>
 
@@ -83,7 +83,7 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 <dd>You can see a list of my Python packages on crate.io by looking for my name.  As of April 2013, the collective list of Python packages that I have authored have been downloaded from PyPI (the Python Package Index) over 12 million times.</dd>
 
 <dt><a href="https://github.com/mozilla/browsermirror">Browser Mirror</a></dt>
-<dd>This project has largely been superceded by <a href="https://towtruck.mozillalabs.com">TowTruck.</a>.  This is like a screensharing system, except it works with the DOM instead of pixels - the page you are viewing is transmitted to the other party, but not a "live" page, literally just the things you see.  Things like clicks are transmitted back to the original browser.  Just like screensharing...?  Started out as a "this can't possibly work" project, but then it kind of worked.</dd>
+<dd>This project has largely been superceded by <a href="https://togetherjs.com">TogetherJS.</a>.  This is like a screensharing system, except it works with the DOM instead of pixels - the page you are viewing is transmitted to the other party, but not a "live" page, literally just the things you see.  Things like clicks are transmitted back to the original browser.  Just like screensharing...?  Started out as a "this can't possibly work" project, but then it kind of worked.</dd>
 
 <dt><a href="https://github.com/ianb/webannotate">webannotate</a></dt>
 <dd>An offshoot of BrowserMirror and related ideas, taking a snapshot of the DOM and saving it, then allowing annotation of that static page.  Like inline commenting without any of the tricky web overlay ideas.</dd>

@@ -1,5 +1,5 @@
-New Blog Software
-#################
+New Blog Software (Previous)
+############################
 :date: 2007-08-01 12:02
 :author: Ian Bicking
 :tags: Non-technical
