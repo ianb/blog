@@ -1,0 +1,21 @@
+Net Neutrality: forcing companies to pay attention to their networks
+####################################################################
+:date: 2010-08-18 11:39
+:author: Ian Bicking
+:tags: Non-technical, Politics
+
+When it comes to software licensing, I get annoyed at GPL critics. Mostly they argue that a permissive license is more hassle-free.  But *all* licensing hassles come from proprietary licenses.  All of them. Open source licenses are simple, well-understood, and if you are doing open source stuff you don't need to negotiate, you don't need lawyers. The deal is laid out and it's more like technical machinery than a business deal.  Open source has just a few deals, and we have names for them (BSD, GPL, etc); the alternative is the ever-expanding number of deals that proprietary licenses represent, always expanding, seldom clear, unnamed but still poised to mess things up.
+
+But this is an introduction for a discussion of net neutrality!  Net neutrality is one deal: simple, obvious, straight-forward.  The opposite isn't one deal, like proprietary licensing it is an ever-expanding complexity of deals, different pricing structures, opaque, and with salespeople using information-scarcity to manipulate sales at every opportunity.
+
+There's an absurd argument against net neutrality, that it would add regulatory complexity.  This is absurd because neutrality is the *default*, regulation only comes into effect when someone messes with something, when some connectivity provider starts adding complexity to the system.
+
+There are net neutrality advocates that ask: what if Fox gets preference over MSNBC?  A poor argument, this kind of politically-motivated network bias seems implausible to me.  The plausible result of not having network neutrality is all kinds of *deals*.  Weird media deals. Deals with companies that have an influx of investment and want to bootstrap their audience.  Providers that build their own content networks.  How much will all this matter?  Probably not much.  Whatever the providers do will be just terrible, they seem to be inevitably bad at both idea and execution.  For everyone else it will just be a competition tax, a way to turn money into a competitive advantage though with hints of the `prisoner's dilemma <http://en.wikipedia.org/wiki/Prisoner%27s_dilemma>`_.
+
+Mostly network bias just adds *complexity* to the system.  It's a whole new opportunity to make *deals*.  Maybe different groups will come out ahead, but maybe not... my best guess is that implementing and justifying a biased network will be more trouble than its worth, and technology will make the issue moot before too long.
+
+The people who will really get out ahead are the deal-mongers, the executives and lawyers and salespeople.  These kinds of deals are opaque, complex, and it's easier to manipulate analysis and perception than to actually provide a valuable agreement.  But deal-making professionals come out ahead with every contract and every negotiation.
+
+The companies providing infrastructure (Verizon, Comcast, AT&T, etc) can take two approaches to maximizing profit.  One approach is to pursue engineering and operational excellence, to provide a *great network*, and compete strongly.  Or they can get "creative".  Network neutrality makes creativity hard -- it doesn't block any creativity in *providing their core service*, but the leadership of these companies provide only deal-making leadership, to them the core service is an afterthought.  I wonder if this is the worst effect of consolidation -- every corporate consolidation requires all kinds of negotiation and further exults the leadership of the deal-makers over the people that are good at managing operations.
+
+For all the complaints (and we complain about these companies a lot), these companies actually do provide good service.  Reliability and speed keep improving.  It could be better, but there are also lots of people doing a good job keeping a complex system working well. Those are the people I want to see empowered, they are the ones that should be the stars in their companies.  I think network neutrality will help do that, it will help focus infrastructure providers on providing infrastructure.  And make an exception for wireless?  They are the *most* in need of focus.

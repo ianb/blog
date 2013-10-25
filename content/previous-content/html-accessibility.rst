@@ -1,0 +1,32 @@
+HTML Accessibility
+##################
+:date: 2008-03-23 17:51
+:author: Ian Bicking
+:tags: HTML, Programming, Web
+
+So I gave a presentation at PyCon about HTML, which I ended up turning into an XML-sucks HTML-rocks talk.  Well that's a trivialization, but *I* have the privilege of trivializing my arguments all I want.
+
+Somewhat to my surprise this got me a heckler (of sorts).  I think it came up when I was making my `<em> lies and <i> is truth <http://blog.ianbicking.org/2007/08/14/reflection-and-description-of-meaning />`_ argument.  That is, presentation and intention are the same.  There are those people who feel they can separate the two, creating semantic markup that represents their intent, but they are so few that the *reader* can never trust that the distinction is intentional, and so ``<i>`` and ``<em>`` must be treated as equivalent.
+
+Someone then yelled out something like "what about blind people?"  The argument being that screen readers would like to distinguish between the two, as not all things we render as italic would be read with emphasis.
+
+It's not surprising to me that the first time I've gotten an actively negative reaction to a talk it was about accessibility.  When having technical discussions it's hard to get that heated up.  Is Python or Ruby better?  We can talk shit on the web, where all emotions get mixed up and weirded, but in person these discussions tend to be quite calm and reasonable.
+
+Discussions about accessibility, however, have strong moral undertones.  This isn't just What Tool Is Right For The Job.  There is a kind of moral certainty to the argument that we should be making a world that is accessible to all people.
+
+I fear this moral certainty has led people self-righteously down unwise paths.  They believe -- with of course some justification -- that the world must be *made* right.  And so many boil-the-ocean proposals are made, and even become codified by standards, but *markup standards* are useless unless embodied in *actual content*, and this is where accessibility falls down.  
+
+There are two posts that together have greatly eroded my trust in accessibility advocates, so that I feel like I am left adrift, unwilling to jump through the hoops accessibility advocates put up as I strongly suspect they are pointless.
+
+`The first post <http://blog.whatwg.org/the-longdesc-lottery>`_ is about the ``longdesc`` attribute, an obscure attribute intended to tell the story of a picture.  Where ``alt`` is typically used as a placeholder for the image, and a short description, ``longdesc`` can point to a document that describes the image in length.  Empirically they (`Ian Hickson <http://ln.hixie.ch />`_ in particular) found that the attribute was almost never used in a useful or correct way, rendering it effectively useless.  If the discussion had clearly ended at this point, I would have deducted points for those people use advocated ``longdesc`` based on bad judgement, but it would not have effected my *trust* because anyone can mispredict.  But the comments just seemed to reinforce the belief that because it *should* work, that it *would* work.
+
+`The second post <http://ln.hixie.ch/?start=1188895731&#038;count=1>`_ was Ian Hickson's description of using a popular screen reader (`JAWS <http://www.blazie.com/fs_products/software_jaws.asp>`_) -- you'll have to dig into the article some, as it's embedded in other wandering thoughts.  In summary, JAWS is a horrible experience, and as an example it didn't even understand paragraph breaks (where the reader would be expected to pause).  What's the point of semantic markup for accessibility when the most basic markup that is both presentation *and* semantic (``<p>``) is ignored?  Ian's brief summary is that if you want to make your page readable in JAWS you'd do better by paying attention to punctuation (which does get read) than to markup.  And if you want to help improve accessibility, blind people need a screen reader that isn't crap.
+
+Months later we started talking a bit about the accessibility of `openplans.org <http://openplans.org>`_.  Everyone wants to do the right thing, no?  With my trust eroded, I argued strongly that we should only implement accessibility empirically, not based on "best practices".  Well, barring some patterns that seem very logical to me, like putting navigation textually at the bottom of the page, and other stuff that any self-respecting web developer does these days.  But except for that, if we want to really consider accessibility we should get a tool and use it.  But I don't really know what that tool should be; JAWS is around $1000, all for what sounds like a piece of crap product.  We could buy that, even though of course most web developers couldn't possibly justify the purchase.  But is that *really* the right choice?  I don't know.  If we could detect something in the User-Agent string we could see what our users actually use.  But I don't think there's information there.  And I don't know what people are using.  Optimizing for screen magnifiers is much different that optimizing for screen readers.
+
+Another shortcut for accessibility -- a shortcut I also distrust -- is that to make a site accessible you make sure it works without Javascript.  But don't many screen readers work directly off browsers?  Browsers implement Javascript.  Do blind users turn Javascript off?  I don't know.  If you use no-Javascript as a hint to make the site more accessible, you might just be wasting your effort.
+
+There's also some weird perspective problems with accessibility.  Blind users will always be a small portion of the population.  It's just unreasonable to expect sighted users to write to this small population.  Relying on hidden hints in content to provide accessibility just *can't work*.  Hidden content will be broken, only visible content can be trusted.  Admitting this does not mean giving up.  As a sighted reader I do not expect the written and spoken word to be equivalent.  I don't think blind listeners lose anything by hearing something that is more a dialect specific to the computer translation of written text to spoken text.  (Maybe treating text-to-speech as a translation effort would be more successful anyway?)  
+
+A freely available screen reader probably would help a lot as well.  I write my markup to render in browsers, not to render to a spec.  Anything else is just bad practice.  I can't seriously write my markup for readers based on a spec.
+
