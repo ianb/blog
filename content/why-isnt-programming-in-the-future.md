@@ -113,3 +113,5 @@ It is productive to get computers to do the things that computers are good at.  
 The impact of computers has met or exceeded expectations.  It turns out computers are great for facilitating communication, and they are great at storing information, they can track history, facilitate transactions, and it's hardly necessary for me to enumerate the things we do with them.  And we shouldn't condemn developers for doing what is most impactful with the least effort.  But of course we must all, collectively and individually, determine what the most impactful *next* thing is to do.
 
 We can mine the past for some of that, there's good stuff there.  But we shouldn't get bummed out just because there's more things to think about.  Rather it's exciting to find new things, even in the past.
+
+[Comments on Hacker News](https://news.ycombinator.com/item?id=6601748)
