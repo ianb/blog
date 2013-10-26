@@ -8,13 +8,17 @@ When people think about web scraping in Python, they usually think `BeautifulSou
 
 First, people think BeautifulSoup is better at parsing broken HTML.  **This is not correct.**  lxml parses broken HTML quite nicely.  I haven't done any thorough testing, but at least `the BeautifulSoup broken HTML example <http://www.crummy.com/software/BeautifulSoup/documentation.html#Parsing%20HTML>`_ is parsed better by lxml (which knows that ``<td>`` elements should go inside ``<table>`` elements).
 
-Second, people feel lxml is harder to install.  This is correct.  **BUT**, lxml 2.2alpha1 includes an option to compile static versions of the underlying C libraries, which should improve the installation experience, especially on Macs.  To install this new way, try::
+Second, people feel lxml is harder to install.  This is correct.  **BUT**, lxml 2.2alpha1 includes an option to compile static versions of the underlying C libraries, which should improve the installation experience, especially on Macs.  To install this new way, try:
+
+.. code:: sh
 
     $ STATIC_DEPS=true easy_install 'lxml>=2.2alpha1'
 
 One you have lxml installed, you have a great parser (which happens to be `super-fast <http://blog.ianbicking.org/2008/03/30/python-html-parser-performance />`_ and that is **not a tradeoff**).  You get a fairly familiar API based on `ElementTree <http://docs.python.org/library/xml.etree.elementtree.html#module-xml.etree.ElementTree>`_, which though a little strange feeling at first, offers a compact and canonical representation of a document tree, compared to more traditional representations.  But there's more...
 
-One of the features that should be appealing to many people doing screen scraping is that you get CSS selectors.  You can use XPath as well, but usually that's more complicated (`for example <http://css2xpath.appspot.com/?css=div.pad%20a&amp; format=html>`_).  Here's `an example I found <http://crowtheries.net/?p=60>`_ getting links from a menu in a page in BeautifulSoup::
+One of the features that should be appealing to many people doing screen scraping is that you get CSS selectors.  You can use XPath as well, but usually that's more complicated (`for example <http://css2xpath.appspot.com/?css=div.pad%20a&amp; format=html>`_).  Here's `an example I found <http://crowtheries.net/?p=60>`_ getting links from a menu in a page in BeautifulSoup:
+
+.. code:: python
 
     from BeautifulSoup import BeautifulSoup
     import urllib2
@@ -25,7 +29,9 @@ One of the features that should be appealing to many people doing screen scrapin
         for link in links:
             print "%s : %s" % (link.string, link['href'])
 
-Here's the same example in lxml::
+Here's the same example in lxml:
+
+.. code:: python
 
     from lxml.html import parse
     doc = parse('http://java.sun.com').getroot()
@@ -34,7 +40,9 @@ Here's the same example in lxml::
 
 lxml generally knows more about HTML than BeautifulSoup.  Also I think it does well with the small details; for instance, the lxml example will match elements in ``<div class="pad menu">`` (space-separated classes), which the BeautifulSoup example does not do (obviously there are other ways to search, but `the obvious and documented technique <http://www.crummy.com/software/BeautifulSoup/documentation.html#Searching%20by%20CSS%20class>`_ doesn't pay attention to HTML semantics).
 
-One feature that I think is really useful is ``.make_links_absolute()``.  This takes the base URL of the page (``doc.base``) and uses it to make all the links absolute.  This makes it possible to relocate snippets of HTML or whole sets of documents (as with `this program <http://svn.colorstudy.com/home/ianb/PageCollector/trunk>`_).  This isn't just ``<a href>`` links, but stylesheets, inline CSS with ``@import`` statements, ``background`` attributes, etc.  It doesn't see quite *all* links (for instance, links in Javascript) but it sees most of them, and works well for most sites.  So if you want to make a local copy of a site::
+One feature that I think is really useful is ``.make_links_absolute()``.  This takes the base URL of the page (``doc.base``) and uses it to make all the links absolute.  This makes it possible to relocate snippets of HTML or whole sets of documents (as with `this program <http://svn.colorstudy.com/home/ianb/PageCollector/trunk>`_).  This isn't just ``<a href>`` links, but stylesheets, inline CSS with ``@import`` statements, ``background`` attributes, etc.  It doesn't see quite *all* links (for instance, links in Javascript) but it sees most of them, and works well for most sites.  So if you want to make a local copy of a site:
+
+.. code:: python
 
     from lxml.html import parse, open_in_browser
     doc = parse('http://wiki.python.org/moin/').getroot()
@@ -43,7 +51,9 @@ One feature that I think is really useful is ``.make_links_absolute()``.  This t
 
 ``open_in_browser`` serializes the document to a temporary file and then opens a web browser (using `webbrowser <http://docs.python.org/library/webbrowser.html>`_).
 
-Here's `an example <http://svn.colorstudy.com/home/ianb/recipes/lxmldiff.py>`_ that compares two pages using ``lxml.html.diff``::
+Here's `an example <http://svn.colorstudy.com/home/ianb/recipes/lxmldiff.py>`_ that compares two pages using ``lxml.html.diff``:
+
+.. code:: python
 
     from lxml.html.diff import htmldiff
     from lxml.html import parse, tostring, open_in_browser, fromstring
@@ -71,14 +81,18 @@ Here's `an example <http://svn.colorstudy.com/home/ianb/recipes/lxmldiff.py>`_ t
         doc = compare_pages(sys.argv[1], sys.argv[2], sys.argv[3])
         open_in_browser(doc)
 
-You can use it like::
+You can use it like:
+
+.. code:: sh
 
     $ python lxmldiff.py \
     'http://wiki.python.org/moin/BeginnersGuide?action=recall&rev=70' \
     'http://wiki.python.org/moin/BeginnersGuide?action=recall&rev=81' \
     'div#content'
 
-Another feature lxml has is form handling.  All the cool sexy new sites use minimal forms, but searching for "registration forms" I get `this nice complex form <http://www.actuaryjobs.com/cform.html>`_.  Let's look at it::
+Another feature lxml has is form handling.  All the cool sexy new sites use minimal forms, but searching for "registration forms" I get `this nice complex form <http://www.actuaryjobs.com/cform.html>`_.  Let's look at it:
+
+.. code:: python
 
     >>> from lxml.html import parse, tostring
     >>> doc = parse('http://www.actuaryjobs.com/cform.html').getroot()
@@ -88,18 +102,24 @@ Another feature lxml has is form handling.  All the cool sexy new sites use mini
     >>> form.inputs.keys()
     ['thank_you_title', 'City', 'Zip', ... ]
 
-Now we have a form object.  There's two ways to get to the fields: ``form.inputs``, which gives us a dictionary of all the actual ``<input>`` elements (and textarea and select).  There's also ``form.fields``, which is a dictionary-like object.  The dictionary-like object is convenient, for instance::
+Now we have a form object.  There's two ways to get to the fields: ``form.inputs``, which gives us a dictionary of all the actual ``<input>`` elements (and textarea and select).  There's also ``form.fields``, which is a dictionary-like object.  The dictionary-like object is convenient, for instance:
+
+.. code:: python
 
     >>> form.fields['cEmail'] = 'me@example.com'
 
-This actually updates the input element itself::
+This actually updates the input element itself:
+
+.. code:: python
 
     >>> tostring(form.inputs['cEmail'])
     '<input type="input" name="cEmail" size="30" value="test2">'
 
 I think it's actually a nicer API than `htmlfill <http://formencode.org/htmlfill.html>`_ and can serve the same purpose on the server side.
 
-But then you can also use the same interface for scraping, by filling fields and getting the submission.  That looks like::
+But then you can also use the same interface for scraping, by filling fields and getting the submission.  That looks like:
+
+.. code:: python
 
     >>> import urllib
     >>> action = form.action
