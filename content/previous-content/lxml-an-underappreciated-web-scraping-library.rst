@@ -8,7 +8,7 @@ When people think about web scraping in Python, they usually think `BeautifulSou
 
 First, people think BeautifulSoup is better at parsing broken HTML.  **This is not correct.**  lxml parses broken HTML quite nicely.  I haven't done any thorough testing, but at least `the BeautifulSoup broken HTML example <http://www.crummy.com/software/BeautifulSoup/documentation.html#Parsing%20HTML>`_ is parsed better by lxml (which knows that ``<td>`` elements should go inside ``<table>`` elements).
 
-Second, people feel lxml is harder to install.  This is correct.  **BUT**, lxml 2.2alpha1 includes an option to compile static versions of the underlying C libraries, which should improve the installation experience, especially on Macs.  To install this new way, try:
+Second, people feel lxml is harder to install.  This is correct.  **BUT**, lxml 2.2alpha1 includes an option to compile static versions of the underlying C libraries, which should improve the installation experience, especially on Macs.  `To install <http://lxml.de/build.html#building-lxml-on-macos-x>`_ this new way, try:
 
 .. code:: sh
 

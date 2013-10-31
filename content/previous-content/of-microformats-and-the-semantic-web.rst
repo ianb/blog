@@ -6,7 +6,9 @@ Of Microformats and the Semantic Web
 
 I was talking a little with `Daniel Krech <http://eikeon.com />`_ (author of `rdflib <http://rdflib.net />`_) about Semantic Web stuff and `microformats <http://microformats.org />`_ and what they all mean. And he was saying that microformats were nice, because you could *do* something with them, but it would be nice to see that generalized.
 
-By "generalized" I think he meant a general way of expressing arbitrary relationships.  As an example, in `hCard <http://microformats.org/wiki/hcard>`_ you can do::
+By "generalized" I think he meant a general way of expressing arbitrary relationships.  As an example, in `hCard <http://microformats.org/wiki/hcard>`_ you can do:
+
+.. code:: html
 
     <span class="tel">
       <span class="type">home</span>:
