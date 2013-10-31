@@ -1,6 +1,7 @@
 Title: TogetherJS as a Postmodern Programming Tool
 slug: togetherjs-a-postmodern-tool
 Date: 2013-10-31
+Category: mozilla
 
 One of the papers that I continue to refer to in my own thinking about technology is [Notes on Postmodern Programming](http://www.mcs.vuw.ac.nz/comp/Publications/CS-TR-02-9.abs.html). Martin Fowler has a [short summary](http://martinfowler.com/bliki/PostModernProgramming.html):
 
