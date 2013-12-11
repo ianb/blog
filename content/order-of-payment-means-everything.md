@@ -1,4 +1,4 @@
-Title: The Order of Payment Drives Content
+Title: The Order of Payment And Consumption Drives Content
 Slug: order-of-payment-drives-content
 Date: 2013-11-04
 
