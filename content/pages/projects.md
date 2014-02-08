@@ -16,6 +16,9 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 
 <dl>
 
+<dt><a href="https://togetherjs.com/hotdish/"><strong>Hotdish</strong></a></dt>
+<dd>This is taking some of the ideas of TogetherJS, some of the tech from <a href="https://github.com/mozilla/browsermirror">Browser Mirror</a>, and thinking about them all in the context of a browser session.  It's implemented as a Firefox addon.  The model we've come to is one where a group of people share everything they do in a specific browser, with awareness of what each person is doing (both in general, and with in-page feedback using TogetherJS), and people can join and present to each other in this context.  <br><br>  Our longer-term goal is for people to be able to understand what each other are doing -- what pages they are interacting with, but also <em>how</em> they are interacting with those pages, similar to how you can understand what a person is doing when they are doing physical work.  <br><br>  Another goal is to look at how, using the same data we capture in order to share a person's actions with everyone else, we can also use that data to create a richer record of what people are doing.  We want knowledge capture and transfer between group members that can encompass not just one site or document, but a session, discussion, and research.</dd>
+
 <dt><a href="https://togetherjs.com"><strong>TogetherJS</strong></a> (formerly TowTruck)</dt>
 <dd>My current project at Mozilla.  This is a service to enable real-time collaboration on any site.</dd>
 

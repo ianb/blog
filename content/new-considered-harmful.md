@@ -1,4 +1,4 @@
-Title: "new" Considered Harmful
+Title: "new" Only Makes Javascript OO Harder
 Slug: new-considered-harmful
 Category: javascript
 Date: 2013-04-29
