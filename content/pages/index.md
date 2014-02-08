@@ -6,7 +6,7 @@ You've reached my homepage on the world wide web.  Hello!
 
 On the internet I'm a computer programmer.  Not on the internet I am also a computer programmer, but I also have a [wife](http://emilymurphy.com) and daughter. I live in Minneapolis, in the Powderhorn Park neighborhood.  On the internet I live here, or maybe more accurately when I say something I often say it on [Google+](https://plus.google.com/+IanBicking/posts).  I'm on [Twitter](https://twitter.com/ianbicking) but it's just mirror of Google+.
 
-I work for [Mozilla](http://www.mozilla.org/), specifically [Mozilla Labs](https://mozillalabs.com/).  You can read more about what I'm doing on my [**projects page**](/projects.html).
+I work for [Mozilla](http://www.mozilla.org/).  You can read more about what I'm doing on my [**projects page**](/projects.html).
 
 ## Getting in contact
 
