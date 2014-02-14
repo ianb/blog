@@ -12,7 +12,18 @@ if [ "$1" = "-q" ] ; then
 fi
 
 echo -n "regenerating..."
+if [[ -e "$output/drafts" ]] ; then
+    rm -r $output/drafts/
+    mkdir $output/drafts
+fi
 ~/.virtualenvs/blog/bin/pelican content/ -o $output -s pelicanconf.py "$@"
+(
+    cd $output/drafts
+    for F in * ; do
+      echo "<a href=\"$F\">$F</a><br>"
+    done
+) > $output/drafts/list.html
+echo "hiya" > $output/drafts/index.html
 echo done.
 
 if [ "$quiet" = "" ] ; then
