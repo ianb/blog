@@ -2,6 +2,7 @@ Title: Hubot, Chat, The Web, and Working in the Open
 Slug: hubot-chat-web-working-in-the-open
 Date: 2014-02-14 12:26:00
 Category: mozilla
+Tags: hotdish
 
 I was listening to a [podcast with some people from GitHub](http://hanselminutes.com/375/on-culture-and-remoteness-at-github-with-paul-betts-and-justin-spahr-summers) and I was struck by [Hubot](http://hubot.github.com/).
 
