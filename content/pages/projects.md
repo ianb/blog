@@ -80,10 +80,9 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 
 ## <span id="retired">Retired Projects</span>
 
-<dl>
+As of February 2014, [packages I have written](https://gist.github.com/ianb/9124545) have been downloaded over 17 million times from [PyPI](https://pypi.python.org/pypi).
 
-<dt><a href="https://crate.io/?q=Ian+Bicking&page=3&has_releases=on">crate.io packages</a></dt>
-<dd>You can see a list of my Python packages on crate.io by looking for my name.  As of April 2013, the collective list of Python packages that I have authored have been downloaded from PyPI (the Python Package Index) over 12 million times.</dd>
+<dl>
 
 <dt><a href="https://github.com/mozilla/browsermirror">Browser Mirror</a></dt>
 <dd>This project has largely been superceded by <a href="https://togetherjs.com">TogetherJS.</a>.  This is like a screensharing system, except it works with the DOM instead of pixels - the page you are viewing is transmitted to the other party, but not a "live" page, literally just the things you see.  Things like clicks are transmitted back to the original browser.  Just like screensharing...?  Started out as a "this can't possibly work" project, but then it kind of worked.</dd>
