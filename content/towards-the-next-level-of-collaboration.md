@@ -1,4 +1,4 @@
-Title: Towards the Next Level of Collaboration
+Title: Towards a Next Level of Collaboration
 Slug: towards-next-level-of-collaboration
 Date: 3014-03-03 12:40:00
 Category: mozilla
@@ -161,4 +161,4 @@ In the past I unintentionally exposed all tab focus and unfocus in TogetherJS, a
 
 I am still in the process of figuring out how and where I can explore these questions, build the next thing, and the next thing after that -- the tooling I envision doesn't feel impossibly far away, but still more than one iteration of work yet to be done, maybe many more than one but I can only see to the next peak.
 
-Who else is thinking about these things?  If you are, or you know someone who is, please [get in contact](mailto:ian@ianbicking.org) -- I'm eager to talk specifics with people who have been thinking about it too, but I'm not sure how to find these people.
+Who else is thinking about these things?  And thinking about how to **build** these things?  If you are, or you know someone who is, please [get in contact](mailto:ian@ianbicking.org) -- I'm eager to talk specifics with people who have been thinking about it too, but I'm not sure how to find these people.
