@@ -2,6 +2,7 @@ Title: Collaboration as a Skeuomorphism for Agents
 Slug: collaboration-as-a-skeuomorphism-for-agents
 Date: 2014-02-21 15:06:00
 Category: mozilla
+Tags: hotdish
 
 In concept videos and imaginings about the Future Of Computing we often see [Intelligent Agents](https://en.wikipedia.org/wiki/Software_agent#User_agents_.28personal_agents.29): smart computer programs that work on your behalf.
 
@@ -61,7 +62,7 @@ In everything I've described agents are interacting with interfaces in the same 
 
 I suggest using the interfaces intended for humans, because those are the interfaces humans understand.  When an agent wants to say "I want to submit this post" if you can show the human the filled-in form and show that you want to hit the submit button, you are using what the person is familiar with.  If the agent wants to say "this is what I looked for" you can show the data in the context the person would themselves look to.
 
-APIs usually don't have a staging process like you find in interfaces for humans.  We don't entirely humans to act correctly.  So we have a shopping cart and a checkout process, you don't just submit a list of items to a store.  You have a composition screen with preview, or interstitial preview.  Dangerous or destructive operations get a confirmation step -- a confirmation step that could be just as applicable of a warning for an agent as it is for a human.
+APIs usually don't have a staging process like you find in interfaces for humans.  We don't expect humans to act correctly.  So we have a shopping cart and a checkout process, you don't just submit a list of items to a store.  You have a composition screen with preview, or interstitial preview.  Dangerous or destructive operations get a confirmation step -- a confirmation step that could be just as applicable of a warning for an agent as it is for a human.
 
 None of this invalidates the reasons to use an API.  And you can imagine APIs with these intermediate steps built in.  You can imagine an API where each action can also be marked as "stage-only" and then returns a link where a human can confirm the action.  You can imagine an API where each data set returned is also returned with the URL of the equivalent human-readable data set.  You can imagine delegation APIs, where instead of giving a category of access to an agent via OAuth, you can ask for some more selective access. All of that would be great, but I don't think there's any movement towards this kind of API design.  And why would there be? There's no one eager to make use of it.
 
