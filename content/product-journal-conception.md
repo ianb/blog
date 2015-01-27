@@ -28,4 +28,4 @@ The big difference with past ideas I've encountered is that here we're not tryin
 
 If you think pulling a technology out of your back pocket and building a product around it is like putting the cart in front of the horse, well maybe... but you have to start somewhere.
 
-[I'll add a link here to the next post once it is written]
+[The next post in the series is [The Tech Demo](http://www.ianbicking.org/blog/2015/01/product-journal-tech-demo.html)]
