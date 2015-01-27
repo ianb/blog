@@ -26,6 +26,14 @@ CATEGORY_FEED_ATOM = "feeds/%s.atom.xml"
 FEED_MAX_ITEMS = 20
 RELATIVE_URLS = False
 STATIC_PATHS = ["media"]
+TAG_URL = 'tag/{slug}.html'
+TAG_SAVE_AS = 'tag/{slug}.html'
+
+MD_EXTENSIONS = [
+    'codehilite(css_class=highlight)',  # Default
+    'extra',  # Default
+    'cite',  # Extra <cite> support
+    ]
 
 
 def FORMAT_DATE(date):
