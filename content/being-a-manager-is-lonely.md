@@ -29,3 +29,5 @@ There is a logical consistency to the argument.  There is wisdom in it.  The imp
 Fuck.  Why would I want to sign up for this?  The dictate they are giving me is literally making me sad.  If it didn't make any sense then I might feel annoyed.  If I thought it represented values I did not share then I might feel angry.  But I *get it*, and so it makes me sad.
 
 Still, I believe in progress.  I believe we can do better than we have in the past.  I believe in unexplored paths, in options we aren't ready to compare to present convention, in new ways of thinking about problems that break out of current categories.  All this in management too – which is to say, new ways to form and coordinate organizations. I think those ideas are out there.  But damn, I don't know what they are, and I don't know how to find out, because I don't know how to talk about what we do and that's the only place where I know how to start.
+
+[I wrote a followup in [*Encouraging Positive Engagement*](http://www.ianbicking.org/blog/2015/01/encouraging-positive-engagement.html)]
