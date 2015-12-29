@@ -67,7 +67,7 @@ THEME = './mystyle/'
 # Social widget
 SOCIAL = (
     ('Google+', 'https://plus.google.com/+IanBicking/posts'),
-    ('@ianbicking (G+ mirror)', 'https://twitter.com/ianbicking'),
+    ('@ianbicking', 'https://twitter.com/ianbicking'),
     ('Github', 'https://github.com/ianb'),
     )
 
