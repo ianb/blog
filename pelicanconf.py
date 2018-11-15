@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- #
+import os
 
+base = os.path.dirname(os.path.abspath(__file__))
 AUTHOR = u'Ian Bicking'
 SITENAME = u'Ian Bicking: a blog'
 SITEURL = 'http://www.ianbicking.org'
 #FEED_DOMAIN = "http://ianbicking.org"
+CACHE_CONTENT = True
+#ARCHIVES_SAVE_AS = 'test-archive.html'
+PATH = os.path.join(base, "content")
 
 import os
 if os.environ.get("OVERRIDE_SITEURL"):
@@ -14,13 +19,13 @@ TIMEZONE = 'US/Central'
 DATE_FORMATS = {
     "en": "%A, %d %B, %Y",
     }
+ARTICLE_EXCLUDES = ["pages", "old", "media", "previous-content"]
 ARTICLE_URL = "blog/{date:%Y}/{date:%m}/{slug}.html"
 ARTICLE_SAVE_AS = "blog/{date:%Y}/{date:%m}/{slug}.html"
 PAGE_URL = "{slug.html}"
 PAGE_SAVE_AS = "{slug}.html"
 DIRECT_TEMPLATES = ('blog/index', 'tags', 'categories', 'archives')
 PAGINATED_DIRECT_TEMPLATES = ['blog/index']
-ARTICLE_EXCLUDES = ["pages", "old"]
 FEED_ATOM = "feeds/atom.xml"
 CATEGORY_FEED_ATOM = "feeds/%s.atom.xml"
 FEED_MAX_ITEMS = 20
@@ -32,7 +37,7 @@ TAG_SAVE_AS = 'tag/{slug}.html'
 MD_EXTENSIONS = [
     'codehilite(css_class=highlight)',  # Default
     'extra',  # Default
-    'cite',  # Extra <cite> support
+    #'cite',  # Extra <cite> support
     ]
 
 
@@ -73,14 +78,16 @@ SOCIAL = (
 
 DEFAULT_PAGINATION = 10
 
+PLUGIN_PATHS = ['./pelican-plugins']
+
 PLUGINS = [
-    'pelican.plugins.github_activity',
-    'pelican.plugins.related_posts',
-    'pelican.plugins.assets',
+    'github_activity',
+    'related_posts',
+    'assets',
     ]
 
 GITHUB_ACTIVITY_FEED = 'https://github.com/ianb.atom'
-
+GITHUB_ACTIVITY_MAX_ENTRIES = 10
 
 DISQUS_SITENAME = "ianbicking"
 GOOGLE_ANALYTICS = "UA-2442258-1"
@@ -91,12 +98,9 @@ MENUITEMS = [
     ("projects", "/projects.html"),
     ]
 
-FILES_TO_COPY = (('favicon.ico', 'favicon.ico'),)
-
 WEBASSETS = True
 DISPLAY_PAGES_ON_MENU = False
 GETATTR = getattr
 
-import os
-with open(os.path.join(os.path.dirname(__file__), "content/old/archive-fragment.html")) as fp:
+with open(os.path.join(base, "content/old/archive-fragment.html")) as fp:
     EXTRA_ARCHIVE = fp.read()
