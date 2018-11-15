@@ -8,7 +8,9 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 - [Small current projects](#smallcurrent)
 - [Toys](#toys)
 - [Retired projects:](#retired)
-    - [Bigger Python projects](#biggerpy)
+    - [Python Packaging](#packaging)
+    - [Python Web](#pythonweb)
+    - [Python Testing](#pythontest)
     - [Smaller Python projects](#smallpy)
     - [Miscellaneous](#miscretired)
 
@@ -16,26 +18,20 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 
 <dl>
 
-<dt><a href="https://github.com/mozilla-services/pageshot"><strong>PageShot</strong></a></dt>
-<dd>An ongoing experiment in sharing and resharing <em>content</em> on the web.  What we share now is URLs, pointers, but this doesn't give the sharer much control over what people will experience.  PageShot tries to add that control by giving sharers tools to copy exact experiences, annotate and collect them, summarize and improve on that content. <br><br> This is available as an alpha-level demo at <a href="https://pageshot.dev.mozaws.net/">pageshot.dev.mozaws.net</a>.</dd>
+<dt><a href="https://github.com/mozilla-services/screenshots"><strong>Firefox Screenshots</strong></a></dt>
+<dd>I started Page Shot (which became Firefox Screenshots) in October 2014. During that time I went from doing it as a small side project, to managing the project during its nascent stages, then when I left management I rejoined development to get it launched as a <a href="https://testpilot.firefox.com/experiments/page-shot">Test Pilot experiment</a>. During that period it went from being a page freezing tool (similar to the Way Back Machine) to a screenshot tool.<br><br>
+It was popular inside Test Pilot, and it wasn't much later when it re-launched as a core Firefox feature. When it launched it was the first real product built that took unencrypted user content, that used Google Analytics, the first Firefox feature to ship as a <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions">WebExtension</a>, and the first use of <a href="https://sentry.io/welcome/">Sentry</a> to monitor errors in the browser. <br><br>
+For myself, Screenshots has been a lesson in managed expectations, but also a lesson in <a href="http://www.ianbicking.org/blog/2018/02/web-small-composable-tools.html">providing simple tools</a> without worrying about how hard they are to create.</dd>
 
-<dt><a href="https://togetherjs.com/hotdish/"><strong>Hotdish</strong></a></dt>
-<dd>This took some of the ideas of TogetherJS, some of the tech from <a href="https://github.com/mozilla/browsermirror">Browser Mirror</a>, and thinking about them all in the context of a browser session.  It's implemented as a Firefox addon.  The model we came to is one where a group of people share everything they do in a specific browser, with mutual awareness of what each person is doing (both in general, and with in-page feedback using TogetherJS), and people can join and present to each other in this context.  <br><br>  Our longer-term goal was for people to be able to understand what each other are doing -- what pages they are interacting with, but also <em>how</em> they are interacting with those pages, similar to how you can understand what a person is doing when they are doing physical work.  <br><br>  Another goal is to look at how, using the same data we capture in order to share a person's actions with everyone else, we can also use that data to create a richer record of what people are doing.  We wanted knowledge capture and transfer between group members that can encompass not just one site or document, but a session, discussion, and research. <br><br> I <a href="https://www.youtube.com/watch?v=8cJQBBHfF9c&feature=youtu.be&vq=hd720">narrated a screencast that we made</a> to explain some of the concepts and things we learned from the experiment. </dd>
+<dt><a href="https://github.com/mozilla/side-view"><strong>Side View</strong></a></dt>
+<dd>Another <a href="https://testpilot.firefox.com/experiments/side-view">Test Pilot experiment</a>, this makes it easy to open a mobile view of a website in the Firefox sidebar. I'm mostly proud that we kept it simple and usable.</dd>
 
-<dt><a href="https://togetherjs.com"><strong>TogetherJS</strong></a> (formerly TowTruck)</dt>
-<dd>My previous project at Mozilla.  This is a service to enable real-time collaboration on any site.</dd>
+<dt><a href="https://github.com/mozilla/email-tabs"><strong>Email Tabs</strong></a></dt>
+<dd>Another [Test Pilot experiment](https://testpilot.firefox.com/experiments/email-tabs). This was strongly influenced by <a href="https://blog.mozilla.org/ux/2015/02/save-share-revisit/">Mozilla's user research</a>. The results of our research was clear: everyone loves to save and share things by email. And yet it took me a few years to sit down and quickly hack out a tool that makes emailing articles work well. Working with email, and poking around in other company's email products, is a bit like science: you have to see what works, nothing works by default or because you want it to work a certain way.<br><br>
+I'm excited by Email Tabs, in no small part because of the simplicity and power of prepopulating compositions. Composing (but not sending) an email is transparent, manipulable, and open-ended. I hope I have the chance to use this lesson elsewhere. The browser is a great location for this, because the browser can integrate with systems in the same way a user integrates with systems, which isn't just handy but also is a kind of working in the open: you can see and understand what the automation does, because it does what you might have done.</dd>
 
-<dt><a href="http://doctestjs.org">doctest.js</a></dt>
-<dd>A testing framework for Javascript, inspired by Python's <a href="http://docs.python.org/2/library/doctest.html">doctest</a>. Something of an alternative to <a href="http://en.wikipedia.org/wiki/Behavior-driven_development">BDD</a>, based on examples and expected output.</dd>
-
-<dt><a href="https://github.com/ianb/walkabout.js">walkabout.js</a></dt>
-<dd>This is something like a UI/DOM fuzzing library.  It inspects the DOM (or uses rewritten Javascript code) to determine what parts of the page are "live" (and in what way).  Then it can choose a random action to perform, like clicking on an element or entering text in a field.</dd>
-
-<dt><a href="https://github.com/ianb/seeitsaveit">SeeItSaveIt</a></dt>
-<dd>An experiment in extracting structured data from web sites.  Works as a Firefox addon.  This is basically furloughed (as of April 2013) pending progress on <a href="https://wiki.mozilla.org/WebAPI/WebActivities">Web Activities</a>.  The addon allows custom scrapers to be run on sites, with several levels of separation to both allow scraping scripts to run safely and isolated from the site receiving the data.  There is some more information <a href="https://seeitsaveit.vcap.mozillalabs.com/">on this site</a>.</dd>
-
-<dt><a href="http://thecutout.org/">The Cut-Out</a></dt>
-<dd>A synchronization library.  This is intended for HTML/Javascript applications that keep all their data locally, but want to be able to synchronize that data between devices.  But it's perhaps overpowered for that minor task.  This includes several pieces, a client library, a protocol, a server, an on-disk database format, and some rough replication and balancing support.</dd>
+<dt><a href="https://github.com/ianb?tab=repositories">Other GitHub miscellany</a></dt>
+<dd>Being in the <a href="https://testpilot.firefox.com/">Firefox Test Pilot</a> team, I have the opportunity to try things out. Sometimes they work out, and sometimes they don't. At that stage you'll find my work in GitHub, which is updated more frequently than this page.</dd>
 
 </dl>
 
@@ -87,6 +83,24 @@ As of February 2014, [packages I have written](https://gist.github.com/ianb/9124
 
 <dl>
 
+<dt><a href="https://togetherjs.com/hotdish/"><strong>Hotdish</strong></a></dt>
+<dd>This took some of the ideas of TogetherJS, some of the tech from <a href="https://github.com/mozilla/browsermirror">Browser Mirror</a>, and thinking about them all in the context of a browser session.  It's implemented as a Firefox addon.  The model we came to is one where a group of people share everything they do in a specific browser, with mutual awareness of what each person is doing (both in general, and with in-page feedback using TogetherJS), and people can join and present to each other in this context.  <br><br>  Our longer-term goal was for people to be able to understand what each other are doing -- what pages they are interacting with, but also <em>how</em> they are interacting with those pages, similar to how you can understand what a person is doing when they are doing physical work.  <br><br>  Another goal is to look at how, using the same data we capture in order to share a person's actions with everyone else, we can also use that data to create a richer record of what people are doing.  We wanted knowledge capture and transfer between group members that can encompass not just one site or document, but a session, discussion, and research. <br><br> I <a href="https://www.youtube.com/watch?v=8cJQBBHfF9c&feature=youtu.be&vq=hd720">narrated a screencast that we made</a> to explain some of the concepts and things we learned from the experiment. </dd>
+
+<dt><a href="https://togetherjs.com"><strong>TogetherJS</strong></a> (formerly TowTruck)</dt>
+<dd>My previous project at Mozilla.  This is a service to enable real-time collaboration on any site.</dd>
+
+<dt><a href="http://doctestjs.org">doctest.js</a></dt>
+<dd>A testing framework for Javascript, inspired by Python's <a href="http://docs.python.org/2/library/doctest.html">doctest</a>. Something of an alternative to <a href="http://en.wikipedia.org/wiki/Behavior-driven_development">BDD</a>, based on examples and expected output.</dd>
+
+<dt><a href="https://github.com/ianb/walkabout.js">walkabout.js</a></dt>
+<dd>This is something like a UI/DOM fuzzing library.  It inspects the DOM (or uses rewritten Javascript code) to determine what parts of the page are "live" (and in what way).  Then it can choose a random action to perform, like clicking on an element or entering text in a field.</dd>
+
+<dt><a href="https://github.com/ianb/seeitsaveit">SeeItSaveIt</a></dt>
+<dd>An experiment in extracting structured data from web sites.  Works as a Firefox addon.  This is basically furloughed (as of April 2013) pending progress on <a href="https://wiki.mozilla.org/WebAPI/WebActivities">Web Activities</a>.  The addon allows custom scrapers to be run on sites, with several levels of separation to both allow scraping scripts to run safely and isolated from the site receiving the data.  There is some more information <a href="https://seeitsaveit.vcap.mozillalabs.com/">on this site</a>.</dd>
+
+<dt><a href="http://thecutout.org/">The Cut-Out</a></dt>
+<dd>A synchronization library.  This is intended for HTML/Javascript applications that keep all their data locally, but want to be able to synchronize that data between devices.  But it's perhaps overpowered for that minor task.  This includes several pieces, a client library, a protocol, a server, an on-disk database format, and some rough replication and balancing support.</dd>
+
 <dt><a href="https://github.com/mozilla/browsermirror">Browser Mirror</a></dt>
 <dd>This project has largely been superceded by <a href="https://togetherjs.com">TogetherJS.</a>.  This is like a screensharing system, except it works with the DOM instead of pixels - the page you are viewing is transmitted to the other party, but not a "live" page, literally just the things you see.  Things like clicks are transmitted back to the original browser.  Just like screensharing...?  Started out as a "this can't possibly work" project, but then it kind of worked.</dd>
 
@@ -95,11 +109,9 @@ As of February 2014, [packages I have written](https://gist.github.com/ianb/9124
 
 </dl>
 
-### <span id="biggerpy">Bigger Python Projects</span>
+### <span id="packaging">Python Packaging</span>
 
-There's a bunch of projects that I've worked on, either authoring or making major contributions.  Most of them I don't work on any more. Ideally other people have taken over, sometimes I'm afraid they've just petered off.  I'm not actively working on any of these myself any more.
-
-Some of the projects in this list are popular, some I think were influential.  Several of them I *wish* were influential.
+I don't currently work on these Python projects, but I authored some important (and now core) parts of the Python packaging ecosystem.
 
 <dl>
 
@@ -108,6 +120,16 @@ Some of the projects in this list are popular, some I think were influential.  S
 
 <dt><a href="http://www.virtualenv.org/">virtualenv</a></dt>
 <dd>This is an environment isolation tool for Python.  The functionality is now going to be built more directly into Python itself, but virtualenv remains very popular for managing projects. <a href="https://pypi.python.org/pypi/workingenv.py">workingenv</a> was an early attempt at the same concept, but virtualenv stuck because it works really well.  It's just the right level of hack to get everything to work consistently and well.</dd>
+
+</dl>
+
+### <span id="pythonweb">Python Web</span>
+
+There's a bunch of projects that I've worked on in the web space, either authoring or making major contributions.  I'm not actively working on any of these myself any more.
+
+Some of the projects in this list are popular, some I think were influential.  Several of them I *wish* were influential.
+
+<dl>
 
 <dt><a href="http://webob.org/">WebOb</a></dt>
 <dd><p>WebOb is a Python request and response library (along with some other miscellaneous pieces).</p>
@@ -137,10 +159,7 @@ Some of the projects in this list are popular, some I think were influential.  S
 <dt><a href="https://bitbucket.org/ianb/silverlining/src">Silver Lining</a></dt>
 <dd>This was an attempt to create a general web application hosting framework.  Vaguely like Heroku; you'd lay your application out in a certain way, and using Silver Lining you could create a new server instance and upload and update your application.  It supported both Python and PHP, with the potential for other languages in the future. I thought it was really cool, but no one else really got on board. Maybe once you decide to give up this level of control you would rather just pay for the service instead of using an open source product.  I'm not sure.  This was kind of my last hurrah for server-side web projects.</dd>
 
-<dt><a href="https://github.com/ianb/apppkg">apppkg</a></dt>
-<dd>A very incomplete design of an "Application Package" for Python. Some of the motivation described <a href="http://blog.ianbicking.org/2012/02/29/python-application-package/">here</a>. The <a href="https://github.com/ianb/apppkg/blob/master/docs/spec.txt">spec</a> is probably the most interesting part.</dd>
-
-<dt><a href="http://webtest.pythonpaste.org/">WebTest</a></dt>
+<dt id="webtest"><a href="http://webtest.pythonpaste.org/">WebTest</a></dt>
 <dd>This is a WebOb rewrite of <code>paste.fixture</code>.  WebTest is a tool to make functional tests of your WSGI-using web application (not specifically WebOb applications).  It makes it easy to create artificial but full HTTP requests, send them to your application, and provides a bunch of helpers to inspect the results.  One feature I think is notable (not <em>challenging</em>, just notable) is that it always contains an implicit "this request should work" assertion. Other similar frameworks force you to write <code>assertEqual(resp.code, 200)</code> all the time; what nonsense! In WebTest this is implied unless you say otherwise.  It does form parsing and cookie storage and other stuff too.</dd>
 
 <dt><a href="http://www.formencode.org/">FormEncode</a></dt>
@@ -156,15 +175,6 @@ Some of the projects in this list are popular, some I think were influential.  S
 
 <dt><a href="http://blog.ianbicking.org/introducing-htconsole.html">htconsole</a></dt>
 <dd>This was a more ambitious take on the interactive web-based debugger.  Instead it was a generalized interactive console.  It had some clever ideas, like inline live function editing.  It exceeded by Javascript skills in some ways at the time, such that it was just a bit <em>frustrating</em> to work on, and I wasn't sure to what end I'd be using it.</dd>
-
-<dt><a href="http://pythonpaste.org/scripttest/">ScriptTest</a></dt>
-<dd>A script testing framework.  Lets you run a script in a subprocess, and inspect the results of that script: what its output was, stderr, error return codes, and any file changes.</dd>
-
-<dt><a href="https://pypi.python.org/pypi/MiniMock">MiniMock</a></dt>
-<dd>A mock library specifically for use with <a href="http://docs.python.org/2/library/doctest.html">doctest</a>. Using doctest, I found it was possible to make a pretty good mock library in almost no code.  (It's gotten <a href="https://bitbucket.org/jab/minimock/src/trunk/minimock.py">a little bigger since then</a>.)</dd>
-
-<dt><a href="http://svn.colorstudy.com/PyLogo/">PyLogo</a></dt>
-<dd>A Logo interpreter written in Python.  A pretty complete implementation of the language, with a lot of support for calling into and out of Logo to Python.</dd>
 
 <dt><a href="http://sqlobject.org/">SQLObject</a></dt>
 <dd>It's been a long time since I worked on this.  This is one of my first major open source projects, that actually had pickup.  SQLObject is an ORM (Object Relational Mapper).  It pioneered many metaprogramming techniques in Python, allowing a declarative class statement to be mapped to SQL, including SQL expressions.  (NumPy championed some of these features, but I believe SQLObject was the first to use these features for SQL expressions.)  The project is still active, but not very active.  But SQLObject was an inspiration for features in frameworks like SQLAlchemy.</dd>
@@ -182,11 +192,34 @@ Some of the projects in this list are popular, some I think were influential.  S
 
 </dl>
 
+### <span id="pythontest">Python Testing</span>
+
+Like packaging, I love and hate testing.  As a result I've tried a bunch of tools.
+
+<dl>
+
+<dt><a href="http://pythonpaste.org/scripttest/">ScriptTest</a></dt>
+<dd>A script testing framework.  Lets you run a script in a subprocess, and inspect the results of that script: what its output was, stderr, error return codes, and any file changes.</dd>
+
+<dt><a href="https://pypi.python.org/pypi/MiniMock">MiniMock</a></dt>
+<dd>A mock library specifically for use with <a href="http://docs.python.org/2/library/doctest.html">doctest</a>. Using doctest, I found it was possible to make a pretty good mock library in almost no code.  (It's gotten <a href="https://bitbucket.org/jab/minimock/src/trunk/minimock.py">a little bigger since then</a>.)</dd>
+
+<dt><a href="http://webtest.pythonpaste.org/">WebTest</a></dt>
+<dd><a href="#webtest">Mentioned above</a></dd>
+
+</dl>
+
 ### <span id="smallpy">Small Python Projects</span>
 
 In addition to those bigger projects, there's a bunch of small stuff I did that is no longer active.
 
 <dl>
+
+<dt><a href="http://svn.colorstudy.com/PyLogo/">PyLogo</a></dt>
+<dd>A Logo interpreter written in Python.  A pretty complete implementation of the language, with a lot of support for calling into and out of Logo to Python.</dd>
+
+<dt><a href="https://github.com/ianb/apppkg">apppkg</a></dt>
+<dd>A very incomplete design of an "Application Package" for Python. Some of the motivation described <a href="http://blog.ianbicking.org/2012/02/29/python-application-package/">here</a>. The <a href="https://github.com/ianb/apppkg/blob/master/docs/spec.txt">spec</a> is probably the most interesting part.</dd>
 
 <dt><a href="http://svn.pythonpaste.org/ObConfLoader/trunk/">ObConfLoader</a></dt>
 <dd>An attempt to extract a best-practice format for locating Python objects with a string, something that Paste Deploy did in a kind of half-assed way.</dd>
