@@ -17,7 +17,7 @@ I have no evidence that we can (or can't), but I will make this assertion: it's 
 
 We treat open source like it's a poison pill for a commercial product. And yes, with an open source license it's harder to force someone to pay for a product, though many successful businesses exist without *forcing* anyone.
 
-I see an implicit assumption that makes it harder to think about this: the idea that if something is useful, it should be profitable. It's an unspoken and morally-infused expectation, a kind of Just World hypothesis: if something has utility, if it helps people, if it's something the world needs, if it empowers other people, then there should be a revenue opportunity. It should be possible for the thing to be your day job, to make money, to see some renumeration for your successful effort in creating or doing this thing.
+I see an implicit assumption that makes it harder to think about this: the idea that if something is useful, it should be profitable. It's an unspoken and morally-infused expectation, a kind of Just World hypothesis: if something has utility, if it helps people, if it's something the world needs, if it empowers other people, then there should be a revenue opportunity. It should be possible for the thing to be your day job, to make money, to see some remuneration for your successful effort in creating or doing this thing.
 
 That's what we think the world *should* be like, but we all know it isn't. You can't make a living making music. Or art. You can't even make a living taking care of children. I think this underlies many of this moment's critiques of capitalism: there's too many things that are important, even needed, or that fulfill us more than any profitable item, and yet are economically unsustainable.
 
@@ -42,3 +42,5 @@ But if you have a business concept, and you think it might work, what does open 
 Another lens might be: who are you selling to? Classical scratch-your-own-itch open source software is built by programmers *for* programmers. And it is wildly successful, but it's selling to people who aren't willing to pay. They want to take the software and turn it around into greater personal productivity (which turns out to be a smart move, given the rise in programmer wages). Can we sell open source to other people? Can anyone else *do* anything with source code?
 
 And so I remain pessimistic that open source can find commercial success. But also frustrated: so much software is open source *except* any commercial product. This is where the Free Software mission has faltered despite so many successes: software that people actually touch isn't free or open. That's a shame.
+
+> You may also wish to read [Hacker News Comments](https://news.ycombinator.com/item?id=19431444) on this post, or the [Reddit r/programming comments](https://www.reddit.com/r/programming/comments/b30m3s/open_source_doesnt_make_money_because_it_isnt/)

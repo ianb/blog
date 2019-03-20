@@ -40,3 +40,5 @@ Here's where I throw my hands up and admit that I don't have solutions to these 
 But it does point in some different directions: how do we support a continuity of intention across a long task? In the context of the browser, how do we contextualize pages and interactions inside some abstract task? How do we clarify context? If the human is forced to multitask, can the multitasking tools be grounding instead of stretching us out?
 
 The resulting exploration is not one that constructs an enviable user. It's a user with virtual piles of papers on their desk with a PB&J forgetten a third of the way down, with a People Magazine placed sneakily inside an important report, with a pile of mail and every single piece is marked Urgent: Open Immediately. People aren't always [knolling](https://www.curbed.com/2016/7/18/12215158/always-be-knolling-tom-sachs-knoll)... but maybe we could be.
+
+> [Hacker News comments](https://news.ycombinator.com/item?id=19072680) for the curious.

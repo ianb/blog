@@ -537,6 +537,8 @@ So, is there room for improvement? Of course there is! The millions of hours spe
 
 And yet...
 
+> [Hack News Comments](https://news.ycombinator.com/item?id=19304802) if that's your thing.
+
 <script src="/media/mockups/loader.js"></script>
 <style>
   img.paused {
