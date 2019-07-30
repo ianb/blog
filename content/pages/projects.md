@@ -23,8 +23,9 @@ This is a list of projects I am working on, or have worked on.  All are open sou
 
 <dt><a href="https://github.com/mozilla-services/screenshots"><strong>Firefox Screenshots</strong></a></dt>
 <dd>I started Page Shot (which became Firefox Screenshots) in October 2014. During that time I went from doing it as a small side project, to managing the project during its nascent stages, then when I left management I rejoined development to get it launched as a <a href="https://testpilot.firefox.com/experiments/page-shot">Test Pilot experiment</a>. During that period it went from being a page freezing tool (similar to the Way Back Machine) to a screenshot tool.<br><br>
-It was popular inside Test Pilot, and it wasn't much later when it re-launched as a core Firefox feature. When it launched it was the first real product built that took unencrypted user content, that used Google Analytics, the first Firefox feature to ship as a <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions">WebExtension</a>, and the first use of <a href="https://sentry.io/welcome/">Sentry</a> to monitor errors in the browser. <br><br>
-For myself, Screenshots has been a lesson in managed expectations, but also a lesson in <a href="http://www.ianbicking.org/blog/2018/02/web-small-composable-tools.html">providing simple tools</a> without worrying about how hard they are to create.</dd>
+It was popular inside Test Pilot, and it wasn't much later when it re-launched as a core Firefox feature in September 2017. When it launched it was the first real product built that took unencrypted user content, that used Google Analytics, the first Firefox feature to ship as a <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions">WebExtension</a>, and the first use of <a href="https://sentry.io/welcome/">Sentry</a> to monitor errors in the browser. <br><br>
+For myself, Screenshots has been a lesson in managed expectations, but also a lesson in <a href="http://www.ianbicking.org/blog/2018/02/web-small-composable-tools.html">providing simple tools</a> without worrying about how hard they are to create. <br><br>
+Despite being popular, in 2019 the server component of Screenshots is being shut down, though the tool will otherwise remain in Firefox. During its life 36 million people used the Screenshots server with over 100 million screenshots uploaded. About 20% of screenshots created are uploaded (instead of being downloaded or copied to the clipboard), so it would be reasonable to estimate 500 million screenshots taken in the course of two years.</dd>
 
 <dt><a href="https://github.com/mozilla/side-view"><strong>Side View</strong></a></dt>
 <dd>Another <a href="https://testpilot.firefox.com/experiments/side-view">Test Pilot experiment</a>, this makes it easy to open a mobile view of a website in the Firefox sidebar. I'm mostly proud that we kept it simple and usable.</dd>
@@ -33,17 +34,22 @@ For myself, Screenshots has been a lesson in managed expectations, but also a le
 <dd>Another <a href="https://addons.mozilla.org/en-US/firefox/addon/email-tabs/">Test Pilot experiment</a>. This was strongly influenced by <a href="https://blog.mozilla.org/ux/2015/02/save-share-revisit/">Mozilla's user research</a>. The results of our research was clear: everyone loves to save and share things by email. And yet it took me a few years to sit down and quickly hack out a tool that makes emailing articles work well. Working with email, and poking around in other company's email products, is a bit like science: you have to see what works, nothing works by default or because you want it to work a certain way.<br><br>
 I'm excited by Email Tabs, in no small part because of the simplicity and power of prepopulating compositions. Composing (but not sending) an email is transparent, manipulable, and open-ended. I hope I have the chance to use this lesson elsewhere. The browser is a great location for this, because the browser can integrate with systems in the same way a user integrates with systems, which isn't just handy but also is a kind of working in the open: you can see and understand what the automation does, because it does what you might have done.</dd>
 
+<dt><a href="https://github.com/ianb/personal-history-archive/"><strong>Personal History Archive</strong></a></dt>
+<dd>I've been poking around at this project for a long time, never really finishing it or deciding exactly what to do with it. The underlying goal is to support local, personal experimentation with the data that can come out of a browser. Most collection like this emphasizes data collected from many aggregate sources, either from select sources or with anonymization, and with only a rough outline of user behavior. A user agent (like a browser) sees everything! It doesn't just see that you visited a site, it sees exactly what that site displayed. It doesn't just see that you have an email, every email you read is displayed by the browser.<br><br>
+So this is a tool to try to collect all that intimate data in a way that supports personal experimentation. Especially experimentation that can produce tools uniquely suited for a user agent that belongs to the user, touching data you'd never want to give to an external service.<br><br>
+Also I have just been poking around with creating highly usable data dumps, where the data is clean, always well-formed, and where behavioral and more static data is mixed together in a usable way.</dd>
+
 <dt><a href="https://github.com/ianb?tab=repositories">Other GitHub miscellany</a></dt>
 <dd>Being in the <a href="https://testpilot.firefox.com/">Firefox Test Pilot</a> team, I have the opportunity to try things out. Sometimes they work out, and sometimes they don't. At that stage you'll find my work in GitHub, which is updated more frequently than this page.</dd>
 
 </dl>
 
-## <span id="smallcurrent">Small (but current) Stuff</span>
+## <span id="smallcurrent">Small (maybe not current) Stuff</span>
 
 <dl>
 
-<dt><a href="http://svn.colorstudy.com/home/ianb/recipes">Misc recipes</a></dt>
-<dd>Sometimes when I want to try out an idea, I throw it in this directory.  There's a grab bag of experiments here.</dd>
+<dt><a href="https://github.com/ianb/misc-recipes">Misc recipes</a></dt>
+<dd>Before GitHub when I want to try out an idea, I throw it in an SVN directory.  There's a grab bag of experiments here, all from quite a while ago.</dd>
 
 <dt><a href="https://github.com/ianb/whrandom">whrandom</a></dt>
 <dd>A small Javascript library for a pseudo-random generator.</dd>
@@ -82,7 +88,7 @@ I'm excited by Email Tabs, in no small part because of the simplicity and power 
 
 ## <span id="retired">Retired Projects</span>
 
-As of February 2014, [packages I have written](https://gist.github.com/ianb/9124545) have been downloaded over 17 million times from [PyPI](https://pypi.python.org/pypi).
+Download stats [aren't necessarily accurate](https://packaging.python.org/guides/analyzing-pypi-package-downloads/), but as of June 2019 pip and virtualenv (which I originally wrote) were downloaded 980 million and 150 million times respectively. Computers are very good at downloading things! The balance of [packages I have written/started](https://gist.github.com/ianb/0a2fa5cd75f6d2ef04c71c546d2df692) have been downloaded roughly 70 million times, most notably WebOb, Paste, PasteScript, PasteDeploy, WebTest, Tempita, SQLObject, and INITools.
 
 <dl>
 
