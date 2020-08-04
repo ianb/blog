@@ -5,7 +5,7 @@ Nocomments: true
 
 I've been working on the Consumer Voice Products team in Mozilla for about a year now. My primary project has been [Firefox Voice](https://github.com/mozilla-extensions/firefox-voice), but our mandate is larger.
 
-I still feel like a beginner in the area voice, but I have developed some opinions. Many observations are the influence of other people’s ideas, work, or research, but I’ve lost the provenance. I’ve benefited a great deal from the long and regular discussions I’ve had with my team, particularly [Abraham Wallin](http://abewallin.com), [Janice Tsai](http://www.harraton.com/), [Jofish Kaye](http://jofish.com), and [Julia Cambre](https://juliacambre.com).
+I still feel like a beginner in the area of voice, but I have developed some opinions. Many observations are the influence of other people’s ideas, work, or research, but I’ve lost the provenance. I’ve benefited a great deal from the long and regular discussions I’ve had with my team, particularly [Abraham Wallin](http://abewallin.com), [Janice Tsai](http://www.harraton.com/), [Jofish Kaye](http://jofish.com), and [Julia Cambre](https://juliacambre.com).
 
 1. Voice interfaces are voice _interfaces_. They are a way for the user to express their desire, using patterns that might be [skeuomorphism](https://en.wikipedia.org/wiki/Skeuomorph) of regular voice interactions, or might be specific learned behaviors. It's not a conversation. You aren't talking with the computer.
     1. I suspect you can push the user into a conversational skeuomorphism if you think that's best, and the user will play along, but it's no more right than another metaphor. It's a question of quality of interaction, not ease or familiarity.
