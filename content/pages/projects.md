@@ -6,11 +6,12 @@ This is a list of projects I am working on, or have worked on. All are open sour
 
 -   [Recent(ish) work](#currentwork)
 -   [Projects I've Retired From:](#retired)
+    -   [Collaboration / general](#collaboration)
     -   [Python Packaging](#packaging)
     -   [Python Web](#pythonweb)
     -   [Python Testing](#pythontest)
     -   [Smaller Python projects](#smallpy)
-    -   [Miscellaneous](#miscretired)
+    -   [Miscellaneous / Small](#miscretired)
 -   [Small projects](#smallcurrent)
 -   [Toys](#toys)
 
@@ -53,6 +54,8 @@ Also I have just been poking around with creating highly usable data dumps, wher
 ## <span id="retired">Projects I've retired from</span>
 
 Download stats [aren't necessarily accurate](https://packaging.python.org/guides/analyzing-pypi-package-downloads/), but as of June 2019 pip and virtualenv (which I originally wrote) were downloaded 980 million and 150 million times respectively. Computers are very good at downloading things! The balance of [packages I have written/started](https://gist.github.com/ianb/0a2fa5cd75f6d2ef04c71c546d2df692) have been downloaded roughly 70 million times, most notably WebOb, Paste, PasteScript, PasteDeploy, WebTest, Tempita, SQLObject, and INITools.
+
+## <span id="collaboration">Collaboration / general</span>
 
 <dl>
 
@@ -307,7 +310,7 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 
 </dl>
 
-### <span id="miscretired">Miscellaneous Retired Projects</span>
+### <span id="miscretired">Miscellaneous / Small Retired Projects</span>
 
 <dl>
 
