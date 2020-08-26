@@ -66,7 +66,7 @@ THEME = "./mystyle/"
 
 # Social widget
 SOCIAL = (
-    ("Mastodon", "https://mastodon.technology/@ianbicking"),
+    # ("Mastodon", "https://mastodon.technology/@ianbicking"),
     ("@ianbicking", "https://twitter.com/ianbicking"),
     ("Github", "https://github.com/ianb"),
 )
