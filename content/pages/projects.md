@@ -4,15 +4,15 @@ slug: projects
 
 This is a list of projects I am working on, or have worked on. All are open source.
 
--   [Recent work](#currentwork)
--   [Small projects](#smallcurrent)
--   [Toys](#toys)
+-   [Recent(ish) work](#currentwork)
 -   [Projects I've Retired From:](#retired)
     -   [Python Packaging](#packaging)
     -   [Python Web](#pythonweb)
     -   [Python Testing](#pythontest)
     -   [Smaller Python projects](#smallpy)
     -   [Miscellaneous](#miscretired)
+-   [Small projects](#smallcurrent)
+-   [Toys](#toys)
 
 ## <span id="currentwork">Recent Work</span>
 
@@ -47,48 +47,6 @@ Also I have just been poking around with creating highly usable data dumps, wher
 
 <dt><a href="https://github.com/ianb?tab=repositories">Other GitHub miscellany</a></dt>
 <dd>Working in the open at Mozilla I have had the opportunity to try things out. Sometimes they work out, and sometimes they don't. At that stage you'll find my work in GitHub, which is updated more frequently than this page.</dd>
-
-</dl>
-
-## <span id="smallcurrent">Small (maybe not current) Stuff</span>
-
-<dl>
-
-<dt><a href="https://github.com/ianb/misc-recipes">Misc recipes</a></dt>
-<dd>Before GitHub when I want to try out an idea, I throw it in an SVN directory.  There's a grab bag of experiments here, all from quite a while ago.</dd>
-
-<dt><a href="https://github.com/ianb/whrandom">whrandom</a></dt>
-<dd>A small Javascript library for a pseudo-random generator.</dd>
-
-<dt><a href="https://github.com/ianb/javascript">Javascript style guide</a></dt>
-<dd>Not a "project" per se, but my own customization of the <a href="https://github.com/airbnb/javascript">Airbnb</a> style guide, represents my current and ongoing opinion on Javascript style.</dd>
-
-<dt><a href="https://github.com/ianb/browsercommander">Browser Commander</a></dt>
-<dd>An incomplete prototype of a kind of file manager built in the browser.  Includes a small server and client library to provide Node.js APIs in the browser (which are proxied over WebSockets to the server).</dd>
-
-<dt><a href="https://github.com/ianb/git-sync">git-sync</a></dt>
-<dd>A small script to use git more like rsync for the purpose of deployment.  Motivation explained some in <a href="http://blog.ianbicking.org/2012/02/14/git-as-sync-not-source-control-as-deployment/">this post</a>.</dd>
-
-<dt><a href="https://github.com/mozilla/receiptverifier">receiptverifier</a></dt>
-<dd>Not very active right now.  This is a library to do client verification of <a href="https://developer.mozilla.org/en-US/docs/Apps">Open Web App</a> receipts.  It's not very exciting, but it does do a heck of a lot of error handling. It was an exercise in thoroughness. Maintained by other people now.</dd>
-
-</dl>
-
-## <span id="toys">Toys</span>
-
-<dl>
-
-<dt><a href="https://github.com/ianb/wordpool">Wordpool</a></dt>
-<dd>A little HTML/Javascript word-search-like game.  The product of a two-hour hackathon.</dd>
-
-<dt><a href="https://github.com/ianb/xmasapp">xmassapp</a></dt>
-<dd>I wanted to compile Christmas carols that I liked, without any fluff.  Also it's an example of an <a href="https://developer.mozilla.org/en-US/docs/Apps">Open Web App</a>.</dd>
-
-<dt><a href="https://github.com/ianb/deducer">deducer</a></dt>
-<dd>A small Javascript/HTML game of logic.  Based on <a href="http://www.kaser.com/sherwin.html">the Sherlock game</a>. Has no instructions, is not really usable ;)</dd>
-
-<dt><a href="https://github.com/ianb/fatfingers">fatfingers</a></dt>
-<dd>An attempt to turn ambiguous touch events into modal selections, as a client library.</dd>
 
 </dl>
 
@@ -361,5 +319,47 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 
 <dt><a href="http://svn.colorstudy.com/home/ianb/htranscluder">htranscluder</a></dt>
 <dd>This did client-side <a href="http://en.wikipedia.org/wiki/Transclusion">transclusion</a> using the microformat <code>&lt;a href="resource" rel="include"&gt;content&lt;/a&gt;</code></dd>
+
+</dl>
+
+## <span id="smallcurrent">Small (maybe not current) Stuff</span>
+
+<dl>
+
+<dt><a href="https://github.com/ianb/misc-recipes">Misc recipes</a></dt>
+<dd>Before GitHub when I want to try out an idea, I throw it in an SVN directory.  There's a grab bag of experiments here, all from quite a while ago.</dd>
+
+<dt><a href="https://github.com/ianb/whrandom">whrandom</a></dt>
+<dd>A small Javascript library for a pseudo-random generator.</dd>
+
+<dt><a href="https://github.com/ianb/javascript">Javascript style guide</a></dt>
+<dd>Not a "project" per se, but my own customization of the <a href="https://github.com/airbnb/javascript">Airbnb</a> style guide, represents my current and ongoing opinion on Javascript style.</dd>
+
+<dt><a href="https://github.com/ianb/browsercommander">Browser Commander</a></dt>
+<dd>An incomplete prototype of a kind of file manager built in the browser.  Includes a small server and client library to provide Node.js APIs in the browser (which are proxied over WebSockets to the server).</dd>
+
+<dt><a href="https://github.com/ianb/git-sync">git-sync</a></dt>
+<dd>A small script to use git more like rsync for the purpose of deployment.  Motivation explained some in <a href="http://blog.ianbicking.org/2012/02/14/git-as-sync-not-source-control-as-deployment/">this post</a>.</dd>
+
+<dt><a href="https://github.com/mozilla/receiptverifier">receiptverifier</a></dt>
+<dd>Not very active right now.  This is a library to do client verification of <a href="https://developer.mozilla.org/en-US/docs/Apps">Open Web App</a> receipts.  It's not very exciting, but it does do a heck of a lot of error handling. It was an exercise in thoroughness. Maintained by other people now.</dd>
+
+</dl>
+
+## <span id="toys">Toys</span>
+
+<dl>
+
+<dt><a href="https://github.com/ianb/wordpool">Wordpool</a></dt>
+<dd>A little HTML/Javascript word-search-like game.  The product of a two-hour hackathon.</dd>
+
+<dt><a href="https://github.com/ianb/xmasapp">xmassapp</a></dt>
+<dd>I wanted to compile Christmas carols that I liked, without any fluff.  Also it's an example of an <a href="https://developer.mozilla.org/en-US/docs/Apps">Open Web App</a>.</dd>
+
+<dt><a href="https://github.com/ianb/deducer">deducer</a></dt>
+<dd>A small Javascript/HTML game of logic.  Based on <a href="http://www.kaser.com/sherwin.html">the Sherlock game</a>. Has no instructions, is not really usable ;)</dd>
+
+<dt><a href="https://github.com/ianb/fatfingers">fatfingers</a></dt>
+<dd>An attempt to turn ambiguous touch events into modal selections, as a client library.</dd>
 
 </dl>
