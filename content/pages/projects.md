@@ -2,28 +2,34 @@ PageTitle: Projects
 Title: Projects
 slug: projects
 
-This is a list of projects I am working on, or have worked on.  All are open source.
+This is a list of projects I am working on, or have worked on. All are open source.
 
-- [Current work](#currentwork)
-- [Small current projects](#smallcurrent)
-- [Toys](#toys)
-- [Retired projects:](#retired)
-    - [Python Packaging](#packaging)
-    - [Python Web](#pythonweb)
-    - [Python Testing](#pythontest)
-    - [Smaller Python projects](#smallpy)
-    - [Miscellaneous](#miscretired)
+-   [Recent work](#currentwork)
+-   [Small projects](#smallcurrent)
+-   [Toys](#toys)
+-   [Projects I've Retired From:](#retired)
+    -   [Python Packaging](#packaging)
+    -   [Python Web](#pythonweb)
+    -   [Python Testing](#pythontest)
+    -   [Smaller Python projects](#smallpy)
+    -   [Miscellaneous](#miscretired)
 
-## <span id="currentwork">Current Work</span>
+## <span id="currentwork">Recent Work</span>
 
 <dl>
+
+<dt><a href="https://github.com/mozilla-extensions/firefox-voice/">Firefox Voice</a></dt>
+<dd>Firefox Voice was our project out of the now-defunct Consumer Voice Products team, in the now-defunct voice program in Mozilla, part of the now-defunct Emerging Technologies division.<br><br>
+Firefox Voice is a voice assistant for the browser, allowing the simple commands like "new tab" as well as routing and interpreting messages to Google ("what's the weather"), integrating with music services ("play David Bowie") and many other commands.<br><br>
+At least for a while (I'm writing this in August 2020) it's available <a href="https://addons.mozilla.org/en-US/firefox/addon/firefox-voice/">on addons.mozilla.org</a>.<br><br>
+I wrote some thoughts coming out of this project in <a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice Interfaces</a>.</dd>
 
 <dt><a href="http://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">Test Pilot Firefox experiment backlog</a></dt>
 <dd>Although I was able to ship some things in Test Pilot, there was a long backlog of ideas, and experiments I started but didn't work out or weren't able to be shipped. I made a list of them!</dd>
 
 <dt><a href="https://github.com/mozilla-services/screenshots"><strong>Firefox Screenshots</strong></a></dt>
 <dd>I started Page Shot (which became Firefox Screenshots) in October 2014. During that time I went from doing it as a small side project, to managing the project during its nascent stages, then when I left management I rejoined development to get it launched as a <a href="https://testpilot.firefox.com/experiments/page-shot">Test Pilot experiment</a>. During that period it went from being a page freezing tool (similar to the Way Back Machine) to a screenshot tool.<br><br>
-It was popular inside Test Pilot, and it wasn't much later when it re-launched as a core Firefox feature in September 2017. When it launched it was the first real product built that took unencrypted user content, that used Google Analytics, the first Firefox feature to ship as a <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions">WebExtension</a>, and the first use of <a href="https://sentry.io/welcome/">Sentry</a> to monitor errors in the browser. <br><br>
+It was popular inside Test Pilot experiment channel, and it wasn't much later when it re-launched as a core Firefox feature in September 2017. When it launched it was the first Mozilla product built that took unencrypted user content, that used Google Analytics, the first Firefox feature to ship as a <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions">WebExtension</a>, and the first use of <a href="https://sentry.io/welcome/">Sentry</a> to monitor errors in the browser. <br><br>
 For myself, Screenshots has been a lesson in managed expectations, but also a lesson in <a href="http://www.ianbicking.org/blog/2018/02/web-small-composable-tools.html">providing simple tools</a> without worrying about how hard they are to create. <br><br>
 Despite being popular, in 2019 the server component of Screenshots is being shut down, though the tool will otherwise remain in Firefox. During its life 36 million people used the Screenshots server with over 100 million screenshots uploaded. About 20% of screenshots created are uploaded (instead of being downloaded or copied to the clipboard), so it would be reasonable to estimate 500 million screenshots taken in the course of two years.</dd>
 
@@ -32,7 +38,7 @@ Despite being popular, in 2019 the server component of Screenshots is being shut
 
 <dt><a href="https://github.com/mozilla/email-tabs"><strong>Email Tabs</strong></a></dt>
 <dd>Another <a href="https://addons.mozilla.org/en-US/firefox/addon/email-tabs/">Test Pilot experiment</a>. This was strongly influenced by <a href="https://blog.mozilla.org/ux/2015/02/save-share-revisit/">Mozilla's user research</a>. The results of our research was clear: everyone loves to save and share things by email. And yet it took me a few years to sit down and quickly hack out a tool that makes emailing articles work well. Working with email, and poking around in other company's email products, is a bit like science: you have to see what works, nothing works by default or because you want it to work a certain way.<br><br>
-I'm excited by Email Tabs, in no small part because of the simplicity and power of prepopulating compositions. Composing (but not sending) an email is transparent, manipulable, and open-ended. I hope I have the chance to use this lesson elsewhere. The browser is a great location for this, because the browser can integrate with systems in the same way a user integrates with systems, which isn't just handy but also is a kind of working in the open: you can see and understand what the automation does, because it does what you might have done.</dd>
+I'm excited by Email Tabs, in no small part because of the simplicity and power of prepopulating compositions. Composing (but not sending) an email is transparent, manipulable, and open-ended. I hope I have the chance to use this lesson elsewhere. The browser is a great location for this, because the browser can integrate with systems in the same way a user integrates with systems, which isn't just handy but also is a kind of working in the open: you can see and understand what the automation does, because it does what you might have done. I wrote some thoughts in <a href="https://www.ianbicking.org/blog/2018/11/thoughts-on-email-tabs.html">Thoughts on the Firefox Email Tabs experiment</a></dd>
 
 <dt><a href="https://github.com/ianb/personal-history-archive/"><strong>Personal History Archive</strong></a></dt>
 <dd>I've been poking around at this project for a long time, never really finishing it or deciding exactly what to do with it. The underlying goal is to support local, personal experimentation with the data that can come out of a browser. Most collection like this emphasizes data collected from many aggregate sources, either from select sources or with anonymization, and with only a rough outline of user behavior. A user agent (like a browser) sees everything! It doesn't just see that you visited a site, it sees exactly what that site displayed. It doesn't just see that you have an email, every email you read is displayed by the browser.<br><br>
@@ -40,7 +46,7 @@ So this is a tool to try to collect all that intimate data in a way that support
 Also I have just been poking around with creating highly usable data dumps, where the data is clean, always well-formed, and where behavioral and more static data is mixed together in a usable way.</dd>
 
 <dt><a href="https://github.com/ianb?tab=repositories">Other GitHub miscellany</a></dt>
-<dd>Being in the <a href="https://testpilot.firefox.com/">Firefox Test Pilot</a> team, I have the opportunity to try things out. Sometimes they work out, and sometimes they don't. At that stage you'll find my work in GitHub, which is updated more frequently than this page.</dd>
+<dd>Working in the open at Mozilla I have had the opportunity to try things out. Sometimes they work out, and sometimes they don't. At that stage you'll find my work in GitHub, which is updated more frequently than this page.</dd>
 
 </dl>
 
@@ -86,29 +92,32 @@ Also I have just been poking around with creating highly usable data dumps, wher
 
 </dl>
 
-## <span id="retired">Retired Projects</span>
+## <span id="retired">Projects I've retired from</span>
 
 Download stats [aren't necessarily accurate](https://packaging.python.org/guides/analyzing-pypi-package-downloads/), but as of June 2019 pip and virtualenv (which I originally wrote) were downloaded 980 million and 150 million times respectively. Computers are very good at downloading things! The balance of [packages I have written/started](https://gist.github.com/ianb/0a2fa5cd75f6d2ef04c71c546d2df692) have been downloaded roughly 70 million times, most notably WebOb, Paste, PasteScript, PasteDeploy, WebTest, Tempita, SQLObject, and INITools.
 
 <dl>
 
 <dt><a href="https://togetherjs.com/hotdish/"><strong>Hotdish</strong></a></dt>
-<dd>This took some of the ideas of TogetherJS, some of the tech from <a href="https://github.com/mozilla/browsermirror">Browser Mirror</a>, and thinking about them all in the context of a browser session.  It's implemented as a Firefox addon.  The model we came to is one where a group of people share everything they do in a specific browser, with mutual awareness of what each person is doing (both in general, and with in-page feedback using TogetherJS), and people can join and present to each other in this context.  <br><br>  Our longer-term goal was for people to be able to understand what each other are doing -- what pages they are interacting with, but also <em>how</em> they are interacting with those pages, similar to how you can understand what a person is doing when they are doing physical work.  <br><br>  Another goal is to look at how, using the same data we capture in order to share a person's actions with everyone else, we can also use that data to create a richer record of what people are doing.  We wanted knowledge capture and transfer between group members that can encompass not just one site or document, but a session, discussion, and research. <br><br> I <a href="https://www.youtube.com/watch?v=8cJQBBHfF9c&feature=youtu.be&vq=hd720">narrated a screencast that we made</a> to explain some of the concepts and things we learned from the experiment. </dd>
+<dd>This took some of the ideas of TogetherJS, some of the tech from <a href="https://github.com/mozilla/browsermirror">Browser Mirror</a>, and thinking about them all in the context of a browser session.  It's implemented as a Firefox addon.  The model we came to is one where a group of people share everything they do in a specific browser, with mutual awareness of what each person is doing (both in general, and with in-page feedback using TogetherJS), and people can join and present to each other in this context.  <br><br>  Our longer-term goal was for people to be able to understand what each other are doing -- what pages they are interacting with, but also <em>how</em> they are interacting with those pages, similar to how you can understand what a person is doing when they are doing physical work.  <br><br>  Another goal is to look at how, using the same data we capture in order to share a person's actions with everyone else, we can also use that data to create a richer record of what people are doing.  We wanted knowledge capture and transfer between group members that can encompass not just one site or document, but a session, discussion, and research. <br><br> I <a href="https://www.youtube.com/watch?v=8cJQBBHfF9c&feature=youtu.be&vq=hd720">narrated a screencast that we made</a> to explain some of the concepts and things we learned from the experiment.<br><br>
+Some blog posts on the topic: <a href="https://www.ianbicking.org/blog/2014/02/defaulting-to-together.html">Defaulting To Together</a>, and <a href="https://www.ianbicking.org/blog/2014/02/hubot-chat-web-working-in-the-open.html">Hubot, Chat, The Web, and Working in the Open</a>.</dd>
 
-<dt><a href="https://togetherjs.com"><strong>TogetherJS</strong></a> (formerly TowTruck)</dt>
-<dd>My previous project at Mozilla.  This is a service to enable real-time collaboration on any site.</dd>
+<dt id="togetherjs"><a href="https://togetherjs.com"><strong>TogetherJS</strong></a></dt>
+<dd>TogetherJS was my last (shipped) project at the <a href="https://www.ianbicking.org/blog/2014/09/professional-transitions.html">first iteration of the now twice-defunct Mozilla Labs</a>.  TogetherJS is a library and service to enable real-time collaboration on any site. It can still be seen on <a href="https://jsfiddle.net/">JSFiddle</a> where it is used for live collaboration.<br><br>
+The larger vision for TogetherJS falls under the category of <a href="https://en.wikipedia.org/wiki/Cobrowsing">Cobrowsing</a>: basically experiencing the web or a website collaboratively. We really wanted to explore what it meant to interact with things side-by-side, moving in and out of synchronous collaboration.<br><br>
+Several blog posts on the topic: <a href="https://www.ianbicking.org/blog/2013/10/togetherjs-a-postmodern-tool.html">TogetherJS as a Postmodern Programming Tool</a> (talking about heuristic-based integration), <a href="https://www.ianbicking.org/blog/2013/11/nouning-the-verb-of-browsing-and-activity.html">Nouning the Verb of Browsing</a> (talking about using the on-the-wire messages as a kind of record), <a href="https://www.ianbicking.org/blog/2014/02/hubot-chat-web-working-in-the-open.html">Hubot, Chat, The Web, and Working in the Open</a> (more about creating a record of activity), <a href="https://www.ianbicking.org/blog/2014/02/collaboration-as-a-skeuomorphism-for-agents.html">Collaboration as a Skeuomorphism for Agents</a> (about using the metaphors and mechanisms of collaboration to introduce automated agents), and my thinking concludes in <a href="https://www.ianbicking.org/blog/2014/03/towards-next-level-of-collaboration.html"><strong>Towards a Next Level of Collaboration</strong></a> (which provides a taxonomy and discussion of several specific aspects).</dd>
 
 <dt><a href="http://doctestjs.org">doctest.js</a></dt>
-<dd>A testing framework for Javascript, inspired by Python's <a href="http://docs.python.org/2/library/doctest.html">doctest</a>. Something of an alternative to <a href="http://en.wikipedia.org/wiki/Behavior-driven_development">BDD</a>, based on examples and expected output.</dd>
+<dd>A testing framework for Javascript, inspired by Python's <a href="http://docs.python.org/2/library/doctest.html">doctest</a>. Something of an alternative to <a href="http://en.wikipedia.org/wiki/Behavior-driven_development">BDD</a>, based on examples and expected output. Blog post: <a href="https://www.ianbicking.org/blog/2012/10/02/why-doctest-js-is-better-than-pythons-doctest/">Why doctest.js is better than Python’s doctest</a>.</dd>
 
 <dt><a href="https://github.com/ianb/walkabout.js">walkabout.js</a></dt>
 <dd>This is something like a UI/DOM fuzzing library.  It inspects the DOM (or uses rewritten Javascript code) to determine what parts of the page are "live" (and in what way).  Then it can choose a random action to perform, like clicking on an element or entering text in a field.</dd>
 
 <dt><a href="https://github.com/ianb/seeitsaveit">SeeItSaveIt</a></dt>
-<dd>An experiment in extracting structured data from web sites.  Works as a Firefox addon.  This is basically furloughed (as of April 2013) pending progress on <a href="https://wiki.mozilla.org/WebAPI/WebActivities">Web Activities</a>.  The addon allows custom scrapers to be run on sites, with several levels of separation to both allow scraping scripts to run safely and isolated from the site receiving the data.  There is some more information <a href="https://seeitsaveit.vcap.mozillalabs.com/">on this site</a>.</dd>
+<dd>An experiment in extracting structured data from web sites.  Works as a Firefox addon.  This is basically furloughed (as of April 2013) pending progress on <a href="https://wiki.mozilla.org/WebAPI/WebActivities">Web Activities</a>.  The addon allows custom scrapers to be run on sites, with several levels of separation to both allow scraping scripts to run safely and isolated from the site receiving the data.  There is some more information <a href="https://ianb.github.io/seeitsaveit/">on this site</a>.</dd>
 
-<dt><a href="http://thecutout.org/">The Cut-Out</a></dt>
-<dd>A synchronization library.  This is intended for HTML/Javascript applications that keep all their data locally, but want to be able to synchronize that data between devices.  But it's perhaps overpowered for that minor task.  This includes several pieces, a client library, a protocol, a server, an on-disk database format, and some rough replication and balancing support.</dd>
+<dt><a href="https://github.com/ianb/thecutout/">The Cut-Out</a></dt>
+<dd>A synchronization library.  This is intended for HTML/Javascript applications that keep all their data locally, but want to be able to synchronize that data between devices.  But it's perhaps overpowered for that minor task.  This includes several pieces, a client library, a protocol, a server, an on-disk database format, and some rough replication and balancing support. It was an experiment in minimalism.</dd>
 
 <dt><a href="https://github.com/mozilla/browsermirror">Browser Mirror</a></dt>
 <dd>This project has largely been superceded by <a href="https://togetherjs.com">TogetherJS.</a>.  This is like a screensharing system, except it works with the DOM instead of pixels - the page you are viewing is transmitted to the other party, but not a "live" page, literally just the things you see.  Things like clicks are transmitted back to the original browser.  Just like screensharing...?  Started out as a "this can't possibly work" project, but then it kind of worked.</dd>
@@ -134,9 +143,9 @@ I don't currently work on these Python projects, but I authored some important (
 
 ### <span id="pythonweb">Python Web</span>
 
-There's a bunch of projects that I've worked on in the web space, either authoring or making major contributions.  I'm not actively working on any of these myself any more.
+There's a bunch of projects that I've worked on in the web space, either authoring or making major contributions. I'm not actively working on any of these myself any more.
 
-Some of the projects in this list are popular, some I think were influential.  Several of them I *wish* were influential.
+Some of the projects in this list are popular, some I think were influential. Several of them I _wish_ were influential.
 
 <dl>
 
@@ -203,11 +212,11 @@ Some of the projects in this list are popular, some I think were influential.  S
 
 ### <span id="pythontest">Python Testing</span>
 
-Like packaging, I love and hate testing.  As a result I've tried a bunch of tools.
+Like packaging, I love and hate testing. As a result I've tried a bunch of tools.
 
 <dl>
 
-<dt><a href="http://pythonpaste.org/scripttest/">ScriptTest</a></dt>
+<dt><a href="https://github.com/pypa/scripttest">ScriptTest</a></dt>
 <dd>A script testing framework.  Lets you run a script in a subprocess, and inspect the results of that script: what its output was, stderr, error return codes, and any file changes.</dd>
 
 <dt><a href="https://pypi.python.org/pypi/MiniMock">MiniMock</a></dt>

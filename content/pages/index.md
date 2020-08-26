@@ -6,19 +6,19 @@ You've reached my homepage on the world wide web. Hello!
 
 On the internet I'm a computer programmer. Not on the internet I am also a computer programmer, but I also have a [wife](http://emilymurphy.com) and daughter. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can't find a social media home, but I guess [Twitter](https://twitter.com/ianbicking) is what I'm re-trying lately.
 
-I work for [Mozilla](http://www.mozilla.org/). You can read more about what I'm doing on my [**projects page**](/projects.html).
+Until recently (August 2020) I worked for [Mozilla](http://www.mozilla.org/). You can read more about what I'm doing on my [**projects page**](/projects.html).
 
 ## Getting in contact
 
 My list of online personas:
 
-- [ian@ianbicking.org](mailto:ian@ianbicking.org)
-- [My blog](/blog/)
-- [@ianbicking on Twitter](https://twitter.com/ianbicking)
-- [LinkedIn](http://www.linkedin.com/in/ianbicking) (I still have no idea what this is useful for)
-- [Facebook](https://www.facebook.com/ianbicking) (this would be my personal/non-professional persona)
-- [ianb on github](https://github.com/ianb/)
-- `ianbicking` on [chat.mozilla.org](https://chat.mozilla.org)
+-   [ian@ianbicking.org](mailto:ian@ianbicking.org)
+-   [My blog](/blog/)
+-   [@ianbicking on Twitter](https://twitter.com/ianbicking)
+-   [LinkedIn](http://www.linkedin.com/in/ianbicking)
+-   [Facebook](https://www.facebook.com/ianbicking) (personal/family, non-professional)
+-   [ianb on github](https://github.com/ianb/)
+-   [Resume](/Ian_Bicking_resume.pdf)
 
 Not online, my mobile number is **773-870-0645**, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is **3015 10th Ave. S, Minneapolis, MN 55407**.
 
