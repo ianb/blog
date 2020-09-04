@@ -6,7 +6,7 @@ base = os.path.dirname(os.path.abspath(__file__))
 AUTHOR = u"Ian Bicking"
 SITENAME = u"Ian Bicking: a blog"
 SITEURL = "https://www.ianbicking.org"
-# FEED_DOMAIN = "http://ianbicking.org"
+# FEED_DOMAIN = "https://ianbicking.org"
 CACHE_CONTENT = True
 # ARCHIVES_SAVE_AS = 'test-archive.html'
 PATH = os.path.join(base, "content")
@@ -18,7 +18,7 @@ TIMEZONE = "US/Central"
 DATE_FORMATS = {
     "en": "%A, %d %B, %Y",
 }
-ARTICLE_EXCLUDES = ["pages", "old", "media", "previous-content"]
+ARTICLE_EXCLUDES = ["pages", "old", "media"]
 ARTICLE_URL = "blog/{date:%Y}/{date:%m}/{slug}.html"
 ARTICLE_SAVE_AS = "blog/{date:%Y}/{date:%m}/{slug}.html"
 PAGE_URL = "{slug}.html"
@@ -50,6 +50,14 @@ def FORMAT_DATE(date):
     d += day + date.strftime(", %Y")
     return d
 
+
+COMMENTS = {}
+for filename in os.listdir(os.path.join(base, "disqusoutput")):
+    if not filename.endswith(".html"):
+        continue
+    content = open(os.path.join(base, "disqusoutput", filename), "r").read()
+    article_id = filename.replace(".html", "")
+    COMMENTS[article_id] = content
 
 TYPOGRIFY = True
 

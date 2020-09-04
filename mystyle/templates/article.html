@@ -17,12 +17,10 @@ endblock %} {% block content %}
             {% include 'twitter.html' %}
         </header>
 
-        <div class="entry-content">
-            {{ article.content }}
-        </div>
+        <div class="entry-content">{{ article.content }}</div>
         <!-- /.entry-content -->
-        {% if DISQUS_SITENAME and article.status != "draft" and not
-        article.nocomments %}
+        {# Note: disabled for now, because we're using static comments: #}
+        {% if False and DISQUS_SITENAME and article.status != "draft" and not article.nocomments %}
         <div class="comments">
             <h2>Comments !</h2>
             <div id="disqus_thread"></div>
@@ -41,6 +39,12 @@ endblock %} {% block content %}
                 })();
             </script>
         </div>
+        {% endif %}
+        {% if COMMENTS.get(article.slug) %}
+          <div class="comments">
+            <h2>Comments</h2>
+            {{ COMMENTS[article.slug] | safe }}
+          </div>
         {% endif %}
     </article>
 </section>
