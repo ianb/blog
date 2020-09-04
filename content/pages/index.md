@@ -4,7 +4,7 @@ Slug: index
 
 You've reached my homepage on the world wide web. Hello!
 
-On the internet I'm a computer programmer. Not on the internet I am also a computer programmer, but I also have a [wife](http://emilymurphy.com) and daughter. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can't find a social media home, but I guess [Twitter](https://twitter.com/ianbicking) is what I'm re-trying lately.
+On the internet I'm a computer programmer. Not on the internet I am also a computer programmer, but I also have a [wife](http://emilymurphy.com) and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can't find a social media home, but I guess [Twitter](https://twitter.com/ianbicking) is what I'm re-trying lately.
 
 Until recently (August 2020) I worked for [Mozilla](http://www.mozilla.org/). You can read more about what I'm doing on my [**projects page**](/projects.html).
 
