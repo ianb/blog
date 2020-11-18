@@ -685,7 +685,13 @@ One goal would be to use keys for “absolute” controls. As an example instanc
 
 Obviously there's a lot of general physical arrangement to be figured out as well.
 
-**Pros:** I'll become an expert hacker! Maybe I can type with a different keyboard for each hand
+These [16 key kits](https://www.1upkeyboards.com/shop/keyboard-kits/macro-pads/sweet-16-macro-pad-black/) seem like an interesting macro option. Interesting things [here too](https://www.gboards.ca/).
+
+**Progress**: I'm trying switching back to my old [Kinesis Advantage keyboard](https://kinesis-ergo.com/shop/advantage2/). The actual keyboard is a bit old and smushy and not 100% reliable, so I might have to re-up if I decide I like it. I'm not sure I do? The movements come back quickly though. Interestingly you can fit the Apple Magic Trackpad in the space between the two hand-wells. I'm not sure if that's actually an improvement.
+
+I'm trying to make it easier to move between sitting, standing, and using a treadmill. I've had the treadmill a long time, but haven't used it that much because it means moving from one workspace to another. This is OK, but puts my productivity in conflict with healthy body positions. That's not a good way to set oneself up to make healthy choices. So instead I've made a platform that can be slid over the treadmill, with a chair on top, and I move that back and forth while everything else stays in place.
+
+**Pros:** I'll become an expert hacker! Maybe I can type with a different keyboard for each hand. Cryptic neon-green characters will flow from my screen
 
 **Cons:** It makes my environment less portable. I might not like the result
 
@@ -740,6 +746,8 @@ I’m sure there’s game frameworks that would be a great basis for this, but t
 **Pros:** This has been in my head much longer than any of these other ideas! It feels fun
 
 **Cons:** Escapist and it’s unlikely to lead anywhere
+
+Possible resources: [fgmk - game and editor](https://github.com/ericoporto/fgmk), [fgmk engine](https://github.com/ericoporto/fgmkJsEngine), [pixel editor](https://make8bitart.com/), [Reldens top-down MMORPG](https://www.reldens.com/), [JS RPG engine](https://thenyanta.github.io/JS-RPG-Engine/), [GitHub category](https://github.com/topics/rpg-engine), [tutorial on MDN](https://developer.mozilla.org/en-US/docs/Games/Techniques/Tilemaps/Square_tilemaps_implementation%3A_Scrolling_maps), [another tutorial](https://www.creativebloq.com/html5/build-tile-based-html5-game-31410992), [tile editor](https://victorribeiro.com/tileEditor/?example=01), [artwork](https://opengameart.org/), especially [LPC](https://lpc.opengameart.org/content/liberated-pixel-cup-faq)
 
 ### <span id="remembrance-agent">Remembrance Agent</span>
 
