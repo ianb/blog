@@ -1,0 +1,481 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Distributed vs. Centralized Version Control</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Distributed vs. Centralized Version Control</h1>
+ 
+<div class="document">
+<p>If you've paid any attention, you'll have noticed there's a ton of new
+version control systems.  It's a little odd, really -- the community
+languished with CVS for such a long time.  CVS got lots of really
+important things right, but as we all know it also was a mess.  Then
+<a class="reference" href="http://subversion.tigris.org/">Subversion</a> and <a class="reference" href="http://www.gnuarch.org/">Arch</a> came along with two different models --
+one based closely on CVS (Subversion), and one based on a new
+distributed model.  Arch seems crufty and difficult, or maybe it's
+just that its designer has a somewhat crufty and difficult
+personality... but clearly that branch of design has had an explosion
+of implementations, where Subversion remains alone (though far more
+successful).</p>
+<p>People treat the benefit of distributed development as self-evident,
+but I don't agree.  The best real justification I've seen of the
+centralized model is Greg Hudson's <a class="reference" href="http://web.mit.edu/ghudson/thoughts/bitkeeper.whynot">Why Bitkeeper Isn't Right For Free
+Software</a>,
+which is still relevant since it wasn't about the BK license or
+proprietary software.  All the arguments against BK on the basis of
+license have been clearly proven, but the model remains relevant.  The
+basic argument Greg makes is that the Linux development process is an
+anomaly and doesn't apply to most projects.</p>
+<p>But I think this can be taken further.  There's nothing wrong with the
+centralized model.  There <em>is</em> something wrong with the way we are
+using Subversion (and CVS before it).  The wrongness isn't that you
+need a server, or a network connection, or disk space.  It's that you need commit privileges.</p>
+<p>I see these issues as the important ones that source control can solve
+for open source:</p>
+<ol class="arabic simple">
+<li>Getting people's work off their hard disks, where it is dead and
+useless to the community.</li>
+<li>Making work available and locatable by other developers.</li>
+<li>Making it easy to understand the changes made.</li>
+<li>Making it easy to integrate changes.</li>
+</ol>
+<p>The distributed systems do some work on (1), usually by not needing a
+&quot;server&quot; (except maybe for rsync and any web server).  But frankly the
+&quot;server-less&quot; systems they set up are usually much more complex in
+practice than a single well-maintained server.  Now that Subversion
+has fixed many of its server problems (with fsfs among other things),
+server maintenance is really not a problem.  And we share the work
+around; there are far fewer servers than developers, and that works
+fine.</p>
+<p>But more practically, I think distributed systems enable private work
+in a way that is bad for the community.  I think the private workflow
+so touted by distributed systems is a total non-feature, even an
+anti-feature.  Open source development should happen in the open;
+that's what people usually want to do, and that's what we should
+encourage at every opportunity.</p>
+<p>The distributed systems offer nothing for (2).  Centralized systems
+allow you to list the files and branches and whatnot.  Subversion made
+an important improvement on CVS by making the branching and tagging
+very transparent, where it was somewhat invisible and mysterious in
+CVS.  That makes a real and practical difference in the usability of
+branching.  Distributed systems are a step back in this respect.</p>
+<p>Honestly I don't know how distributed systems compare on (3) and (4).
+Subversion could definitely be better, but I don't think that has
+anything to do with centralization.  I find handling patches very
+difficult, but I think merging branches in Subversion is generally
+easier, and with far more room for improvement.  As an aside, I don't
+see why the exchange of patches in email is even relevant in a usable
+and complete system -- emailing files around is a crappy interface for
+everyone.  Making it less crappy is missing the point; email is not a good
+file transfer protocol.  But because Linus does everything in
+email... <em>sigh</em>.</p>
+<p>But centralized version control <em>does</em> need to become more open.  The
+difference between someone with commit access and some random
+contributor should be reduced.  Anonymous commits should be allowed
+(or commits with a very low registration threshold -- strict anonymity
+isn't really important here).  The tools should be usable enough that
+we can say &quot;we don't accept patches, we only accept pointers to
+branches in our repository&quot;.  Maybe we could even say &quot;we accept bug
+reports, but we prefer bug reports in the form of commits into our
+<tt class="docutils literal"><span class="pre">bug_example/</span></tt> directory&quot;.  We should stop using Wikis, and just use
+web frontends to our version control.</p>
+<p>There's great potential in version control -- but it's all in
+usability and tools, security and scaling, not the mathematical appeal
+of patch management algorithms.</p>
+<p>People like to talk about the benefit of open source's
+distributed development, but I think the communal
+aspect is just as important.  We all already know that a successful
+open source developer must play well with others, much both follow and
+lead in different projects, must be able to handle and resolve
+personal and technical conflicts.  We succede when we work in public;
+so why should we be so drawn to version control that encourages
+isolation, where everything is a fork?</p>
+</div>
+ <div class="dates" align="right">
+Created 05 Aug '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>I wish you would have went into this level of detail a month ago or so when we were talking about setting up a public repository for patterns. You're making a ton of sense here. I think you could have a workable model w/ subversion if you could figure out how to:</p>
+<ol class="arabic simple">
+<li>Self-register or distribute identity. Anonymous write is a non-starter...</li>
+<li>Tier access such that newly registered users can create new branches in a sandbox area with full write access but not be able to write outside of their own branches until they were granted higher access.</li>
+</ol>
+<p>I wonder if a simple web front end might not help accomplish a lot of this. A form takes a username/password + source branch and create a new &quot;free branch&quot; somewhere and spits that out as a result. This could also have a web/machine interface that you could probably wrap with five lines of bash/curl to have a nice little CLI:</p>
+<pre class="literal-block">
+$ svn_share -u username http://example.com/reposhare/trunk 
+Hello username, we don't know you. Enter a password for jailed access...
+Password: *********
+Your branch is http://example.com/repo/username/01/
+</pre>
+<p>The command might be best as a wrapper around <tt class="docutils literal"><span class="pre">svn</span> <span class="pre">co</span></tt> that would have basic logic for establishing the account and creating one of these &quot;free branches&quot; and then checking it out.</p>
+<p>This leads to some problems:</p>
+<ul class="simple">
+<li>Branch bombs - The branching mechanism is cheap but you'd have to put some kind of basic constraints around creation.</li>
+<li>Stale branch detection - It would be nice to have some heuristic for determining if a branch was actually valuable and to clean up those that aren't.</li>
+</ul>
+<p>At any rate, I'm interested in hearing more on this if you've thought about implementation at all.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-1.html" rel="nofollow">#</a> <a href="http://naeblis.cx/rtomayko/">Ryan Tomayko</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I was trying to figure out how to set up Apache for this sort of situation in <a class="reference" href="help-me-apache-auth.html">Apache auth</a> -- I haven't had a chance to revisit it since then (sysadmining, blech), but I think there's a special tool for svn permissions which is pretty granuar.</p>
+<p>For self-registration it might be sufficient simply to use some simple webapp that manages <tt class="docutils literal"><span class="pre">.htaccess</span></tt> files, maybe with a little something for forgotten passwords and whatnot (a parrallel record of email addresses would have to be kept).</p>
+<p>I am worried about security though, especially since Subversion is written in C.  C does not encourage confidence in security.  Not a big issue when you trust everyone you authorize, but if authorization is opened up...</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-5.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Wouldn't the Wikepedia model be helpful here as a model for thinking about security?  It seems to me that some of security concerns might not be _that_ big a deal since you can just roll back to a previous version if someone pollutes the tree.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-11.html" rel="nofollow">#</a> <a href="http://www.planetshwoop.com/">brian</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I'm thinking of security like buffer overflows, or people adding gigantic files to the repository which cause the database size to explode (since deleted items remain in the repository database).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-16.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>One way to do this would be to hook the authentication into something like Bugzilla.  We did that at work so that both subversion and bugzilla had the same set of users with just one place to have to deal with them -- the username was a full email address for subversion.  This also gives the ability to self-register, reset passwords, etc.  A few changes to bugzilla would probably allow patches to point to subversion changes and allow sharing write access to branches.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-44.html" rel="nofollow">#</a> David Ward</div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Have you checked out &lt;a href=&quot;<a class="reference" href="http://www.selenic.com/mercurial/">http://www.selenic.com/mercurial/</a>&quot;&gt;Mercurial&lt;/a&gt;?
+I wrote a short post about it recently.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-2.html" rel="nofollow">#</a> <a href="http://julianyap.blogspot.com">Julian</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I'll have to throw my approval in on this one as well.  I have been using GNU Arch for some time now, and although it is a powerful SCM, it's definitely not the easiest thing to use.  Bazaar has addressed some of these issues while remaining compatible with GNU Arch. Tom Lord has pre-released GNU Arch 2.0, which is another complete rewrite that borrows ideas from Linus' Git.  It's not a feature-complete SCM yet, but it appears to be picking up steam.  Hopefully, he'll incoporate the usibility features in Bazaar into the new version.</p>
+<p>I have not jumped on the Subversion bandwagon, partially because it had such a rocky start right about the time I was looking for a new SCM.  I have it installed, but only to pull your source code, at which point I slough it off to whatever SCM I might be playing with at the time.</p>
+<p>I have not used monotone because of its dependence upon OpenSSL libraries and the inability to incorporate GPG/OpenPGP utilities (though that's such a little nit that I should probably reconsider).  I'm also not entirely comfortable with having to cut-n-paste SHA-1 strings just to get a branch I want.  (Git suffers from this, too.)  Mercurial incorporates a versioned tagging system that allows you to set arbitrary names to revisions and travels with the archive.  You can also set local tags that do not get transfered, which allows you to make less &quot;official&quot; notes about what a branch or revision represents.  +1 for Mercurial.</p>
+<p>Codeville has some interesting merging algorithms, but ease of use is by far the more important thing to consider.  Darcs has gotten some bad press regarding its memory consumption and long operations when merging with large histories, though these might be fixed by now. (Plus, it's written in Haskell!?  Who uses that?!)  Canonical is sponsoring the development of Bazaar-ng, another python-based SCM that borrows ideas from GNU Arch and Bazaar.  I don't really know where it is in a feature-wise comparison, but it's a relatively new project.  Now that GNU Arch 2.0 is in alpha, I'm not sure if bazaar-ng is going to take the new direction (I haven't been following that closely lately).</p>
+<p>That brings us back to Mercurial.  It's a mouthful to say, but the commandline is a terse <cite>hg COMMAND</cite> style.  It's very cvs-like in the way it feels, yet shares a lot of properties with monotone and codeville.  It is self-hosting and can publish over HTTP.  A CGI front-end is provided so you can incoporate it with your favorite web server.  The CGI/web front-end looks a lot like gitweb, the Perl git front-end on kernel.org, though there have been recent patches to the list that really improve on the presentation.  Plus, it's FAST! (And written in Python, non-the-less.)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-7.html" rel="nofollow">#</a> <a href="http://wookimus.net/~chewie">Chad Walstrom</a></div><hr noshade>
+ 
+<div class="document">
+<p>Hi; yes, I actually saw that on del.icio.us, and it's what got me thinking about version control again.</p>
+<p>It sounds like the developer on Mercurial has the technical parts down well.  I don't know about usability, especially since it seems like it's a contender for Linux development, and I think Linux developers (or maybe just Linus) have distorted ideas about usable version control.</p>
+<p>I don't know what the technical foundation of <a class="reference" href="http://bazaar-ng.org/">Bazaar-NG</a> is, but they seem the most concerned with basic usability issues.  Other ones can be better or worse in terms of usability -- Arch is pretty horrible from what I can tell, and Darcs is pretty straight-forward.  Many of them put so much emphasis on the distributed part, that continuous integrating (the norm in Subversion or CVS) is an Excersize Left Up To The Reader.</p>
+<p>It is interesting that this latest generation of version control systems is very heavy on Python (Mercurial, Bazaar-NG, Codeville, and I think I'm forgetting something else...)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-8.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>From a usability perspective, Mercurial is quite similar to both CVS and SVN.  Commands that &quot;mean the same&quot; in CVS and Mercurial have the same names, flags, and so on.</p>
+<p>Linus definitely has extremely peculiar notions about version control, but those are all firewalled in git/cogito, and have not bled elsewhere.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-29.html" rel="nofollow">#</a> <a href="http://www.serpentine.com/blog">Bryan O'Sullivan</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Darcs is yet another one -- <a class="reference" href="http://darcs.net/DarcsWiki">http://darcs.net/DarcsWiki</a></p>
+<p>I've just started playing with it for personal projects.  CVS is too crufy, and Subversion has too many requirements for my personal stuff (though we moved from VSS to Subversion at the office and have never been happier).</p>
+<p>Back to darcs -- the commands are easy.  It seems to be distribuated when you want it to be and centralized when you want.  The fact that you can immediately mail patches back and forth, and pull any source tree off the web and into are cool features.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-3.html" rel="nofollow">#</a> <a href="http://users.binary.net/thehaas/cgi-haas/blosxom.cgi">MikeH</a></div><hr noshade>
+ 
+<div class="document">
+<p>&quot;But centralized version control does need to become more open. The difference between someone with commit access and some random contributor should be reduced&quot;</p>
+<p>True to a very large extent and it focusses on a very important issue.  Subversion has a very specific problem when used with free/open source projects. It pretends that patch management is none of it's business, since all it promises to be is a better CVS. But remember that CVS itself is probably two decades old and should not be setting the bar for any version control software beyond a certain extent. Now we know after a decade+ of distributed software development in which not everyone has commit privilieges, that there are problems with the way patches are handled. But it probably best not to depende on the SVN project itself to do this. As you note in another excellent point:- &quot;There's great potential in version control -- but it's all in usability and tools, security and scaling, not the mathematical appeal of patch management algorithms.&quot;. Tortoise SVN and SVK are the only two SVN based projects that have had any real impact. I am not sure though about that bit about &quot;patch management algorithms&quot;. It's a prominent shortcoming/defect in SVN that it does have a real handle on objects through object IDs - there is no way to clearly answer the question &quot;Is file A on branchA the same as the file A on trunk&quot;; also lacking is true renames. Merge Tracking will not really be possible unless these are sorted out.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-4.html" rel="nofollow">#</a> <a href="http://cycle-gap.blogspot.com">Rams</a></div><hr noshade>
+ 
+<div class="document">
+<p>Hmmm...
+Your idea of anonymous commits seems like a possible source of unintended consequences.
+I'll throw out the term 'wikification' to describe it.
+I love wikis, but there is a significant maintenance cost, due to flaws in human nature.
+You'd almost have to automatically build on every commit, and roll back changes that no worky-worky, and then black list bogus committers somehow.
+The haters of open source would likely DOS a lot of projects.
+Ultimately, there is a huge learning curve before stepping into any project.
+Even if I know python (and I consider myself a medium-weight), I probably can't do useful work until I've interacted significantly with the team, beyond trivial bugfixing.
+So, I'm luke-warm on the idea.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-6.html" rel="nofollow">#</a> <a href="http://">Chris Smith</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I think new people shouldn't be able to commit to the trunk, but they should be able to make their own branches.  There remain some DoS possibilities, no doubt, but those are all simply bugs.  There might be a lot of those bugs, of course...</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-9.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>I work as a team leader in a small/medium-sized developer team, and we are using CVS/subversion successfully, but after playing around with darcs for a toy project, we also think about moving to a SCM without a central server. May be we are a &quot;to agile&quot; or whatever, but sometimes it would be just nice to sync with the repository of my coworker without submitting it to a central server or using branches. And approaching a release all my team members start to merge with a central repository. May be I must say, that I highly appreciate the way Guido (GvR) and Linus manage there projects. And I guess this can be applied to a lot of open source software too. Well, and email is not to bad for patch &quot;movement&quot;, isn't it? I think, the way darcs does it, is the best. Some people can commit directly, the rest has to send the patches by mail.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-10.html" rel="nofollow">#</a> Oliver Andrich</div><hr noshade>
+ 
+<div class="document">
+<p>The ability to submit a patch directly via the version control system so that the project leader(s) can review and merge it as desired would be a great boon. You'd certainly think that SVN could be given explicit support for this feature, and I think that SVN is the best candidate given how much acceptance it has gained.</p>
+<p>One thing that should be kept in mind with regards to accepting anonymous or nearly anonymous patches is the whole Linux/SCO nonsense. While only a project as successful as Linux is likely to gain that level of attention, it's always good to have an idea of who is vouching for a piece of code (and whether they wrote it themselves) when you're adding it to your repository.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-12.html" rel="nofollow">#</a> <a href="http://www.blueskyonmars.com">Kevin Dangoor</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>One of my favorite features of Darcs is the &quot;darcs send&quot; command, which e-mails your changes to the owner of the upstream repository.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-14.html" rel="nofollow">#</a> <a href="http://advogato.org/person/mbrubeck/">Matt Brubeck</a></div><hr noshade>
+ 
+<div class="document">
+<p>In some of my thoughts about building systems on top of Subversion, I've thought about expressing workflow through custom properties, and acting on those in hooks.  So instead of patches you'd have branches, and a submission would be a flag/property on the branch that said you were ready for someone to look at it.  The &quot;ready for someone to look at it&quot; is almost an indexing operation as much as anything.</p>
+<p>Though another possibility might be special conventions.  For instance, it would be nice to encapsulate discussions of patches in the version control system as well.  Maybe a file (<tt class="docutils literal"><span class="pre">discussion.txt</span></tt> or something) could store that information.  This would be like pushing the Trac database into Subversion.  I'm not sure if this would work with Subversion in practice, but that's the kind of feature that could make me switch.</p>
+<p>That reminds me of Subversion hooks -- there's a lot of power there.  I don't think that's transferable to a distributed system.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-15.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I believe projects that use distributed models have been using email for that type of message. i.e. &quot;Subject: [MERGE] ab327e678c8&quot;</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-17.html" rel="nofollow">#</a> <a href="http://wookimus.net/~chewie">Chad Walstrom</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Distributed version control software is not incompatible with communal, centralized development.  In practice, most projects that use distributed software still have one central repository that everyone syncs and submits to.  They're not using the distributed software to split development off into isolated forks; they're using it precisely to allow work to be shared more easily without such hard boundaries between established developers and new contributors.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-13.html" rel="nofollow">#</a> <a href="http://advogato.org/person/mbrubeck/">Matt Brubeck</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>+1</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-18.html" rel="nofollow">#</a> <a href="http://wookimus.net/~chewie">Chad Walstrom</a></div><hr noshade>
+ 
+<div class="document">
+<p>Another agreement to this.</p>
+<p>I find that distributed systems have many more features to the centralized ones and make it easy to set up a repository. I set all of the ones on my site with an rsync command. Also not everyone has access to public subversion repository. Or people don't want to use sourceforge or berilos.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-19.html" rel="nofollow">#</a> <a href="http://thecrypto.org">Julian Krause</a></div><hr noshade>
+</blockquote>
+ Ian,
+<P>
+The key point I see missing here is the fact that centralized development is a subset of what a distributed model can do. At <a href="http://www.summersault.com">Summersault</a> we switched from CVS to <a href="http://www.darcs/">darcs</a>, but kept the centralized development model for the most part. 
+<P>
+darcs offers us many benefits, including <a href="http://wiki.darcs.net/index.html/SpontaneousBranches">spontaneous branches</a>, interactive commits and updates, a smart patch algebra, and working on private branches we need. 
+<P>
+You can read my full write up of  <a href="http://mark.stosberg.com/Tech/darcs/cvs_switch/">our switch from CVS to darcs</a>. 
+<P>
+For open source work I also use darcs. We start of using 'darcs send' to exchange patches by e-mail, which works great. For small projects my website works as a central public repo for read only access, and I filter commits through my e-mail. 
+<P>
+For larger projects, we can set of a central server for darcs (which is just copying files a web server), and give a group of comitters ssh access to commit there, while others contribute by e-mail.  
+<P>
+I use svn for one project and am definitely slowed down because it doesn't offer interactive commits, updates or easy cherrypicking of patches. 
+<P>
+Try darcs. 
+<P>
+  Mark
+ <div align="right"><a href="http://blog.ianbicking.org/distributedvscentralizedscmcomment20.html" rel="nofollow">#</a> <a href="http://www.darcs.net/">Mark Stosberg</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p><em>The key point I see missing here is the fact that centralized development is a subset of what a distributed model can do.</em></p>
+<p>I think there's a good possibility that one of the distributed systems will focus on making centralized development work well.  I don't think they've done that yet.  They are ignoring something important as a result.  Since there's so much competition at the moment hopefully someone will try to differentiate in this way.  I can even imagine a centralized fork; just like svk is like fork of svn, the opposite might happen.  At least, I hope it does -- I personally am not tied to Subversion.</p>
+<p><em>For larger projects, we can set of a central server for darcs</em></p>
+<p>I think that should be the first thing to happen for a new project.  Personally I &quot;set up&quot; a central server for all of my projects now, because I happen to have an svn repository at my disposal.  Keeping 1 project or 100 projects in one svn server isn't substantially more difficult.  Managing permissions is a pain... but eh.  Easier than ssh accounts at least.  I'm also generally fine giving people access based on informal agreements about permission.</p>
+<p><em>I use svn for one project and am definitely slowed down because it doesn't offer interactive commits, updates or easy cherrypicking of patches.</em></p>
+<p>I don't think these are problems with centralized servers.  There's hard problems to be solved, and it's clear the new batch of version control systems is addressing many of those problems better than Subversion has.  (And it's not surprising they are doing it with high-level languages.)    Subversion hooks have a tremendous amount of potential, though, and I'd hate to lose that feature.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributedvscentralizedscm-comment-22.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;I think there's a good possibility that one of the distributed systems will focus on making centralized development work well.&quot;</p>
+<p>For darcs, there's the &quot;darcshive&quot; centralized server project:</p>
+<p><a class="reference" href="http://darcs.net/DarcsWiki/RelatedSoftware">http://darcs.net/DarcsWiki/RelatedSoftware</a></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributedvscentralizedscm-comment-25.html" rel="nofollow">#</a> <a href="http://advogato.org/person/mbrubeck/">Matt Brubeck</a></div><hr noshade>
+ Thanks for the response, Ian. 
+<P>
+<I>I think there's a good possibility that one of the distributed systems will focus on making centralized development work well. I don't think they've done that yet. They are ignoring something important as a result. </i>
+<P>
+Working with a centralized server is arguably easier with darcs than svn. 
+<P>
+Svn recommends you think about your branches, tags, and overall layout when you create the project. There is no need for this in darcs.
+<P>
+Svn has a special command, 'svn import' for starting a project. darcs has a syntax that is as easy to use, but more general purpose, as it can be used whenever you want to creat a new branch: 
+<P>
+darcs put mark@otherserver.com:/home/repos/my_new_project
+<P>
+There is nothing special to learn about users and permissions, as you can use unix permissions and ssh, or gpg-signed e-mail to transport patches. 
+<P>
+It's not clear to this to me why this wouldn't be considered "working well". It has the added benefit that casual contributors can still commit repeatedly offline on their laptops before sync'ing, or easily create their own branch. 
+<P>
+&nbsp;Mark
+ <div align="right"><a href="http://blog.ianbicking.org/distributedvscentralizedscmcomment33.html" rel="nofollow">#</a> <a href="http://www.darcs.net/">Mark Stosberg</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>good</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributedvscentralizedscm-comment-37.html" rel="nofollow">#</a> <a href="http://www.mulu.org">网页目录</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>As far as I can tell darcs cannot be run on anything but i386 and amd64. Most of the servers where I work are Linux or BSD running on sparc64.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributedvscentralizedscm-comment-23.html" rel="nofollow">#</a> <a href="http://eradman.com">Eric Radman</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I'm running it under Mac OSX, so I don't think you're necessarily correct there.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributedvscentralizedscm-comment-32.html" rel="nofollow">#</a> <a href="http://www.halfcooked.com/">Andy Todd</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>I don't think current centralized SCMs can accomodate large numbers of development branches.  The problem comes when mainline development activity is merged into those branches to produce a more up-to-date branch.  In CVS and svn, such a merge duplicates the mainline changes--even changes to unmodified files--into the back-end storage system.  So, a hundred actively maintained development branches means your mainline development is consuming a hundred times as much space.  I've brought up cleverer ways of representing big merges in Subversion, but there hasn't been a whole lot of interest so far.  For the most part, projects seem happy storing patches in an issue-tracking system to represent small changes--not a very elegant solution, but one which eliminates 95% of the efficiency problem with branches.</p>
+<p>The distributed SCM answer is to use a hundred times as many hard drives to hold the data.  That works fine, but the perception of distributed functionality as an anti-feature is not unique to you: other projects, like gcc, would much rather see development go on &quot;in the open&quot; in the central repository, rather than off to the side where it's harder to find.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-21.html" rel="nofollow">#</a> Greg Hudson</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I just stumbled across this thread again, and noticed that something appears to have gone uncorrected here. Subversion does do branching cheaply. The whole tree is not copied into the branch: subversion internally stores what amounts to a symbolic link.</p>
+<p>It may be the case that if you check out from the top of the tree, you'll get multiple copies of the files. I'm just pointing out how the repository itself works. (This is all described in the svn book.)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-34.html" rel="nofollow">#</a> <a href="http://www.blueskyonmars.com">Kevin Dangoor</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I don't think that's the duplication Greg is talking about. What's he's referring to is this sequence:</p>
+<ol class="arabic simple">
+<li>Branch trunk -&gt; foo (cheap, no dup files)</li>
+<li>hack hack hack on trunk (modify 20 files)</li>
+<li>Merge trunk changes to foo (oops)</li>
+</ol>
+<p>At stage 3, we've now got 20 modified files in foo, for which we are storing diffs in both the trunk and in foo. Instead, the modified trunk files could be &quot;re-branched&quot;. You'd still need a new revision in the branch, obviously, but it would just be with the new pointers. This is probably yet another issue that really needs true branch and merge history tracking.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-35.html" rel="nofollow">#</a> Steve Greenland</div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Changeset-based &quot;distributed&quot; version control systems (like my favorite, darcs) make patch management and integration possible in a way I haven't seen in subversion, and I see patch management as central to defining the trunk of a project. Say you want to merge the changes I've made over the past three days, because I just made my branch of SQLObject self-aware. (Bouyeah.) With a tree-based VCS you must calculate a diff between my tree three days ago and my tree now and apply that patch to your tree. With a changeset-based VCS, you just apply my patches. Svn's merging is rudimentary at best for this reason. I make mistakes with it all the time in my repositories - and I'm the only committer!</p>
+<p>About hooks, I see svn like a car that you can put a different spoiler on, but darcs like an engine you can hook up to a different transmission if you like, and put in a car of your choice. I can see my way much more clearly to building more complex and wonderful things with darcs than i can with svn (e.g., making some sort of dynamic branch-maker-and-authorizer with apache and python and sane security and permissions and discussion, that deletes old stale branches and doesn't take too much space).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-24.html" rel="nofollow">#</a> <a href="http://www.dingoskidneys.com/~jaredj/">jared jennings</a></div><hr noshade>
+ 
+<div class="document">
+<p>In using a distributed version control system, I found the ability to create what you might call micro branches quite useful. In an environment where we were juggling lots of small changes to a large system, being able to create a local staging environment and repository for each small feature is extremely helpful.</p>
+<p>The problem with putting all of that in the central repository is that, aside from Subversion's branch merging difficulty, it would clutter up the repository with branches. From the POV of the main repository, each of these minor fixes were coming through as normal commits was quite nice, even though on our desktops they amounted to micro branches.</p>
+<p>-Ken</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-26.html" rel="nofollow">#</a> <a href="http://www.kenkinder.com/">Ken Kinder</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>How big of a problem is a microbranch in Subversion?  Greg pointed out that they aren't stored efficiently, but if you make a modification in a branch and then integrate it into the trunk, it only doubles the storage of diffs, no more (at least if I read his comment correctly) -- that doesn't seem so bad.  I know I underuse short-lived branches, but Subversion doesn't disallow them; you can delete a branch as soon as you are done with it.  The only real issue is that its merging is rather poor, so it discourages branching.</p>
+<p>That said, I do see the usefulness of &quot;spontaneous branching&quot; as Mark termed it.  There is a certain oddity to the special place the checkout has in Subversion, where in distributed systems there isn't anything quite like a checkout, and there's an opportunity to be somewhat more cohesive as a result.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-27.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>Well - centralized version control is a <em>subset</em> of distributed version control, since you can still upload (or &quot;push&quot;) stuff from your branches to the project's central server. What distributed version control adds is the voluntarity of this action, and freedom to fork the project independently while keeping the history and the possibility to merge back in the future easily. (And some other bonuses like ability to work offline.)</p>
+<p>So the question is whether this kind freedom is a good thing. For the forking issue, if you want to fork, you will do that anyway and I doubt you will care that much about how hard would that be. But at least you will retain the full history, and it will be possible to easily merge the projects back later, which I'd say makes the situation at least somewhat better than with centralized VCS.</p>
+<p>The &quot;voluntary publication&quot; is probably less clear-cut, but I think it's better this way as well. How does this stuff usually go? If you are new developer, you decide &quot;I need this thing to do X&quot; or &quot;this Y thing is bothering me&quot;. So you can either:</p>
+<ul class="simple">
+<li>first ask for a branch on the central server. No matter how low the threshold is, this forces you into some kind of a commitment, at least social-like. &quot;Yet sworn word may strengthen quaking heart&quot; - &quot;Or break it&quot;. At any rate, this will make you reconsider if you are really sure you will finish this and likely discourage you from trying.</li>
+<li>first hack. If you are successful, you can upload this (and you will do that as likely as you would with the centralized version control), but you had no version control while hacking! After all, this is one of the main points of distributed version control - you can version control your private development so that there is some history when you actually publish it. If you are NOT successful hacking, noone will likely ever see your work, and that's probably core of your argument against it. The question is, whether it outweights all the other disadvantages, and whether that unsuccessful work is actually worth seeing - I think it isn't, up to some rather rare exceptions.</li>
+</ul>
+<p>The bottom line is, I argue that the additional freedom distributed VCS gives you is a good thing and actually significantly lowers the barrier for new hacks by making it easier to do them and potentially reducing the bureaucracy.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-28.html" rel="nofollow">#</a> Petr Baudis</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Petr, it's what happens <em>after</em> you've worked on your modification in private and you decide to publish it to the world that's the interesting question.</p>
+<p>You can make a patch and post it to Bugzilla, or you can publish your repo on your own server where the maintainers can pull from.  Bugzilla isn't as attractive as some kind of anonymous micro-branch, which after all is basically what your patch is.  Publishing your own repo is not stable over time.  In reality, patches often wait many months for integration, and private repos are likely to move or go down, and you still have the problem of tracking the links to all the private repos.</p>
+<p>It seems that the problem with turning anonymous patches into anonymous branches is that svn can't merge between repos (e.g. main and pending-patches), and people are uncomfortable adding anon branches to the main svn repo.  Right?</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-30.html" rel="nofollow">#</a> Stephen</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Well, I argue that centralized version control systems ain't any better than decentralized ones here. You can make server-side anonymous branch with sensible decentralized VCSes - at least git and monotone can do that, I'm not that familiar with the others; but you can always just have parallel repositories at the server.</p>
+<p>So this is NOT a problem with distributed VCSes.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-31.html" rel="nofollow">#</a> <a href="http://">Petr Baudis</a></div><hr noshade>
+</blockquote>
+ <blockquote>So the question is whether this kind freedom is a good thing. For the forking issue, if you want to fork, you will do that anyway and I doubt you will care that much about how hard would that be. But at least you will retain the full history</blockquote>
+
+As of subversion 1.4.0 and its client/server support for "svnsync", you can indeed replicate a repository with nothing more than anonymous read access.  Prior to 1.4.0, there were hacks to accomplish more or less the same thing, and you could always use rsync if you had shell access to the server.
+
+<blockquote>and it will be possible to easily merge the projects back later, which I'd say makes the situation at least somewhat better than with centralized VCS.</blockquote>
+
+That part of the problem, subversion does not solve.
+ <div align="right"><a href="http://blog.ianbicking.org/distributedvscentralizedscmcomment39.html" rel="nofollow">#</a> Peter Samuelson</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>&quot;As an aside, I don't see why the exchange of patches in email is even relevant in a usable and complete system -- emailing files around is a crappy interface for everyone. Making it less crappy is missing the point; email is not a good file transfer protocol. But because Linus does everything in email... sigh.&quot;</p>
+<p>Well that's a shame, because emailing patches solves 1, 2, 3, and 4.
+1) It gets it out into the community. Anyone can look at a mailing list and see the patches that have been made to a project. A project I'm working on currently uses gitweb, which lists all the recent commits to a repository, with the tags and commit message visible, and you can view any patch you want with a click.
+2) We attach patches to bug reports and e-mails. All our commit messages that are related to a bug report have the bug number and link back to the bug report from gitweb. Similarly, each resolved bug has a git commit id. Each author has his own repository remotely (on a server) as well as on their own machines. Anyone can find work in no time by just looking up a bug, looking at gitweb, or reading the mailing list.
+3) Seriously, what could be easier to understand than a patch? Sending it in an e-mail doesn't mean someone is going to commit the patch straight out of an e-mail. Sending it in an e-mail is a good way for people on a mailing list (e.g. developers and contributors) to verify correctness of a patch and to possibly locate more flaws.
+4) The whole patch concept couldn't be easier. You write some code, you commit it and the patch is generated for you, you don't even need to look at a patch at all if you don't want to. Then you can push it to a remote repository. What's more is that outside contributors can e-mail a patch or attach it to a bug report that any developer can include in their program. The project I contribute to has dozens of contributors and they often work in this way, speeding up development. They even get their name on the commit.</p>
+<p>&quot;But I think this can be taken further. There's nothing wrong with the centralized model. There is something wrong with the way we are using Subversion (and CVS before it). The wrongness isn't that you need a server, or a network connection, or disk space. It's that you need commit privileges.&quot;</p>
+<p>You make no mention about how this is different for the distributed model.</p>
+<p>Your issue with 1) is a non-issue with proper design. Centralized or not, no code is useful to anyone until you push it. Distributed systems can have one repository if you prefer, though this basically defeats the purpose of a distributed system.</p>
+<p>Your article could say instead that not all these features are _inherent_ in distributed systems. Distributed systems (git/cogito, atleast) are a bit more low-level than CVS and SVN, which means that you have to take some sort of care when setting one up for a project. But if you're not completely braindead, this should be easy. Set up a central repository for your project, then set up repositories for each author. Make sure all authors file bugs or feature requests that they can link their commits to. And, of course, keep commits small (meaning solve one problem at a time).</p>
+<p>As for your closing paragraph, this is plain nonsense. The point of distribution _is_ the communal aspect. With distribution, you allow (and encourage!) anyone in the community to participate in the development process. This tracks back to e-mail, which is a very convenient way for John Doe to send in a patch for a bug he found in your program. It's a lot better than having to whine to the program devs about a bug and have them solve the problem. And it's better than creating an account for John Doe to commit his one patch to your centralized repository.
+The focus isn't on isolation, it's on distribution; you're confusing these terms. Yes, they are related terms, but the isolation here is of a specific problem, not an entire project. There is no more encouragement to fork than with any other SCM. Anyone can grab the source for a project and fork it no matter what SCM is used. The encouragement is for different authors to work on problems in a _distributed_ manner towards the goals of the whole project.</p>
+<p>Please, take a look at the kernel.org git trees. Read their mailing list. And try to back up your claims using their example.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-36.html" rel="nofollow">#</a> <a href="http://dan.chokola.com/">Daniel Chokola</a></div><hr noshade>
+ 
+<div class="document">
+<p>sometimes, if you have other things to do, you must leave your pc, use Ghost Control to control your pc aotomatically.</p>
+<p><a class="reference" href="http://www.yaodownload.com/utilites/system-utilities/ghost-control/">http://www.yaodownload.com/utilites/system-utilities/ghost-control/</a></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/distributed-vs-centralized-scm-comment-38.html" rel="nofollow">#</a> tony</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

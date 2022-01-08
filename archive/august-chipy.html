@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>August ChiPy (and the stdlib)</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>August ChiPy (and the stdlib)</h1>
+ 
+<div class="document">
+<p>Had the <a class="reference" href="http://chipy.org">ChiPy</a> meeting on Thursday.  Aaron Lav
+started out with a talk on <a class="reference" href="http://www.pobox.com/~asl2/talks/unicode_talk/out/">Unicode and Chinese</a>.  One thing
+that I hadn't realized about Unicode is that it needs to be
+normalized.  You can represent characters either as composed or
+decomposed.  E.g., e' could be a single character or two characters
+(the <tt class="docutils literal"><span class="pre">e</span></tt> and the <tt class="docutils literal"><span class="pre">'</span></tt>).  Of course this has a dramatic effect on
+searching, string length, etc.  From what Aaron said the display
+support for the decomposed form isn't very good, but he made use of it
+for constructing pronunciation guides and then turned it into the
+composed form.  The <a class="reference" href="http://python.org/doc/current/lib/module-unicodedata.html">unicodedata</a> module
+has a <tt class="docutils literal"><span class="pre">normalize</span></tt> function to handle this.</p>
+<p>I'd also had the vague impression that Chinese was one character per
+word.  But of course there's too many words for that.  But there are
+no spaces, so it's not immediately clear where the word boundaries are
+(at least to a computer, and certain it is unclear to me eye).  So the
+<a class="reference" href="http://www.pobox.com/~asl2/software/middleproxy">middleproxy</a>
+application actually scans every three-character combination for
+possible &quot;words&quot;.  That reminded me a great deal of <a class="reference" href="http://perl.plover.com/yak/debruijn/">this presentation</a>.</p>
+<p>I gave <a class="reference" href="http://ianbicking.org/docs/setuptools-presentation">a presentation on setuptools</a>, mostly hoping
+to introduce all the things you can do, and how to distribute
+packages.</p>
+<p>At the end <a class="reference" href="http://weblog.lonelylion.com/?p=532">Chris McAvoy</a>
+brought up the <a class="reference" href="http://www.amk.ca/diary/archives/cat_python.html#003382">issue of the standard library</a>.  I had
+kind of forgotten about it, but that's what got me to thinking about
+<a class="reference" href="versioned-imports.html">versioned imports</a> some time ago,
+and I think Setuptools has an important place there.</p>
+<p>So, the story goes like this: the standard library isn't advancing
+very fast.  Little of the neat new stuff in Python is in the standard
+library, with a few small exceptions, and when neat new stuff <em>is</em> in
+the standard library it's often not really <em>helpful</em> for a few years
+anyway, since it's not in the standard library in old versions of
+Python.  And the standard library is stuck in a release cycle that is
+really slow -- slow releases are okay for a core language (good even!)
+but not for the software built on that language.</p>
+<p>Setuptools doesn't improve the standard library.  <a class="reference" href="thinking-about-the-python-standard-library.html">The standard
+library has some advantages</a>
+over other libraries, but I think we need to figure out how to develop
+outside of the standard library with those same advantages, and that's
+what Setuptools (really the whole family of setuptools,
+easy_install.py, Python Eggs, and pkg_resources) give us.  Or at least
+move us in the right direction.  The <a class="reference" href="http://cheeseshop.python.org/pypi">Cheese Shop</a> is also important, and the <a class="reference" href="http://www.python.org/peps/pep-0001.html">PEP
+process</a> can still be
+applicable to libraries not in the standard library.  For instance, if
+<a class="reference" href="http://www.python.org/sigs/web-sig/">Web-SIG</a> creates libraries on
+top of <a class="reference" href="http://www.python.org/peps/pep-0333.html">WSGI</a> I think some
+PEP-ish process is appropriate (giving some consensus and authority to
+the library), even though the library can't reasonably be distributed
+with the Python standard library.</p>
+</div>
+ <div class="dates" align="right">
+Created 13 Aug '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>There are all sorts of messy hacks in Unicode.</p>
+<p>Take Devanagari for example. Devanagari is the Indian script used to write classical sanskrit, hindi, nepali, marathi and some other languages adding up to the mother tongues of several hundred million people. So quite important to get right really. Devanagari is a kind-of-syllabic alphabet in which consonants are normally are read as including an implicit &quot;a&quot; sound - so &quot;t&quot; is read as &quot;ta&quot;. (Unless it's at the end of a word in hindi, I believe). There are supplementary characters to replace the &quot;a&quot; with other vowels or suppress it completely at the end of a word (except in hindi, where it's suppressed automatically anyway at the end a word. I think).</p>
+<p>There are also compound consonants, e.g. the &quot;tr&quot; in the word &quot;sutra&quot;. These have their own written characters, which are (mostly) recognisable as combined versions of the two root characters. These ligature characters are not conventionally regarded as letters in their own right even though they are written/printed as single characters, and they don't have their own unicode code points. Instead the &quot;tra&quot; in &quot;sutra&quot; is written as three code points: Ux0924 TA, Ux094D VIRAMA to suppress the implicit A in TA, Ux0930 RA.</p>
+<p>So how many characters is Ux0924Ux094DUx0930?</p>
+<p>It's one on the printed (rendered) page. Linguistically it's normally regarded as two, TA &amp; RA combined. It certainly isn't three, using the VIRAMA to signal a ligature in that way is a Unicode hack not a part of the real script. (Nor is it six, as some idiot who didn't know they were dealing with a utf-8 encoded version might conclude from counting bytes).</p>
+<p>(Sorry for the lots of words and no visible examples. It's late at night, I don't know if your comments system would handle unicode examples correctly, and even if it does several browsers - basically all Mozilla variants - don't display devanagari ligatures correctly anyway. I raised this as a bug nearly a year ago, no sign of progress. Presumably all Indian hackers are southerners and don't care if hindi-speaking northerners get to read stuff on the web or not)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/august-chipy-comment-1.html" rel="nofollow">#</a> <a href="http://www.alanlittle.org/weblog/">Alan Little</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Ligatures are always a little confusing.  But in all honesty, I think it's not unreasonable that the native speakers adapt just as computers adapt, and we meet somewhere in the middle.  In some ways it seems gross that we change an entire language and tradition to comply with our technical limitations.  But people have been doing that for thousands of years, and they'll do it today regardless of whether it is expected or approved.  Spanish officially dropped two letters a few years ago (ch and ll) in recognition of the predominant understanding of what a &quot;letter&quot; is.  If I remember correctly, Chinese is traditionally written top-to-bottom, but electronically it seems like left-to-right is the norm.  I appreciate the adaptation.  Not because everything should match the Western norms, but because the Western norms are notable for how much they themselves have adapted over time, and I believe there's virtue in that.</p>
+<p>If Devanagari adapts its ideas of the linguistic meaning of character, or readers recognize the adapted typography of that character, I think that's reasonable.  But then I'm not a traditionalist, and I like the idea of a polyglot.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/august-chipy-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I agree it's an inherently difficult problem. If you're not going to give ligatures their own code points - I assume native speakers were probably consulted and said &quot;no&quot; to that idea - then you have to come up with something. And the something thery came up with is perfectly reasonable.</p>
+<p>It still leave us, though, in the situation where there are plausible arguments for the &quot;length&quot; of a single sequence of three code points being one, two -or- three, with my personal preference being two.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/august-chipy-comment-3.html" rel="nofollow">#</a> <a href="http://www.alanlittle.org/weblog/">Alan Little</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

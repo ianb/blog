@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>WSGI and Dispatch</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>WSGI and Dispatch</h1>
+ 
+<div class="document">
+<p>A few days ago Mark Baker <a class="reference" href="http://www.markbaker.ca/blog/2006/10/18/links-for-2006-10-18/">left a little comment on WSGI</a> on
+his blog (for background Mark Baker is an enthusiastic <a class="reference" href="http://en.wikipedia.org/wiki/REST">REST</a> advocate).</p>
+<p>While he was mostly positive about WSGI, he said this in a comment:</p>
+<blockquote>
+<p>This is the problem [with WSGI]:</p>
+<pre class="literal-block">
+def application(environ, start_response):
+</pre>
+<p>Because it encourages bad practice with HTTP, such as those apps
+that behave the same way to GET and POST requests (as the examples
+in the article do).</p>
+<p>I think this would have been superior:</p>
+<pre class="literal-block">
+def get(environ, start_response):
+def post(environ, start_response):
+def put(environ, start_response):
+</pre>
+</blockquote>
+<p>Well, the first reason this doesn't work is fairly concrete.  It would
+actually have to look like this:</p>
+<pre class="literal-block">
+class Application:
+    def get(self, environ, start_response): ...
+    etc..
+</pre>
+<p>because you can't pass a request to a set of functions, without
+somehow defining what the &quot;set&quot; is.  You could also put them in a
+module, or some other container object.  This opens up a whole bunch
+of messy and dull questions about how you traverse the
+container to get to the request method method.</p>
+<p>This also encodes request method dispatch into the spec, without
+encoding any other kinds of dispatch into the spec.  The bad solution
+here would be to encode all kinds of dispatch into the spec.  What
+WSGI got <em>really</em> right was that it has <strong>absolutely no dispatch</strong> in
+the specification.</p>
+<p>At the same time <em>implementing</em> dispatch in WSGI is really easy.
+Creating a dispatcher in a style like Mark suggests is rather
+difficult, because you have to do something like this:</p>
+<pre class="literal-block">
+class Dispatcher:
+    def dispatch(self, environ, start_response):
+        return self.sub_object(environ)(environ, start_response)
+    get = post = put = dispatch
+</pre>
+<p>And of course you have to enumerate <em>all</em> the possible request
+methods.  This is just silly, but it's become a common design
+misfeature in frameworks influenced by the Java Servlet specification
+(e.g., <a class="reference" href="http://python.org/doc/current/lib/module-BaseHTTPServer.html">BaseHTTPServer</a>).</p>
+<p>The reason I think this misdesign seems reasonable is because other kinds of
+dispatch are assumed to have already occurred, and are opaque to the
+specification.  WSGI does not make this mistaken assumption.</p>
+<p>The primary kind of dispatch that people do is based on the request
+path.  I.e., if you do <tt class="docutils literal"><span class="pre">GET</span> <span class="pre">/blog/archive/2006/10</span></tt>, first you have
+to figure out what <tt class="docutils literal"><span class="pre">/blog/archive/2006/10</span></tt> is.  Here's the general
+way you do this in WSGI:</p>
+<ol class="arabic simple">
+<li>Probably you start out by realizing that <tt class="docutils literal"><span class="pre">/blog</span></tt> is the blog
+application, and you delegate the request there.  WSGI separates
+the path into two parts using the CGI convention that the &quot;used&quot;
+part of the path is in <tt class="docutils literal"><span class="pre">SCRIPT_NAME</span></tt>, and the &quot;unused&quot; part is in
+<tt class="docutils literal"><span class="pre">PATH_INFO</span></tt>.  So the blog app gets <tt class="docutils literal"><span class="pre">SCRIPT_NAME=&quot;/blog&quot;</span></tt> and
+<tt class="docutils literal"><span class="pre">PATH_INFO=&quot;/archive/2006/10&quot;</span></tt></li>
+<li>How does the blog application parse its part?  We assume only the
+blog application knows the best way to do that.  Very possibly it
+does another prefixed based search on <tt class="docutils literal"><span class="pre">/archive</span></tt>, and then that
+resource in turn parses <tt class="docutils literal"><span class="pre">/2006/10</span></tt>.  At different stages the
+results of this intermediate parsing may go into the request in
+non-standard locations, e.g., <tt class="docutils literal"><span class="pre">environ['routes.url_vars']</span></tt></li>
+<li>Only after all these steps have happened is it likely that <tt class="docutils literal"><span class="pre">GET</span></tt>
+has any meaning.  Thankfully we've been allowed to totally ignore
+the request method until this point.</li>
+</ol>
+<p>Note that this specific example is not the only way it might work.  For instance, we might have started with:</p>
+<ol class="arabic simple" start="0">
+<li>First, look at the <tt class="docutils literal"><span class="pre">Host</span></tt> header and dispatch on that.</li>
+</ol>
+<p>This adds virtual hosting.  Server environments that code step
+1 directly into their environment often have to create special
+exceptions for virtual hosting.  Or:</p>
+<ol class="arabic simple" start="0">
+<li>First, look at the <tt class="docutils literal"><span class="pre">Host</span></tt> header, matching <tt class="docutils literal"><span class="pre">(.*)\.myblogs.org</span></tt>,
+and putting the matched value into <tt class="docutils literal"><span class="pre">environ['myblogs.username']</span></tt></li>
+</ol>
+<p>Now you can set up a wildcard DNS and get your blog app to look up the
+user based on that key.</p>
+<p>If you want to pay close attention to the request method, you are
+quite free to do so.  WSGI does not tell you how, but it does not in
+<em>any</em> way hinder you from doing so.  A good example of something that
+pays close attention to the request method is Joe Gregorio's
+<a class="reference" href="http://bitworking.org/news/wsgicollection">wsgicollection</a>, which
+could very well be the terminal point for some of these examples.</p>
+<p><em>Because</em> WSGI does not include any form of dispatching it represents
+HTTP very accurately.  HTTP does not lend special meaning to the
+request path.  It does not say that different domains resolve to
+different servers.  HTTP is a kind of message, and there are many ways
+to interpret that message.  Low-level specifications overstep their bounds when they interpret those messages for you.
+WSGI is not an educational project, it is <em>infrastructure</em>, and an important feature is that it does not overstep its bounds.</p>
+<p>I'll also note that I think WSGI represents the HTTP message very
+well; the parts of HTTP that it leaves out are primarily about the
+HTTP <em>connection</em>, which are best handled by the actual
+connected-to-the-browser server.  The rest of the message is all in
+there if you want to use it.</p>
+</div>
+ <div class="dates" align="right">
+Created 21 Oct '06</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;bad practice with HTTP, such as those apps that behave the same way to GET and POST requests&quot;</p>
+<p>Is there a real reason why this matters? No.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/wsgi-and-dispatch-comment-1.html" rel="nofollow">#</a> <a href="http://www.maluke.com/">Sergey</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>For one, it matters for the simplicity of a client application. If the server implements REST properly, then all the client needs to know is the URI for the resource it's dealing with and then it basically knows that it can do a GET or a POST or a DELETE or whatever on that URI and the appropriate action will be taken. If the server doesn't distinguish between GET and POST (or the others) the dispatching to different functionality has to be done via the URI, so the client then also needs to know what URIs to hit for the equivalent create/delete/update actions.</p>
+<p>The other problem is that if the server doesn't distinguish between GET and POST, then some client somewhere is going to use a GET for an update because, hey, it seems to work. Then a cache somewhere in between might legitimately cache it. Or you get problems like with the Google Web Accelerator that would delete all the content on a site because there are &quot;delete&quot; buttons with links to URIs that delete a resource on a GET request and the GWA hits them all because it <em>ought</em> to be safe to make GET requests according to the specs.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/wsgi-and-dispatch-comment-2.html" rel="nofollow">#</a> <a href="http://thraxil.org/users/anders/">Anders</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>It matters only <em>sometimes</em>, and in those cases people will handle it on their own. It's counterproductive to force everyone to use programming model they don't need just so that someone else will not make a certain (well known and understood) mistake. That's B&amp;D approach which thankfuly is not in Python or WSGI style. import this will give you a couple reasons what is.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/wsgi-and-dispatch-comment-3.html" rel="nofollow">#</a> <a href="http://www.maluke.com/">Sergey</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>It's not really B&amp;D: when you recieve a request, you have to keep in mind what verb was used because each verb guarantees different kinds of behaviour. For instance, it's one thing to treat GET and POST requests identically if what you're doing to process the request fits the kind of behaviour that's acceptable in response to such a request, such as, say, displaying a page, but quite another thing if they don't, such as Anders' example of an application allowing items to be deleted with GET requests.</p>
+<p>However, as Ian outlined, such matters are a matter for a higher-level framework than WSGI and deciding them at WSGI's level would complicate the interface between it and the application or framework sitting on top of it.</p>
+<p>It <em>is</em> something that matters quite a bit, but because of HTTP itself and not some misplaced desire for B&amp;D. It's something which ought to be in the minds of any application developer because part of developing a good application is using the underlying protocol correctly. It's nothing to do with forcing a programming model and everything to do with passing the request onto another lump of code smart enough to <em>really</em> know what to do with it.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/wsgi-and-dispatch-comment-4.html" rel="nofollow">#</a> <a href="http://talideon.com/">Keith Gaughan</a></div><hr noshade>
+ 
+<div class="document">
+<p>I want to be clear that I wasn't disagreeing with Ian at all. I think he's absolutely spot on that the dispatching on method shouldn't be done at the WSGI level. It should be done by some layer that's on top of WSGI (I use wsgicollection for that, and it rocks).</p>
+<p>The point that I was making was just that GET and POST are not interchangeable. They are completely different operations with different semantics. Adhering to standardized semantics isn't B&amp;D, it's just interoperability and it lets you make simpler clients and servers.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/wsgi-and-dispatch-comment-5.html" rel="nofollow">#</a> <a href="http://thraxil.org/users/anders/">Anders</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Thanks for clearing up my failed attempt at Python; I've only dabbled with it.</p>
+<p>You're right that this was partly inspired by Servlets, but only insofar as I consider them to be a pretty good API for HTTP that I've used successfully for a number of years.  You can use Servlets as you would use WSGI, by just overriding the service() method, or you can use doGet, doPost, etc..  URI based dispatch can either be handled within service(), or using any of the URI-dispatching tools the containers typically provide (e.g. web.xml).  So there's certainly ample precedent for this form of API supporting the flexibility WSGI seems to require.  But <em>only</em> doing the equivalent of service() (as WSGI currently does) places more of the burden on remaining HTTP-friendly with what's built on top.  Perhaps that will work out, I don't know, but I don't see much downside to such a framework constraining the use of HTTP as I've described.  But if it doesn't work out for WSGI, and you have apps which, for example, don't distingiush GET and POST, then you lose the ability to, say, support cache management at the WSGI level.  Providing a Servlet-like API doesn't guarantee you that HTTP won't be abused of course, but it does reduce the likelihood that it'll be done accidentally.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/wsgi-and-dispatch-comment-6.html" rel="nofollow">#</a> <a href="http://www.markbaker.ca">Mark Baker</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Mark, not much people will wirte apps directly to the WSGI layer, but instead they'll use some framework... or at least will use some simple tool (like the 'selector' wsgi dispatch - <a class="reference" href="http://lukearno.com/projects/selector/">http://lukearno.com/projects/selector/</a>).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/wsgi-and-dispatch-comment-7.html" rel="nofollow">#</a> Damjan</div><hr noshade>
+</blockquote>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

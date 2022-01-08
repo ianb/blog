@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>More thoughts on Ruby on Rails</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>More thoughts on Ruby on Rails</h1>
+ 
+<div class="document">
+<p>I wrote some <a class="reference" href="thoughts-on-ruby-on-rails.html">thoughts on Ruby on Rails</a> a couple months ago.  But
+that was just formed by reading a bunch of docs, which is actually
+about as far as I get into a number of things.  I'm a little
+embarrassed to admit it, but I often build strong opinions on things
+I've only read about.  But, I don't really feed <em>bad</em> about it; I try
+not to be a curmudgeon and I give projects the benefit of the doubt.
+Installation sometimes feels like a waste of time when I just want to
+look around.</p>
+<p>But anyway, since I've been <a class="reference" href="what-really-makes-rails-work.html">thinking about Rails</a> lately, I thought
+I'd give it an actual test run.  I only went through the quite-short
+<a class="reference" href="http://manuals.rubyonrails.com/read/book/7">Making a to-do list</a>
+tutorial.</p>
+<p>So, I installed Ruby from the Debian packages (0.11.1) and set out.
+Impressions...</p>
+<p>First thing that Rails does is create a bunch of files and directories
+for your project.  I think this is a good idea, and something I <a class="reference" href="http://pythonpaste.org/docs/TodoTutorial.html#setting-up-the-files">added</a>
+recently to Paste.  (When I was introducing a coworker to Webware,
+the lack of a clear convention for file structure was actually one of
+his first concerns.)</p>
+<p>Now... the actual files.  More than I would have expected -- 11
+directories at the top level, and 29 total.  I'm not a fan of
+hierarchy, so this puts me off a little.  And it feels more complex
+than I expected.  But people can argue about file layout forever.</p>
+<p>Onward... I made a controller.  I notice controllers feel a lot like a
+published object, or even Webware's servlets.  Controllers are
+classes, and every method is its own page/URL (<tt class="docutils literal"><span class="pre">index</span></tt> as the
+default all the way down).  There's other more complicated ways to map
+URLs, but personally I find URLs a little boring.  People who start
+applications with URL design are, IMHO, displaying classic engineer
+tendencies wherein they focus on small technical details that don't
+matter in any larger picture.  But I digress...</p>
+<p>I find it odd that <em>every</em> method is published.  Which means there's
+no private methods.  Instead there's a &quot;helper&quot; class (for
+<tt class="docutils literal"><span class="pre">app/controllers/todo_controller.rb</span></tt> there's
+<tt class="docutils literal"><span class="pre">app/helpers/todo_helper.rb</span></tt>).  That's... awkward.  At one time Zope
+used docstrings to mark methods as public, but that was a bad idea
+(&quot;docstring abuse&quot;).  Now (in Python) function attributes are an easy
+way to do that, like:</p>
+<pre class="literal-block">
+def screen_method(...): ...
+screen_method.public = True
+</pre>
+<p>Or decorators can be used to the same effect, but with somewhat more
+pleasant syntax.  Or you can just use a naming convention (a name
+prefix that indicates a method is public).  But in Rails not only do
+helper methods not go in the same class, or the same file, or even the
+same directory, but in a separate file in a sibling directory.
+Strange.  I think there's also a good deal of mix-ins happening -- not
+just the helper into the controller, but the template into the
+controller as well.  Mix-ins were something people <a class="reference" href="http://www.linuxjournal.com/article/4540">thought to be a
+good idea in Python</a> some
+time back, but I think we've all realized they don't scale well (no
+worse than multiple inheritance, but that doesn't scale well either).
+Or at least mix-ins implies modularity where in fact there is none.</p>
+<p>Lots of things get passed around as instance variables of the
+controller.  It's encouraged (from what I can tell) to use instance
+variables for even local scope, so that helper methods can find these
+variables by name.  People who study language history will know
+pass-by-name as the black sheep in the pass-by-value/pass-by-reference
+debate.  No one uses pass-by-name anymore.  (Well, maybe that's not
+entirely true -- Tcl uses it for arrays, PHP uses it for callbacks,
+REST uses it for identifiers, and everyone who uses XML configuration
+uses it for all sorts of stuff.)  I'm sure there's good reasons for
+this stuff, but I also feel like Rails is willing to compromise on
+predictable isolated programming constructs if it saves them a line or
+two of code.  I like short code, but I like locally-understandable
+code <em>much</em> more.</p>
+<p>The model thing confuses me a bit as well.  I'm used to models being
+an abstract concept.  Models are your objects.  <em>Yours</em>, not the
+framework's.  The model can be a dictionary, or a number, or a ORM
+object, or a set of functions that call to a database procedurally, or
+code that queries remote services.  Whatever.  I don't see much of a
+difference between your &quot;model&quot; and your &quot;library&quot;.  But Rails
+formalizes it -- at least a little -- but making a separate directory
+for models.  Presumably they are distinguished in other ways too.
+It's hard to tell the difference between suggestive convention --
+meant to embody good practices -- and meaningful distinctions.</p>
+<p>One thing I like about the generation process (generating models,
+controllers, etc) is that it also extends the test framework.  That's
+definitely something that is going to go into Paste.  In addition to
+adding files for unit tests, it also adds model fixtures, which are
+some sample data.  Stuff you could use to see what the website looks
+like in a more realistic situation, or a way to avoid some tedium in
+your unit test setup.  This is similar to what scaffolding provides --
+not a great UI, but just enough stuff to give you enough navigation to
+get to the part you are working on right now.  I think there's value
+in that, and the name indicates its purpose, but it's also easy to
+over-appreciate because it seems magic.</p>
+<p>One last thing that struck me was the templates.  In a bad way.  The
+templates are a standard ASP-style of template; a classification one
+commenter seemed offended by in my last post, but it's not meant that
+way.  That's just what they are; they look exactly like ASP.  So what?
+Anyway, I don't care much about that.  I think <a class="reference" href="http://www.zope.org/DevHome/Wikis/DevSite/Projects/ZPT/FrontPage">ZPT</a>
+has some interesting ideas about how to put code into HTML, but I've
+never been that convinced that tag-based templates are easier or even
+as easy as more textual/program-oriented templating languages.</p>
+<p>What bothered me was the way they dealt with reuse.  At least in the
+template two options were given -- one generated the HTML in plain
+Ruby code.  Clearly ugly.  The other use &quot;partials&quot;, which a way of
+saying &quot;a second template that gets embedded&quot;.</p>
+<p>Well, like I said, I don't like hierarchy, and similarly I like
+keeping information together.  As a result, I <em>really</em> like templating
+languages that have <em>structure</em>.  Both ZPT and Cheetah have this,
+though using different metaphors.  In ZPT you have macros (METAL), and
+you use this for both the site wrapper and for reusing markup inside a
+page.  It's very nice; it really is a macro, and I'm not a big fan of
+macros, but I haven't had any problems with that aspect.  You can put
+lots of macros in a single file, you can give them all sorts of
+internal structure, etc.  Works great.  Cheetah does it with <tt class="docutils literal"><span class="pre">#def</span></tt>
+and representing templates as classes.  This serves many of the same
+purposes -- the ZPT macro is a Cheetah abstract superclass, and the
+macro &quot;slots&quot; are methods in Cheetah.  Either way you can define rich
+structure without adding new files or putting in new conditionals and
+funny exceptions and whatnot into your code.  Rails seems to offer no
+structure in its templates, and so they lack expressiveness.</p>
+<p>Anyway, that's my impression; still a bit shallow, but more informed.
+There's good things that I plan to borrow from Rails.  But there's a
+lot of things that feel unnecessary, or feel like paths I've explored
+(or seen other people explore) and chosen not to follow.  My
+impression of Rails' success has been that, compared to Java and PHP,
+it <em>is</em> really great.  In no small part because those are really
+crappy languages; low-level and lacking expressiveness.  There are
+also some important things Rails gets right, and I'm not going to
+ignore those.  There's some important things <a class="reference" href="php-and-application-evolution.html">PHP gets right too</a>, and
+I try not to ignore those either.  Java....... well, I guess it must
+get some things right too.  <a class="reference" href="http://dirtsimple.org/2004/12/java-is-not-python-either.html">People besides myself</a> will
+have to figure out what to take from them.</p>
+<p>In the end, there are some real distinctions between Rails and My
+Ideal Framework that go beyond these nitpicky details I bring up
+here; distinctions that are real tradeoffs, and where there can be
+real differentiation between us and them.  Not trivial things, like
+blocks or threads or whitespace, but different perspectives on 
+programming.  But I'll talk about that another time.</p>
+</div>
+ <div class="dates" align="right">
+Created 23 Apr '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>I'm really confused why so few people have noticed <a class="reference" href="http://www.myghty.org/">Myghty</a>. This Python web framework started as a direct <a class="reference" href="http://www.masonhq.com/">Mason</a> port, then added some MVC and advanced Resolver abilities (in the alpha release) that have turned it into an even more powerful web framework. The templating approach is already known and <strong>proven</strong> to scale for large deployment and development, as Amazon.com is using Mason.</p>
+<p>While this particular code-base re-implementing <a class="reference" href="http://www.masonhq.com/">Mason</a> is young, it's running great and is quite solid. When I was looking for a Python web framework, I originally considered Cheetah, ZPT, and some of the other template designs but they all seemed deficient in some way compared to Mason which I had been using earlier. I'm currently using Myghty with SQLObject for a large production site at my company and the performance has been excellent, and being able to specify per Component <a class="reference" href="http://www.myghty.org/docs/cache.myt">Caching</a> is a feature you won't want to live without in any templating language once you see it in operation.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/more-thoughts-on-ruby-on-rails-comment-15.html" rel="nofollow">#</a> <a href="http://www.groovie.org/">Ben Bangert</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

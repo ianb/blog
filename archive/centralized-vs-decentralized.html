@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Centralized vs. Decentralized 2</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Centralized vs. Decentralized 2</h1>
+ 
+<div class="document">
+<p>After thinking about the comments to <a class="reference" href="distributed-vs-centralized-scm.html#comments">my last post</a>
+I'm starting to see some of the technical advantages to distributed
+version control (even though I'm not any more enamored to the
+development process it so seldom presumes).</p>
+<p>Really the thing that keeps me from just opening up large swathes of a
+Subversion repository to anonymous access is the security concern.  I
+just don't trust Subversion in that way, and I doubt the Subversion
+developers trust it that way either.  After all, it's written in C,
+one of the Least Secure Languages Ever.  (PHP is giving it a run for
+its money with its own take on How To Be Insecure, but C has a much
+deeper and richer legacy of insecurity.)</p>
+<p>But a lot of the problems are hard to really imagine fixing in
+Subversion.  What if someone uploads 10Gig of <tt class="docutils literal"><span class="pre">asdfasdfasdf</span></tt> into
+the repository?  Sure, you can delete anything, but stuff still Lives
+Forever in the history.  Or less maliciously, someone is sure to start
+uploading core dumps, or giant PDFs, or something.  So even though
+Subversion is much less prone to mistakes than CVS, because operations
+can generally be &quot;undone&quot; there's still cruft left behind.  Not
+enough to bother me now, but enough that I suspect I'd be bothered
+if I give access to the public.  (I still plan to give access to more
+people once I get the permission thing figured out, just not self-signup.)</p>
+<p>Also, because lots of the logic lives on the server with a centralized
+tool like Subversion, there's a lot more to worry about in terms of
+remote exploits.  If most of the logic is in the client then they can
+only exploit their own machine.  Though on reflection this might be
+worse, since it could mean checking out a repository could itself be a
+security risk.  Well... let's just hope we're working with environments
+where security is valued and attainable.</p>
+<p>Another issue is backend management.  One of Subversion's benefits and
+drawbacks over CVS is that you couldn't &quot;maintain&quot; the repository,
+meaning you couldn't go in and fiddle with files on the server.  This
+means you can't break the repository, but also that you can't fix it
+(like when someone uploads those core dumps, or completely eliminating defunct
+branches).  Distributed systems leave room to meaningfully modify the
+&quot;repository&quot; using file commands, where the &quot;repository&quot; is really a
+whole set of repositories, which together form something equivalent to the more
+inclusive repository that Subversion expects.</p>
+<p>So maybe a distributed version control system would be a good basis
+for an open centralized repository, where that open repository is
+primarily a file share.  A usable system would actually handle the
+file sharing internally, since relying on scp, rsync, or an OS-level
+webdav client implementation is too error prone at this time.</p>
+<p>From this perspective centralizing the files is still very important
+to me.  In the model I would prefer there is a privileged (and
+presumably somewhat trusted) limited set of branches (like trunk or
+HEAD, tagged releases, stable branches).  And then there are all the
+other branches, and anyone can edit any of them.  That means that the
+default is open, which I feel strongly is the right default.  The current
+default of distributed systems is private and with author editing only.
+This feels like an unnecessary restriction imposed mostly because they
+are avoiding the technical issues of sharing.  I think the way these systems rely
+on email, rsync, ssh, etc., is simply avoidance, an unwillingness to
+address the whole experience.  But that can certainly be resolved.</p>
+</div>
+ <div class="dates" align="right">
+Created 09 Aug '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;&quot;&quot;Sure, you can delete anything, but stuff still Lives Forever in the history.&quot;&quot;&quot;</p>
+<p>It is possible to make the current (and past) states of the repository whatever you like by doing a dump/filter/reload.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/centralizedvsdecentralizedcomment1.html" rel="nofollow">#</a> <a href="http://benjiyork.com">Benji York</a></div><hr noshade>
+ 
+<div class="document">
+<p>I'll be really original, and suggest that what this really means is that you need to check out _my_ favorite system ;-)</p>
+<p>In this case, Monotone.  The interesting point relative to your post is that monotone, from some points of view, is quite close to what you describe.  Most of the distributed VCSes have branches thare are not just distributed, but scattered -- each meaningful branch lives in a particular location, these meaningful locations can be on different hosts, you have to know which host each branch lives on and be able to connect to it, etc.</p>
+<p>In monotone, OTOH, no repository is more equal than any other one; the basic network operation is just &quot;send them the facts I know but they don't, get fetch the facts that they know that I don't&quot; -- so one way to think of it is as a centralized VCS where that center is made a little more diffuse.  You can still commit while on an airplane, and it becomes completely trivial to do things like set up load-balancing hot-backup repos, if your server goes down anyone can step in for it, etc., but in the usual case everything is in the same place.  Think of it less &quot;no-one knows what's going on&quot;, more &quot;no central point of failure, many more 9s of robustness than achievable by any other method&quot;.</p>
+<p>New developers generally cannot push to a project's main server, because of exactly the sort of issues you mention -- we'd really rather not become the next big warez distribution network -- but they can push to their own server, and if a developer pulls from that server the changes will end up in the central server the next time they sync.  Apparently this sort of thing is called a &quot;gossip network&quot;, and has some rather nice properties this way.  Of course, this is a really high-level hand-wavy description...</p>
+<p>(It also, uh, contrary to comments on the last post, has never used OpenSSL's libraries, and has supported tag and branch based checkout for eons.  No local tags, though, hadn't encountered that idea before.  Interesting idea.)</p>
+<p>I think you were missing the point just a bit in the last post; the advantages of DVCSes aren't so much &quot;oo, distributedness!&quot; as lots and lots of things like this -- increased robustness, better merging, workflow improvements (no update-before-commit requirement, for instance; frees one from the tyranny of the cowboy who keeps breaking mainline), cooperation across organizational and trust boundaries, that sort of thing.  Distribution is one nice feature, but hardly defines a VCS by itself; the particular issues you listed are real ones, but not necessarily the relevant ones.</p>
+<p>DVCSes _do_ also make it possible and even easy to fork.  There are people who want to make it hard to fork.  (I don't know if you're one of them.)  I can understand where they're coming from, but I do outright disagree with the position; forking is an important freedom, and I honestly think it's wrong for tools to try and enforce otherwise.  OTOH, this certainly doesn't mean they should make it easy to accidentally drift out of sync and neglect to inform other contributors of work ongoing...</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/centralized-vs-decentralized-comment-2.html" rel="nofollow">#</a> <a href="http://venge.net/monotone/">Nathaniel Smith</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p><em>&quot;It also, uh, contrary to comments on the last post, has never used OpenSSL's libraries, and has supported tag and branch based checkout for eons&quot;</em></p>
+<p>My bad.  Sorry. :(</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/centralized-vs-decentralized-comment-4.html" rel="nofollow">#</a> <a href="http://wookimus.net/~chewie">Chad Walstrom</a></div><hr noshade>
+ 
+<div class="document">
+<p>Don't forget that distributed systems make it easier to <em>recover from</em> a fork.  It's just a merge, after all.</p>
+<p>I don't think they have any effect on how easy it is to fork in the first place; tools like cvsps and tailor make it trivial to pull history out of one repository and into another.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/centralized-vs-decentralized-comment-10.html" rel="nofollow">#</a> <a href="http://www.serpentine.com/blog">Bryan O'Sullivan</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>What's wrong with SSH?  If your goal is to support authenticated write access, using SSH makes a lot more sense than trying to hack together your own cryptographically sound transport mechanism.  You should also support anonymous read access, of course.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/centralized-vs-decentralized-comment-3.html" rel="nofollow">#</a> Aaron Bentley</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Working with ssh via TortoiseSVN on Windows is not endearing to ssh.  Of course in this case it's my own fault for not having an https access method to the repository... which is to say, it's my fault for not using the superior server support Subversion provides via HTTP.  Anyway, ssh doesn't make for a very good, complete experience.  SSH servers and clients are not as easy to abstract or build upon as with other protocols, so actually building ssh support into the server and client is rather hard, and you end up with hacky (IMHO) command-line solutions.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/centralized-vs-decentralized-comment-5.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I think you're talking more about bad ssh use than problems with ssh, itself.  If you're building your own protocol, layering it on top of SSH takes care of security.  If you just want access to files, sftp comes with SSH and is capable-- much nicer than http for filesystem access.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/centralized-vs-decentralized-comment-6.html" rel="nofollow">#</a> <a href="http://">Aaron Bentley</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>SSH requires OS level user accounts.  That's just not possible in many situations.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/centralized-vs-decentralized-comment-8.html" rel="nofollow">#</a> <a href="http://">Stephen</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Not true.  Nothing in the SSH protocol requires OS-level accounts.</p>
+<p>Admittedly implementations of it that don't require OS-level accounts are rare, but they exist.  For instance, Canonical provides SFTP space for Bazaar archives (and soon Bazaar-NG branches) for anyone with a Launchpad (<a class="reference" href="https://launchpad.net/">https://launchpad.net/</a>) account.  These are then mirrored to the world via HTTP.</p>
+<p>We implement this SFTP server using Twisted's Conch SSH library, and I can assure you we don't create OS-level accounts for every Launchpad user :) ... it was actually surprisingly easy to use Conch for this.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/centralized-vs-decentralized-comment-9.html" rel="nofollow">#</a> <a href="http://">Andrew</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>And I've posted it at <a class="reference" href="http://www.serpentine.com/blog/software/distributed-vs-centralised.html">http://www.serpentine.com/blog/software/distributed-vs-centralised.html</a> to save on re-pasting it here.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/centralized-vs-decentralized-comment-7.html" rel="nofollow">#</a> <a href="http://www.serpentine.com/blog">Bryan O'Sullivan</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

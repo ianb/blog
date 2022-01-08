@@ -1,0 +1,314 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Python's Makefile</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Python's Makefile</h1>
+ 
+<div class="document">
+<p>Sometimes people decry the lack of a good <tt class="docutils literal"><span class="pre">make</span></tt> tool in Python.
+There are some make tools (e.g., <a class="reference" href="http://www.scons.org/">SCons</a> or
+<a class="reference" href="http://www.plope.com/software/pymake">pymake</a>), but that's not
+actually what people are usually thinking about.  It's not about
+building code based on a system of dependencies.  We do pretty well
+without that anyway.</p>
+<p>Because really people are talking about something more like <a class="reference" href="http://rake.rubyforge.org/">rake</a> -- something where you can put together
+a bunch of code management tools.  These aren't commands provided <em>by</em>
+the code, these are commands used <em>on</em> the code.  You can do this in a
+Makefile too, but none of it really has any relation to what <tt class="docutils literal"><span class="pre">make</span></tt>
+does -- it's just a convention for where to put tools.</p>
+<p>We do have the infrastructure for this in Python, but no one is really
+using it.  So I'm writing this to suggest people use it more: the
+<tt class="docutils literal"><span class="pre">setup.py</span></tt> file.  So where in another environment someone does
+<tt class="docutils literal"><span class="pre">rake</span> <span class="pre">COMMAND</span></tt>, we can do <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">COMMAND</span></tt>.</p>
+<p>Setuptools in particular provides an <a class="reference" href="http://peak.telecommunity.com/DevCenter/setuptools#creating-distutils-extensions">extension mechanism for this</a>.
+With it you can add new globally-available commands.  An example of
+this is <a class="reference" href="http://buildutils.lesscode.org/">buildutils</a>.  This package
+is, sadly, unmaintained; in part I'm writing this blog post to
+encourage people to steal/remake/repair the kind of functionality
+buildutils provides, and provide entirely new functionality.</p>
+<p>The basic pattern is that you create a distribution that provides the
+<tt class="docutils literal"><span class="pre">[distutils.commands]</span></tt> entry point.  This points to a subclass of
+<tt class="docutils literal"><span class="pre">distutils.cmd.Command</span></tt>; the class is a little arcane, but not
+really too hard to handle.  It looks like this:</p>
+<pre class="literal-block">
+from distutils.cmd import Command
+from distutils.errors import *
+class my_command(Command):
+    description = &quot;&lt;help description&gt;&quot;
+    user_options = [('long-option=', 'l', '&lt;help&gt;'),
+                    ('other-long-option', 'o', '&lt;help&gt;')]
+    boolean_options = 'other-long-option'
+    def initialize_options(self):
+        self.long_option = &lt;default&gt;
+        self.other_long_option = False
+    def finalize_options(self):
+        if self.long_option is not valid:
+            raise DistutilsOptionError(...)
+    def run(self):
+        do stuff...
+</pre>
+<p>There's other details as well.  It's not a <em>great</em> framework, but it's
+a passable one.</p>
+<p>All the options you provide can be set in
+<tt class="docutils literal"><span class="pre">setup.cfg</span></tt> (in this case under <tt class="docutils literal"><span class="pre">[my_command]</span></tt>).  This lets the
+package configure itself for the command.  You can also add new
+keyword arguments to <tt class="docutils literal"><span class="pre">setup()</span></tt>, but I'd avoid that technique
+(distutils/setuptools will whine but not fail if it gets unexpected
+keyword arguments -- and they'll only be &quot;expected&quot; if you have all the right
+packages installed).</p>
+<p>When you add a command this way it becomes globally available.
+Sometimes you don't want that -- a command might be applicable only to code
+using a particular framework, for instance -- so there is another option that comes
+from distutils (and is inherited by setuptools):
+<tt class="docutils literal"><span class="pre">--command-packages</span></tt>.  This points to a package where each module is
+a separate command.  As a result is good practice to put all your commands
+in a subpackage dedicated to distutils commands.  In a <tt class="docutils literal"><span class="pre">setup.cfg</span></tt> file
+this then looks like:</p>
+<pre class="literal-block">
+[global]
+command_packages = buildutils.command, other.module, ...
+</pre>
+<p>The commands provided don't show up in <tt class="docutils literal"><span class="pre">--help-commands</span></tt> (unfortunately),
+but they do work.</p>
+<p>Ideally I'd like to see all the commands people write around
+maintenance tasks use this convention -- document extraction tools,
+file publishing tools, tools to create boilerplate source files and
+templates, tools to test and analyze code, etc.  It will make
+distributing and using these tools easy, and hopefully get everyone on
+the Good Packaging Bandwagon.</p>
+<p><strong>Update</strong>: Trying to put my money where my mouth is, I wrote up a <a class="reference" href="https://svn.openplans.org/svn/TaskTracker/trunk/tasktracker/distutils_commands/compress_resources.py">little recipe for combining CSS and Javascript files in a project</a> (with accompanying <a class="reference" href="https://svn.openplans.org/svn/TaskTracker/trunk/setup.cfg">setup.cfg</a>).</p>
+</div>
+ <div class="dates" align="right">
+Created 15 Apr<br>
+Modified 25 Apr</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>FTR, pymake is dead, and has been replaced functionally by buildit (<a class="reference" href="http://www.agendaless.com/Members/chrism/software/buildit/">http://www.agendaless.com/Members/chrism/software/buildit/</a>).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-1.html" rel="nofollow">#</a> <a href="http://www.plope.com">Chris McDonough</a></div><hr noshade>
+ 
+<div class="document">
+<p>Oh.  And Ian is right inasmuch buildit (and to some degree ZC's buildout framework) are not really tools for packaging and deploying Python modules and packages (although they can be used for this).  Instead, they fall into the same space that make does as a general purpose &quot;put files on the filesystem using these shell commands&quot; tools, and they happen to be written in Python and exensible in Python.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-2.html" rel="nofollow">#</a> <a href="http://www.plope.com">Chris McDonough</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I'm not sure I understand how zc.buildout is <em>not</em> really a tool for packaging and deploying Python modules and packages. I thought it was. That's not to flame, I just have difficulty seeing the difference.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-8.html" rel="nofollow">#</a> Jan-Wijbrand Kolman</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>They are tools for working with the deployed modules.  So for instance, when I have a library and I want to release it, I have to create a tag in the version control.  I have to update the news file, run some tests, change some metadata in <tt class="docutils literal"><span class="pre">setup.py</span></tt>, etc.  Maybe I have to update some gettext catalogs, etc.  These are the kinds of tools I am talking about.</p>
+<p>What zc.buildout and buildit do comes after that.  <em>After</em> you have does all these code maintenance tasks, they help you use the code in a real deployment.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-9.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Hrm, I think <em>around</em> is more how zc.buildout fits in the picture. In combination with find-links it can be a great way to maintain a consistent set of the kinds of tools you could run from make; but all packaged up for python. I think this use overlaps with workingenv. One of my pet gripes with setup.py has nothing to do with its utility. I like my build configuration to be declaritive. placing entry_points, version, and all sorts of other build facts in setup.py makes it a pain to consume that data else where. .egg-info is only available after the build has run. There does not seem to be a 'best practice' for sourcing entry-points etc from a seperate, declaritive, file. setup.cfg maybe but its not what I use.</p>
+<p>A couple of buildout recipes I've been fooling around with:
+<a class="reference" href="http://svn.wiretooth.com/svn/open/rsb_sourcesvn/trunk/">http://svn.wiretooth.com/svn/open/rsb_sourcesvn/trunk/</a> checkout sources from svn into a build out
+<a class="reference" href="http://svn.wiretooth.com/svn/open/rsb_setupdevelop/trunk/">http://svn.wiretooth.com/svn/open/rsb_setupdevelop/trunk/</a> wraps zc.recipe.egg:scripts to do the equivelent of 'python setup.py develop'
+Illustrate the way my setup.py usage is going these days.</p>
+<p>And then I tend to have a 'toolbox' buildout that pulls in this config
+<a class="reference" href="http://svn.wiretooth.com/svn/open/share/zc.buildout.cfgs/python-development-tools.cfg">http://svn.wiretooth.com/svn/open/share/zc.buildout.cfgs/python-development-tools.cfg</a></p>
+<p>Using buildouts 'config from url' trick.</p>
+<p>All that said, your OP is spot on, its not make we are all missing.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-11.html" rel="nofollow">#</a> robinbryce</div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>By the way, setuptools also lets you define additional setup() arguments (that can then be used by your add-on commands), and you can use the setup_requires argument to make your setup script depend on eggs containing the commands and/or arguments your setup script may need.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-3.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+ 
+<div class="document">
+<p>Doesn't this conflicts with eggs? When you have only an egg and easy_install, you'll not be able to do this...</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-4.html" rel="nofollow">#</a> <a href="http://snakesaysni.blogspot.com">Lior Gradstein</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>If you just have an egg, you aren't developing the package, so you don't need access to the development tools.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-7.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ I love you <a href="http://www.vhvm.com">群发软件</a> <a href="http://www.vhvy.com">群发软件</a> <a href="http://www.vhvf.com">群发软件</a>  <a href="http://www.vhvk.com">群发软件</a>  <a href="http://www.wodiyi.net">群发软件</a>  <a href="http://www.wofanyi.com">群发软件</a> <a href="http://www.quzuche.com">群发软件</a> 
+<a href="http://www.vhvm.com/soft-shopping.htm">群发软件</a>
+<a href="http://www.vhvm.com/Update.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/baiweiblog.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/soft-service.htm">群发软件</a>
+<a href="http://www.vhvm.com/hy-item.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/wwqq.htm">群发软件</a>
+<a href="http://www.vhvm.com/soft-down.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/soft2006-118.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/yyhh.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/wwxx.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/jf-x.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/ttgg.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/yyxx.htm">群发软件</a>
+<a href="http://www.vhvm.com/soft-paid.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/hy-item.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/tsv.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/ggdd.htm">群发软件</a>
+<a href="http://www.vhvm.com/software.files/soft-paid.htm">群发软件</a>
+<a href="http://www.vhvm.com/Member.htm">群发软件</a>
+<a href="http://www.vhvm.com/free.htm">群发软件</a>
+<a href="http://www.vhvy.com">群发软件</a>
+<a href="http://www.vhvy.com">群发软件</a>
+<a href="http://www.vhvy.com/Member.htm">群发软件</a>
+<a href="http://www.vhvy.com/free.htm">群发软件</a>
+<a href="http://www.wodiyi.net/soft-shopping.htm">群发软件</a>
+<a href="http://www.wodiyi.net/Update.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/baiweiblog.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/soft-service.htm">群发软件</a>
+<a href="http://www.wodiyi.net/hy-item.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/wwqq.htm">群发软件</a>
+<a href="http://www.wodiyi.net/soft-down.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/soft2006-118.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/yyhh.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/wwxx.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/jf-x.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/ttgg.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/yyxx.htm">群发软件</a>
+<a href="http://www.wodiyi.net/soft-paid.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/hy-item.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/tsv.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/ggdd.htm">群发软件</a>
+<a href="http://www.wodiyi.net/software.files/soft-paid.htm">群发软件</a>
+<a href="http://www.wodiyi.net/Member.htm">群发软件</a>
+<a href="http://www.wodiyi.net/">群发软件</a>
+<a href="http://www.wodiyi.net/free.htm">群发软件</a>
+<a href="http://www.lihuida.com/soft-shopping.htm">群发软件</a>
+<a href="http://www.lihuida.com/Update.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/baiweiblog.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/soft-service.htm">群发软件</a>
+<a href="http://www.lihuida.com/hy-item.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/wwqq.htm">群发软件</a>
+<a href="http://www.lihuida.com/soft-down.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/soft2006-118.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/yyhh.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/wwxx.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/jf-x.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/ttgg.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/yyxx.htm">群发软件</a>
+<a href="http://www.lihuida.com/soft-paid.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/hy-item.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/tsv.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/ggdd.htm">群发软件</a>
+<a href="http://www.lihuida.com/software.files/soft-paid.htm">群发软件</a>
+<a href="http://www.lihuida.com/Member.htm">群发软件</a>
+<a href="http://www.lihuida.com/free.htm">群发软件</a>
+<a href="http://www.lihuida.com/">群发软件</a>
+<a href="http://www.vhvf.com">群发软件</a>
+<a href="http://www.vhvf.com/hhyy.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/md.htm">群发软件</a>
+<a href="http://www.vhvf.com/zxgx.htm">群发软件</a>
+<a href="http://www.vhvf.com/hftg.htm">群发软件</a>
+<a href="http://www.vhvf.com/xxqf.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/tgzs.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/blog.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/qibing.htm">群发软件</a>
+<a href="http://www.vhvf.com/index2.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/lx.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/qnyx.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/wxswyq.htm">群发软件</a>
+<a href="http://www.vhvf.com/index5.htm">群发软件</a>
+<a href="http://www.vhvf.com/buy.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/ssk.htm">群发软件</a>
+<a href="http://www.vhvf.com/member.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/swkc.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/fkss.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/baidusj.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/hfyx.htm">群发软件</a>
+<a href="http://www.vhvf.com/index3.htm">群发软件</a>
+<a href="http://www.vhvf.com/download.htm">群发软件</a>
+<a href="http://www.vhvf.com/index6.htm">群发软件</a>
+<a href="http://www.vhvf.com/paid.htm">群发软件</a>
+<a href="http://www.vhvf.com/index1.htm">群发软件</a>
+<a href="http://www.vhvf.com/index4.htm">群发软件</a>
+<a href="http://www.vhvf.com/soft/qqqq.htm">群发软件</a>
+<a href="http://www.9fu9.com">博客群发软件</a>
+<a href="http://www.9fu9.com/fbjt.htm">博客群发软件</a>
+<a href="http://www.9fu9.com/new.htm">博客群发软件</a>
+<a href="http://www.henjiandan.com/soft-shopping.htm">群发软件</a>
+<a href="http://www.henjiandan.com/Update.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/baiweiblog.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/soft-service.htm">群发软件</a>
+<a href="http://www.henjiandan.com/hy-item.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/wwqq.htm">群发软件</a>
+<a href="http://www.henjiandan.com/soft-down.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/soft2006-118.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/yyhh.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/wwxx.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/jf-x.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/ttgg.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/yyxx.htm">群发软件</a>
+<a href="http://www.henjiandan.com/soft-paid.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/hy-item.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/tsv.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/ggdd.htm">群发软件</a>
+<a href="http://www.henjiandan.com/software.files/soft-paid.htm">群发软件</a>
+<a href="http://www.henjiandan.com/Member.htm">群发软件</a>
+<a href="http://www.henjiandan.com/free.htm">群发软件</a>
+<a href="http://www.henjiandan.com/">群发软件</a>
+ <div align="right"><a href="http://blog.ianbicking.org/pythonsmakefilecomment13.html" rel="nofollow">#</a> <a href="http://www.vhvm.com">群发软件</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>The thing I love most about Python is that many of its APIs are intuitive and obvious.  Compare, e.g. reading a line from a text file in Python and in Java.  Sometimes when I use a new standard library module I don't even have to go read its documentation: a brief glance with pydoc suffices to show the method or class names, and the rest is obvious.</p>
+<p>Distutils, sadly, is an exception.  Despite reading the documentation and creating three setup.py files, I do not feel comfortable with it.  If I were stranded on a desert island with no Internet access and no documentation, I could not write a setup.py file.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-5.html" rel="nofollow">#</a> <a href="http://gedmin.as">Marius Gedminas</a></div><hr noshade>
+ 
+<div class="document">
+<p>I started going in this direction a long time ago, with my <a class="reference" href="http://da44en.wordpress.com/2002/11/22/using-distutils/">Using distutils</a> post.  There is a section entitled &quot;Adding a new command: automated tests&quot;, wherein I showed how to create <tt class="docutils literal"><span class="pre">test</span></tt> and <tt class="docutils literal"><span class="pre">clean</span></tt> targets (or whatever distutils calls them, I forget now).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-6.html" rel="nofollow">#</a> <a href="http://sevenroot.org/">Darren Chamberlain</a></div><hr noshade>
+ 
+<div class="document">
+<p>How come no one talks about aap <a class="reference" href="http://www.a-a-p.org/">http://www.a-a-p.org/</a> ?</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/pythons-makefile-comment-10.html" rel="nofollow">#</a> Kent</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

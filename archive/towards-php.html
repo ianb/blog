@@ -1,0 +1,458 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Towards PHP</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Towards PHP</h1>
+ 
+<div class="document">
+<p>I've been thinking more about PHP after my <a class="reference" href="orthogonality-is-pretentious.html">last post</a>.
+Here's <a class="reference" href="http://twwilliams.com/blog/2006/02/20/why-does-php-have-to-be-professional-grade/">another post</a>
+along the same lines.  In summary, there's a kind of admission on all
+sides that PHP lets people with no programming skill program,
+producing bad software, but actually <em>producing</em>.  Some people think
+that's okay, some don't; I definitely believe that is okay, even if it
+doesn't lead to the technical decisions <em>I</em> want.</p>
+<p><em>But</em> PHP is still a horrible language.  It's okay that PHP mixes HTML
+and code.  It is okay that some of its data structures are sloppy,
+like arrays.  It's okay that it's not very object oriented.  But some
+things aren't okay.  The quoting rules are horrible, and the database
+access is horrible, and several other pieces are just incredibly stupid.</p>
+<p>PHP was not designed by good language designers.  I don't even think
+it was designed by people interested in language design.  Which is
+strange in a way, because there's far more people interested in
+language design than there is room for languages.  But maybe it took
+bad (or at least disinterested) language designers to create something
+that didn't overthink the problem, so that they approached the design
+much like beginning programmers would eventually approach the language
+itself.</p>
+<p>But you don't <em>have</em> to be disinterested to create an a
+language or environment good for beginners.  And you don't <em>have</em> to make stupid
+decisions to mirror the stupid decisions your language users will
+later make.</p>
+<p>So it makes me think; what could really be the better PHP?  Something
+that flows more comfortably towards &quot;good&quot; web programming practice
+(e.g., MVC), but doesn't require those practices.  Something that suggests
+techniques to users, even very primitive techniques that seem entirely
+obvious to an experience programmer.</p>
+<p>I think the active page model is a good place to start, allowing a
+gradual move from static HTML to dynamic.  I think databases should be
+considered from the start, because that's just obvious and universal
+at this point.  I imagine something like <a class="reference" href="http://www.freenet.org.nz/python/ezsqlobject/">ezSqlObject</a> (even though I don't
+think that code is maintained anymore, and I probably wouldn't base it directly
+on SQLObject).  You have an object that represents
+your database, attributes that represent tables, etc.  There is no
+&quot;model&quot;; database access is procedural.</p>
+<p>To allow better flow to MVC, you should be able to mix the active
+pages with Python code, and you should be able to put a block of
+Python code at the top of your page.   Code
+reloading must happen totally transparently and reliably.</p>
+<p>It needs to be a multiprocess server, not threads (<em>maybe</em> one process
+and multiple interpreters); this <a class="reference" href="http://www.sitepoint.com/blogs/2006/02/21/a-pro-php-rant/">is one of the big features</a> of PHP.
+It needs to have a complete server setup.  PHP gets by with nearly
+everyone using Apache, and it does well -- the constraint is a
+feature.  Less to think about.</p>
+<p>To be really like the PHP process model, the only current option for Python is to use
+CGI.  This is not actually realistic.  But I think it is possible,
+given the appropriate monitoring and isolation to get nearly as
+reliable a system.  That means a really reliable master process, with
+subprocesses that are monitored and managed.  The only Python system I
+know that really does this is <a class="reference" href="http://skunkweb.sourceforge.net/">SkunkWeb</a>, though a complete system would
+probably be more extensive still.</p>
+<p>Errors should initially display as simply as possible, possibly
+allowing you to dig in.  I imagine some notion of &quot;library&quot; versus
+&quot;application&quot; code (probably based on package), and the most minimal
+error message shows the outermost frame of application code.  From
+there you can expand, but most errors are trivial and can be best
+detected with this separation.  This is true of experienced users too,
+and certainly it's a UI principle that we could stand to use
+elsewhere; but it's especially true for new users, and the
+intimidation of a full traceback is a problem.</p>
+<p>We should build other tools into the system, like code editing.  This
+doesn't mean storing code in a database ala Zope, it just means one
+less bit of overhead to getting started.  Figuring out how to handle
+editing is a significant overhead.  The <a class="reference" href="http://www.turbogears.org/docs/toolbox/">TurboGears toolbox</a> is an
+example of providing good through-the-web tools; these should just be tools,
+not frameworks.  No frameworks!</p>
+<p>For the actual pages, what template?  I'd probably suggest Cheetah or
+Spyce.  Though I mention Django in the previous post, it is not
+powerful enough to be used without Python code, nor does it allow the
+flow from HTML, to simple page, to complex page, to MVC; it's missing
+a step.</p>
+<p>I also think that the template should be textual, not markup-based.
+People will be editing these pages in their text form; <em>maybe</em> you can
+edit markup-based templates using WYSIWYG tools, but you certainly
+can't add all the logic you need to make a dynamic site.  Like Django,
+it only really works when used in concert with a &quot;real&quot; programmer.
+If you are editing text, you should be working on the text level.
+Spyce, unlike Cheetah, is really targetted at exactly this model; that
+said, Cheetah is entirely capable of this model.  So it's a toss-up to
+me.  They both do a good job of embedding Python into markup, which is
+not easy.  Myghty is also usable in this same way, but I find it
+rather complex.</p>
+<p>I think an object explorer would also be a very nice tool, but I won't
+go into the design.  It would be a very interested project, though.
+Think of live objects.  The multiprocess thing makes this hard,
+though.  Maybe it's good to expect a single-process non-concurrent
+development mode.</p>
+<p>Another important key will be a rich library of routines for typical
+web programming tasks.  That's the thing I praise so much in the PHP
+post; Python supports this well, but there isn't really such a library
+just for web programming.  It can't be a framework, it shouldn't be
+very object oriented.  I think namespaces are completely okay (you
+don't have to be <em>quite</em> as flat as PHP), but import management is
+problematic.</p>
+<p>I think <a class="reference" href="http://pylonshq.com/">Pylons</a> is going in a good direction
+in terms of these routines.  First is the <a class="reference" href="http://pylonshq.com/WebHelpers/">WebHelpers</a> module (with no particular
+attachment to Pylons or Myghty, except being codeveloped).  The other
+thing they are doing is a per-application module where you import all
+your helpers (by default just the WebHelpers package, but you can add
+imports there).  Everything imported into this special module is
+available as a global variable in your pages.  I think this is a good
+way of balancing explicitness with easy and casual availability of
+simple routines.  The initial set of imports should be fairly rich.</p>
+<p>Anyway, there's a simple outline.  I don't think any one part of it requires
+anything too radical -- except for the process model (and reloading goes with
+that).  That part is hard, but very very important.  We can't clone PHP to achieve
+that -- mod_python is not really equivalent to mod_php.  And using Apache as
+the app server works in PHP because their standard library is entirely in C.</p>
+<p>Since Python is a capable language for writing library code, this is not an
+option; most of the standard library is already written in Python.  There's other
+similar aspects to PHP we can't clone -- mod_php is much much closer to Python CGI than to mod_python,
+in my opinion.  I think for
+Python to make this work we need more flexibility than we can get being embedded
+in Apache.</p>
+<p>Anyway, there's some thoughts for ya'.</p>
+</div>
+ <div class="dates" align="right">
+Created 22 Feb '06</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>I strongly agree that a dirt-simple DB layer would be a plus.  Advanced ORMs like SQLAlchemy have their place, but are probably too much for most beginning Spyce users to handle.  Most other ORMs have the kind of complexity that comes from several iterations of feature creep, without SQLAlchemy's power.  There's definitely room for a tool that designs for simplicity and sticks with that design even in the face of temptation to add just one more feature.  Such a tool could probably be built fairly easily on top of SQLAlchemy's introspection layer.  No need to re-invent the wheel.</p>
+<p>But, I disagree that multiple, short-lived processes is the way to go: one of the leading causes of bad PHP code is the tendency to stuff all kinds of crap into session objects, because that's the only easy way to persist things between requests.  (At the extreme end of this, I've seen 10MB session blobs in the database.)  A single multithreaded server simplifies this greatly, e.g. with Spyce's pool module.  (Multiple, long-lived processes, of course, offer the worst of both worlds from this perspective: no state reset between requests, AND no simple persistence -- because your user might not get the same process with his next request.)  Scalability is a separate problem, really; by the time you have more traffic than you can handle with a single threaded server, you should either have a clue or be able to hire someone who does. :)</p>
+<p>(Amusing captcha, btw. :)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-1.html" rel="nofollow">#</a> <a href="http://spyced.blogspot.com">Jonathan Ellis</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>A multiprocess server isn't so much about performance, it's about reliability and some better predictability (not perfect if you aren't throwing away all state, but at least better).  And in part about architecture.  Putting stuff into a session isn't particularly worse than putting stuff into a global variable.  Better, really; at least you are being explicit about the storage you are doing.  I already abhor losing any information on server restart -- I <em>always</em> regret it later -- so I don't put anything valuable in memory.  If it's too hard to do otherwise, then that is something to be fixed, it's not that we should use the poor man's persistence of threading and global state.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-5.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;I already abhor losing any information on server restart -- I always regret it later -- so I don't put anything valuable in memory.&quot;</p>
+<p>For my applications, there always seems to be all kinds of temporary crap that I'd like in memory to avoid recomputing, but that I can always auto-re-derive from my normalized data on a restart.  I guess either we're writing different kinds of apps, or we're not really disagreeing, or a little of both -- what I keep in memory isn't &quot;valuable,&quot; either, but I do enough of it that if the only caching API I had were a session-based one, my code would suck.</p>
+<p>(This isn't really about premature optimization, either; I could point at any number of pages where doing a dozen queries to set things up once a day or once a server restart is okay, but doing it once per page load is unacceptable with any number of users.)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-9.html" rel="nofollow">#</a> <a href="http://spyced.blogspot.com">Jonathan Ellis</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>PHPs main use is simplicity.  Isn't python supposed to be simple?</p>
+<p>The simplest program, is edit a file called helloworld.php and put this in it.
+&lt;? echo &quot;hello world&quot;; ?&gt;
+Upload helloworld.php to your host.</p>
+<p>PHP is on a lot of hosts by default.  mod_python support is improving a lot, with it being a supported configuration in a bunch of the hosting control panels now.</p>
+<p>PHP has much better documentation than python.  Yes, user comments do work.  Yes a searchable documentation is useful.  The PHP documentation has better structure, and a common style which is followed for all of its parts.  You will see examples for every function.</p>
+<p>Some language features are better than python ones.  Its array combines lists, and dict functionality.  They even preserve order, which is a common need.  It has a familiar syntax to C/C++/java/C# programmers.  The syntax is a reason why some people do not use python.  Which is silly.  but eh.</p>
+<p>Of course PHP can be used with MVC style as well.  Where you do not mix your code and html.  Lots of major programs do not mix code and html in php land.  Check out the various open source applications available.  I'd be suprised if you found even one that mixed html and code.</p>
+<p>PHP can also be used threaded, and not part of apache at all.  Running as fcgi processes.  It can also be run from the command line, and from cgi.</p>
+<p>A windows installer for a python web server would go a long way towards getting designers able to use it.  I think that is one of plones reasons for success.  Having a usable WSGI server that is in standard python would be great.</p>
+<p>Have fun!</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-2.html" rel="nofollow">#</a> <a href="http://www.madecollective.com/">Rene Dudfield</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>&gt;Its array combines lists, and dict functionality. They even preserve order, which is a common need.&lt;</p>
+<p>Yes, it's a common need, every week people ask how to sort a dict. Unsorted dicts are probably faster then ordered ones, that probably have to be implemented as some kind of trees (to avoid wasting memory). Around there are some odict (ordered dict) implementations for Python, but maybe they aren't used much. Putting one of such refined implementations inside the collections module of the standard library (Hettinger can probably do something like this in few days) can help, but probably not much. Changing the Python dicts to ordered ones can (probably) be done without breaking old python programs, but such change can probably slow down all the CPython (but I don't know much), so I don't know how much good it can be.</p>
+<p>Having a mixed list and dict functionality can be a positive thing for a scripting language that has to be used for quick programming tasks, but probably it's not useful for Python now... I don't know.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-16.html" rel="nofollow">#</a> bearophile</div><hr noshade>
+ 
+<div class="document">
+<p>About the documentation</p>
+<p>Agreed, agreed, agreed. It's one of the thing which really needs improvement at the python Web site. The documentation is just not usable for people with little understanding of programming. The step is really too high to be able to start programming because of the documentation.</p>
+<p>Take for example Module Email in Python
+<a class="reference" href="http://docs.python.org/lib/module-email.html">http://docs.python.org/lib/module-email.html</a></p>
+<p>And compare to Module Mail in PHP
+<a class="reference" href="http://jp2.php.net/manual/function.mail.php">http://jp2.php.net/manual/function.mail.php</a></p>
+<p>What is more useful for a beginner? Attracting more beginners to Python will help to reach the mass limit for having a python ecology on Web sites. :) 
+Documentation is one of the key thing.</p>
+<p>Better doc, more people
+more people, progress in libraries and hosting services supporting python.</p>
+<p>I love python, but it's very difficult to use at the start.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-18.html" rel="nofollow">#</a> <a href="http://www.la-grange.net/">karl</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>Interesting.  I just got back from mashupcamp.  There I was talking with a developer of one of the big php apps.  I said something to the effect of &quot;the language design of php was an afterthought&quot;.  (Note to me, not a good thing to do to a php developer).  He made some rather offensive comment about python programmers and then said he'd have a complete application done just by configuring exisitng parts of their solution in less than 30 minutes.  (Which is probably true, and the only thing that really exists in python similarly would by plone).  Fine he had a point, php makes web programming easy (for easy things).
+I said something about PHP5 fixing some of the warts and he said that no one would move to php5 because &quot;objects are a bad thing in web programming, just look at java&quot;.  Another php developer who was chatting with us kind of gasped...</p>
+<p>One more quick story.  I was in a screen scraping session given by Adrian Holovarty (of Django fame) and someone walked in and asked if php made web programming easy.  Adrian just kind of grinned.  I found it quite humorous....</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-3.html" rel="nofollow">#</a> <a href="http://panela.blog-city.com">matt</a></div><hr noshade>
+ 
+<div class="document">
+<p>Great post as always. Coming myself from PHP (in terms of web programming) I can relate to a lot of this. Now I'm involved into Zope (3) a lot, so I guess that should tell you something too :).</p>
+<p>Several times you try to compare mod_python to mod_php. I think a better comparison would be mod_python vs. mod_perl. Both of those modules are about writing Apache handlers in the respective languages. mod_php isn't really about writing specific handlers but about a new type of page.</p>
+<p>I'm not quite comfortable with your aiming at CGI. With WSGI and paste (after all, that's your invention :)) I think we can offer more flexibility. A mod_python WSGI handler is available, setting it up (especially with paste) is a no-brainer. I hear your saying &quot;the constraint is a feature&quot;. I still think that it can be just as easy with an obvious default option while still providing a choice for other servers platforms.</p>
+<p>I find the idea of having a Pythonic PHP-like web tool that a) works without threads, b) has a simple web toolbox like PHP (but better organized), c) easy database access and d) a decent way to do sensible HTML templating with the ability to add Python scripting in between (ZPT has that in a fully XML-wellformed manner) very appealing. Building it isn't probably the real challenge even. Making it scale (not in a performance sense but in a size and complexity of project sense) is. In Zope we have the problem that we want to scale down (perhaps to something similar to what you're suggesting) so that people can get familiar with Zope on a small scale and then work their way up. Similarly, your &quot;Better PHP&quot; would have to be able to scale up eventually when people decide to extend their apps, make them reusable, etc.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-4.html" rel="nofollow">#</a> <a href="http://worldcookery.com">Philipp von Weitershausen</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>My reference to CGI is merely to acknowledge that it is the only current system that really is fully <em>like</em> PHP; but it's not a practical way forward for Python.  It just doesn't scale to complex code -- it scales well for lots and lots of <em>users</em>, but for large codebases it performs badly.  PHP's CGI-like model might be part of why object-oriented code is not very well valued there -- PHP punishes large codebases more than Python.  (Which is why I noted PHP doesn't have a built-in large codebase like Python does in the standard library.)</p>
+<p>I would just like to see a single preferred, really good process and server model for Python; not to the exclusion of anything else, but something we can point people to as a good starting point.  There's a handful of issues that need to be solved on that level that haven't been solved yet (like reloading), and it just needs to be done right.  WSGI is still very handy, particularly because it means that building that server isn't a prerequesite for work on other levels, and that it won't invalidate that other work in the future.  WSGI allows diversity, but because it means we can make more granular decisions it also means we should eventually start consolidating around certain best-of-breed pieces at some of the levels of the stack that can now be chosen independently of other parts.  In this case there's no server that I think is good enough currently, but we're close, and it would be a good thing to tackle at this time.  And the result should perform every bit as well as CGI in all the ways CGI performs well.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-7.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>A bunch of random thoughts.</p>
+<ul>
+<li><p class="first">&quot;And using Apache as the app server works in PHP because their standard library is entirely in C.&quot;</p>
+<p>Really good point which I'd never considered before. That's basically the answer to my grief here: <a class="reference" href="http://www.procata.com/blog/archives/2005/09/29/why-isnt-php-the-natural-successor-to-java/#comment-11143">http://www.procata.com/blog/archives/2005/09/29/why-isnt-php-the-natural-successor-to-java/#comment-11143</a></p>
+</li>
+<li><p class="first">Although PHP is easy to learn, when you really get intimate with it (particularily where you start doing security audits of code), it smells much more like scaling is the primary objective and that the target developer is a C programmer with a patch mindset.</p>
+</li>
+<li><p class="first">There are people doing serious stuff with PHP and it's worth looking at to see where this model &quot;fails&quot; or gets hard. A big one is reducing initialization to only the stuff that's specific to a given request, given that it's going to be chucked out again at the end of the request. PHP makes it possible but it's hard to do - it's worth looking at this: <a class="reference" href="http://www.sitepoint.com/blogs/2004/05/05/lazy-php-part-3/">http://www.sitepoint.com/blogs/2004/05/05/lazy-php-part-3/</a> - this has later become: <a class="reference" href="http://cvs.sourceforge.net/viewcvs.py/wact/wact/framework/di/di.inc.php?view=auto">http://cvs.sourceforge.net/viewcvs.py/wact/wact/framework/di/di.inc.php?view=auto</a></p>
+</li>
+<li><p class="first">On the DB front, why not forget ORM for a momentand try something else? For example (WACT again - Jeff is a smart guy) this: <a class="reference" href="http://cvs.sourceforge.net/viewcvs.py/wact/wact/framework/db/db.inc.php?view=auto">http://cvs.sourceforge.net/viewcvs.py/wact/wact/framework/db/db.inc.php?view=auto</a> - the API makes getting common data structures for web pages easy e.g.;</p>
+<pre class="literal-block">
+$numusers = DBC::getOneValue('SELECT COUNT(*) FROM users');
+
+$options = DBC::getOneColumnAsArray('SELECT user FROM users');
+foreach ( $options as $option ) {
+    // draw HTML select options
+}
+
+$user = DBC::FindRecord('SELECT * FROM users WHERE id = 2');
+echo $user['name'];
+</pre>
+<p>etc.</p>
+<p>It's slightly dubious who columns automatically get massaged into native PHP types but think it's a whole lot less dubious and a great deal easier to learn than something &quot;ORMish&quot; like;:</p>
+<blockquote>
+<p>sales_figures = shop.find('OUTER JOIN sales.id GROUP BY sales.region')</p>
+</blockquote>
+</li>
+<li><p class="first">Rene Dudfield's comment on the documentation I agree with strongly. Python has complete static documentation but comments can dramatically improve things, such as illustrating less common use cases. To my mind the way to go there would be integration with a wiki (easiest using static content) - pydoc generates wiki output. Like what you did with commentary BTW - perhaps that's a better solution.</p>
+</li>
+<li><p class="first">Another angle is rather than appealing to users, appeal to shared hosts. If you can solve the security problems with PHP's model (which are significant -see <a class="reference" href="http://www.gossamer-threads.com/lists/modperl/modperl/86096">http://www.gossamer-threads.com/lists/modperl/modperl/86096</a>) you might have something shared hosts would adopt. (OK - demand is still needed but). I'm tempted to say twisted here - combine it with a &quot;complete package&quot; of email server etc.</p>
+</li>
+</ul>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-8.html" rel="nofollow">#</a> <a href="http://www.phppatterns.com">Harry Fuecks</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p><em>On the DB front, why not forget ORM for a momentand try something else?</em></p>
+<p>Yes, I can see the benefit of that.  The DB-API is not too bad, but it can also be needlessly verbose for many cases, and even just a thin wrapper would help.  Especially for people who are already very comfortable with SQL.  Not that a super-simple ORM would be without purpose; I still think it just feels much nicer in many cases.  But a super-simple ORM would also not be entirely sufficient for even fairly simple situations, and such a thing should also work comfortably alongside explicit SQL.</p>
+<p>Security is an interesting problem.  I think it would be nice to have a trusted (high priviledge) parent process that creates lower-priviledge subprocesses.  It would be adaptive, so if user X had a lot of activity and several active processes, but then user Y's scripts got some use, we'd just kill the user X processes.  You can even go down to zero processes, so that really low-usage environments have zero overhead until they are effectively woken up.  Similarly you cull old processes, and processes that are not responding in a timely manner, or maybe those that are taking up too much memory.  Though memory seems hard to track -- since PHP throws everything away memory this isn't as big a deal there.  Simply culling all processes after some set number of requests would help.  Processes would still have to &quot;warm up&quot; -- responding to their first request rather slowly.  But in terms of scaling that doesn't seem too bad, and in terms of user experience an occassional slow request isn't the end of the world.</p>
+<p>With threads, you simply don't have this kind of control.  Dealing with dead threads and other nuisances is a real pain in the butt, and there's simply <em>no</em> good solution.  At least with multiple processes you have a chance.  There's always the Windows issue -- I really don't know what the process situation is like there.  There's no fork, but is it unworkable to simply spawn processes the hard way?</p>
+<p>It also seems like keeping it separate from Apache opens up a lot of flexibility -- if for no other reason than it's easier to do this work in Python than in C.  (Though I suppose you could implement it in mod_python, even though mod_python wouldn't actually be running any user code... I'm not sure what the benefits would be, but it seems like an interesting strategy).</p>
+<p>As I think more about this, I realize this is all what FastCGI does.  Every single feature I describe here, I think.  Maybe what is needed is simply a really good, well specified implementation of the full FastCGI featureset.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-12.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>re: FASTCGI</p>
+<p>You would be better served to consider SCGI.
+Go to <a class="reference" href="http://www.fastcgi.com/dist/">http://www.fastcgi.com/dist/</a> and check out the last-modified dates.
+The most recent stable release was Jan 19, 2003.
+The most recent SNAPSHOT is April 14, 2004.
+Contrast this with SCGI ( last release Feb 2, 2006 )
+<a class="reference" href="http://www.mems-exchange.org/software/scgi/scgi-1.10.tar.gz/scgi-1.10/CHANGES">http://www.mems-exchange.org/software/scgi/scgi-1.10.tar.gz/scgi-1.10/CHANGES</a>
+SCGI is vibrant and python-centric.
+mod_scgi is robust and stable for Apache 1.3x and 2.0x
+scgi_server.py is small, well-written, and easily extensible.</p>
+<p>re: threads
+You are absolutely right</p>
+<p>re: per-user processes
+This is problematic.  You will need a master-process with root-privileges to fork/setuid all these lower-privileged process.
+This is a big security hole unless you do it exactly right ( Note the apparent deadend of the apache2 perchild mpm. )
+This program will be talking to the internet.  Running as root is hubris.
+It would be better to serve all requests for all hosts as one unprivileged user.</p>
+<p>re: PHP
+I loathe PHP, but I believe that one of PHP's greatest virtues is as follows:
+Consider an apache server with 200 virtual-hosts.
+Each virtual host has 100 php-scripts.
+The run-time cost of these 20,000 php-scripts is only that whatever pages the server is currently serving.
+If the request rate is 1 page/second or less the load-average is 0-0-0.
+It doesn't matter whether there are 100 virtual-hosts or 1.
+It doesn't matter whether there are 20,000 distinct php-scripts available or 1.</p>
+<p>A tomcat installation with 20,000 distinct .jsp pages by comparison would be in swap-storm standing still.</p>
+<p>Most python web-application frameworks tend to favor the tomcat model.
+They work great for complex apps on a dedicated machine.</p>
+<p>Providing simple and robust dynamic web-pages for scores of unrelated virtual-hosts with low resource utilization, not so much.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-19.html" rel="nofollow">#</a> <a href="http://blog.ianbicking.org/avesi.com">Christopher Mulcahy</a></div><hr noshade>
+ 
+<div class="document">
+<p>re: FASTCGI</p>
+<p>You would be better served to consider SCGI.
+Go to <a class="reference" href="http://www.fastcgi.com/dist/">http://www.fastcgi.com/dist/</a> and check out the last-modified dates.
+The most recent stable release was Jan 19, 2003.
+The most recent SNAPSHOT is April 14, 2004.
+Contrast this with SCGI ( last release Feb 2, 2006 )
+<a class="reference" href="http://www.mems-exchange.org/software/scgi/scgi-1.10.tar.gz/scgi-1.10/CHANGES">http://www.mems-exchange.org/software/scgi/scgi-1.10.tar.gz/scgi-1.10/CHANGES</a>
+SCGI is vibrant and python-centric.
+mod_scgi is robust and stable for Apache 1.3x and 2.0x
+scgi_server.py is small, well-written, and easily extensible.</p>
+<p>re: threads
+You are absolutely right</p>
+<p>re: per-user processes
+This is problematic.  You will need a master-process with root-privileges to fork/setuid all these lower-privileged process.
+This is a big security hole unless you do it exactly right ( Note the apparent deadend of the apache2 perchild mpm. )
+This program will be talking to the internet.  Running as root is hubris.
+It would be better to serve all requests for all hosts as one unprivileged user.</p>
+<p>re: PHP
+I loathe PHP, but I believe that one of PHP's greatest virtues is as follows:
+Consider an apache server with 200 virtual-hosts.
+Each virtual host has 100 php-scripts.
+The run-time cost of these 20,000 php-scripts is only that whatever pages the server is currently serving.
+If the request rate is 1 page/second or less the load-average is 0-0-0.
+It doesn't matter whether there are 100 virtual-hosts or 1.
+It doesn't matter whether there are 20,000 distinct php-scripts available or 1.</p>
+<p>A tomcat installation with 20,000 distinct .jsp pages by comparison would be in swap-storm standing still.</p>
+<p>Most python web-application frameworks tend to favor the tomcat model.
+They work great for complex apps on a dedicated machine.</p>
+<p>Providing simple and robust dynamic web-pages for scores of unrelated virtual-hosts with low resource utilization, not so much.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-20.html" rel="nofollow">#</a> <a href="http://blog.ianbicking.org/avesi.com">Christopher Mulcahy</a></div><hr noshade>
+ 
+<div class="document">
+<p>re: FASTCGI</p>
+<p>You would be better served to consider SCGI.
+Go to www.fastcgi.com/dist/ and check out the last-modified dates.
+The most recent stable release was Jan 19, 2003.
+The most recent SNAPSHOT is April 14, 2004.
+Contrast this with SCGI ( last release Feb 2, 2006 )
+www.mems-exchange.org/software/scgi/scgi-1.10.tar.gz/scgi-1.10/CHANGES
+SCGI is vibrant and python-centric.
+mod_scgi is robust and stable for Apache 1.3x and 2.0x
+scgi_server.py is small, well-written, and easily extensible.</p>
+<p>re: threads
+You are absolutely right</p>
+<p>re: per-user processes
+This is problematic.  You will need a master-process with root-privileges to fork/setuid all these lower-privileged process.
+This is a big security hole unless you do it exactly right ( Note the apparent deadend of the apache2 perchild mpm. )
+This program will be talking to the internet.  Running as root is hubris.
+It would be better to serve all requests for all hosts as one unprivileged user.</p>
+<p>re: PHP
+I loathe PHP, but I believe that one of PHP's greatest virtues is as follows:
+Consider an apache server with 200 virtual-hosts.
+Each virtual host has 100 php-scripts.
+The run-time cost of these 20,000 php-scripts is only that whatever pages the server is currently serving.
+If the request rate is 1 page/second or less the load-average is 0-0-0.
+It doesn't matter whether there are 100 virtual-hosts or 1.
+It doesn't matter whether there are 20,000 distinct php-scripts available or 1.</p>
+<p>A tomcat installation with 20,000 distinct .jsp pages by comparison would be in swap-storm standing still.</p>
+<p>Most python web-application frameworks tend to favor the tomcat model.
+They work great for complex apps on a dedicated machine.</p>
+<p>Providing simple and robust dynamic web-pages for scores of unrelated virtual-hosts with low resource utilization, not so much.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-21.html" rel="nofollow">#</a> <a href="http://blog.ianbicking.org/avesi.com">Christopher Mulcahy</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>&quot;PHP was not designed by good language designers. I don't even think it was designed by people interested in language design.&quot;</p>
+<p>PHP wasn't <em>designed</em>, period. It was a bunch of ad-hoc functions and features that weren't expected to gain such a widespread acceptance (it originally stood for &quot;Personal Home Pages&quot;, not &quot;Enterprise Web Sites&quot; -- lest we forget). At the time, Perl/CGI sucked and nothing else was free.</p>
+<p>By the time people started approaching it from a language-design angle, it was too late -- there was the hobgoblin of backwards-compatibility. Just look at the inelegance and overlap of strpos(), stripos(), strrpos(), strstr(), stristr(), substr(), etc.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-10.html" rel="nofollow">#</a> <a href="http://www.joegrossberg.com">Joe Grossberg</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Exactly.  I talked with the designer of PHP, Rasmus Lerdorf, sometime around 2001 or 2002 at one of our LUG meetings.  Very bright guy, and impressed upon us that PHP was truly an organically grown language.  It started as a Perl app, later rewritten to C.  Rather than butcher the history, I'll point you off to <a class="reference" href="http://us2.php.net/history">http://us2.php.net/history</a>.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-13.html" rel="nofollow">#</a> <a href="http://wookimus.net/~chewie">Chad</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>Colubrid now features a php like application in the SVN Version. Just for fun, but it behaves really like php :)</p>
+<p><a class="reference" href="http://wsgiarea.pocoo.org/repos/colubrid/trunk/examples/cgilike/">http://wsgiarea.pocoo.org/repos/colubrid/trunk/examples/cgilike/</a></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-11.html" rel="nofollow">#</a> <a href="http://www.active-4.com">Armin Ronacher</a></div><hr noshade>
+ 
+<div class="document">
+<p>btw. The problem is not the syntax or missing template language. The problem is the distribution.</p>
+<p>If would be better to have a central mod-wsgi which hosting providers can configure like this:</p>
+<pre class="literal-block">
+[server]
+execution = /usr/bin/flupsrv
+</pre>
+<p>The flupsrv would look like that:</p>
+<blockquote>
+<p>#!/usr/bin/env python
+import sys
+from flup.server.fcgi import WSGIServer</p>
+<p>mname, fname = sys.argv[1].rsplit(':', 1)
+module = __import__(mname, locals(), globals(), [''])
+cls = getattr(module, fname)</p>
+<p>WSGIServer(cls).run()</p>
+</blockquote>
+<p>And the user only has to create a nice small .htaccess with the following content:</p>
+<pre class="literal-block">
+SetHandler wsgi-application myapplication:app
+</pre>
+<p>Or something as simple like that</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-14.html" rel="nofollow">#</a> <a href="http://www.active-4.com">Armin Ronacher</a></div><hr noshade>
+ 
+<div class="document">
+<p>I love Python.  But my first choice for web development is still PHP.  Briefly, here's why:</p>
+<pre class="literal-block">
+$&gt; apt-get install php
+
+$&gt; echo '&lt;?php
+session_start();
+$_SESSION[&quot;world&quot;] = &quot;world&quot;;
+$world = htmlspecialchars($_SESSION[&quot;world&quot;]);
+echo &quot;Hello $world&quot;;
+?&gt;' &gt; /var/www/html/test.php
+</pre>
+<p>Load up browser to test.php.  Done. (did this from memory, syntax might not be correct, but you get the idea -- installs in one line, built in support for sessions (that use cookies OR urls), built in functions for common web chores, everything can go in one php file for quick prototyping.)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/towards-php-comment-17.html" rel="nofollow">#</a> sjbrown</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

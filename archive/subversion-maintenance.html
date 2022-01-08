@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Subversion Maintenance</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Subversion Maintenance</h1>
+ <p>
+
+Subversion has been kind of a pain in the ass; I'm constantly having
+to run <tt>svnadmin recover</tt> (or worse).  I blame it mostly on the
+Berkeley database.  It's contantly crapping out when there's
+concurrent access.  <a href="subversion-maintenance.html">ViewCVS</a> has to have write access to
+the repository.  Permissions get messed up.  It sucks.
+
+<p>
+
+Anyway, as a result I've turned off ViewCVS for the
+<tt>svn://colorstudy.com</tt> repository.  Instead, the repository is
+browseable at <a href="http://colorstudy.com/svn/">http://colorstudy.com/svn/</a>.  If
+you want history or anything, you'll have to use the subversion
+client.
+
+<p>
+
+To do it, I added this to my <tt>hooks/post-commit</tt> script:
+
+<pre>
+touch /var/lib/subversion/update.txt
+chmod a+w /var/lib/subversion/update.txt
+</pre>
+
+And run this script via a cronjob:
+
+<pre>
+#!/bin/sh
+
+FILE=/var/lib/subversion/update.txt
+
+if [ -e $FILE ] ; then
+    rm -f $FILE
+    cd /www/colorstudy.com/html/svn
+    svn up
+fi
+</pre>
+
+And add this to my Apache <tt>httpd.conf</tt>:
+
+<pre>
+&lt;Directory /www/colorstudy.com/html/svn&gt;
+  Options Indexes FollowSymLinks MultiViews
+  AllowOverride None
+  DirectoryIndex
+  DefaultType text/plain
+  AddType text/plain .cgi .py .php
+  AddType text/html .shtml
+  RemoveHandler .cgi .php .php3 .py .pl
+&lt;/Directory&gt;
+</pre>
+
+<p>
+
+At work we're using ssh to access the repositories.  This causes
+constant permission problems, as a user writes the files as themself,
+leading to situations where the files aren't writable by others.
+Neither <tt>umask</tt> or the sticky bit on the <tt>db/</tt> directory
+seem to fix it reliably.  So, I added this line to the end of
+<tt>hooks/post-commit</tt>:
+
+<pre>
+cd /path/to/repository/db && chmod g+w *
+</pre>
+
+There's been some infrequent problems due to concurrent access since
+then, but no permission problems.
+ <div class="dates" align="right">
+Created 27 Oct '04<br>
+Modified 14 Dec '04</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ svn 1.1 supports something called 'fsfs', the file system file system. It's non Berkeley DB storage for svn. Seems like it could be less flaky. Take care.
+ <div align="right"><a href="http://blog.ianbicking.org/comment437.html" rel="nofollow">#</a> <a href="http://www.pycs.net/users/0000231">John P Speno</a></div><hr noshade>
+ Have you played with <a href="http://www.edgewall.com/products/trac/" target="_blank">Trac</a> at all? It's an excellent Web-based wiki/bug tracker/Subversion repository viewer. We've been using the heck out of it and love it.
+<br />
+
+<br />
+It was flaky with Subversion at first, but we managed to fix the problem.
+ <div align="right"><a href="http://blog.ianbicking.org/comment438.html" rel="nofollow">#</a> <a href="http://www.holovaty.com/">Adrian Holovaty</a></div><hr noshade>
+ I think you would like arch: www.gnuarch.org
+<br />
+the archive maintenance doesn't even exist!
+ <div align="right"><a href="http://blog.ianbicking.org/comment439.html" rel="nofollow">#</a> rastandy</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I once kept one project in Arch, but repository was broken so badly, that I could come round with it.</p>
+<p>So I was forced to abandon this crashy system.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/-comment-850.html" rel="nofollow">#</a> Michal</div><hr noshade>
+</blockquote>
+ Just curious, but does the RSS pubdate get bumped to NOW() for each comment?  The feed showed up as new a few times but I didn't notice a difference in content.  Of course, I'll know in a second after I submit this and check the feed again ...
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment440.html" rel="nofollow">#</a> <a href="http://jackdied.com">Jack Diederich</a></div><hr noshade>
+ I battled with permission problems with Subversion ssh access for months until I finally nailed it down: set the umask to 002 in /etc/bash.bashrc --
+<br />
+<a href="http://mg.pov.lt/blog/setting-umask-for-subversion.html" target="_blank">http://mg.pov.lt/blog/setting-umask-for-subversion.html</a> contains the full story.
+<br />
+
+<br />
+ViewCVS also used to cause occasional problems that disappeared once we added a robots.txt file kindly asking search engines not to hammer our repository.
+<br />
+
+<br />
+BTW I like your post-commit hook + cron job solution for getting a reasonably up-to-date checkout.
+<br />
+
+<br />
+Off-topic: a Preview button in the add new comment form would be nice.
+ <div align="right"><a href="http://blog.ianbicking.org/comment441.html" rel="nofollow">#</a> <a href="http://mg.b4net.lt">Marius Gedminas</a></div><hr noshade>
+ Re: fsfs; I certainly look forward to it.  I think by now everyone is pretty aware of bdb's shortcomings for Subversion.  You live, you learn.
+<br />
+
+<br />
+Re: Trac; I haven't tried it.  I've heard it has caused problems similar to what viewcvs has caused.  But, if it communicates with the subversion server as a client, I imagine it would work well -- if not, then it'll have the same problems as viewcvs.  (There is supposed to be some experimental viewcvs code that uses the client interface, which would also fix things).  It sucks to give write access to web clients, but apparently that requirement is bdb's fault.
+<br />
+
+<br />
+Re: arch; I dunno... the technical arguments for it don't hold a lot of sway with me.  There's an article that I can never find when I want it, which I think very successfully defends the advantages of a centralized repository.  Basically the claim is that distributed repositories are necessary only for a very small number of projects (like the Linux Kernel), and are detrimental to most open source projects, where centralization provides transparency.  What I've seen of arch also seems rather arcane; reminds me of qmail a little, in that the author made up all sorts of weird conventions.  But I dunno, maybe.
+<br />
+
+<br />
+Re: RSS; I was having problems posting this last article.  It's probably an anomoly.
+<br />
+
+<br />
+Re: bashrc; dammit, why are there so many rc scripts for the shell?  I can never keep track of them all, or which ones get called in favor of others.  Anyway, the post-commit chmod trick is working for now.
+ <div align="right"><a href="http://blog.ianbicking.org/comment442.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ A better choise for a web interface for svn is <a href="http://websvn.tigris.org/" target="_blank">http://websvn.tigris.org/</a>
+<br />
+
+<br />
+It uses the svn client to access stuff and doesnt need write access to the repository. Here at work we've been using SVN with websvn since january and we've only had to run recover on the repository once.
+<br />
+
+<br />
+Also unlike cvs you can quite successfully run svn up from within the post-commit script itself with no problems, we keep our devel site up to date that way, whenever a commit made, it checks which repository dir was in then runs an svn update on the appropriate devel dir.
+ <div align="right"><a href="http://blog.ianbicking.org/comment443.html" rel="nofollow">#</a> Adam Ashley</div><hr noshade>
+ If you're running Apache2, i advise you setting up webdav access to your SVN repository. I believe it's the best way to display the last revision of your respoitory.
+<br />
+
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment444.html" rel="nofollow">#</a> <a href="http://base-art.net">phil</a></div><hr noshade>
+ $ cat `which svnserve`
+<br />
+#!/bin/sh
+<br />
+
+<br />
+SVNSERVE=$(dirname $(realpath $0))/svnserve.bin
+<br />
+
+<br />
+umask 002
+<br />
+$SVNSERVE "$@"
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment445.html" rel="nofollow">#</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+If you are mixing local/ssh and webdav access, you will need to change the umask with which apache runs, either using mod_umask or simply adding the line to the apache2ctl script.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/-comment-849.html" rel="nofollow">#</a> anonymous</div><hr noshade>
+</blockquote>
+ And using svn + https has another feature, you don't use SSH, so you have to fight with the umask. On the other side, apache need to write stuffs in the SVN so ..
+ <div align="right"><a href="http://blog.ianbicking.org/comment446.html" rel="nofollow">#</a> Jkx</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

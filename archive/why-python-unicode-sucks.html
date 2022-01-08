@@ -1,0 +1,219 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Why Python Unicode Sucks</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Why Python Unicode Sucks</h1>
+ 
+<div class="document">
+<p>Besides <a class="reference" href="do-i-hate-unicode-or-do-i-hate-ascii.html">concrete problems</a>
+with the current status quo in Python Unicode, I think there's a
+general philosophical problem to the way Unicode is expected to be
+used in Python.</p>
+<p>The convention in other languages is that you define boundaries, and you put
+thought into the encoding at those boundaries (maybe using some
+particular metadata like an HTTP header, maybe using convention or
+configuration -- there's no single rule).  Then inside the boundaries there's the safe
+All-Unicode inner world.</p>
+<p>This is a good solution for Java.  Unfortunately it just doesn't work
+in Python, because you can't build good boundaries in Python.  There's
+a couple reasons:</p>
+<ul class="simple">
+<li>Python is not statically typed.  If it was, we could use the typing
+to make it very clear where those boundaries were, and what parts of
+the code required decoded strings.  Adaptation-based type declarations would probably
+be just as effective here.</li>
+<li>We have two kinds of strings, Java has one.</li>
+<li>Those two kinds of strings act <em>almost</em> exactly like each other.
+This means <strong>duck typing does not work</strong>.  If the two string objects
+had a very different set of methods and were not interchangeable,
+then the boundaries would become very clear at runtime.  (<a class="reference" href="python-nit-chapter-3.html">This</a> is a
+similar string-related wart in Python.)  As it is <tt class="docutils literal"><span class="pre">str</span></tt> objects
+can get deep into the system before a Unicode expectation causes an
+exception.</li>
+<li>Byte (non-Unicode) strings are prevalent in Python code, both in the
+core and in libraries.  If you only use mindfully-written code that
+deals with the Unicode properly you are okay.  This is fine for,
+say, Zope users.  Or people who do all their work as XML
+transformations, since XML libraries are another place where Unicode
+is mindfully supported.  But for people that don't live in a walled city of
+vetted code, this doesn't work.</li>
+</ul>
+<p>If we got rid of <tt class="docutils literal"><span class="pre">str</span></tt> entirely and added a bytestring type (with a
+very different API than strings!) then the rest of Python's system
+would work.  Duck typing would work.  You wouldn't have to learn best
+practices through hard-won experience, and you wouldn't have to audit every
+piece of outside code you use for problems.  You could handle Unicode safely and confirm
+it through unit
+testing and during the development process.  But that's now where we
+are now; and as a result Python is very prickly and unfriendly when it
+comes to this issue.</p>
+<p>Most criticisms of dynamic typing apply to this very case; and those
+criticisms are right.  This is a case where dynamic typing leads very directly to difficult-to-predict and
+difficult-to-detect runtime bugs.
+Dynamic typing only works when you adhere to certain
+important principles -- one of those is that if objects are not interchangeable
+they should use differently-named methods.</p>
+<p>As a stop-gap I think <a class="reference" href="illusive-setdefaultencoding.html">setdefaultencoding</a> will
+paper over a lot of these issues.  It's not perfect by any means.
+It's akin to being able to add numbers to strings, and having the
+numbers automatically coerced into strings in the process -- it's not
+the sort of feature you really <em>want</em> to introduce; it's clearly sloppy.  But until Python
+3.0 it's the best option I see.</p>
+<p><strong>Note:</strong> <a class="reference" href="python-unicode-doesnt-really-suck.html">I don't really think Python Unicode sucks</a>,
+even if it does annoy me sometimes.</p>
+</div>
+ <div class="dates" align="right">
+Created 02 Aug '05<br>
+Modified 12 Aug '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>As I mentioned in a comment to the previous post: I setdefaultencoding to utf8 and it pretty much seems to work. No use though for shared hosting environments for code you're distributing for others to use.</p>
+<p>I don't think the python situation is <em>so</em> terrible - I've been tempted to look at Rails and/or Borges and/or Seaside lately; one of the things holding me back (apart from the sheer wierdness of the Squeak environment) is that I get the impression unicode handling is even flakier in Ruby &amp; Squeak. That's purely from a few minutes' googling in both cases and I may be wrong.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-1.html" rel="nofollow">#</a> <a href="http://www.alanlittle.org/weblog/">Alan Little</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>A few more minutes strolling through comp.lang.ruby strengthens my &quot;it's all about the language's inventor's native language&quot; theory - Ruby's BDFL is of course Japanese, and it seems one reason Ruby is behind python on unicode support (yes, really - or at least lots of Ruby people appear to think so) is the widely-held Japanese belief that Unicode is a tiny and inadequate character set. And for all I know they may be right, although it's good enough for all the languages I think I'm ever likely to be interested in so (just like ASCII-only American programmers) I don't care.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-3.html" rel="nofollow">#</a> <a href="http://www.alanlittle.org/weblog/">Alan Little</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I get the impression that some Japanese people are annoyed that their text is especially space-inefficient in UTF-8.  But I don't quite get it -- disk is cheap, RAM doesn't fill up due to native-language text, and gzip encoding should mitigate the bandwidth issues.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-5.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>you can get a better sense of the issue starting here:
+<a class="reference" href="http://en.wikipedia.org/wiki/Han_unification">http://en.wikipedia.org/wiki/Han_unification</a></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-6.html" rel="nofollow">#</a> anonymous</div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>At least in Ruby my impression is that they only have bytestrings, and a module <a class="reference" href="http://www.ruby-doc.org/stdlib/libdoc/iconv/rdoc/">iconv</a> to convert between encodings.  And it's just a wrapper around system libraries, which seems like it's opening up a whole can o' worms of cross-platform compatibility.  I'll give credit to the people who handled Python Unicode -- they stepped up and took on a whole lot of work that I expect was both boring and tedious, to give us a very complete and reliable foundation.</p>
+<p>This seems strange to me that Ruby isn't better, since Ruby is Japanese and you'd think they'd care even more about encodings.  <a class="reference" href="http://www.yoshidam.net/Ruby.html#uconv">There's even a separate module for Japanese encodings</a> -- Python appears to have better Japanese support than Ruby!  It has <a class="reference" href="http://python.org/doc/current/lib/standard-encodings.html">13 Japanese encodings</a> built in.  I'd tear my hair out if I had to deal with 13 encodings for one language.  But at least, bald or not, I'd appreciate the support.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-4.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>It looks to me like the Ruby example is a case of the perfect being the enemy of the good. Matz, being a smart Japanese programmer and therefore much more keenly aware of Unicode's faults and failings than most people, is therefore reluctant to regard it and use it as the be all and end all of string handling, a la Java or C#. If you google a few of his comp.lang.ruby postings on the subject, it appears he has big ideas, maybe even a prototype, of some kind of better-than-unicode ultimate international text handling. But it Isn't Ready Yet (will it ever be?) and meanwhile Ruby struggles along with some kind of half-working implementation of utf8.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-7.html" rel="nofollow">#</a> <a href="http://www.alanlittle.org/weblog/">Alan Little</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Yeah, str really needs to just die already.  Python 1.4 called, it wants its broken text handling back.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-2.html" rel="nofollow">#</a> <a href="http://bob.pythonmac.org/">Bob Ippolito</a></div><hr noshade>
+ 
+<div class="document">
+<p>I'm sorry Ian, but this reads to me like knee-jerk abuse of Python's Unicode triggers knee-jerk abuse of dynamic typing.  I disagree with you strongly on both points.  I've worked with a lot of people who had the same initial complaints, and with a little bit of discipline and experience, they simply cease to have these sorts of problems, and they do not need to resort to such nasty hacks as changing sysdefault encoding.</p>
+<p>And things are <em>far</em> from rosy in the ststically typed Java world, BTW.  Static typing does not save any language from the complexities of Unicode.  Python is well ahead of Java in some respects.  And what of that complexity of Unicode?  My thoughts here:</p>
+<p><a class="reference" href="http://copia.ogbuji.net/blog/2005-08-04/alt_unicod">http://copia.ogbuji.net/blog/2005-08-04/alt_unicod</a></p>
+<p>TANSTAAFL.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-8.html" rel="nofollow">#</a> <a href="http://copia.ogbuji.net">Uche</a></div><hr noshade>
+ 
+<div class="document">
+<p>Having dynamic types does <em>NOT</em> meant that you can be sloppy about what your functions should expect and can handle.  And this comment is not just valid for string types, it is for all types.  If you're not thinking about what types you are working on, then you will suffer from those encode/decode errors.  There is no fix for this.  Once you delineate clearly what objects you are handling and you are publishing that you are handling, and you write your code accordingly, the Python unicode system is just fantastic.</p>
+<p>Once trick that you might want to use: use a variant of Hungarian notation to indicate the expected type, e.g.</p>
+<blockquote>
+uname = name.decode('latin-1')</blockquote>
+<p>or</p>
+<blockquote>
+name_u = name.decode('latin-1')</blockquote>
+<p>Sometimes when there is a chance for confusion, I even mark the encoded strings:</p>
+<blockquote>
+buffer_utf8 = ...</blockquote>
+<p>Maybe you could even have another suffix for when the object your handling is _either_ of the string types.  I used to suffer the same plight, until the day I decided to sit down and really understand how Unicode works, and then I made decisions in my source code to always think about which kinds of string I'm handling where.  Now I never have any troubles anymore.  Dynamic typing means that it is easy for you to make mistakes.  Make decisions and add assertions in your code to ensure that you're moving the correct types between functions.</p>
+<p>Also, dealing with Unicode strings is not as efficient as simple encoded strings (e.g. data), so both data types need to remain.  This problems is thus not likely to go away.</p>
+<p>To me all this ranting is just telling that you've been sloppy about which types you are working with.  The problem is not Python, the problem is this habit that we all fall into at some point to not look at the problem straight in the face and to spend some time understanding all the details (granted, I suppose that's what you're doing now, but with a lot of blog noise...).</p>
+<p>If you just take the habit to decide, everywhere, all the time, which types of string object you're accepting (str, Unicode, or string-or-unicode), your problems will go away.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-9.html" rel="nofollow">#</a> Martin</div><hr noshade>
+ 
+<div class="document">
+<p><em>Dynamic typing only works when you adhere to certain important principles -- one of those is that if objects are not interchangeable they should use differently-named methods.</em></p>
+<p>If you really meant that, you'd have to abandon polymorphism for good and all.  If (classes of) objects were truly interchangeable, the only possible difference would be in performance.  So since sets and bags are not interchangeable, we'd have to use addToSet and addToBag methods instead of just add methods in each one.</p>
+<p>You've got a hold of a serious point here, but you are holding the stick at the wrong end.  To begin with, a better title (if less blogospherically trendy) would be &quot;Why Python 'str' Sucks&quot;.4</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-10.html" rel="nofollow">#</a> <a href="http://www.ccil.org/~cowan">John Cowan</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Abandoning polymorphism seems extreme.  I read the originating comment as 'if objects are not interchangeable, they should use differently-named methods for places where that difference lies&quot;.</p>
+<p>Both sets and bags support addition, existence testing, held object counts, and the like.  'add' is thus a perfectly fine method for both, and usage via duck typing makes sense - if an add method exists, then I can use it.  Where you run into problems is when there is a behavioral difference - a set can return only a single item, thus the idea of a 'countOfItem' method in a Set is silly.  In a bag, it is not.  Thus, the key behavioral difference shows up in a way visible to duck typing, and it is visible for those clients that care.</p>
+<p>The problem with strings is that there are two different classes that have virtually identical method signatures, so client code interacting with these classes has a hard time knowing wherther it will get something that behaves well with Unicode.</p>
+<p>Scott</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-11.html" rel="nofollow">#</a> Scott Ellsworth</div><hr noshade>
+ 
+<div class="document">
+<p>The point was intended to include only dynamically typed languages (i.e. Ruby with its duck typing).  In other words, the risk of naming incompatible methods with the same name only exists if the language will assume these similarly named methods denote polymorphic behavior.  In contrast, with a statically typed language like Java, polymorphism will only be assumed if the classes are explicitly placed in a class hierarchy using inheritance.  (Unless, of course that is bypassed using reflection, as with Java Beans).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-12.html" rel="nofollow">#</a> <a href="http://www.bbsinc.biz">Keith Bennett</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p><a class="reference" href="http://bestbody-piercing.com">http://bestbody-piercing.com</a>
+<a class="reference" href="http://bestmedical-tests.com">http://bestmedical-tests.com</a>
+<a class="reference" href="http://charmssale.com">http://charmssale.com</a>
+<a class="reference" href="http://shop-sextoys.com">http://shop-sextoys.com</a>
+<a class="reference" href="http://v-jewelrystores.com">http://v-jewelrystores.com</a>
+<a class="reference" href="http://bestgift-baskets.com">http://bestgift-baskets.com</a>
+<a class="reference" href="http://bestprogressiveinsurance.com">http://bestprogressiveinsurance.com</a>
+<a class="reference" href="http://cheap-uggboots.biz">http://cheap-uggboots.biz</a>
+<a class="reference" href="http://cheap-uggboots.info">http://cheap-uggboots.info</a>
+<a class="reference" href="http://cheap-uggboots.com">http://cheap-uggboots.com</a>
+<a class="reference" href="http://v-debtconsolidation.info">http://v-debtconsolidation.info</a>
+<a class="reference" href="http://v-debtconsolidation.net">http://v-debtconsolidation.net</a>
+<a class="reference" href="http://v-debtconsolidation.com">http://v-debtconsolidation.com</a>
+<a class="reference" href="http://v-homebusinesses.info">http://v-homebusinesses.info</a>
+<a class="reference" href="http://v-homebusinesses.com">http://v-homebusinesses.com</a>
+<a class="reference" href="http://v-homebusinesses.biz">http://v-homebusinesses.biz</a></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-python-unicode-sucks-comment-19.html" rel="nofollow">#</a> <a href="http://bestbody-piercing.com">body piercing</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

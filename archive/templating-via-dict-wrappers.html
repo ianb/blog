@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Templating via dict wrappers</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Templating via dict wrappers</h1>
+ 
+<div class="document">
+<p>James Tauber wrote a kind of <a class="reference" href="http://jtauber.com/2006/05/templates.html">narrative construction of a template
+language</a> using simple
+string substitution.  It's an interesting way of building up a
+template language, but I think unnecessarily complex because of some
+minor details.</p>
+<p>The basic structure he uses is this:</p>
+<pre class="literal-block">
+class Template:
+
+    _template = 'some string with %(sub)s'
+
+    def __init__(self, dict):
+        self.dict = dict
+
+    def __str__(self):
+        return self._template % self
+
+    def __getitem__(self, key):
+        # or some fancier processing...
+        return self.dict[key].upper()
+</pre>
+<p>I think it's easier to not think so much in terms of templates as
+classes, and to put all the logic in <tt class="docutils literal"><span class="pre">__getitem__</span></tt> mostly
+disassociated from templates.</p>
+<p>The basic pattern is that of a wrapper:</p>
+<pre class="literal-block">
+class Wrapper(object):
+    def __init__(self, dict):
+        self.dict = dict
+    def __getitem__(self, item):
+        raise NotImplementedError
+</pre>
+<p>Used like this:</p>
+<pre class="literal-block">
+rendered = 'some string' % SomeWrapper(data_source)
+</pre>
+<p>For instance, his piping technique:</p>
+<pre class="literal-block">
+class Piper(Wrapper):
+
+    def __getitem__(self, item):
+        parts = item.split(&quot;|&quot;)
+        value = self.dict[parts[0]]
+        for func in parts[1:]:
+            value = self.dict[func](value)
+        return value
+</pre>
+<p>Then if you use a key of <tt class="docutils literal"><span class="pre">name|upper</span></tt> you will really mean
+<tt class="docutils literal"><span class="pre">dict['upper'](dict['name'])</span></tt>.  You actually use it like:</p>
+<pre class="literal-block">
+tmpl = &quot;Are you %(name|upper)s?!?&quot;
+rendered = tmpl % Piper({'name': 'the keymaster',
+                         'upper': lambda x: x.upper()})
+</pre>
+<p>Because of the way <a class="reference" href="http://python.org/doc/current/lib/node109.html">string.Template</a> is defined you
+can't use it with complex key names, but this fixes it (from
+<a class="reference" href="http://svn.pythonpaste.org/Paste/Script/trunk/paste/script/copydir.py">paste.script.copydir</a>):</p>
+<pre class="literal-block">
+class LaxTemplate(string.Template):
+    # This change of pattern allows for anything in braces, but
+    # only identifiers outside of braces:
+    pattern = re.compile(r&quot;&quot;&quot;
+    \$(?:
+      (?P&lt;escaped&gt;\$)             |   # Escape sequence of two delimiters
+      (?P&lt;named&gt;[_a-z][_a-z0-9]*) |   # delimiter and a Python identifier
+      {(?P&lt;braced&gt;.*?)}           |   # delimiter and a braced identifier
+      (?P&lt;invalid&gt;)                   # Other ill-formed delimiter exprs
+    )
+    &quot;&quot;&quot;, re.VERBOSE | re.IGNORECASE)
+</pre>
+<p>Then you can do:</p>
+<pre class="literal-block">
+tmpl = LaxTemplate('Are you ${name|upper}?!?').substitute(
+    Piper({'name': 'the keymaster', 'upper': lambda x: x.upper()}))
+</pre>
+<p>So, what if you want to HTML quote everything by default?</p>
+<pre class="literal-block">
+class HTMLQuote(Wrapper):
+
+    def __getitem__(self, item):
+        value = self.dict[item]
+        return cgi.escape(str(value), 1)
+</pre>
+<p>What if you want to allow arbitrary expressions for keys?</p>
+<pre class="literal-block">
+class Eval(Wrapper):
+
+    def __getitem__(self, item):
+        return eval(item, self.dict)
+</pre>
+<p>Now you can use a template like <tt class="docutils literal"><span class="pre">Name:</span> <span class="pre">%(user.name)s</span></tt>.</p>
+<p>What if you want catch exceptions ZPT-style, where you use <tt class="docutils literal"><span class="pre">|</span></tt> to
+indicate alternatives?</p>
+<pre class="literal-block">
+class ZPTCatcher(Wrapper):
+
+    def __getitem__(self, item):
+        alternatives = item.split(&quot;|&quot;)
+        for i in alternatives[:-1]:
+            try:
+                return self.dict[i]
+            except (KeyError, AttributeError):
+                pass
+        return self.dict[alternatives[-1]]
+</pre>
+<p>What if, again ZPT-like, you want to allow different <em>kinds</em> of
+wrappers based on a prefix?  E.g., <tt class="docutils literal"><span class="pre">python:expr</span></tt> for Python syntax,
+<tt class="docutils literal"><span class="pre">django:value|filter</span></tt> for Django syntax, <tt class="docutils literal"><span class="pre">string:a${b}</span></tt> for a literals with
+<tt class="docutils literal"><span class="pre">string.Template</span></tt> style substitution.</p>
+<pre class="literal-block">
+class Dispatcher(Wrapper):
+
+    def __init__(self, dict, **prefix_wrappers):
+        self.dict = dict
+        self.prefix_wrappers = prefix_wrappers
+
+    def __getitem__(self, item):
+        if ':' not in item:
+            wrapper = self.prefix_wrappers['default']
+            expr = item
+        else:
+            prefix, expr = item.split(':', 1)
+            wrapper = self.prefix_wrappers[prefix]
+        return wrapper(self.dict)[expr]
+
+class StringTemplate(Wrapper):
+
+    def __getitem__(self, item):
+        tmpl = string.Template(item)
+        return tmpl.substitute(self.dict)
+
+fancy_dict = Dispatcher(some_dict,
+                        python=Eval,
+                        string=StringTemplate,
+                        django=Piper)
+</pre>
+<p>Note that these dictionaries can be used with <tt class="docutils literal"><span class="pre">%</span></tt> or
+<tt class="docutils literal"><span class="pre">string.Template</span></tt> or anything that uses <tt class="docutils literal"><span class="pre">__getitem__</span></tt> (and <em>only</em>
+<tt class="docutils literal"><span class="pre">__getitem__</span></tt>).</p>
+<p>This is one reason why any string substitution should allow passing in
+a dictionary-like object, not just use <tt class="docutils literal"><span class="pre">**kw</span></tt> for passing in
+dictionaries.  This seems to still be a flaw of <a class="reference" href="http://www.python.org/dev/peps/pep-3101/">PEP 3101</a>, which is a expanded
+string formatting proposal for Python 3.  The reason <tt class="docutils literal"><span class="pre">**kw</span></tt> can't
+work is that these are only very lightly dictionary-like; there is no
+<tt class="docutils literal"><span class="pre">keys()</span></tt> method.  <tt class="docutils literal"><span class="pre">Eval(locals()).keys()</span></tt> would have to enumerate
+all possible expressions; clearly not feasible.  And <tt class="docutils literal"><span class="pre">**kw</span></tt> has to unpack
+the dictionary (enumerating it) before it can pass it into the function.</p>
+</div>
+ <div class="dates" align="right">
+Created 19 May '06</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>you may want to take a look at Templite:
+<a class="reference" href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496702">http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496702</a></p>
+<p>it just lets you embed python code directly into your template.</p>
+<dl class="docutils">
+<dt>for example, this code:</dt>
+<dd><p class="first">tmpl = &quot;Are you %(name|upper)s?!?&quot;</p>
+<p class="last">rendered = tmpl % Piper({'name': 'the keymaster', 'upper': lambda x: x.upper()})</p>
+</dd>
+<dt>becomes:</dt>
+<dd><p class="first">tmpl = Templite(&quot;Are you ${emit(name.upper())}$?!?&quot;</p>
+<p class="last">rendered = tmpl(name =&quot;the keymaster&quot;)</p>
+</dd>
+</dl>
+<p>-tomer</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/templating-via-dict-wrappers-comment-1.html" rel="nofollow">#</a> <a href="http://">tomer filiba</a></div><hr noshade>
+ 
+<div class="document">
+<p>I had basically the same idea a few months ago and wrote up a generic object wrapper to help with template substitution.  You've inspired me to add it to the Cookbook: <a class="reference" href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496730">http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496730</a></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/templating-via-dict-wrappers-comment-2.html" rel="nofollow">#</a> <a href="http://malamas.com/">Costas</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

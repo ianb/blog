@@ -1,0 +1,772 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
+<script type="text/javascript">/*<![CDATA[*/(function(a){function b(a,b){if(+a)return~a||(d.cookie=h+"=; path=/");j=d.createElement(e),k=d.getElementsByTagName(e)[0],j.src=a,b&&(j.onload=j.onerror=b),k.parentNode.insertBefore(j,k)}function c(){n.api||b(l.shift()||-1,c)}if(this.Mobify)return;var d=document,e="script",f="mobify",g="."+f+".com/",h=f+"-path",i=g+"un"+f+".js",j,k,l=[!1,1],m,n=this.Mobify={points:[+(new Date)],tagVersion:[6,0]},o=/(; |#|&|^)mobify-path=([^&;]*)/g.exec(location.hash+"; "+d.cookie);o?(m=o[2])&&!+(m=sessionStorage[h]||m)&&(l=[!0,"//preview"+g+escape(m)]):(l=a()||l,l[0]&&l.push("//cdn"+i,"//files01"+i)),l.shift()?(d.write('<plaintext style="display:none;">'),setTimeout(c)):b(l[0])})(function(){if(/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)){return[1,"//cdn.mobify.com/sites/ians-blog/production/mobify.js"]}})/*]]>*/</script>
+<!-- END MOBIFY -->
+	<title>Ian Bicking: a blog   ::  Opening Python Classes</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta name="generator" content="WordPress 3.4.2" /><!-- LEAVE FOR STATS -->
+	<meta name="description" content="" />
+	<link rel="stylesheet" title="plaintxtSimpler" href="../../../../wp-content/themes/Barthelme-ianb/style.css" type="text/css" media="all" />
+	<link rel="start" href="../../../../index.html" title="Ian Bicking: a blog" />
+	<link rel="alternate" type="application/atom+xml" title="Ian Bicking: a blog Atom Feed" href="../../../../feed/atom/index.html" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog RSS 2.0 Feed" href="../../../../feed/rss/index.html" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog Comments RSS 2.0 Feed" href="../../../../comments/feed/index.html" />
+	<link rel="alternate" type="application/rdf+xml" title="Ian Bicking: a blog RSS 1.0" href="../../../../feed/rdf/index.html" />
+	<link rel="alternate" type="text/xml" title="Ian Bicking: a blog RSS 0.92 Feed" href="../../../../feed/rss/index.html" />
+	<link rel="pingback" href="../../../../xmlrpc.php" />
+	<link rel="openid.server" href="http://www.myopenid.com/server" />
+	<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <link rel="me" type="text/html" href="http://www.google.com/profiles/ianbicking"/>
+		<link rel='archives' title='October 2012' href='../../../../2012/10/index.html' />
+	<link rel='archives' title='February 2012' href='../../../../2012/02/index.html' />
+	<link rel='archives' title='April 2011' href='../../../../2011/04/index.html' />
+	<link rel='archives' title='March 2011' href='../../../../2011/03/index.html' />
+	<link rel='archives' title='September 2010' href='../../../../2010/09/index.html' />
+	<link rel='archives' title='August 2010' href='../../../../2010/08/index.html' />
+	<link rel='archives' title='May 2010' href='../../../../2010/05/index.html' />
+	<link rel='archives' title='April 2010' href='../../../../2010/04/index.html' />
+	<link rel='archives' title='March 2010' href='../../../../2010/03/index.html' />
+	<link rel='archives' title='February 2010' href='../../../../2010/02/index.html' />
+	<link rel='archives' title='January 2010' href='../../../../2010/01/index.html' />
+	<link rel='archives' title='September 2009' href='../../../../2009/09/index.html' />
+	<link rel='archives' title='May 2009' href='../../../../2009/05/index.html' />
+	<link rel='archives' title='April 2009' href='../../../../2009/04/index.html' />
+	<link rel='archives' title='January 2009' href='../../../../2009/01/index.html' />
+	<link rel='archives' title='December 2008' href='../../../../2008/12/index.html' />
+	<link rel='archives' title='November 2008' href='../../../../2008/11/index.html' />
+	<link rel='archives' title='October 2008' href='../../../../2008/10/index.html' />
+	<link rel='archives' title='September 2008' href='../../../../2008/09/index.html' />
+	<link rel='archives' title='August 2008' href='../../../../2008/08/index.html' />
+	<link rel='archives' title='July 2008' href='../../../../2008/07/index.html' />
+	<link rel='archives' title='June 2008' href='../../../../2008/06/index.html' />
+	<link rel='archives' title='May 2008' href='../../../../2008/05/index.html' />
+	<link rel='archives' title='April 2008' href='../../../../2008/04/index.html' />
+	<link rel='archives' title='March 2008' href='../../../../2008/03/index.html' />
+	<link rel='archives' title='February 2008' href='../../../../2008/02/index.html' />
+	<link rel='archives' title='January 2008' href='../../../../2008/01/index.html' />
+	<link rel='archives' title='November 2007' href='../../../11/index.html' />
+	<link rel='archives' title='October 2007' href='../../../10/index.html' />
+	<link rel='archives' title='September 2007' href='../../../09/index.html' />
+	<link rel='archives' title='August 2007' href='../../index.html' />
+	<link rel='archives' title='July 2007' href='../../../07/index.html' />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog &raquo; Opening Python Classes Comments Feed" href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/feed/" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="../../../../xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="../../../../wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='XO B4' href='../../07/xo-b4/index.html' />
+<link rel='next' title='Defaults &amp; Inheritance' href='../../10/defaults-inheritance/index.html' />
+<meta name="generator" content="WordPress 3.4.2" />
+<link rel='canonical' href='index.html' />
+<link rel='shortlink' href='http://blog.ianbicking.org/?p=19' />
+<link rel="stylesheet" href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"  type="text/css" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+        <style type="text/css" media="all">
+/*<![CDATA[*/
+body { font-size: 100%; }
+body { font-family: tahoma, geneva, sans-serif; }
+div.post-header, h2.post-title, p.post-date-single, h2.post-title-single, div.post-entry h1, div.post-entry h2, div.post-entry h3, div.post-entry h4, div.post-entry h5, div.post-entry h6, div.post-entry blockquote, div.post-footer, h3#comment-count, h4#comment-header, div#comments ol li p.comment-metadata, h4#respond { font-family: verdana, geneva, sans-serif; }
+div.post-entry p { text-align: left; }
+div#wrapper { width: 100%; }
+
+/*]]>*/
+</style>
+</head>
+<body>
+
+<div id="wrapper">
+
+	<div id="header" onclick="location.href='http://blog.ianbicking.org/';" style="cursor:pointer;">
+		<h1 id="title"><a href="../../../../index.html" title="Ian Bicking: a blog">Ian Bicking: a blog</a></h1>
+		<p id="description"></p>
+	</div>
+<!-- WP Theme Credits -->
+<div style="display: none;">We can answer on question <a href="http://www.olnevhost.net/vps-hosting.html">what is VPS</a>? and
+what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap dedicated servers</strong></a>?</div>
+<!-- END HEADER -->
+<div id="container">
+	<div id="content" class="widecolumn">
+
+
+		<div id="post-19" class="post single-post">
+			<p class="post-date-single">{ 2007 08 08 }</p>
+			<h2 class="post-title-single">Opening Python Classes</h2>
+			<div class="post-entry">
+				<div class="document">
+<p>So, I was reading through comments to despam my old posts before archiving them, and came upon <a class="reference external" href="http://dan.chokola.com/journal/?user=dan&amp;#038;entry=2007-01-27.105426">this old reply</a> to <a class="reference external" href="../../../../re-ruby-and-python-compared.html">this old post of mine</a> which was a reply to <a class="reference external" href="http://web.archive.org/web/20070329162213/http://www.rexx.com/~oinkoink/Ruby_v_Python.html">this much older post</a>.</p>
+<p>I won&#8217;t reply to that post much, because it&#8217;s mostly&#8230; well, not useful to respond to.  But people often talk about the wonders of Open Classes in Ruby.  For Python people who aren&#8217;t familiar with what that means, you can do:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="co1"># Somehow acquire SomeClassThatAlreadyExists</span><br />
+<span class="kw1">class</span> SomeClassThatAlreadyExists<br />
+&nbsp; &nbsp; <span class="kw1">def</span> some_method<span class="br0">&#40;</span>blahblahblah<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; stuff<br />
+&nbsp; &nbsp; end<br />
+end<br />
+&nbsp;</div>
+<p>And <tt class="docutils literal"><span class="pre">SomeClassThatAlreadyExists</span></tt> has a <tt class="docutils literal"><span class="pre">some_method</span></tt> added to it (or if that method already exists, then the method is replaced with the new implementation).</p>
+<p>In Python when you do this, you&#8217;ve defined an entirely new class that just happens to have the name <tt class="docutils literal"><span class="pre">SomeClassThatAlreadyExists</span></tt>.  It doesn&#8217;t actually effect the original class, and probably will leave you confused because of the two very different classes with the same name.  In Ruby when you define a class that already exists, you are extending the class in-place.</p>
+<p>You can change Python classes in-place, but there&#8217;s no special syntax for it, so people either think you can&#8217;t do it, or don&#8217;t realize that you are doing the same thing as in Ruby but without the syntactic help.  I guess this will be easier with <a class="reference external" href="http://www.python.org/dev/peps/pep-3129/">class decorators</a>, but some time ago I also wrote a recipe using normal decorators that looks like this:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+@<span class="co1">magic_set(SomeClassThatAlreadyExists)</span><br />
+<span class="kw1">def</span> some_method<span class="br0">&#40;</span><span class="kw2">self</span>, blahblahblah<span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; stuff<br />
+&nbsp;</div>
+<p>The only thing that is even slightly magic about the setting is that I look at the first argument of the function to determine if you are adding an instance, class, or static method to an object, and let you add it to classes or instances.  It&#8217;s really not that magic, even if it is called <a class="reference external" href="http://svn.colorstudy.com/home/ianb/recipes/magicset.py">magicset</a>.</p>
+<p>I think with class decorators you could do this:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+@<span class="co1">extend(SomeClassThatAlreadyExists)</span><br />
+<span class="kw1">class</span> SomeClassThatAlreadyExists:<br />
+&nbsp; &nbsp; <span class="kw1">def</span> some_method<span class="br0">&#40;</span><span class="kw2">self</span>, blahblahblah<span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; stuff<br />
+&nbsp;</div>
+<p>Implemented like this:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">def</span> extend<span class="br0">&#40;</span>class_to_extend<span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; <span class="kw1">def</span> decorator<span class="br0">&#40;</span>extending_class<span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; class_to_extend.<span class="kw4">__dict__</span>.<span class="me1">update</span><span class="br0">&#40;</span>extending_class.<span class="kw4">__dict__</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> class_to_extend<br />
+&nbsp; &nbsp; <span class="kw1">return</span> decorator<br />
+&nbsp;</div>
+</div>
+<p>Automatically generated list of related posts:</p><ol>
+<li><a href='../../../09/16/2-python-environment-experiments/index.html' rel='bookmark' title='2 Python Environment Experiments'>2 Python Environment Experiments</a> <small>two experiments in the Python environment. The first is virtualenv,...</small></li>
+<li><a href='../../21/the-shrinking-python-web-framework-world/index.html' rel='bookmark' title='The Shrinking Python Web Framework World'>The Shrinking Python Web Framework World</a> <small>When I was writing the summary of differences between WebOb...</small></li>
+<li><a href='../../../../2008/03/30/python-html-parser-performance/index.html' rel='bookmark' title='Python HTML Parser Performance'>Python HTML Parser Performance</a> <small>In preparation for my PyCon talk on HTML I thought...</small></li>
+<li><a href='../../../../index.html?p=250' rel='bookmark' title='A Python Web Application Package and Format (we should make one)'>A Python Web Application Package and Format (we should make one)</a> <small>At PyCon there was an open space about deployment, and...</small></li>
+<li><a href='../../../../2009/01/16/woonerf-and-python/index.html' rel='bookmark' title='Woonerf and Python'>Woonerf and Python</a> <small>At TOPP there&#8217;s a lot of traffic discussion, since a...</small></li>
+</ol>											</div><!-- END POST-ENTRY  -->
+			<!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			xmlns:dc="http://purl.org/dc/elements/1.1/"
+			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+		<rdf:Description rdf:about="http://blog.ianbicking.org/2007/08/08/opening-python-classes/"
+    dc:identifier="http://blog.ianbicking.org/2007/08/08/opening-python-classes/"
+    dc:title="Opening Python Classes"
+    trackback:ping="http://blog.ianbicking.org/2007/08/08/opening-python-classes/trackback/" />
+</rdf:RDF> -->
+			<div class="post-footer">
+				<p>Posted by Ian Bicking on Wednesday, August 8th, 2007, at 2:03 pm, and filed under <a href="../../../../category/programming/index.html" title="View all posts in Programming" rel="category tag">Programming</a>, <a href="../../../../category/python/index.html" title="View all posts in Python" rel="category tag">Python</a>.</p>
+				<p>
+				Comments have a <a href='http://blog.ianbicking.org/2007/08/08/opening-python-classes/feed/'>feed</a>.</p>
+			</div><!-- END POST-FOOTER -->
+		</div><!-- END POST -->
+
+<div id="comments">
+
+
+
+
+<h4 id="comments">21 Comments</h4>
+ <ul class="commentlist">
+		<li class="comment even thread-even depth-1" id="comment-95">
+				<div id="div-comment-95" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/c41b3a735b666e1506c99a6795d61639?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://joker.linuxstuff.pl' rel='external nofollow' class='url'>Michał Kwiatkowski</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-95">
+			August 8, 2007 at 2:37 pm</a>		</div>
+
+		<p>The main difference between Ruby and Python here is that in Ruby you can modify built-in classes, while in Python (CPython at least) you can&#8217;t. That&#8217;s where all those nice railish <code>7.days.ago</code> method calls come from &#8211; by extending base classes (Numeric in this case).</p>
+
+<p>Of course this power comes with a cost. Because any piece of code can modify built-in classes, a single <code>require</code> can completely change the meaning of the code below it. In Python import statements are much more safe in a sense that you can expect what changes they will bring to the following code. In Python you decide what names will be imported into your current scope. In Ruby you have to guess (or better reference the documentation). Most of the time it&#8217;s not a big problem, but can be a source of confusion when you monkey-patch to much.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-96">
+				<div id="div-comment-96" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/04d6b8e8d3c68899ac88eb8623392150?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.eflorenzano.com' rel='external nofollow' class='url'>Eric Florenzano</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-96">
+			August 8, 2007 at 3:43 pm</a>		</div>
+
+		<p>I don&#8217;t see why it&#8217;s so hard to dynamically add methods.</p>
+
+<pre><code>class abc(object):
+    def jkl(self):
+        print "hello, world"
+
+def ghi(self, string):
+    print string
+
+abc.ghi = ghi
+
+a = abc()
+a.jkl()
+a.ghi("this is a test")
+</code></pre>
+
+<p>would print</p>
+
+<pre><code>hello, world
+this is a test
+</code></pre>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment byuser comment-author-ianb bypostauthor even thread-even depth-1" id="comment-97">
+				<div id="div-comment-97" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-97">
+			August 8, 2007 at 3:48 pm</a>		</div>
+
+		<p>I agree it&#8217;s not very hard, but somehow it is <em>perceived</em> to be very hard.</p>
+
+<p>Re: global implicit monkeypatching, the [mathn](<a href="http://www.ruby-doc.org/stdlib/libdoc/mathn/rdoc/index.html" rel="nofollow">http://www.ruby-doc.org/stdlib/libdoc/mathn/rdoc/index.html</a>) module is the one that really gets me.  And it&#8217;s in the stdlib.  It changes Fixnum/, i.e., number division.  Globally.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-98">
+				<div id="div-comment-98" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ac7005eff7720218df4cf0c72ddf6a3d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://simonwillison.net/' rel='external nofollow' class='url'>Simon Willison</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-98">
+			August 8, 2007 at 4:25 pm</a>		</div>
+
+		<p>open-uri is equally scary &#8211; it patches the built-in open() function (used to read files from the filesystem) and replaces it with one that also knows how to pull in data over HTTP if the &#8220;filename&#8221; begins with <a href="http://" rel="nofollow">http://</a>.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-99">
+				<div id="div-comment-99" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ee688dfe13e5ceab3025d04d496a92f7?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://optilude.wordpress.com' rel='external nofollow' class='url'>Martin Aspeli</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-99">
+			August 8, 2007 at 4:50 pm</a>		</div>
+
+		<p>Language flame wars are always really lame because people argue about what you can do in language X or Y. Comparing languages like Ruby and Python, there are very few things you can do in one that you can&#8217;t really do in the other.</p>
+
+<p>What&#8217;s much more important is what the language <em>encourages</em> you to do. I think a language that encourages monkey patching of built-in stuff (kind of like some people do in JavaScript with prototypes) has a cultural problem, for example. It may be neat to feel like you have the power to change anything, but when building complex systems, using third party libraries (which may have been written by morons, that just happened to be morons with the time to spend writing the thing you can&#8217;t find the time to perfect), and sharing a project with dozens of developers across the globe&#8230; well, I want predictability and consistency.</p>
+
+<p>My  biggest reasons for liking Python are that the core concepts are easy to grasp, they are applied consistently, and the syntax is (for the most part) consistent and predictable. It is very, very rare that I come across Python code that makes no sense to me. It&#8217;s hard to write obfuscated Python. That means a lot to me.</p>
+
+<p>I&#8217;m not familiar enough with Ruby to make some kind of comparison, and in any way, it&#8217;d be stupid to do so. But I think there are lessons to be shared about how a language (natural or programming) influences the way people think about problems and their solutions.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1" id="comment-100">
+				<div id="div-comment-100" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-100">
+			August 8, 2007 at 4:51 pm</a>		</div>
+
+		<p>Technically you could do that in Python:</p>
+
+<pre><code>real_open = open
+def url_open(fn, mode='r'):
+    if fn.startswith('http:') and mode.startswith('r'):
+        return urllib.urlopen(fn)
+    else:
+        return real_open(fn, mode)
+__builtins__['open'] = url_open
+</code></pre>
+
+<p>Of course, if you try that sort of thing when you are working with other programmers they&#8217;ll rightfully kick your ass.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-101">
+				<div id="div-comment-101" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/5c6568e93ed24cc806795367bf9b92fa?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Jess Austin</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-101">
+			August 8, 2007 at 6:53 pm</a>		</div>
+
+		<p>I don&#8217;t really know Ruby, but does this Python code do what you&#8217;re talking about?</p>
+
+<pre><code>a = SomeClassThatAlreadyExists()
+
+class SomeClassThatAlreadyExists(SomeClassThatAlreadyExists):
+    def some_method(blahblahblah):
+        stuff
+
+b = SomeClassThatAlreadyExists()
+</code></pre>
+
+<p>I suspect the difference is that in Ruby both object a and object b will have some_method, while in Python only b will have it.  That strikes me as a point of sanity in Python, although for all I know Ruby may have other mechanisms that alleviate problems with global class modification.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-102">
+				<div id="div-comment-102" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/8cdc5c49c6af8da6c50e6b643fbabf5d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://codeplayer.blogspot.com' rel='external nofollow' class='url'>huangyi</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-102">
+			August 8, 2007 at 7:09 pm</a>		</div>
+
+		<p>Both a and b will have the method, because what&#8217;s changed is class, not instance.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-103">
+				<div id="div-comment-103" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/3199adc87e7d5a279106a35a21e238a8?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Carl</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-103">
+			August 9, 2007 at 2:51 am</a>		</div>
+
+		<p>@huangyi:</p>
+
+<p>That may be the case in Ruby, but not so in Python. Here&#8217;s the cut and paste from my Python shell:</p>
+
+<pre><code>))) class SomeClassThatAlreadyExists(object): pass
+... 
+))) a = SomeClassThatAlreadyExists()
+))) 
+))) class SomeClassThatAlreadyExists(SomeClassThatAlreadyExists):
+...  def methody(self, arg): pass
+... 
+))) dir(a)
+['__class__', '__delattr__', '__dict__', '__doc__', '__getattribute__', 
+'__hash__', '__init__', '__module__', '__new__', '__reduce__', 
+'__reduce_ex__', '__repr__', '__setattr__', '__str__', '__weakref__']
+))) b = SomeClassThatAlreadyExists()
+))) dir(b)
+['__class__', '__delattr__', '__dict__', '__doc__', '__getattribute__', 
+'__hash__', '__init__', '__module__', '__new__', '__reduce__', 
+'__reduce_ex__', '__repr__', '__setattr__', '__str__', '__weakref__', 'methody']
+))) 
+</code></pre>
+
+<p>If you want <code>a</code> to take the new method, you have to modify the class in place, not just have a new class take the old class&#8217;s name. </p>
+
+<pre><code>))) class SomeClassThatAlreadyExists(object): pass
+... 
+))) a = SomeClassThatAlreadyExists()
+))) dir(a)
+['__class__', '__delattr__', '__dict__', '__doc__', '__getattribute__', 
+'__hash__', '__init__', '__module__', '__new__', '__reduce__', 
+'__reduce_ex__', '__repr__', '__setattr__', '__str__', '__weakref__']
+))) def newmethod(self, arg): pass
+... 
+))) SomeClassThatAlreadyExists.method = newmethod
+))) dir(a)
+['__class__', '__delattr__', '__dict__', '__doc__', '__getattribute__', 
+'__hash__', '__init__', '__module__', '__new__', '__reduce__', 
+'__reduce_ex__', '__repr__', '__setattr__', '__str__', '__weakref__', 'method']
+)))
+</code></pre>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-104">
+				<div id="div-comment-104" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/73e879fe356b2e446337d69233af2392?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Fredrik</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-104">
+			August 9, 2007 at 4:16 am</a>		</div>
+
+		<p>&gt; &#95;&#95;builtins&#95;&#95;['open'] = url_open</p>
+
+<p>If you want to monkeypatch, please do it the right way.  Builtins live in the &#95;&#95;builtin&#95;&#95; module (singular); the &#95;&#95;builtins&#95;&#95; object is a CPython implementation detail, and is not always a dictionary.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-107">
+				<div id="div-comment-107" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ab535cda1b74f481dde53091b03417a2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Paul Boddie</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-107">
+			August 9, 2007 at 8:50 am</a>		</div>
+
+		<p>&#8220;That’s where all those nice railish 7.days.ago method calls come from&#8221;</p>
+
+<p>Ah yes, domain-specific languages on the cheap: the source of many requests for changes to the Python language, just so people who can&#8217;t write parsers can pretend to almost write English or some other natural language directly in their programs. Reminds me of articles from The Register about Yahoo! such as &#8220;Yahoo! denies! China! claims!&#8221; which would presumably be permissible under some syntax-busting DSL-fuelled language amendment suggestion.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1" id="comment-108">
+				<div id="div-comment-108" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-108">
+			August 9, 2007 at 9:06 am</a>		</div>
+
+		<p>At one point I got into a small argument with some guy about how I thought <code>"markdown string".to_html</code> was a really stupid idea, and he just thought it was obvious and wonderful, and that I clearly didn&#8217;t understand object oriented programming.</p>
+
+<p>I think it&#8217;s when people try to tell me about how I don&#8217;t understand object oriented programming (because how could someone understand such things if they use Python?) that gets me a bit testy.</p>
+
+<p>ActiveResource&#8217;s Hash.to_xml method is similarly nutty, as though there was just some canonical way to turn any hash into an XML structure.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-109">
+				<div id="div-comment-109" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/c41b3a735b666e1506c99a6795d61639?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://joker.linuxstuff.pl' rel='external nofollow' class='url'>Michał Kwiatkowski</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-109">
+			August 9, 2007 at 9:24 am</a>		</div>
+
+		<p><em>Ah yes, domain-specific languages on the cheap: the source of many requests for changes to the Python language, just so people who can’t write parsers can pretend to almost write English or some other natural language directly in their programs.</em></p>
+
+<p>Why such strong words? Even people who <strong>can</strong> write parsers would probably not do so in Python for implementation of those kind of language enhancements, because it would be time expensive, inconvenient, non-standard, etc. In Ruby it&#8217;s much easier to extend the language itself, which in part gives you more freedom in designing API for specific needs (like date comprehensions in the <code>7.days.ago</code> example). This power comes with a cost. Sometimes you want to pay it and sometimes not, so there&#8217;s a place for both Python and Ruby in this world. No reason to bash one or the other.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1" id="comment-110">
+				<div id="div-comment-110" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-110">
+			August 9, 2007 at 9:35 am</a>		</div>
+
+		<p>There is, however, lots of room to bash <code>7.days</code>, since I believe it is equal to 7x24x60x60==604800.  That is, it doesn&#8217;t even return any kind of time delta object, it just converts a number of days to a number of seconds with no units.  Adding <code>.ago</code> it becomes equivalent to <code>time.time() - 7&#42;24&#42;60&#42;60</code>.</p>
+
+<p>All of which is fine for some code you hack out.  Maybe there wasn&#8217;t a good time/time-delta object in Ruby when this code was written.  It would certainly have been a poor choice to have fixed <em>that</em> problem when DHH was initially writing Rails.  But because of the <em>way</em> in which this was implemented it can&#8217;t be changed, you can&#8217;t really tell where it comes from (<code>ActiveSupport::CoreExtensions::Numeric::Time</code>, it turns out), and now you can neither really be sure the methods will be there (they&#8217;ll only be there if you are using Rails), nor can you add your own improved methods without causing all kinds of frustrating incompatibilities for yourself and everyone else.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-111">
+				<div id="div-comment-111" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/c41b3a735b666e1506c99a6795d61639?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://joker.linuxstuff.pl' rel='external nofollow' class='url'>Michał Kwiatkowski</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-111">
+			August 9, 2007 at 10:05 am</a>		</div>
+
+		<p>Actually <code>7.days.ago</code> will evaluate to a Time object, so it&#8217;s not equivalent to <code>time.time() - 7*24*60*60</code> (which is an integer in Python).</p>
+
+<p>Methods will be there if you <code>require 'active_support'</code> at the top of your program or you use Rails (which imports active support for you), it&#8217;s that easy. You don&#8217;t expect to get datetime class in Python without importing datetime module, do you?</p>
+
+<p>You <strong>can</strong> change them, because (as you found out) you know where they are. Look at <code>ActiveSupport::CoreExtensions::Numeric::Time</code> and override methods that interests you.</p>
+
+<p>About the incompatibilities argument &#8211; you&#8217;re right it would be problematic to patch around this, but I don&#8217;t believe it&#8217;s a problem of the language, but rather of packaging. If those time comprehensions were packaged separately (or there would be a method to cherry-pick in the require call) you could easily exclude them from the import and define your own versions. In the way or another &#8211; it&#8217;s not the problem with open classes, it&#8217;s just an inconvenient way DHH bundled different things together into active support. And remember you&#8217;d have to face those problems in any other language as well &#8211; messing with other modules internals is risky, no less in Python than in Ruby.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-112">
+				<div id="div-comment-112" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/2c1bbda1fbfa050465bc2a4448866c09?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">fijal</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-112">
+			August 9, 2007 at 12:00 pm</a>		</div>
+
+		<p>Hum. we do have such a thing for in-house use in pypy.</p>
+
+<p>You say:</p>
+
+<pre><code>class SomeClass(extendable):
+  def one_method(self):
+    pass
+
+class __extend__(SomeClass):
+  def second_method(self):
+    pass
+</code></pre>
+
+<p>and just works (by metaclass trick), doesn&#8217;t work for builtin types.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-113">
+				<div id="div-comment-113" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ab535cda1b74f481dde53091b03417a2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Paul Boddie</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-113">
+			August 9, 2007 at 1:24 pm</a>		</div>
+
+		<p>Michal, Ian: They may seem like strong words, but the Ruby flavour of DSLs (which some people argue are not really proper DSLs) tends to lead people to suggest things like making parentheses optional for function calls in Python, just so they can lay out their code in a way which looks like some prose in a natural language or another language, but is really a combination of coincidences and side-effects. Meanwhile, with pyparsing and similar tools, how hard would it be for such people to write a proper parser for a proper language?</p>
+
+<p>Listen to this podcast for some deeper thought into DSLs:</p>
+
+<p><a href="http://www.se-radio.net/index.php?post&#95;id=211178" rel="nofollow">http://www.se-radio.net/index.php?post_id=211178</a></p>
+
+<p>And take a look at EasyExtend for a more convincing Python-related approach:</p>
+
+<p><a href="http://www.fiber-space.de/EasyExtend/doc/EE.html" rel="nofollow">http://www.fiber-space.de/EasyExtend/doc/EE.html</a></p>
+
+<p>P.S. Apologies for the ASCIIfication of your name, erm, Michal &#8211; Ian&#8217;s software doesn&#8217;t like the last letter of your name, preferring to substitute it with another character which it won&#8217;t let me reproduce either.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-114">
+				<div id="div-comment-114" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/c41b3a735b666e1506c99a6795d61639?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://joker.linuxstuff.pl' rel='external nofollow' class='url'>Michał Kwiatkowski</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-114">
+			August 9, 2007 at 2:57 pm</a>		</div>
+
+		<p>Paul,</p>
+
+<p>Optional parentheses are actually very useful, I use them all the time while hacking in [ipython](<a href="http://ipython.scipy.org/" rel="nofollow">http://ipython.scipy.org/</a>) ;-).</p>
+
+<p><em>just so they can lay out their code in a way which looks like some prose in a natural language or another language, but is really a combination of coincidences and side-effects</em></p>
+
+<p>Ruby works. Really. So does Lisp. It&#8217;s up to a programmer to properly use language capabilities. You can write beautiful code in C/Python/Ruby/Lisp/whatever, but it&#8217;s completely up to your skills if you shoot yourself in the foot or not. Some APIs (or DSLs if you like) people write in Ruby are in fact <em>a combination of coincidences and side-effects</em>, but most of them are not. It&#8217;s really not that different from Python or any other language.</p>
+
+<p>You agree on the usefulness of DSLs &#8211; why not have the ability to program them in the same language as the rest of your application? Why force the programmer to design/learn new language while he is already comfortable with the one he uses? Messing with built-in classes is risky, sure, but a programmer should know that already. Things shouldn&#8217;t be hard to implement just to scare the clueless newbies (they will misuse the language in a way or another).</p>
+
+<p>Now just don&#8217;t get me wrong. I believe Python has much of its value in its purity. I personally like predictability Python brings, because it means I can easier understand and hack on other people&#8217;s code. It&#8217;s really a great language to maintain code in. That means I also would strongly reject ruby-ish changes to Python. It&#8217;s a different language than Ruby and there is value in this. At the same time I really like the way you can quickly try out DSL/API ideas in Ruby (or Smalltalk/Lisp for that matter). There&#8217;s a place for both Python and Ruby in this world and there&#8217;s no point in saying that people using the other one are crazy/uneducated/stupid. There are different needs and so there are different tools to satisfy them.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-115">
+				<div id="div-comment-115" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ab535cda1b74f481dde53091b03417a2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Paul Boddie</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-115">
+			August 9, 2007 at 4:57 pm</a>		</div>
+
+		<p>I&#8217;m not arguing about whether Lisp or Ruby work, but whether more flexible syntax plus guesswork on the part of the language plus environment make for a sane DSL or a sane environment.</p>
+
+<p>I guess it&#8217;s just a case of &#8220;not in my Python&#8221; on my part, but I&#8217;m tired of seeing excuses for DSLs really amounting to the fact that people need new toys to be bothered to write new libraries. It&#8217;s not as if we&#8217;re using Java where patterns and boilerplate are needed all over the place: you can get quite far with Python, even if you need to actually write Python code &#8211; shock horror!</p>
+
+<p>Seeing inline dialects in code reminds me of things like Pro*C Embedded SQL, although DSL proponents would have you write the SQL in some bizarre variant of Python &#8211; something which you can see in various Python projects, in fact. A diversity of languages is a good thing, I agree, but I dispute the DSL movement&#8217;s emphasis on where the diversity should be.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-117">
+				<div id="div-comment-117" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/769084f2da2ebbc1e483af3f0e72adaa?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Jim</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-117">
+			August 10, 2007 at 2:06 am</a>		</div>
+
+		<p>&gt; Optional parentheses are actually very useful</p>
+
+<p>Do you really mean that though?  <em>Useful</em>?  You may very well <em>prefer</em> them, but unless they actually provide functionality, they aren&#8217;t <em>useful</em>.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-139">
+				<div id="div-comment-139" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ee688dfe13e5ceab3025d04d496a92f7?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://optilude.wordpress.com' rel='external nofollow' class='url'>Martin Aspeli</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/08/08/opening-python-classes/comment-page-1/#comment-139">
+			August 13, 2007 at 5:38 am</a>		</div>
+
+		<p>&#8220;About the incompatibilities argument &#8211; you’re right it would be problematic to patch around this, but I don’t believe it’s a problem of the language, but rather of packaging. If those time comprehensions were packaged separately (or there would be a method to cherry-pick in the require call) you could easily exclude them from the import and define your own versions. In the way or another &#8211; it’s not the problem with open classes, it’s just an inconvenient way DHH bundled different things together into active support. And remember you’d have to face those problems in any other language as well &#8211; messing with other modules internals is risky, no less in Python than in Ruby.&#8221;</p>
+
+<p>No, it&#8217;s a problem of the language. Or rather, of the culture of the language and the way people use it. It&#8217;s infeasible in any language to have import/require statements that are so detailed you need to know lots and lots of detail about each module. If you had to &#8220;require&#8221; the &#8220;days&#8221; syntax and the &#8220;ago&#8221; syntax and also the &#8220;forwards&#8221; but not the &#8220;backwards&#8221; because you needed the one from module &#8220;foo&#8221; but not from &#8220;bar&#8221;&#8230; well, you&#8217;d spend more time working out what to import than you&#8217;d spend writing useful code. In general, importing a module from which you only actually need a subset should not have bad side-effects. That places an unnecessary burden on both the author and the user of the module.</p>
+
+<p>Like people have pointed out, you <em>can</em> do this in all kinds of languages, including Python, but in Python this kind of thing is frowned upon: monkey patching is a necessary evil that you do in moderation and aim to refactor away (for the most part).</p>
+
+<p>Predictability has a lot of benefits. I <em>hate</em> languages (like VB) that make parentheses optional in most cases, because it&#8217;s hard to see what&#8217;s a function and you end up having to learn various special cases about when something is required and when it&#8217;s not. That doesn&#8217;t make things easier, it makes them confusing and inconsistent. People who write code learn (either explicitly or implicitly) the underlying structure of the lanaguage (much like for a natural language) and then intuitively understand how to apply that structure to new problems that are like ones they&#8217;ve seen before. The fewer rules and more internally consistent they are, the more predictable the language and ultimately the less time the developer wastes on debugging things that don&#8217;t work the way he/she thinks it should work.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+
+<div class="navigation">
+<div class="alignleft"></div>
+<div class="alignright"></div>
+</div>
+
+
+
+
+</div>
+
+		<div class="navigation">
+			<div class="nav-left">&laquo; <a href="../../07/xo-b4/index.html" rel="prev">XO B4</a></div>
+			<div class="nav-right"><a href="../../10/defaults-inheritance/index.html" rel="next">Defaults &#038; Inheritance</a> &raquo;</div>
+		</div><!-- END NAVIGATION -->
+
+
+	</div><!-- END CONTENT -->
+</div><!-- END CONTAINER  -->
+
+<div id="sidebar">
+	<ul>
+		<li id="home-link">
+			<h2><a href="../../../../index.html" title="Ian Bicking: a blog">Home</a></h2>
+		</li>
+<li id="text-315934862" class="widget widget_text"><h2 class="widgettitle">About</h2>
+			<div class="textwidget">Ian is a developer with Mozilla, <a href="http://ianbicking.appspot.com/projects">Python open source developer</a>, actually uses <a href="https://plus.google.com/u/0/104537541227697934010/posts">Google+</a> more than <a href="http://twitter.com/ianbicking">twitter</a> and lives in Minneapolis.<br>
+<span class="gittip-0001" gittip-username="ianbicking"></span>
+<script id="gittip-0001"
+  src="https://www.gittip.com/assets/widgets/0001.js"></script>
+</div>
+		</li>
+<li id="text-315934863" class="widget widget_text">			<div class="textwidget"><!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> --></div>
+		</li>
+<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
+		<ul>
+			<li><a href='../../../../2012/10/index.html' title='October 2012'>October 2012</a></li>
+	<li><a href='../../../../2012/02/index.html' title='February 2012'>February 2012</a></li>
+	<li><a href='../../../../2011/04/index.html' title='April 2011'>April 2011</a></li>
+	<li><a href='../../../../2011/03/index.html' title='March 2011'>March 2011</a></li>
+	<li><a href='../../../../2010/09/index.html' title='September 2010'>September 2010</a></li>
+	<li><a href='../../../../2010/08/index.html' title='August 2010'>August 2010</a></li>
+	<li><a href='../../../../2010/05/index.html' title='May 2010'>May 2010</a></li>
+	<li><a href='../../../../2010/04/index.html' title='April 2010'>April 2010</a></li>
+	<li><a href='../../../../2010/03/index.html' title='March 2010'>March 2010</a></li>
+	<li><a href='../../../../2010/02/index.html' title='February 2010'>February 2010</a></li>
+	<li><a href='../../../../2010/01/index.html' title='January 2010'>January 2010</a></li>
+	<li><a href='../../../../2009/09/index.html' title='September 2009'>September 2009</a></li>
+	<li><a href='../../../../2009/05/index.html' title='May 2009'>May 2009</a></li>
+	<li><a href='../../../../2009/04/index.html' title='April 2009'>April 2009</a></li>
+	<li><a href='../../../../2009/01/index.html' title='January 2009'>January 2009</a></li>
+	<li><a href='../../../../2008/12/index.html' title='December 2008'>December 2008</a></li>
+	<li><a href='../../../../2008/11/index.html' title='November 2008'>November 2008</a></li>
+	<li><a href='../../../../2008/10/index.html' title='October 2008'>October 2008</a></li>
+	<li><a href='../../../../2008/09/index.html' title='September 2008'>September 2008</a></li>
+	<li><a href='../../../../2008/08/index.html' title='August 2008'>August 2008</a></li>
+	<li><a href='../../../../2008/07/index.html' title='July 2008'>July 2008</a></li>
+	<li><a href='../../../../2008/06/index.html' title='June 2008'>June 2008</a></li>
+	<li><a href='../../../../2008/05/index.html' title='May 2008'>May 2008</a></li>
+	<li><a href='../../../../2008/04/index.html' title='April 2008'>April 2008</a></li>
+	<li><a href='../../../../2008/03/index.html' title='March 2008'>March 2008</a></li>
+	<li><a href='../../../../2008/02/index.html' title='February 2008'>February 2008</a></li>
+	<li><a href='../../../../2008/01/index.html' title='January 2008'>January 2008</a></li>
+	<li><a href='../../../11/index.html' title='November 2007'>November 2007</a></li>
+	<li><a href='../../../10/index.html' title='October 2007'>October 2007</a></li>
+	<li><a href='../../../09/index.html' title='September 2007'>September 2007</a></li>
+	<li><a href='../../index.html' title='August 2007'>August 2007</a></li>
+	<li><a href='../../../07/index.html' title='July 2007'>July 2007</a></li>
+		</ul>
+</li>
+<li id="text-315934861" class="widget widget_text">			<div class="textwidget"><a href="../../../../archive/index.html">The Older Archives</a></div>
+		</li>
+<li id="categories-1" class="widget widget_categories"><h2 class="widgettitle">Categories</h2>
+		<ul>
+	<li class="cat-item cat-item-12"><a href="../../../../category/erlang/index.html" title="View all posts filed under Erlang">Erlang</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="../../../../category/html/index.html" title="View all posts filed under HTML">HTML</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="../../../../category/javascript/index.html" title="View all posts filed under Javascript">Javascript</a>
+</li>
+	<li class="cat-item cat-item-15"><a href="../../../../category/licensing/index.html" title="View all posts filed under Licensing">Licensing</a>
+</li>
+	<li class="cat-item cat-item-18"><a href="../../../../category/mozilla/index.html" title="View all posts filed under Mozilla">Mozilla</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="../../../../category/notech/index.html" title="View all posts filed under Non-technical">Non-technical</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="../../../../category/olpc/index.html" title="View all posts filed under OLPC">OLPC</a>
+</li>
+	<li class="cat-item cat-item-14"><a href="../../../../category/packaging/index.html" title="View all posts filed under Packaging">Packaging</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="../../../../category/politics/index.html" title="View all posts filed under Politics">Politics</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="../../../../category/programming/index.html" title="View all posts filed under Programming">Programming</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="../../../../category/python/index.html" title="View all posts filed under Python">Python</a>
+</li>
+	<li class="cat-item cat-item-10"><a href="../../../../category/ruby/index.html" title="View all posts filed under Ruby">Ruby</a>
+</li>
+	<li class="cat-item cat-item-19"><a href="../../../../category/security/index.html" title="View all posts filed under Security">Security</a>
+</li>
+	<li class="cat-item cat-item-16"><a href="../../../../category/silverlining.1" title="View all posts filed under Silver Lining">Silver Lining</a>
+</li>
+	<li class="cat-item cat-item-20"><a href="../../../../category/programming/testing/index.html" title="View all posts filed under Testing">Testing</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="../../../../category/web/index.html" title="View all posts filed under Web">Web</a>
+</li>
+	<li class="cat-item cat-item-13"><a href="../../../../category/zopeplone/index.html" title="View all posts filed under Zope/Plone">Zope/Plone</a>
+</li>
+		</ul>
+</li>
+<li id="search-2" class="widget widget_search"><form id="searchform" method="get" action="../../../../index.html">
+	<div>
+		<input id="s" name="s" type="text" value="" tabindex="1" size="10" />
+		<input id="searchsubmit" name="searchsubmit" type="submit" value="Find" tabindex="2" />
+	</div>
+</form> </li>
+		<li id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widgettitle">Recent Posts</h2>
+		<ul>
+				<li><a href="../../../../index.html?p=291" title="Why doctest.js is better than Python&#8217;s doctest">Why doctest.js is better than Python&#8217;s doctest</a></li>
+				<li><a href="../../../../index.html?p=283" title="Python Application Package">Python Application Package</a></li>
+				<li><a href="../../../../index.html?p=277" title="Git-as-sync, not source-control-as-deployment">Git-as-sync, not source-control-as-deployment</a></li>
+				<li><a href="../../../../index.html?p=253" title="My Unsolicited Advice For PyPy">My Unsolicited Advice For PyPy</a></li>
+				<li><a href="../../../../index.html?p=250" title="A Python Web Application Package and Format (we should make one)">A Python Web Application Package and Format (we should make one)</a></li>
+				</ul>
+		</li>
+<li id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widgettitle">Recent Comments</h2>
+<ul id="recentcomments"><li class="recentcomments"><a href='http://www.mirsa.com.tr' rel='external nofollow' class='url'>havalandırma</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://redealmeidense.com.br/portalx/modules/' rel='external nofollow' class='url'>this website</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Eric Pierce on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Paul Brian on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://benjiyork.com' rel='external nofollow' class='url'>Benji York</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320">Why doctest.js is better than Python&#8217;s doctest</a></li></ul></li>
+	</ul>
+</div>
+
+	<div id="footer">
+		<p>
+			&copy; 2013 Ian Bicking<!--
+Does this commenting make me evil?
+			|
+			Thanks, <a href="http://wordpress.org/" title="WordPress">WordPress</a>
+			|
+			<a href="http://www.plaintxt.org/themes/barthelme/" title="Barthelme for WordPress" rel="follow">Barthelme</a> theme by <a href="http://scottwallick.com/" title="scottwallick.com" rel="follow">Scott</a>
+			| <!-- The following is a link to the theme author's sponsor. Please consider its smallness and that Scott was nice enough to make this theme publically available. -->
+			Sponsor: <a href="http://www.active-sandals.com/womreefsan.html" title="Support: Reef Sandals">Reef Sandals</a>
+			|
+			Valid <a href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1" title="Valid XHTML 1.0 Strict" rel="nofollow">XHTML</a> &amp; <a href="http://jigsaw.w3.org/css-validator/validator?uri=http://blog.ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no" title="Valid CSS" rel="nofollow">CSS</a>
+			|
+			-->
+			RSS: <a href="../../../../feed/rss/index.html" title="Ian Bicking: a blog RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Posts</a> &amp; <a href="../../../../comments/feed/index.html" title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Comments</a>
+		</p>
+	</div>
+
+</div><!-- END WRAPPER -->
+
+	<!-- Somehow 44 queries occured in 1.238 seconds. Magic! -->
+	<!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
+	<script type='text/javascript' src='../../../../wp-includes/js/comment-reply.js?ver=3.4.2'></script>
+
+<!-- Google Analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script>
+
+</body>
+</html>

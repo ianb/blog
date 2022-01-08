@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Introspecting expressions in py3k</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Introspecting expressions in py3k</h1>
+ 
+<div class="document">
+<p>There was <a class="reference" href="http://mail.python.org/pipermail/python-3000/2006-April/000608.html">a bit of discussion</a>
+on the python-3000 list about getting access to AST, and the
+manipulations one could do at that point.  Several people chimed in; I
+wrote up several packages I know of that could make use of this:</p>
+<ul>
+<li><p class="first">ORMs:</p>
+<ul class="simple">
+<li><a class="reference" href="http://projects.amor.org/dejavu">Dejavu</a> by Robert Brewer does
+lambda introspection</li>
+<li><a class="reference" href="http://sqlobject.org">SQLObject</a> and <a class="reference" href="http://sqlalchemy.org">SQLAlchemy</a> use operator overriding, which isn't as
+general but is used to similar effect</li>
+<li><a class="reference" href="http://subway.python-hosting.com/wiki/SQLComp">SQLComp</a> by
+Peter Hunt is another lambda introspection library</li>
+<li>I can imagine an RDF querying system that would work similarly,
+but not using SQL</li>
+</ul>
+</li>
+<li><p class="first">Constraints:</p>
+<ul class="simple">
+<li><a class="reference" href="http://peak.telecommunity.com/">RuleDispatch</a> compiles strings
+and then looks inside their AST, maybe a bit fancier than the
+other projects, as I believe the other's don't pay as much
+attention to the scope at the position where the expression is
+defined</li>
+<li>I believe Enthought's <a class="reference" href="http://code.enthought.com/traits/">Traits</a> is doing something vaguely
+similar (at least in motivation, at some level), using constraints</li>
+<li>David Binger did a lightning talk on a system he wrote -- who's
+name I've forgotten -- which is also constraint-based and could
+benefit from a way to represent constraints</li>
+</ul>
+</li>
+<li><p class="first">Numeric, etc...</p>
+<p>I think the various numeric packages do things along these lines,
+often with operator overloading and whatnot, so that you can give an
+expression that is efficiently implemented in a specific context.
+This is similar in spirit to what the ORMs are doing, except where
+the ORMs use the expression to generate SQL to be sent off
+somewhere, the numeric packages consume the expression in-process
+(but not in Python).</p>
+</li>
+<li><p class="first">In <a class="reference" href="http://mail.python.org/pipermail/python-3000/2006-April/000627.html">another email</a>
+an equation solver was noted</p>
+</li>
+</ul>
+<p>Underlying this vaguely-defined feature is the same featureset as
+LINQ, and it's something that people have been doing in Python for
+some time despite the fact that the language doesn't support it
+particularly well.  It would be in my personal top 3 features that I'd
+like to see in py3k.</p>
+<p>Guido's <a class="reference" href="http://mail.python.org/pipermail/python-3000/2006-April/000652.html">reply</a>
+was:</p>
+<blockquote>
+<p>I believe I've seen something like this described for an
+experimental version of Haskell; they had an operator that you
+used to prefix an expression and it returned the AST for that
+expression. One important feature was that they also had the
+opposite feature -- you could use another operator in the
+thus-quoted expression and it would evalulate that subtree and a
+normal expression, and substitute the result in the tree. They
+probably used it to implement a macro facility (though the example
+I remember was a type-safe printf facility).</p>
+<p>I'm going to place the ball firmly in the court of those who want
+this feature: please write a proposal <em>and</em> an implementation. All
+that work is <em>not</em> going to get your proposal accepted for
+certain, but it'll let me look at it.</p>
+<p>(You know, I really hate to be in the position of the parent
+always saying &quot;no&quot;. But there's gotta be someone who ensures that
+Python 3000 will in fact be Python 3000 and not Perl 7. There are
+many, many more possible changes to the language than can possibly
+be accepted. We have to prioritize.)</p>
+</blockquote>
+<p>So, the challenge is out.  In order to put this feature up for consideration:</p>
+<ul class="simple">
+<li>We have to agree what it is, what problems it solves</li>
+<li>An interface</li>
+<li>An implementation</li>
+<li>A justification/PEP</li>
+<li>Tests, both for the implementation and the justification</li>
+</ul>
+<p>So: if you are interested in this sort of feature, please pop on over
+to the <a class="reference" href="http://mail.python.org/mailman/listinfo/python-3000">python-3000 list</a> so we can
+discuss it (that list seems like the best place to discuss, unless
+someone suggests otherwise).</p>
+</div>
+ <div class="dates" align="right">
+Created 11 Apr '06</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>Couple of years ago I was trying to understand Tomcat, and got stuck with its security model.
+To the best of my grasp of the core code, Tomcat was using an XML parser and introspection against the JVM to treat a configuration file like a script.
+Byzantine.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/introspecting-expressions-in-py3k-comment-1.html" rel="nofollow">#</a> <a href="http://">Chris Smith</a></div><hr noshade>
+ 
+<div class="document">
+<p>David Binger's talk was likely on <a class="reference" href="http://www.mems-exchange.org/software/qp/qp-1.5.tar.gz/qp-1.5/lib/spec.py">Spec</a>, a module which can be found in the QP web framework and in the <a class="reference" href="http://www.mems-exchange.org/software/dulcinea/Dulcinea-0.13.tar.gz/Dulcinea-0.13/lib/">Dulcinea</a> package (a bolt on library of objects and UI suitable for QP or Quixote programmers).</p>
+<p><a class="reference" href="http://www.mems-exchange.org/software/qp/qp-1.5.tar.gz/qp-1.5/lib/spec.py">Spec</a> is useful enough all on its own. Its a single file, easy to comprehend, and once you start designing objects with it, you don't want to go back.</p>
+<p>Its useful to look at some code that uses <a class="reference" href="http://www.mems-exchange.org/software/qp/qp-1.5.tar.gz/qp-1.5/lib/spec.py">Spec</a> - perhaps one of the <a class="reference" href="http://www.mems-exchange.org/software/dulcinea/Dulcinea-0.13.tar.gz/Dulcinea-0.13/lib/">Dulcinea</a> objects like <a class="reference" href="http://www.mems-exchange.org/software/dulcinea/Dulcinea-0.13.tar.gz/Dulcinea-0.13/lib/user.py">User</a> or <a class="reference" href="http://www.mems-exchange.org/software/dulcinea/Dulcinea-0.13.tar.gz/Dulcinea-0.13/lib/item.py">Item</a>.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/introspecting-expressions-in-py3k-comment-2.html" rel="nofollow">#</a> <a href="http://mikewatkins.net/">Mike Watkins</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

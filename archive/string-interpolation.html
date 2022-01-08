@@ -1,0 +1,253 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>String Interpolation</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>String Interpolation</h1>
+ 
+<div class="document">
+<p>I was using <a class="reference" href="http://python.org/doc/current/lib/node108.html">string.Template</a> in <a class="reference" href="http://wsgikit.org">WSGIKit</a> recently, and I started hacking silly things
+onto it with a dictionary that, for instance, turned <tt class="docutils literal"><span class="pre">d['str_v']</span></tt>
+into <tt class="docutils literal"><span class="pre">repr(d['v'])</span></tt>.  But it got me to thinking about simple
+templates and string substitution, and the next thing you know I
+implemented something to do richer interpolation:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; name = 'Bob'
+&gt;&gt;&gt; e('Hi $name')
+'Hi Bob'
+&gt;&gt;&gt; e('Hi ${name.lower()}')
+'Hi bob'
+&gt;&gt;&gt; e('Your name is spelled: ${&quot; &quot;.join(list(name.upper()))}')
+'Your name is spelled: B O B'
+</pre>
+<p>Maybe I should just use <a class="reference" href="http://cheetahtemplate.org">Cheetah</a> and be
+done with it, but it was interesting to experiment.  The <a class="reference" href="http://svn.colorstudy.com/home/ianb/recipes/sub_expr.py">source to e</a> is, I
+think, relatively straight-forward.  This has been done before in the
+guise of <a class="reference" href="http://www.python.org/peps/pep-0215.html">PEP 215</a>.  If I
+was to use this for real, I'd probably allow you to pass in a
+namespace as well -- it still adds value over plain <tt class="docutils literal"><span class="pre">Template</span></tt> by
+allowing expressions.</p>
+</div>
+ <div class="dates" align="right">
+Created 13 Apr '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+Why the &quot;finally&quot; block with all the &quot;del&quot;s? There's obviously some python black-magic going on that I'm not privvy to ;)</div>
+ <div align="right"><a href="http://blog.ianbicking.org/string-interpolation-comment-1.html" rel="nofollow">#</a> <a href="http://www.mechanicalcat.net/richard/log">Richard Jones</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+Oh, wait, I get it. Euwww :)</div>
+ <div align="right"><a href="http://blog.ianbicking.org/string-interpolation-comment-2.html" rel="nofollow">#</a> <a href="http://www.mechanicalcat.net/richard/log">Richard Jones</a></div><hr noshade>
+ 
+<div class="document">
+Apparently you have to be extra careful about not keeping frame objects or other people's scopes around.  Less so with the circular garbage collector in place, but frames are still special.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/string-interpolation-comment-3.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>This already exists in Itpl, and has since at least 2000 [1]:</p>
+<pre class="doctest-block">
+&gt;&gt;&gt; import Itpl
+&gt;&gt;&gt; pp = Itpl.itpl
+&gt;&gt;&gt; x = &quot;This is a test&quot;
+&gt;&gt;&gt; print pp(&quot;Today made me say $x.upper()&quot;)
+Today made me say THIS IS A TEST
+&gt;&gt;&gt; print pp(&quot;Today made me say ${' '.join(('what', 'is', 'going', 'on?'))}&quot;)
+Today made me say what is going on?
+</pre>
+<p>[1] <a class="reference" href="http://lfw.org/python/Itpl.py">http://lfw.org/python/Itpl.py</a></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/string-interpolation-comment-4.html" rel="nofollow">#</a> <a href="http://llimllib.f2o.org">Bill Mill</a></div><hr noshade>
+ 
+<div class="document">
+<p>This reminds me of all of the new text editors that show up on freshmeat as being &quot;smaller than vi&quot; or &quot;less bloated than emacs&quot;... and then the authors drop those once they start growing in size and realize that they actually want some of those things in vi and emacs.</p>
+<p>So, I think your comment is probably correct... if you keep heading down this path, you'll probably end up with Cheetah again :)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/string-interpolation-comment-5.html" rel="nofollow">#</a> <a href="http://www.blueskyonmars.com">Kevin Dangoor</a></div><hr noshade>
+ 
+<div class="document">
+<p>Ian, what do you think of using % operator as basic templates? I do it now and delay decision on some templating language.</p>
+<blockquote>
+<pre class="doctest-block">
+&gt;&gt;&gt; name = 'Bob'
+&gt;&gt;&gt; size = 5
+&gt;&gt;&gt; '%(name)s\'s size is %(size)d.' % locals()
+&quot;Bob's size is 5.&quot;
+&gt;&gt;&gt;
+</pre>
+</blockquote>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/string-interpolation-comment-6.html" rel="nofollow">#</a> anonymous</div><hr noshade>
+ 
+<div class="document">
+I've played with all the templates and till I decide on the web framework to use I use preppy. Which is very light weight and works well similar to what you are trying to do.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/string-interpolation-comment-7.html" rel="nofollow">#</a> anonymous</div><hr noshade>
+ 
+<div class="document">
+<p>In the early days of <a class="reference" href="http://aquarium.sf.net">Aquarium</a>, before I started using <a class="reference" href="http://cheetahtemplate.sourceforge.net/">Cheetah</a>, I had a decent interpolation library that fit in a single function, but was still quite handy:</p>
+<pre class="literal-block">
+def evalstr(s, dollar=&quot;$&quot;):
+
+    &quot;&quot;&quot;Evaluate a string with embedded python expressions.
+
+    This is a Python version of the function evalstr, which is used for
+    variable interpolation.
+
+    For instance,
+
+        a = 5
+        evalStr(&quot;I have $a$ dogs.&quot;)
+
+    will return
+
+        &quot;I have 5 dogs.&quot;
+
+    The code between the $'s can be any valid Python expression.  I'll
+    just basically do
+
+        str(eval(expression), yourGlobals, yourLocals)
+
+    Since eval is being used, the expression must return some value.
+    To escape $'s in s, just use $$ (even within expressions).  To use
+    a different character than $, pass the desired character in the
+    second (optional) argument.  If there are an odd number of $
+    symbols, a ValueError exception will be raised.  Here are some
+    additional examples (assuming a = 5):
+
+    &quot;My dog is $a$ years old.&quot; -&gt; &quot;My dog is 5 years old.&quot;,
+    &quot;I have $$5.00&quot; -&gt; &quot;I have $5.00&quot;,
+    &quot;My $a$ year old dog has $$5.00&quot; -&gt; &quot;My 5 year old dog has $5.00&quot;,
+    &quot;My dog has $'$$%s.' % a$&quot; -&gt; &quot;My dog has $5.&quot;,
+    &quot;My dog has $'$$' + str(a) + '.'&quot; -&gt; ValueError exception,
+    &quot;My dog is $a$.$&quot; -&gt; ValueError exception,
+    &quot;$$ is a char.&quot; -&gt; &quot;$ is a char.&quot;,
+    &quot;$a$ is a number.&quot; -&gt; &quot;5 is a number.&quot;,
+    &quot;$a$&quot; -&gt; &quot;5&quot;,
+    &quot;$a&quot; -&gt; ValueError exception,
+    &quot;I have a $$&quot; -&gt; &quot;I have a $&quot;,
+    &quot;&quot; -&gt; &quot;&quot;,
+    &quot;Spam&quot; -&gt; &quot;Spam&quot;,
+    &quot;$&quot; -&gt; ValueError exception,
+    &quot;$ evalstr('I am #a#.', '#') $&quot; -&gt; &quot;I am 5.&quot;
+
+    &quot;&quot;&quot;
+    
+    # By the way, I'm sorry if this stuff is hard to read.  If you
+    # can come up with something more elegant, I'd love to see it, 
+    # but this is the best that I could come up with.  
+
+    import string
+    import sys
+    inEv = 0     # Are we in eval mode (i.e. inside a single $)?
+    inDollar = 0 # We just got a dollar.  We might be in an escape.
+    ret = &quot;&quot;     # This is the string we're returning.
+    tok = &quot;&quot;     # The token we're currently working with.
+    stack = []   # All good languages are stack based ;)
+    i=j=0        # These are indexes into s.
+
+    # Grab the calling function's namespace.  I can't find a nice 
+    # way to do this other than manually generating an exception 
+    # and surfing the traceback.  As for performance, you can do 
+    # this about 10000 times in a bit less than a second on my 
+    # PIII 600 mhz system.
+
+    try:
+        1/0
+    except:
+        traceback = sys.exc_info()[2]
+        currFrame = traceback.tb_frame
+        prevFrame = currFrame.f_back
+        prevGlobals = prevFrame.f_globals
+        prevLocals = prevFrame.f_locals
+    
+    # If they forget to close the $, raise a ValueError exception.
+
+    if string.count(s, dollar) % 2: 
+        raise ValueError, &quot;unmatched dollar symbol&quot;
+
+    sLen = len(s)
+    while 1:
+
+        # Get next token.
+
+        j = i
+        if j==sLen:
+            tok = &quot;&quot;
+        elif s[j] == dollar:
+            tok = dollar
+            i = j+1
+        else:
+            while j&lt;sLen and s[j]!=dollar: j=j+1
+            if j==sLen:
+                tok = s[i:]
+                i = sLen
+            else:
+                tok = s[i:j]
+                i = j
+
+        # Deal with receiving $'s (may call continue).
+
+        if tok == dollar:
+            if inDollar: inDollar = 0
+            else: 
+                inDollar = 1
+                continue
+
+        # Deal with appending stuff to the stack or to ret.
+
+        if inDollar:
+            inEv = not inEv
+            inDollar = 0
+        if inEv: stack = stack + [tok]
+        else:
+            if len(stack) &gt; 0:
+                ret = ret + \
+                    str(eval(string.join(stack, &quot;&quot;),
+                         prevGlobals, 
+                         prevLocals))
+            ret = ret + tok
+            stack = []
+
+        # Deal with end of string.
+
+        if tok == &quot;&quot;: break
+    return ret
+</pre>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/string-interpolation-comment-8.html" rel="nofollow">#</a> <a href="http://jjinux.blogspot.com/">Shannon -jj Behrens</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

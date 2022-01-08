@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>My First Ajax App</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>My First Ajax App</h1>
+ 
+<div class="document">
+<p>Well, it took a while, but I finally finished my first experiment with <a class="reference" href="http://en.wikipedia.org/wiki/AJAX">Ajax</a> (aka Asynchronous Javascript and XML; i.e., DHTML revisited).  It actually doesn't use XML, but I guess it uses XMLHttpRequest, so that's good enough.</p>
+<p>Sadly I cannot demo it for you all, but you can run it on your own with <a class="reference" href="http://pythonpaste.org">Paste</a>; it's at <a class="reference" href="http://svn.pythonpaste.org/Paste/trunk/examples/console">http://svn.pythonpaste.org/Paste/trunk/examples/console</a> -- it gives you an interface similar to the interactive interpreter in Python (obviously not secure for the public web!).  When you enter a command, it sends it to the server (as a URL-encode POST request at the moment), and the server returns any output (including the <tt class="docutils literal"><span class="pre">repr</span></tt> of any expression, the way the interactive interpreter does).  I used code from <a class="reference" href="http://python.org/doc/current/lib/module-doctest.html">doctest</a> as a model for <a class="reference" href="http://svn.pythonpaste.org/Paste/trunk/examples/console/evalcontext.py">evalcontext</a>, which implements the actual interpreter part.  Everything gets interpreted in the server process, so potentially it's a debugging tool.  I can imagine lots of ways to improve it for debugging -- things like HTML object inspectors -- but this is just a minimal experiment at this point.  Or other similar tools, like something similar to <tt class="docutils literal"><span class="pre">tail</span></tt> that shows an ongoing list of log messages.  (Paste first needs a logging system, though -- based on <a class="reference" href="http://python.org/doc/current/lib/module-logging.html">logging</a> of course, but made more convenient)</p>
+<p>In theory you could even hook up <a class="reference" href="http://python.org/doc/current/lib/module-pdb.html">pdb</a> to this kind of system and debug exceptions.  That would be neat.  Not that I actually use pdb that often, but I feel like I should.  Right now post-mortem debugging is generally more useful to me, and with good post-mortem debugging the interactive work isn't as hard.  I still need to add <a class="reference" href="http://python.org/doc/current/lib/module-cgitb.html">cgitb</a>-like capturing of local variables.  But I can imagine an entirely different error middleware (different than <a class="reference" href="http://svn.pythonpaste.org/Paste/trunk/paste/error_middleware.py">this</a>) that implements the debugger.  Parallel development of these things is part of what I hope to see from WSGI.</p>
+<p>Thinking about it, it doesn't even seem that hard.  You catch an execption.  You get <tt class="docutils literal"><span class="pre">sys.exc_info()</span></tt>, which contains all the frames from the exception, and thus contains all the local variables.  You show a traceback.  You have something like this interactive console, but you also let the user select a frame from the traceback, so that their statements will be executed in that scope.  And there you have a pretty neat little debugging environment.  Fun.  But... must... not... get... distracted...</p>
+<p>I used <a class="reference" href="http://jsolait.net">Javascript O Lait</a> for the Javascript.  I tried using <a class="reference" href="http://www.json-rpc.org/">JSON-RPC</a> (via <a class="reference" href="http://jsolait.net/doc/jsonrpc.xhtml">ServerProxy</a> and <a class="reference" href="http://svn.pythonpaste.org/Paste/trunk/examples/console/JSONComponent/">JSONComponent</a>), but it was too slow for some reason.  I'll figure that why later.  So in the end I just used <a class="reference" href="http://jsolait.net/doc/urllib.xhtml">urllib</a>, which is a fairly thin wrapper around <a class="reference" href="http://developer.apple.com/internet/webcontent/xmlhttpreq.html">XMLHttpRequest</a>.  I've looked at <a class="reference" href="http://dojotoolkit.org/">Dojo</a>, which seems simple but doesn't seem to have any useable documentation and the download is huge and confusing.  I looked at <a class="reference" href="http://sarissa.sourceforge.net/doc/">Sarissa</a>, but it's mostly about XML, and XML is the least interesting part of Ajax to me.  I looked at <a class="reference" href="http://www.modernmethod.com/sajax/">Sajax</a>, but it's a little too clever with the server-side stuff for me.  I want to develop the server-side integration myself, in whatever way makes best sense for the framework.  But it probably deserves a bit more attention; it's the next closest in scope to what I'm interested in.</p>
+<p>Dang, that's a lot of links.  Well, there's my link dump for ya'.</p>
+</div>
+ <div class="dates" align="right">
+Created 07 May '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p><a class="reference" href="http://deadbeefbabe.org/shell">http://deadbeefbabe.org/shell</a> seems to be the same thing implemented with nevow's livepage. very cool!</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-ajax-app-comment-1.html" rel="nofollow">#</a> anonymous</div><hr noshade>
+ 
+<div class="document">
+<p>Same stuff here:</p>
+<p><a class="reference" href="http://john.thetrotter.net/cherryshell.html">http://john.thetrotter.net/cherryshell.html</a></p>
+<p>Lorenzo</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-ajax-app-comment-2.html" rel="nofollow">#</a> Lorenzo</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Sigh, the site is down now.  Well, I looked at it before, and it looks quite cool, integrating a richer shell than the one I dug out of doctest into the browser (PyShell...?)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-ajax-app-comment-3.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>cherryshell still there 
+now version 0.2 ;)
+<a class="reference" href="http://john.thetrotter.net">http://john.thetrotter.net</a></p>
+<p>Anyway site goes down sometimes when i am doing changes. But is will come back :)</p>
+<p>Also there is pyroshell (remote pyshell with pyro) not really usefull but 
+proof of concept</p>
+<p>site goes up and down because I do changes.</p>
+<p>cherryshell 0.2 is quirky but works and is cool (lol me prejudiced)
+it quirk thought.</p>
+<p>I need to make gui class for javascript. Working on that then will release 0.3</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-ajax-app-comment-6.html" rel="nofollow">#</a> <a href="http://john.thetrotter.net">nopa90</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>I think (no benchmarking) that jsonrpc with jsolait is quicker then xmlrpc.</p>
+<p>I was using it on project that fall through :(. To get results from a db and give them back to user.</p>
+<p>approx size of db 10,000 and results where like 300. It could fetch them in less then 1 second, plus page do not have to be regened.</p>
+<p>When I use xmlrpc it was slower 1.5 sec.</p>
+<p>I have crappy virtual server.</p>
+<p>I was thinking of making a debugger, with same idea, but the client browser would have to poll the server.
+(I do not think with javascript there is a way to send result to client, without client initiating the request).</p>
+<p>I do not understand why in your case jsonrpc slow</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-ajax-app-comment-7.html" rel="nofollow">#</a> <a href="http://john.thetrotter.net">nopa90</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Concerning, &quot;I do not think with javascript there is a way to send result to client, without client initiating the request,&quot; Nevow's LivePage addresses this concern.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-ajax-app-comment-8.html" rel="nofollow">#</a> <a href="http://jjinux.blogspot.com/">Shannon -jj Behrens</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>A Oracle form like AJAX Data-driven web sample application, <a class="reference" href="http://rhae.dunco.com.my/examples/lppbap/jsp/">http://rhae.dunco.com.my/examples/lppbap/jsp/</a> . This
+is a combination of JSP/Servlet/JavaBean driven backend and AJAX/JSP web form as front end. All form, backend, AJAX handling of this application was generated by Motionk AjaxApp Rapid Builder, an ASP version is hosted &#64; <a class="reference" href="http://rhae.dunco.com.my/tools/LoginFormServlet">http://rhae.dunco.com.my/tools/LoginFormServlet</a> . The generated application is fully working with all the database handling including add new, update, delete, select record etc.</p>
+<p>A PHP AJAX shopping cart, <a class="reference" href="http://www.smartborneo.com/h/home.php">http://www.smartborneo.com/h/home.php</a></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-ajax-app-comment-9.html" rel="nofollow">#</a> <a href="http://www.ajaxapp.com">K.Y. Chee</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

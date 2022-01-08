@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Re: Behavior Driven Programming</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW"><script type="text/javascript" src="http://blog.ianbicking.org/WK/menubar.js"></script>
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Re: Behavior Driven Programming</h1>
+ 
+<div class="document">
+<p>Huh. &quot;Behavior Driven&quot;? Hey, I hear those Ruby people are good at marketing, so maybe they needed a new name for unittesting? Maybe that's not a bad thing. RSpec seems like .. exactly .. py.test? I can't find the blog article mentioned (A New Look at Test Driven Development), but is there some aversion to &quot;assert&quot; in tests that I'm not aware of? Doctest is even nicer, when that's all you need, but other than the Ruby habit of using words to mean builtin things (DSL, righto) x.should_equal 0 =&gt; assert x == 0, right? I thought there must be something more I was missing, but here's the full list of expectations that I can find in the source doc on the RSpec site:</p>
+<pre class="literal-block">
+should_raise -&gt; assert py.test.raises
+should_not_raise -&gt; assert not py.test.raises
+should_be_empty -&gt; assert len(x) == 0 # couple options here, depending on what this means
+should_be_false -&gt; assert x is False
+should_be_nil -&gt; assert x is None
+should_be_same_as -&gt; assert x is y
+should_be_true -&gt; assert x is True
+should_equal -&gt; assert x == y
+should_include -&gt; assert x in y
+should_match -&gt; (not sure what this ruby means)
+</pre>
+<p>and _not_ versions of the same.</p>
+<p>Clearly, the whole point of this <em>is</em> a test assertion DSL? Agree with you that creating this by putting methods onto Object feels much less acceptable to my non-ruby/smalltalk mind. But ok, maybe someday I'll go the rest of the way in this DSL fervor.</p>
+</div>
+ <div class="dates" align="right">
+Comment on <a href="behavior-driven-programming.html">Behavior Driven Programming</a><br>
+by <a href="http://">Luke Opperman</a></div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>Apparently they aren't willing to hack the language interpreter a little to improve their testing?  py.test does some cleverness to reinterpret assert statements and capture subexpressions, and in the process solves the problem that a whole series of assertEqual/etc methods are created to solve.  Doctest solves it in a slightly different way, by basically turning everything into assertEqual (though the fact that is less general can be a problem).</p>
+<p>RSpec is doing something else besides this, I think.  The tutorial isn't completely up-to-date, so now you can actually do <tt class="docutils literal"><span class="pre">x.should.be.foo</span></tt> which I think is entirely equivalent to <tt class="docutils literal"><span class="pre">assert</span> <span class="pre">x.foo?</span></tt>.  Since these transformations are generally pretty easy and obvious (and they are <em>supposed</em> to be easy and obvious), I'm not sure what the advantage of the RSpec style is.  Maybe if I saw his presentation.</p>
+<p>I do think it is or can be correct that &quot;Behavior Driven Programming&quot; is different than just &quot;Test Driven&quot; or unit testing.  There really is something different to starting with doctest than with starting with unittest or py.test.  It's closer to acceptance testing; acceptance testing of the API, I guess.  Unit testing tends to be more focused on testing the internals.  By emphasizing a story, doctest is encouraging you to talk about what things look like from the outside.  I expect that the style RSpec is implementing is intended to do the same.  But creating a DSL for that seems like exactly the <em>wrong</em> thing, because you aren't describing something that anyone can use.  When talking about an API, you should be using the API, nothing more.</p>
+</div>
+ <div align="right"><a href="behavior-driven-programming-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Ahh, true - I tend to write my tests as &quot;this is how the API should work&quot;, so maybe I'm just an early adopter of &quot;Behavior Driven Testing&quot;? :) Although, I thought I was just doing good Test Driven Development... but my point is, TDD freaks people out almost as much as Pair Programming, so if someone wants to try a new name, I'm ok with that.</p>
+</div>
+ <div align="right"><a href="behavior-driven-programming-comment-3.html" rel="nofollow">#</a> <a href="http://">Luke Opperman</a></div><hr noshade>
+ 
+<div class="document">
+<p>After watching the Google TechTalk video ( <a class="reference" href="http://video.google.com/videoplay?docid=8135690990081075324&amp;pl=true">http://video.google.com/videoplay?docid=8135690990081075324&amp;pl=true</a> ) on this I think something like this would be a nice thing in Python.  Sure it's really just TDD, but it's changing the semantics to encourage good TDD practices instead of just a verification mechanism.</p>
+</div>
+ <div align="right"><a href="behavior-driven-programming-comment-4.html" rel="nofollow">#</a> Steve</div><hr noshade>
+</blockquote>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

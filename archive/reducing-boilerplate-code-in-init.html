@@ -1,0 +1,282 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Reducing boilerplate code in __init__</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Reducing boilerplate code in __init__</h1>
+ 
+<div class="document">
+<p>In Dr. Dobb's Python-URL I came upon <a class="reference" href="http://groups-beta.google.com/group/comp.lang.python/browse_thread/thread/7346ad00a14e821a">this thread</a>
+proposing a change to Python (either syntax or builtin) to facilitate
+this general pattern:</p>
+<pre class="literal-block">
+class Foo(object):
+    def __init__(self, a, b=5, c=None):
+        self.a = a
+        self.b = b
+        self.c = c or {}
+</pre>
+<p>There's two proposals, basically.  One is syntax:</p>
+<blockquote>
+<p>class Foo(object):</p>
+<blockquote>
+<dl class="docutils">
+<dt>def __init__(self, .a, .b=5, c=None):</dt>
+<dd>self.c = c or {}</dd>
+</dl>
+</blockquote>
+</blockquote>
+<p>By putting (that very little character) <tt class="docutils literal"><span class="pre">.</span></tt> in front of an argument,
+you imply that it should be assigned to <tt class="docutils literal"><span class="pre">self</span></tt>.  The other builtin
+is:</p>
+<pre class="literal-block">
+class Foo(object):
+    def __init__(self, a, b=5, c=None):
+        adapt_init_args(self, locals())
+        # reassignment fixup:
+        self.c = c or {}
+</pre>
+<p>Using frame hacks, you could easily allow <tt class="docutils literal"><span class="pre">adapt_init_args()</span></tt> to
+work without arguments.  Someone additionally noted <a class="reference" href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/435880">a recipe</a>
+that putting <tt class="docutils literal"><span class="pre">_</span></tt> in front of the <tt class="docutils literal"><span class="pre">a</span></tt> and <tt class="docutils literal"><span class="pre">b</span></tt> to hint to
+<tt class="docutils literal"><span class="pre">adapt_init_args</span></tt> which arguments should become instance variables
+(though that messes up the signature).</p>
+<p>There's lots of ways to do this.  For instance, I regularly use:</p>
+<pre class="literal-block">
+class Foo(object):
+    def __init__(self, **kw):
+        for name, value in kw.items():
+            setattr(self, name, value)
+</pre>
+<p>But that can allow typos too easily.  So sometimes I set defaults as
+class variables, and test for <tt class="docutils literal"><span class="pre">hasattr()</span></tt>, and raise an error if an
+extraneous variable is found.  It also doesn't allow for positional
+arguments.  Or mutable defaults, since those defaults end up as class
+variables, and unwittingly mutating values for all instances will mess
+you up.</p>
+<p>This is one those <em>There's More Than One Way To Do It</em> cases.  Though
+I'm not excited about the syntax proposal, it's addresses a real
+problem.  Clever hacks don't cut it.  There's lots of them.  They work
+differently.  You can't necessarily recognize them each right away.
+They each have flaws -- some quite significant.</p>
+<p>So far the only hack that seems decent to me (a hack that does not
+exist to my knowledge) would be a decorator that works with the <tt class="docutils literal"><span class="pre">_</span></tt>
+prefixes on variables (using something like <tt class="docutils literal"><span class="pre">**_kw</span></tt> to replicate the
+<tt class="docutils literal"><span class="pre">setattr</span></tt> thing I show above).  This should be a clever decorator
+because it needs to:</p>
+<ul class="simple">
+<li>Read the signature of the enclosed function.</li>
+<li>Modify that signature, removing <tt class="docutils literal"><span class="pre">_</span></tt> prefixes, so that you can do
+<tt class="docutils literal"><span class="pre">Foo(a=10)</span></tt> instead of <tt class="docutils literal"><span class="pre">Foo(_a=10)</span></tt>.</li>
+<li>Reveal the &quot;proper&quot; (underscore-less) signature to introspection tools.</li>
+<li>Allow positional calling of keyword arguments, just like normal
+functions.</li>
+</ul>
+<p>A decorator for this is okay -- better than most of the things people
+have been proposing -- but not terribly pleasing.  It's magical, but a
+kind of hidden and mysterious magic.  It bridges an implementation and
+an external interface, but if you don't know how the decorator works
+then you won't understand the disconnect.</p>
+<p>I'm not sure what syntax I'd want.  I'm not sure if syntax is feasible
+here -- there's limited room in a function signature.  But I think
+people who say that syntax is always the wrong
+answer, or that this isn't an issue, are just too set in their ways to
+see the issue.  Python's strength -- particularly compared to the
+other dynamic languages -- is in the consistency with which people use it.
+This is how Python is different from Lisp and Ruby (and
+actually how it is similar to Smalltalk).  I think many people
+(especially the perennial skeptics in comp.lang.python)
+underappreciate this.</p>
+</div>
+ <div class="dates" align="right">
+Created 05 Jul '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>What I don't like about .syntax is that the comma and the dot overlap visually. OTOH, something like this:</p>
+<pre class="literal-block">
+class Foo:
+    def bar(self, self.baz, self.xyzzy):
+        pass
+</pre>
+<p>is what I'd like to see in Python.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/reducing-boilerplate-code-in-init-comment-1.html" rel="nofollow">#</a> Baczek</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Hmmm, this seems to make sense (so much that I actually went and tried it out to see if it would work... which it didn't of course ;-)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/reducing-boilerplate-code-in-init-comment-4.html" rel="nofollow">#</a> polaar</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>I took a crack at writing a simple &quot;autoinit&quot; decorator.  It's not &quot;complete&quot; in that it doesn't do all the minor tasks like setting the wrapping functions name, doc string, etc. nor does it preserve the function signature of the wrapped function, but it does do everything else.  One minor &quot;issue&quot; is that it will assign every keyword argument to the instance, not just declared ones:</p>
+<pre class="literal-block">
+from itertools import izip
+
+def autoinit(f):
+  # get arg names minus 'self'
+  argnames = f.func_code.co_varnames[1:f.func_code.co_argcount]
+  # get argument defaults
+  argdefs = f.func_defaults
+  # build defaults dictionary
+  if argdefs:
+      defdict = dict(izip(argnames[-len(argdefs):], argdefs))
+  else:
+      defdict = {}
+  def newf(self, *args, **kwargs):
+      selfdict  = self.__dict__
+      # start with argument defaults
+      selfdict.update(defdict)
+      # add positional arguments
+      selfdict.update(izip(argnames, args))
+      # add keyword arguments
+      selfdict.update(kwargs)
+      # call the original function
+      return f(self, *args, **kwargs)
+  return newf
+</pre>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/reducing-boilerplate-code-in-init-comment-2.html" rel="nofollow">#</a> Shahms King</div><hr noshade>
+ 
+<div class="document">
+<p>That consistency is both a strength and a weakness. It doesn't have only good points. Couldn't the argument be be made the other way around? That people who think it's very good are just caught up in they're ways to realize the expressivity and power that comes from more freedom?</p>
+<p>Actually Lisp has a much smaller core than Python. I imagine you're talking about Common Lisp. But consider Scheme for example.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/reducing-boilerplate-code-in-init-comment-3.html" rel="nofollow">#</a> Mike</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Yes, I was thinking of Common Lisp.  Or any of the Lisps that have macros, really.  Though really a small core is exactly the thing that leads to TMTOWTDI -- it's based on the idea that it is okay if things are simply <em>possible</em>, regardless of whether they are easy, obvious, readable, or reproduceable; that a small core is a virtue in itself, often ignoring the size of the working set of functionality a programmer must use to actually get anything done.    Common Lisp includes all that functionality in duplicate in its core, while Scheme includes none of that functionality.  Both end up in the same place -- TMTOWTDI.  For example, there are many object systems for Scheme.  And there's many ways to bind a variable in Common Lisp.  Neither place great value in consistency for practical programs.</p>
+<p>And maybe Smalltalk isn't a good counterexample -- as a language it's more like Lisp than Python.  But culturally it's more like Python in this regard, with a rich library and set of conventions.</p>
+<p>Re: expressivity; in this case, there is a fine edge.  If you try to handle every case, you've recreated all of Python in a set of weird rules that can be embedded in a function signature.  That's bad.  This is something frameworks often get wrong -- they write piles of code to save framework users a couple <tt class="docutils literal"><span class="pre">if</span></tt> statements or a loop, confusing everyone in the process.  Certainly <tt class="docutils literal"><span class="pre">__init__</span></tt>, a procedure which can do anything it wants with the object, shouldn't and can't go away.  But really, the choice here isn't between expressivity/freedom and TOOWTDI.  The status quo has <em>simplicity</em> and <em>transparency</em> on its side, while a change has <em>conciseness</em> and <em>uniformity</em> on its side.  This isn't a question of consistency vs. expressivity.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/reducing-boilerplate-code-in-init-comment-6.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>These ideas about monkeying with <tt class="docutils literal"><span class="pre">__init__</span></tt> are Just Plain Wrong, because <tt class="docutils literal"><span class="pre">__init__</span></tt> is the source of the problem in the first place.  The existence of <tt class="docutils literal"><span class="pre">__init__</span></tt> is largely a hack to work around the absence of descriptors in earlier versions of Python, so compounding the hack with more hackery is a bad idea.</p>
+<p>If you are defining attributes, the sane place to do so is in the class body, not in an <tt class="docutils literal"><span class="pre">__init__</span></tt> signature.  Your &quot;class Foo&quot; is the One Obvious Way to do it, defining <em>attributes</em> using default values in the class, or properties, or other kinds of descriptors.  But don't define <tt class="docutils literal"><span class="pre">__init__</span></tt> methods in your subclasses, just define the attributes.  This is the One True Way to solve this problem, because trying to &quot;fix&quot; <tt class="docutils literal"><span class="pre">__init__</span></tt> will get you nowhere: the very <em>idea</em> of <tt class="docutils literal"><span class="pre">__init__</span></tt> is what's broken.  Pinning wings on the pig won't make it fly.</p>
+<p>All of the problems that make you discard this solution are actually quite trivial to fix, compared to trying to &quot;fix&quot; <tt class="docutils literal"><span class="pre">__init__</span></tt>.  For example, mutable defaults are easily handled with a descriptor that creates a new mutable value when its <tt class="docutils literal"><span class="pre">__get__</span></tt> is called and no value is defined.  In PEAK, for example,  <tt class="docutils literal"><span class="pre">bar</span> <span class="pre">=</span> <span class="pre">binding.Make(list)</span></tt> defines a <tt class="docutils literal"><span class="pre">bar</span></tt> property that will be a new list object when first accessed, unless you set it to something else via the constructor or some other way.  Such descriptors are easily created, and far less magical than stack-tampering decorators.</p>
+<p>Similarly, positional arguments are also easy.  You should never have more than a few of those anyway, so just write an <tt class="docutils literal"><span class="pre">__init__</span></tt> that calls the base <tt class="docutils literal"><span class="pre">__init__</span></tt> with them as keywords.  Again, it's much simpler and more straightforward than the alternatives.</p>
+<p>I wish that the <tt class="docutils literal"><span class="pre">object</span></tt> base class provided this behavior; it sure would make it the &quot;obvious&quot; way to do things.  Unfortunately, I don't think it can be added without breaking code that works now, so it likely won't be until Python 3.0 that it'll appear, assuming that Guido agrees this is the One Obvious Way.  (Jython already believes this, and interprets keyword arguments to Java object constructors as a request to set properties on the created object.)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/reducing-boilerplate-code-in-init-comment-5.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I'm not sure exactly what you are proposing or backing; if you want to, say, follow this up with a blog post of your own on the issue, I'm sure that would be interesting.</p>
+<p>Anyway, I think what you mean is that the default __init__ should always act like this:</p>
+<pre class="literal-block">
+class Foo(object):
+    def __init__(self, **kw):
+        for name, value in kw.items(): setattr(self, name, value)
+</pre>
+<p>And, of course, <tt class="docutils literal"><span class="pre">self.__dict__.update(kw)</span></tt> is a horrible hack that bypasses descriptors and shouldn't be seen as a decent way to implement any of this (I note this because it's often offered up -- an example of one of the Bad Ideas about how to deal with this problem).</p>
+<p>Of course, there are many places where you really need clever descriptors to make this work right, if you propose that it replace all of <tt class="docutils literal"><span class="pre">__init__</span></tt> (at least all the attribute-setup portion of that function -- it's overboard to say that all possible initialization code could be removed).</p>
+<p>For an instance of where this becomes complicated, I was just writing some code today:</p>
+<pre class="literal-block">
+class Site(object):
+    def __init__(self, htdocs, conf_dir=None):
+        self.htdocs = htdocs
+        self.conf_dir = conf_dir or htdocs
+</pre>
+<p>I.e., <tt class="docutils literal"><span class="pre">conf_dir</span></tt> defaults to <tt class="docutils literal"><span class="pre">htdocs</span></tt>, and of course you can't resolve that default in the class definition.  So you need a special decorator that forwards <tt class="docutils literal"><span class="pre">.conf_dir</span></tt> to <tt class="docutils literal"><span class="pre">.htdocs</span></tt> when you haven't given an explicit <tt class="docutils literal"><span class="pre">conf_dir</span></tt>.  This is slightly different semantics, but in most cases it's equivalent.  I'd actually be surprised if PEAK didn't already have some binding option to do this.  But some patterns of initialization won't exist.  So when that happens you'd have to write something like this:</p>
+<pre class="literal-block">
+class forwarding_attr(object):
+    def __init__(self, forwarded): # I want a positional argument here,
+                                   # so I need __init__ anyway!
+        self.forwarded = forwarded
+        self.private_attr = forwarded + '_explicit'
+    def __get__(self, obj, type=None):
+        return getattr(obj, self.private_attr, getattr(obj, self.forwarded))
+    def __set__(self, obj, value):
+        setattr(obj, self.private_attr, value)
+
+class Site(object):
+    htdocs = Attr()
+    conf_dir = forwarding_attr('htdocs')
+</pre>
+<p>The <tt class="docutils literal"><span class="pre">private_attr</span></tt> thing is dumb, and I <a class="reference" href="descriptor-nit.html">wrote about that before</a> -- I think PEAK has an answer to that, but there's no convention for it, and it regularly annoys me.</p>
+<p>Anyway, <em>I'll</em> know what <tt class="docutils literal"><span class="pre">forwarding_attr</span></tt> is.  And I can describe it easily enough in a docstring or whatever.  But it's not transparent; I have a hard time justifying how it is better than <tt class="docutils literal"><span class="pre">self.conf_dir</span> <span class="pre">=</span> <span class="pre">conf_dir</span> <span class="pre">or</span> <span class="pre">htdocs</span></tt>.  It's not even significantly shorter, though it is declarative and introspectable.</p>
+<p>I think this sort of thing would appeal to me if I committed to the style.  But I have a hard time committing.  I also have a hard time asking other people to commit to this style -- and I am highly reluctant to commit to something that I'm not willing to advocate that everyone use.  And everyone has to understand this, because it's not a bit of implementation you can encapsulate -- it's a whole different way of thinking about object instantiation, and effects the language significantly.  So, these are the reasons that high-level declarative extensions to Python worry me, even though I understand the motivation, and I can certainly see how it could be useful.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/reducing-boilerplate-code-in-init-comment-7.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;&quot;&quot;This is slightly different semantics, but in most cases it's equivalent. I'd actually be surprised if PEAK didn't already have some binding option to do this.&quot;&quot;&quot;</p>
+<p>Yep.  <tt class="docutils literal"><span class="pre">conf_dir</span> <span class="pre">=</span> <span class="pre">binding.Obtain('htdocs')</span></tt> is the simplest way to do what you described in PEAK; if <tt class="docutils literal"><span class="pre">conf_dir</span></tt> is used without being set, it will take on the value in <tt class="docutils literal"><span class="pre">htdocs</span></tt> at the moment it was looked up (and stays set to it thereafter, unless changed).  There's no <tt class="docutils literal"><span class="pre">private_attr</span></tt> because PEAK is smart enough to be able to ensure that the descriptors know their attribute names.  If <tt class="docutils literal"><span class="pre">conf_dir</span></tt> is set directly or via the constructor, then it won't try to &quot;obtain&quot; the <tt class="docutils literal"><span class="pre">htdocs</span></tt> attribute.</p>
+<blockquote>
+&quot;&quot;&quot;it's overboard to say that all possible initialization code could be removed&quot;&quot;&quot;</blockquote>
+<p>Maybe.  Maybe not.  Fewer than 10% of PEAK's classes even have an <tt class="docutils literal"><span class="pre">__init__</span></tt> method, and most of those are in very &quot;low level&quot; classes.  If you look at &quot;component&quot; and &quot;entity&quot; classes only (high-level constructs used to model services or business objects), you'll find almost no <tt class="docutils literal"><span class="pre">__init__</span></tt> methods at all.  (And I only say &quot;almost&quot; so that I won't look silly if somebody happens to find one or two out of PEAK's 2200+ classes.)</p>
+<blockquote>
+&quot;&quot;&quot;it's a whole different way of thinking about object instantiation, and effects the language significantly. So, these are the reasons that high-level declarative extensions to Python worry me, even though I understand the motivation, and I can certainly see how it could be useful.&quot;&quot;&quot;</blockquote>
+<p>I can understand that.  In a sense, something like this &quot;wants&quot; to be part of the language; you should really be able to do the equivalents of <tt class="docutils literal"><span class="pre">binding.Make</span></tt>, <tt class="docutils literal"><span class="pre">binding.Obtain</span></tt>, and <tt class="docutils literal"><span class="pre">binding.Delegate</span></tt> with syntax or builtins.  But, if what you're looking for is the best <em>technical</em> solution to the problem, PEAK's descriptor patterns are the way to go, whether you use PEAK's implementation or not.  If you're trying to deal with the educational/political issues, then you should just write the boilerplate <tt class="docutils literal"><span class="pre">__init__</span></tt> methods and quit trying to &quot;fix&quot; them, because the fixes will just have a different set of educational/political issues, in addition to being a technically inferior solution.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/reducing-boilerplate-code-in-init-comment-8.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<pre class="doctest-block">
+&gt;&gt;&gt; class Foo(object):
+...     def __init__(self, a, b=10):
+...             for name, value in locals().items():
+...                     setattr(self, name, value)
+...
+&gt;&gt;&gt; foo = Foo(1)
+&gt;&gt;&gt; foo.__dict__
+{'a': 1, 'self': &lt;__main__.Foo object at 0xb7d7396c&gt;, 'b': 10}
+</pre>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/reducing-boilerplate-code-in-init-comment-9.html" rel="nofollow">#</a> <a href="http://edcrypt.blogspot.com">EduardoPadoan</a></div><hr noshade>
+ 
+<div class="document">
+<pre class="doctest-block">
+&gt;&gt;&gt; class Foo(object):
+...     def __init__(self, a, b=10):
+...             for name, value in locals().items():
+...                     setattr(self, name, value)
+...
+&gt;&gt;&gt; foo = Foo(1)
+&gt;&gt;&gt; foo.__dict__
+{'a': 1, 'self': &lt;__main__.Foo object at 0xb7d7396c&gt;, 'b': 10}
+</pre>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/reducing-boilerplate-code-in-init-comment-10.html" rel="nofollow">#</a> <a href="http://edcrypt.blogspot.com">EduardoPadoan</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

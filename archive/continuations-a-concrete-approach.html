@@ -1,0 +1,339 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Continuations: a concrete approach</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Continuations: a concrete approach</h1>
+ <p>
+
+Keith Devens <a href="http://keithdevens.com/weblog/archive/2004/Jul/11/continuations">asked about continuations</a> on his blog.
+And even though I usually don't feel like I understand continuations,
+his theorizing made me believe otherwise.  He also <a href="http://lambda-the-ultimate.org/node/view/86">asked on
+Lambda the Ultimate</a>.  The answers there made me feel like I didn't
+understand continuations again.  But I think I do.  I think the
+problem is so many descriptions of continuations are written by
+Schemers and math geeks, and computer geeks don't talk quite the same
+language.  It might be even worse, because we <i>almost</i> talk the
+same language.  Anyway, here's my explanation:
+
+<p>
+
+There's a theoretical idea of what a continuation <i>is</i>, and
+another idea about how you can use continuations.  I won't cover what
+it <i>is</i> - as is the nature of ideas, you must figure out what an
+idea is on your own.  But maybe if you understand a concrete example, 
+you can figure it out in the abstract as well.
+
+<p>
+
+In a normal language (Python, C, Perl, whatever) you'll have a call
+stack.  Let's use an example:
+
+<pre>
+01 def apple_counter(vegetable_basket):
+02     count = 0
+03     for vegetable in vegetable_basket:
+04         if is_basket(vegetable):
+05             count += apple_counter(vegetable)
+06         elif is_apple(vegetable):
+07             count += 1
+08     return count
+09 
+10 def is_apple(vegetable):
+11     return vegetable == "apple"
+12 
+13 def is_basket(vegetable):
+14     return isinstance(vegetable, list)
+</pre>
+
+Let's say we call <tt>apple_counter(['orange', 'apple',
+['apple', 'apple']])</tt>.  The sequence of actions (line numbers in parenthesis):
+
+<ol>
+  <li> Create a new local scope (we'll call this scope A) (01) 
+  <li> Bind <tt>A.vegetable_basket</tt> to <tt>['orange', 'apple',
+     ['apple', 'apple']]</tt> (01) 
+  <li> Bind <tt>A.count</tt> to <tt>0</tt> (02) 
+  <li> Iterate through <tt>['orange', 'apple', ['apple',
+  'apple']]</tt> (03) 
+
+  <li> Bind <tt>A.vegetable</tt> to <tt>'orange'</tt> (03) 
+  <li> <tt>is_basket('orange')</tt>?  (false: skip to 06) (04) 
+  <li> <tt>is_apple('orange')</tt>?  (false: skip to end of loop, back
+  up to 03) (06) 
+  <li> Bind <tt>A.vegetable</tt> to <tt>'apple'</tt> (03) 
+  <li> <tt>is_basket('apple')</tt>?  (false: skip to 06) (04) 
+  <li> <tt>is_apple('apple')</tt>?  (true) (06) 
+  <li> Bind <tt>A.count</tt> to <tt>1</tt> (07) 
+  <li> Bind <tt>A.vegetable</tt> to <tt>['apple', 'apple']</tt> (03) 
+  <li> <tt>is_basket(['apple', 'apple'])</tt>?  (true) (04) 
+  <li> Evaluate <tt>apple_counter(['apple',
+    'apple'])</tt> (05) 
+
+    <li> Running <tt>apple_counter(['apple', 'apple'])</tt>... 
+    <li> Create a new local scope (we'll call this scope B) (01) 
+    <li> Bind <tt>B.vegetable_basket</tt> to <tt>['apple', 'apple']</tt> (01) 
+    <li> Bind <tt>B.count</tt> to <tt>0</tt> (02)
+    <li> Interate through <tt>['apple', 'apple']</tt> (03) 
+
+    <li> Bind <tt>B.vegetable</tt> to <tt>'apple'</tt> (03) 
+    <li> <tt>is_basket('apple')</tt>?  (false: skip to 06) (04) 
+    <li> <tt>is_apple('apple')</tt>?  (true) (06) 
+    <li> Bind <tt>B.count</tt> to <tt>1</tt> (07) 
+    <li> Bind <tt>B.vegetable</tt> to <tt>'apple'</tt> (03) 
+    <li> <tt>is_basket('apple')</tt>?  (false) (04) 
+    <li> <tt>is_apple('apple')</tt>?  (true) (06) 
+    <li> Bind <tt>B.count</tt> to <tt>2</tt> (07) 
+    <li> List is exhausted, escape for loop (03) 
+    <li> Return <tt>2</tt> (allowing step 14 to be completed, at A.05) (08) 
+
+  <li> Bind <tt>A.count</tt> to <tt>3</tt> (05) 
+  <li> List is exhausted, escape for loop (03)
+  <li> Return <tt>3</tt> (08) 
+
+</ol>
+
+In our example we have two frames, A and B.  (There's actually several
+frames created for <tt>is_basket</tt> and <tt>is_apple</tt>, but we'll
+ignore those.)  These frames consist of a set of bindings (variable
+names <i>pointing</i> to values), and a program counter.  The program
+counter tells the interpreter what instruction to execute next.  It's
+easy to imagine this data structure: the bindings are a simple
+dictionary or hash table.  The program counter (PC) depends on the
+data structure we use to represent the code, but it should be easy
+enough to imagine.  The only complex part might be that the program
+counter can point to the middle of an expression, when an expression
+has only been partly evaluated (as in step 14) -- so the PC can't just
+be a line number.  But most language implementations "compile" the
+source code into a set of instructions, and an expression is actually
+made up of many instructions, and the PC can point to a single
+instruction.
+
+<p>
+
+The PC can also be manipulated by the program itself.  For instance,
+on line 04 if the expression <tt>is_basket(vegetable)</tt> evaluates
+to false, the next line to run will be line 06 (if true, then line
+05).  But that is a digression.
+
+<p>
+
+Back to continuations.  What we've shown here is some of what forms a
+<i>closure</i>: the PC and the local bindings.  So what is a
+continuation?  The continuation is the entire set of closures that
+make of a point of execution.  For instance, lets look at the
+continuation right after step 23 is executed:
+
+<pre>
+Store (heap):
+  Object 1 = 'orange'
+  Object 2 = 'apple'
+  Object 3 = [Object 2, Object 2]
+             # i.e., ['apple', 'apple']
+  Object 4 = [Object 1, Object 2, Object 3] 
+             # i.e., ['orange', 'apple', ['apple', 'apple']]
+  Object 5 = Integer 1
+
+Scope A:
+  vegetable_basket = Object 4
+  count = Object 5
+  vegetable = Object 3
+  for loop index = 2
+  program counter = 05
+  return to = ? (maybe the interactive prompt)
+
+Scope B:
+  vegetable_basket = Object 3
+  count = Object 5
+  vegetable = Object 2
+  for loop index = 0
+  program counter = 03
+  return to = Scope A
+
+Current scope = Scope B
+</pre>
+
+The "store" <i>isn't</i> part of the continuation, I give it for
+reference.  Those numbers (like <tt>Object 3</tt>) are addresses into
+the store, and a programmer cannot handle those addresses directly
+(they can in C++, much to everyone's dismay).  It's important here to
+remember the variables are <i>bound</i> to values, and those values
+are located in the store (often called the "heap").  The scope doesn't
+include any values itself.  In a language like C this is confusing,
+because values can be stored on the stack, which means they would be
+part of the continuation, but languages like Python and Scheme avoid
+this confusion.
+
+<p>
+
+There's also a couple values like the <tt>for index</tt> which are
+hidden from the programmer, but are important to the interpreter.  In
+fact there's probably many more of these, which form a kind of hidden
+interpreter state - but even though we can't see them, they are still
+simple values; it's not black magic, even if the continuation contains
+items you as a programmer wouldn't recognize.
+
+<p>
+
+When you think about this data, something like <tt>call/cc</tt>
+(Scheme's <tt>call-with-current-continuation</tt>) make a bit more
+sense.  The "continuation" is just this data structure.  When you are
+saving a continuation, you are telling the interpreter to capture its
+state into a data structure.  When you restart a continuation, you are
+telling the interpreter to put itself back in the given state.
+
+<p>
+
+Continuation Passing Style is related to all this, but I think it is a
+distraction when trying to understand continuations.  (Shouldn't that
+be obvious, isn't understanding of continuations a prerequesite to
+understanding a programming style that uses continuations?)
+
+<p>
+
+Note that I refer to the interpreter in many places.  All programs are
+interpreted.  Java is interpreted by the JVM, Python by the
+interpreter embedded in the <tt>python</tt> executable, C is
+interpreted by the CPU directly.
+
+<p>
+
+If this doesn't make sense or I got something wrong, I'll try to
+correct it - leave a note in the comments.
+ <div class="dates" align="right">
+Created 12 Jul '04<br>
+Modified 14 Dec '04</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ your hrefs (supposedly linking to keith's posts) are empty.
+ <div align="right"><a href="http://blog.ianbicking.org/comment196.html" rel="nofollow">#</a> caio</div><hr noshade>
+ Indeed -- fixed now, thanks.
+ <div align="right"><a href="http://blog.ianbicking.org/comment197.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ Great post! Your explanation is very readable, and it certainly seems to make sense from what I've picked up here and there about closures and continuations.
+<br />
+
+<br />
+There's a minor typo in the heart of your definition of continuations. In "The continuation is the entire set of closures that make of a point of execution", the second "of" should probably be replaced by "up".
+ <div align="right"><a href="http://blog.ianbicking.org/comment198.html" rel="nofollow">#</a> <a href="http://olifante.blogs.com">Olifante</a></div><hr noshade>
+ Ian, apples and oranges are fruit, not vegetables!
+ <div align="right"><a href="http://blog.ianbicking.org/comment199.html" rel="nofollow">#</a> David</div><hr noshade>
+ While I like to think of continuations concretely (I started with machine language and graduated to assemblers and compilers), the mind-bendingly tricky part of a continuation is that it can be used more than once.  If you remove that ability, what you have is essentially co-routines, a much simpler concept.  
+<br />
+
+<br />
+With true continuations, you can enter a function E times and leave it X times with just about any values for E and X (except that E must be greater than 0 to form the continuation).
+<br />
+
+<br />
+In a functional language this is a bit easier to think about.  We are (or at least I am) pretty well trained to be surprised by a function which returns several times.  I can kind of understand "what the effect of this continuation is,"
+<br />
+for some functional continuations.  The shift to the more concrete is a bit more exciting in imperative languages; perhaps a setable hardware interrrupt dispatch vector is my best mental model in the imperative world: There you have the continuation when the hardware blinked (that you usually resume) and the continuation which is the "what to do on a hardware blink."
+ <div align="right"><a href="http://blog.ianbicking.org/comment200.html" rel="nofollow">#</a> Scott David Daniels</div><hr noshade>
+ If you want a concrete example of continuations in Python, you need look no further than Twisted.  Essentially, to do anything in Twisted, you need to write code in CPS: continually passing "the next function" to other functions.
+<br />
+
+<br />
+peak.events also implements a gentler form of CPS, using generator stacks as continuations, so that you don't have to actually write in CPS.
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment201.html" rel="nofollow">#</a> Phillip J. Eby</div><hr noshade>
+ I've also written a tutorial on continuations for ordinary programmers.  The examples are in Python, and I tried to keept he explanation very simple:
+<br />
+
+<br />
+<a href="http://mojave.caltech.edu/papers/cont-tut.ps" target="_blank">http://mojave.caltech.edu/papers/cont-tut.ps</a>
+ <div align="right"><a href="http://blog.ianbicking.org/comment202.html" rel="nofollow">#</a> <a href="http://www.idyll.org/~n8gray/blog">Nathan Gray</a></div><hr noshade>
+ Thanks for the help on continuations.
+<br />
+
+<br />
+Nathan that was a very well written tutorial thank you very much.
+ <div align="right"><a href="http://blog.ianbicking.org/comment203.html" rel="nofollow">#</a> <a href="http://www.devtty.net">adam</a></div><hr noshade>
+ <br />
+Continuation Passing Style is related to all this, but I think it is a distraction when trying to understand continuations. (Shouldn't that be obvious, isn't understanding of continuations a prerequesite to understanding a programming style that uses continuations?) 
+<br />
+
+<br />
+
+<br />
+That's letting the name mislead you.  In continuation passing style, continuations are explicit - not a feature of the language - and what are they?  Just closures.  You could call it closure passing style.  No matter which approach to continuations you take, the key to understanding them (in the context of ordinary programming languages) is understanding closures.
+<br />
+
+<br />
+Once you understand closures, continuations can be explained quite easily in a few different ways.  The reason understanding CPS helps is because it connects continuations to the implicit continuations that all functions in most languages use, i.e. the point is that continuations are not esoteric, you depend on them in every program you write.  CPS helps you "see" the continuations in your ordinary programs, as opposed to presenting them as something that you've never used before.
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment204.html" rel="nofollow">#</a> Anton van Straaten</div><hr noshade>
+ A nit: C is _not_ interpreted by the CPU directly.  A C program is compiled to machine code.  It is this code that is fetched by the CPU during execution.
+<br />
+
+<br />
+On Intel CPU's, each instruction triggers a subroutine stored in the CPU and written in microcode.  On other architectures (the 6502 comes right to mind), the instruction is directly executed by hardware (apply a pattern to the chip inputs, read the answer from the outputs).  The first case could be considered 'interpretation' (but of a machine language rather than C), but the second is not.  Applying the word 'interpret' to a transistor changing state would stretch the definition beyond all recognition.
+ <div align="right"><a href="http://blog.ianbicking.org/comment205.html" rel="nofollow">#</a> Jeff Root</div><hr noshade>
+ C is not interpreted by the CPU directly, but neither is Python interpreted by the Python interpreter directly -- it is also compiled, in that case to a bytecode representation.  All serious (and most trivial) languages these days are compiled.  The target may be a CPU, or the microcode of a CPU, or a virtual machine.  In all cases, the target interprets the compilation results.  Well, JIT might be something a bit different, as it changes the program as it runs it; something now that even CPUs do (Transmeta).  Anyway, it's just to say that there's not actually any fundamental difference between the "compiled" languages (like C or Java) and the "interpreted" languages (like Python or Smalltalk).
+ <div align="right"><a href="http://blog.ianbicking.org/comment206.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ I may be completely wrong, but the idea of continuations I got from Smalltalkers was something like this:
+<br />
+
+<br />
+imagine the stack for a function A that called function B... function A has some local variables its stack-frame, and function B has some local variables in its stack-frame, and there is a pointer to the code instruction in function B that will be called when function A returns. Now, in some Smalltalks, the stack-frames are actually objects. 
+<br />
+
+<br />
+So instead of a thread of execution creating and disposing of the stack-frame objects, we sort of "suspend" the thread, and retain the stack frames in memory. Smalltalk would actually keep those stack frame objects in the heap instead of the CPU's stack.
+<br />
+
+<br />
+For a web-app framework like Seaside manages those stack-frames, causing them and their associated code to be executed in response to events...
+<br />
+
+<br />
+This kind of goes back to "an object is like a little computer that responds to messages" that was Alan Kay's basic idea of OO programming in the late 1960's.
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment207.html" rel="nofollow">#</a> <a href="http://homepage.mac.com/keithray/blog/index.html">keith ray</a></div><hr noshade>
+ This area is one of the more exciting areas in Python in my opinion, although I still don't fully understand it.  I think this is the solution I've been looking for event driven application programming.  I've written an event driven proxy in C++ and holy heck it is nightmare.  Basically you have to manually mark the state everytime you need an event from the OS to continue.  It can be done, but it is switch statement hell.
+ <div align="right"><a href="http://blog.ianbicking.org/comment208.html" rel="nofollow">#</a> <a href="http://www.baus.net/">Christopher Baus</a></div><hr noshade>
+ 
+<div class="document">
+<p>The concept behind continuations is relatively easy: the problem is that to build something 
+non-trivial with continuations is <em>hard</em>. Also, reading non-trivial code involving continuations 
+is <em>extremely hard</em>, especially in Scheme, which makes big effort to make then unreadable.</p>
+<p>I am very much against exposing continuations to the application programmer: I don't want
+to make the job of the language implementor. Having said that, you can play cool games
+with continuations; for instance you can implement Python generators in few lines:</p>
+<p><a class="reference" href="http://chicken.humankraft.com/wiki.ssp?page=Python%2dlike%20generators">http://chicken.humankraft.com/wiki.ssp?page=Python%2dlike%20generators</a></p>
+<p>(this is one of the simplest non-trivial usages of continuations I know of, 
+still I needed a <em>very substantial</em> effort to reach the competence to write it).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/continuations-a-concrete-approach-comment-1.html" rel="nofollow">#</a> Michele Simionato</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

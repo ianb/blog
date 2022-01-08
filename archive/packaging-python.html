@@ -1,0 +1,263 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Packaging Python</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Packaging Python</h1>
+ 
+<div class="document">
+<p>Here's my opinion on how you should package most Python libraries:</p>
+<blockquote>
+you shouldn't</blockquote>
+<p>Package applications.  Package things that are useful.  Libraries
+aren't useful.  Things made <em>with</em> libraries are useful.  Package
+those.</p>
+<p>Don't put anything in <tt class="docutils literal"><span class="pre">site-packages</span></tt>.  Simply because you shouldn't
+have to, there's no reason to, you aren't making the system run any
+better or be any more useful.</p>
+<p>There are probably some exceptions to this.  Such as libraries that
+interact with other C libraries on the system, like a database driver.
+And... well, that's about it.</p>
+<p>For <em>development of applications</em> something like <a class="reference" href="http://peak.telecommunity.com/DevCenter/EasyInstall#creating-a-virtual-python">virtual-python</a>
+or <a class="reference" href="working-env.html">working-env</a>
+combined with <a class="reference" href="http://peak.telecommunity.com/DevCenter/EasyInstall">easy_install</a> and <tt class="docutils literal"><span class="pre">python</span>
+<span class="pre">setup.py</span> <span class="pre">develop</span></tt> gives you the features you will want, in a way that
+is much more comfortable and flexible for the developer.</p>
+<p>Those isolated development environments are reminiscent of the kind of thing you
+should be packaging up as an application.  Sadly, there are no tools
+yet built to make packaging these bundles easy (that I know of --
+though probably things like <a class="reference" href="http://www.py2exe.org/">p2exe</a> come
+close in spirit).  Yup, those tools should be built.  For all I know they are
+easy; I would speculate, for instance, that some of p2exe's harder
+work comes from extracting such an isolated environment from the big
+dump of packages that is <tt class="docutils literal"><span class="pre">site-packages</span></tt>.  If you get something
+working (or even try and fail), please be sure to tell <a class="reference" href="http://www.python.org/community/sigs/current/distutils-sig/">distutils-sig</a>, as
+we'll be interested.</p>
+<p><strong>Update</strong>: it occurs to me that when I say &quot;package&quot; here I am being vague.  Don't package
+Python libraries as RPMs or Debs or any of those things.  <strong>Do</strong> use Python &quot;packages&quot; aka namespaces.</p>
+</div>
+ <div class="dates" align="right">
+Created 17 Mar '06<br>
+Modified 17 Mar '06</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>I ran into an instance just this morning where I was trying to install a prototype of an app on someone's laptop, using a virtual-python setup, and I ran into problems due to packages being in the system-wide site-packages that were in the way of what I wanted to install in the virtual-python environment.</p>
+<p>I ended up removing the symlinks from the virtual-python's site-packages dir, but perhaps a good wiki page somewhere would be a collection of big long one-liners that remove Python library packages from various operating systems.  For instance, I would use a big long <tt class="docutils literal"><span class="pre">apt-get</span> <span class="pre">remove</span> <span class="pre">...</span></tt> line on Debian systems :)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-1.html" rel="nofollow">#</a> <a href="http://">Matthew Scott</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>In <tt class="docutils literal"><span class="pre">working-env.py</span></tt> by default I leave out site-packages entirely (though there is an option to include it).  Then you don't have to remove anything, since nothing at all gets copied over ;)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>Luckily I don't think that debian is going to listen to you about this :-) but if they did, I think it's a disaster waiting to happen.</p>
+<p>Basically, what you're saying is that any time you want to integrate 2 python libraries on a given system, you should have to create two <em>entirely new</em> &quot;virtual installations&quot;.  If everyone writes libraries this way, why bother with namespaces?  I know that in <em>my</em> &quot;virtual installations&quot;, &quot;n.py&quot; is the networking module.  It's a lot less work to type &quot;import n&quot; than to  create an __init__.py, a package directory, and do 'from my_networking import n'.</p>
+<p>Now, working-env.py looks valuable.  In fact, it looks identical (from what I can see) to Divmod's Combinator, something I wrote myself to handle similar deployment issues. However, real installations and real packaging are going to beat this kind of ad-hoc code slinging any day.  The fact that they're still more work is unfortunate, but in the end it's worth it to have all your code in one place so it's easily loadable from one interpreter.</p>
+<p>It sounds like when you boil it down, this is the argument between static and dynamic linking.  Dynamic linking may be less important due to disk-space concerns today, but it is still clearly the superior option for security reasons.  If ten of your &quot;working environments&quot; have the same library installed and it has a security flaw, it is going to be a lot more work to make sure they're all properly updated (by hand, by copying files) rather than having your distro install a new (but tested to be compatible by distro QA) version of the library.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-3.html" rel="nofollow">#</a> <a href="http://glyf.livejournal.com/">Glyph Lefkowitz</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<blockquote>
+Basically, what you're saying is that any time you want to integrate 2 python libraries on a given system, you should have to create two entirely new &quot;virtual installations&quot;. If everyone writes libraries this way, why bother with namespaces? I know that in my &quot;virtual installations&quot;, &quot;n.py&quot; is the networking module. It's a lot less work to type &quot;import n&quot; than to create an __init__.py, a package directory, and do 'from my_networking import n'.</blockquote>
+<p>I don't know what you mean by &quot;integrate 2 python libraries&quot;.  Libraries don't integrate.  They are integrated.  What is integrating them?  A developer, or an application.  If it's a developer, they should be doing it in a development sandbox.  If it is an application, then it is a package.</p>
+<p>Underlying the system-level packages are python-level packages.  I'm not arguing against Python packages (though my original post didn't make the distinction as it should have).  In this model a system-level package (e.g., an rpm) contains a set of python-level packages.  There is some kind of point of entry into this set of packages; typically it will be a script that changes <tt class="docutils literal"><span class="pre">sys.path</span></tt>.  In other environments where there isn't an executable point of entry, I'm not sure how the activation happens.  For plugins it is a little fuzzy too, but plugin systems are already fuzzy in these packaging systems.</p>
+<blockquote>
+However, real installations and real packaging are going to beat this kind of ad-hoc code slinging any day. The fact that they're still more work is unfortunate, but in the end it's worth it to have all your code in one place so it's easily loadable from one interpreter.</blockquote>
+<p>How?  Why is it easier?  It's a heck of a lot more implicit.  It's a heck of a lot harder to debug.  It's harder to control dependencies.  It's harder to develop, harder to branch.  We have a modest number of tools that work well with the current system; more tools than we currently have to work with a new isolated system.  <tt class="docutils literal"><span class="pre">/usr/bin/python</span></tt> is just one tool, it's not something magical.  These tools are the only advantage I see to the status quo.  But it's not an impressive number of tools on either side.</p>
+<p>&quot;Real&quot; packaging leaves many problems unsolved.  It doesn't solve the problem of different applications requiring different versions of code.  The packaging systems will whine and complain and get in your way if you have conflicting requirements, but they won't <em>help</em> you in any way.  &quot;Real&quot; packaging systems force you to upgrade even when you don't want to, they force you to create a globally consistent environment.  This is everything that pisses deployers off.  This is the style of development that makes it hard for Debian to make releases.  &quot;Real&quot; packages are an enabler for coupled software, and promote cultures that are getting in the way of building properly decoupled software.</p>
+<blockquote>
+It sounds like when you boil it down, this is the argument between static and dynamic linking. Dynamic linking may be less important due to disk-space concerns today, but it is still clearly the superior option for security reasons. If ten of your &quot;working environments&quot; have the same library installed and it has a security flaw, it is going to be a lot more work to make sure they're all properly updated (by hand, by copying files) rather than having your distro install a new (but tested to be compatible by distro QA) version of the library.</blockquote>
+<p>To me that sounds like bad tool support being a justification for complex architecture.</p>
+<p>Honestly, why is it so much worse if 10 packages have to be upgraded in response to a security flaw instead of 1?  Because we can't keep track of what libraries are embedded in what packages?  That doesn't seem hard to resolve.  Because computers are incapable of doing repetitive tasks?  Because the network bandwidth is so valuable?  It doesn't make sense to me.</p>
+<p>I'm <em>not</em> arguing that everything should be entirely ad hoc, though for my own uses system-level packages are not useful.  I'm arguing that <em>developer</em> use <em>libraries</em>, but <em>deployers</em> never do.  Current systems kind of suck for developers.  And to the degree they <em>don't</em> suck for developers, they suck for deployers.  It's a back-and-forth where neither is happy.  So I'm saying developers shouldn't bother using system packages for libraries <em>at all</em>.  Setuptools and sandbox environments are already a much better experience for them.  And deployers don't care about libraries, so don't we shouldn't waste our time trying to expose that level of ganularity to them.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-5.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Okay, I can see where you're coming from.  The deployment system within my company uses a &quot;virtual environment&quot; or &quot;sandbox&quot; model, and it does have its advantages.  However, it also creates its own complexity and coordination problems, which I think are easy to underestimate if you haven't used such a system on a large scale.  If I'm a library developer in this system, it can be quite hard to get updates to my library deployed to all the relevant application environments, even with the help of an extensive system for tracking deployments and dependencies.</p>
+<p>Ubuntu uses the same packaging system (and almost all of the same packages) as Debian, and they have no problem releasing on schedule.  Debian does have a problem (note: I am a Debian developer), but it's not a technical problem and does not have a technical solution.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-7.html" rel="nofollow">#</a> <a href="http://advogato.org/person/mbrubeck/">Matt Brubeck</a></div><hr noshade>
+ 
+<div class="document">
+<p>First of all, let me be clear that there is a point of agreement here.  I think there is a happy medium between what you're saying and the status quo.  Right now, per-user installation is screwed, and there is no generally accepted facility for virtual installations.  site.py only reads user-installed directories on OS X, for some reason.  That sucks.  There are many times wheren virtualized installations are really handy, and <em>certainly</em> per-user installation is important (at the very least, if your installer does not have system-administrator privileges) and it is one of python's strengths that this kind of configuration is relatively easy to do from the interpreter itself, from any application.  The fact that there are no standard or accepted conventions for doing this, especially in Python where it is <em>only</em> a matter of convention, all the technical problems are solved, is unfortunate.</p>
+<blockquote>
+I'm arguing that developer use libraries, but deployers never do.</blockquote>
+<p>If that's the core argument, then I'll argue against just that and I won't bother with defending the other things I was saying :).  Debian developers (who I think are generally considered authoritative on the topic of deployment, at least) have already responded here saying why deployers care about libraries.  However, another good indication of the fact that deployers deal with libraries directly is the phenomenon of library configuration; for example, /etc/fonts/fonts.conf - someone deploying a GNOME desktop will edit that file, and it doesn't configure the X server &quot;application&quot; - it is a common configuration file read by every application that uses fontconfig, generally invoked by the Xft library.  There's also a pile of library-related configuration in /etc/gnome* and /etc/gconf.  If fontconfig were installed for every application, first of all, there would be a lot of copies of fontconfig:</p>
+<blockquote>
+<p>% apt-cache rdepends libfontconfig1 | wc -l</p>
+<p>1091</p>
+</blockquote>
+<p>and second of all, it would be a package management nightmare making sure that all 1091 applications on this system with their own copy of fontconfig were able to read the same configuration format.</p>
+<p>(By the way: fontconfig is about 1M all told, so although disk space isn't as big a deal as it used to be, all those packages would have 1G of <em>just</em> copies of fontconfig.  Once you add in the inevitable X and Gnome dependencies in each package too, that number would explode into impracticality really fast.)</p>
+<p>Speaking in terms of the strength of tools, good libraries are tools in their own right, not just for developers.  Deployers can use to configure and customize large groups of applications at a time.  In the best case, a library can allow you to tweak its behavior independently of an application, to affect an application's behavior (or many applications' behavior) without the applications having explicitly coded any support for it.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-10.html" rel="nofollow">#</a> <a href="http://glyf.livejournal.com/">Glyph Lefkowitz</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<blockquote>
+However, another good indication of the fact that deployers deal with libraries directly is the phenomenon of library configuration; for example, /etc/fonts/fonts.conf - someone deploying a GNOME desktop will edit that file, and it doesn't configure the X server &quot;application&quot; - it is a common configuration file read by every application that uses fontconfig, generally invoked by the Xft library.</blockquote>
+<p>That's an example of a situation where discovery and registration of resources is necessary.  That is definitely a problem with bundled software, though it is not trivial in a centralized system either.  /etc/fonts/fonts.conf has policy associated with it, and various scripts that do things to that file -- all of which must work properly for the entire system to work properly -- and all as an augmentation of the (fairly slow) index of package metadata that exists elsewhere.</p>
+<p>It's harder with software bundles, but I don't think that isolated installs need to be <em>entirely</em> isolated from the system either.  I think it's better to start from the default of fully insulated and add conventions from there.  It's not easy regardless of what you are doing.</p>
+<blockquote>
+(By the way: fontconfig is about 1M all told, so although disk space isn't as big a deal as it used to be, all those packages would have 1G of just copies of fontconfig. Once you add in the inevitable X and Gnome dependencies in each package too, that number would explode into impracticality really fast.)</blockquote>
+<p>Perhaps caching of shared content needs to be a central concept of this.  Something I've meant to add to working-env.py, for instance, is a way of linking in libraries from elsewhere -- probably using Setuptools <tt class="docutils literal"><span class="pre">.egg-link</span></tt> files (which are largely equivalent to platform independent symlinks).  In that case it would an opt-in sharing -- which is better than implicit sharing without any opt-out option at all (except for careful manipulation and stacking of the entries on sys.path).  But a more implicit sharing of resources that are identical would be possible.</p>
+<p>I don't think fontconfig is actually an example of a resource at all, but the problem certainly exists.  I'm also not sure how far down to push this isolation.  Right now most Python applications depend on a set of libraries that mostly <em>should</em> be bundled.  Should everything be bundled everywhere?  Thinking about what that would mean would be an interesting thought experiment ;)  I'm not even sure what it would look like.</p>
+<blockquote>
+Deployers can use to configure and customize large groups of applications at a time. In the best case, a library can allow you to tweak its behavior independently of an application, to affect an application's behavior (or many applications' behavior) without the applications having explicitly coded any support for it.</blockquote>
+<p>Applications should delegate to their component libraries when possible and reasonable, and let information pass down.  This usually has nothing to do with the packaging used.  Applications would still <em>use</em> libraries, and those libraries can still look at their environment; nothing changes with respect to that.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-14.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<blockquote>
+Applications should delegate to their component libraries when possible and reasonable, and let information pass down. This usually has nothing to do with the packaging used.</blockquote>
+<p>In fact it does.  Default configuration is very much part of the library package, at least on debian.</p>
+<blockquote>
+Applications would still use libraries, and those libraries can still look at their environment; nothing changes with respect to that.</blockquote>
+<p>The thing that changes with respect to that is that, within a compatible version of a library, the format of the system configuration for the library may change, or features may be added, without necessarily alerting applications to that fact.  Or, an entirely new version might be released, which provides a compatibility later.</p>
+<p>Now, there are ways to design around this, future-proofing your format etc, but demonstrably library authors do not always do this.  Configuration formats do change, and will continue to change whether application authors start bundling everything under the sun with their application or not.</p>
+<p>Right now the user experience of this is, you upgrade the library, and Debian prompts you if you want to upgrade your system config file.  You (and your users) have to infer that you also must upgrade files under ~/. as well, but at least one upgrade to that file and you're done with it.  If every application packages every library, all of a sudden you've got 1091 copies of fonts.conf, under /etc/gaim/fonts/fonts.conf, /etc/gimp/fonts/fonts.conf, and you have to track the version of fontconfig used by every single one of those apps manually.  Even if you make no modifications, the package maintainers for each of those applications suddenly has to become a fontconfig expert, whereas before they didn't even have to know this file existed.</p>
+<p>If you include .egg-link files with your application that &quot;link&quot; to other libraries, how is that different from an import statement &quot;linking&quot; to another library?  It's just adding additional work to your import lines.  What if I want to write a plugin for application X which imports a library from application Y?  What is my &quot;application&quot;?  How do I install under package X in such a way that I can then &quot;link&quot; to package Y?  Perhaps each project should also come with an XML config file which describes all its dependencies?  The pygtk project had thoughts along these lines before, and their solution has mainly made people unhappy: <a class="reference" href="http://www.tortall.net/mu/blog/2006/01/18/pyxyz_require_sense">http://www.tortall.net/mu/blog/2006/01/18/pyxyz_require_sense</a></p>
+<p>I've been talking a lot about random C libraries as if they might be in Python (and I hope in the future more will) but let me speak directly and practically about Python as it is now.  The status quo may not be perfect, but it effortlessly allows me to write python plugins for nautilus or gaim which import twisted, gtk, vte, sqlite, ogg, BitTorrent, or any other library on my system.  It seems you want to break that by unbundling every library (I have over 100 python libraries installed through Ubuntu's packaging system, and a half-dozen installed in my user environment) from my system, and putting it into the applications which use it, and making me re-install or re-declare the use of those libraries in my &quot;working environment&quot; for the plugin, all apparently to prevent some hypothetical breakage.  (Is the plugin an &quot;application&quot;?  How does its environment differ from that of the (usually non-Python) application it's hosted in?)</p>
+<p>To get to the bottom of this, though: what's the real problem you're trying to solve here?  Is it just making side-by-side installation so that applications don't break when subtly different versions of libraries are installed?</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-15.html" rel="nofollow">#</a> <a href="http://glyf.livejournal.com/">Glyph Lefkowitz</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Suppose a security bug is found in a popular library.</p>
+<p>If I'm using a Debian-based system like Ubuntu, a notification will appear on my screen.  I click the &quot;install update&quot; button.  The system downloads installs a new version of the library package.  I'm done.</p>
+<p>On the other hand, suppose I'm on a system without proper packages, where each application installs the library into its own copy of the environment.  Then I need to hunt through every application on my system, see if it uses the library, and install the security fix for each application that does.  Or, every application author needs to update their application packages to include the security fix, and I need to install all of the updated packages.</p>
+<p>This is just one of the reasons that libraries benefit from proper packaging even more than applications do.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-4.html" rel="nofollow">#</a> <a href="http://advogato.org/person/mbrubeck/">Matt Brubeck</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<blockquote>
+Suppose a security bug is found in a popular library.</blockquote>
+<p>Then the security bug exists in every application using that library, and they should all be updated, and new versions of the system-level application packages will emerge for you to install.  Problem solved.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-6.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>This is pretty fast problem solving.  But it doesn't match reality.</p>
+<p>Look for example at xpdf; its code is duplicated in gpdf, kpdf, some command-line utilities, poppler, I am probably missing some.  Waiting for all of them to update to the newer xpdf code is unrealistic.  It has been <em>shown</em> as not working and causing delays.</p>
+<p>You write they should <em>all</em> be updated.  While only one single package could.  I prefer that second option.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-8.html" rel="nofollow">#</a> <a href="http://www.0d.be">Frederic Peters</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>This is something that should be handled with proper tool support.</p>
+<blockquote>
+Look for example at xpdf; its code is duplicated in gpdf, kpdf, some command-line utilities, poppler, I am probably missing some. Waiting for all of them to update to the newer xpdf code is unrealistic.</blockquote>
+<p>Why is it unrealistic?  Because updating the code causes problems in those packages?  Updating the code via dynamic linking doesn't improve that any.  Because the maintainer isn't sufficiently available to make the update in time, or in a coordinated fashion?  Debian does non-maintainer updates to solve this sort of problem; that kind of update just needs to be done more widely.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-9.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>It is not easy because gpdf, kpdf, etc. don't have much knowledge about the xpdf code they ship; so it takes time.</p>
+<p>And the developers who will bundle many Python packages to get an &quot;application package&quot; won't know details about all those Python packages, same problem.</p>
+<p>Even worse it gets much harder for an entity that cares (say Debian) to apply the fixes; 1) they must be applied in many different places and 2) those different places have different versions.</p>
+<p>As for the tools to handle all of this, they do not exist for the moment.</p>
+<hr class="docutils" />
+<p>IIRC you had slides opposing developers and packagers (&quot;deployers&quot;, maintainers, sysadmins, whatever the name), iirc.  All of this, <em>For development of applications</em>, <em>much more comfortable and flexible for the developer</em>, <em>isolated development environments</em> concerns developers.  Please don't forget the other side.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-12.html" rel="nofollow">#</a> <a href="http://www.0d.be">Frederic Peters</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>I sort of agree.</p>
+<p>There are fewer libraries in Python that can even have true security flaws.   Those libraries are usually used in such a fashion that they _can_ be installed system-wide.  In fact they should be included with the Python distribution.</p>
+<p>All those helper libraries should be bundled separately with the application (as is usually done on Windows) and makes deployment easier.</p>
+<p>But what about GUI development?  For development, the sandbox approach doesn't work.  I find wxWidgets is a pain sometimes because I need to tweak a widget to work well with my applications, since they often don't make subclassing easy.  As a developer, sandboxing doesn't make sense because I want to be able to add this tweak to all my applications.  But I do want to take advantage of new features, so something like working-env makes sense for all my legacy apps.  Maybe that's a problem with the library though.</p>
+<p>But what about web development?  For hosting, the sandbox approach doesn't work so well for deployers (bundling CherryPy.)    In this case it's nice to have a real server that can stay stable underneath.</p>
+<p>However, I do agree that the majority of libraries don't belong in site-packages at all.  Library dependencies should be resolved by the developer, not the deployer.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-11.html" rel="nofollow">#</a> <a href="http://">Kevin Deenanauth</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<blockquote>
+But what about GUI development? For development, the sandbox approach doesn't work. I find wxWidgets is a pain sometimes because I need to tweak a widget to work well with my applications, since they often don't make subclassing easy. As a developer, sandboxing doesn't make sense because I want to be able to add this tweak to all my applications.</blockquote>
+<p>You mean you edit the wx code directly?  In that case you should probably make a mini fork.  Monkeypatching is probably a more realistic option, though.  It's a messy situation any way you do it -- I think it's cleaner with monkeypatching though.  Monkeypatching someone else's (or everyone else's) application is a little more difficult with isolated installations.  So I don't know.</p>
+<blockquote>
+But what about web development? For hosting, the sandbox approach doesn't work so well for deployers (bundling CherryPy.) In this case it's nice to have a real server that can stay stable underneath.</blockquote>
+<p>I think the opposite is true.  The hoster really doesn't care about CherryPy, and generally doesn't want to maintain or update that for you.  On both sides of that relationship people just want things to work and not to have to coordinate and communicate.  Bundling CherryPy or whatever your web framework is is probably going to work better for everyone.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-13.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Don't often disagree with you, but I do this time.</p>
+<p>For some of us, python is the application. e.g. we want to analyse scientific data using python. We load libraries, we load (python) tools (aka applications) that use the libraries, but we mix them together to solve problems in python.   We build wrappers to our legacy applications and we build libraries out of those, and we glue them together with python ...</p>
+<p>... and tomorrows problem is different from todays, so the way we arrange things is different. I want a different bundle of libraries, and I want to different things with them ... I never release an application. Python is the application. Please don't argue that the application is the <em>only</em> endgame. We need to make it easy for people to package the libraries as well.</p>
+<p>(p.s. my capta question is &quot;of apples and oranges, which is more red&quot; ... hmm is it a red delicious or a granny smith?)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-16.html" rel="nofollow">#</a> <a href="http://home.badc.rl.ac.uk/lawrence">Bryan</a></div><hr noshade>
+ 
+<div class="document">
+<p>So you'd recommend packaging the same libraries multiple times in separate applications?</p>
+<p>In the past I've had to manage a Linux distro, and had to worry about supporting upgrades. The only mechanism that I had to work with was rpm. How would you suggest managing that with a minimum of effort, with no human interaction?</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-17.html" rel="nofollow">#</a> <a href="http://digitaltorque.ca">Michael Soulier</a></div><hr noshade>
+ 
+<div class="document">
+<p>Given some 3am shenanigans with various setuptools autoinstallation tricks in conjunction with a fairly well-known Python package, I'd like to advise your readers to make full use of their distribution's packages and packaging system: no &quot;automagical, I'm off to get stuff for you - bet you didn't expect that!&quot; fun with setup scripts, just plain-and-simple use of the tools already available, documented and promoted things which everything else on your system already uses.</p>
+<p>If setuptools played better with established solutions instead of wanting to install various things in /usr/bin without asking first, perhaps I'd take it a lot more seriously. Perhaps this isn't how setuptools is supposed to be used - in which case we have a prime example of how exciting new stuff, contrary to popular denial, really does have an impact on others via a combination of technical <em>and</em> social factors.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/packaging-python-comment-18.html" rel="nofollow">#</a> <a href="http://">Paul Boddie</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Twill in Javascript</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Twill in Javascript</h1>
+ 
+<div class="document">
+<p>I was thinking about <a class="reference" href="http://www.idyll.org/~t/www-tools/twill.html">Twill</a> and <a class="reference" href="best-of-the-web-app-test-frameworks.html">web testing</a>
+and operational tests.  After a couple emails with Titus Brown about
+Twill and his recent <a class="reference" href="http://advogato.org/person/titus/diary.html?start=119">WSGI support</a>.  And I
+thought that Twill could be nice for some operational and functional
+tests, and that it would be even better if you could also run them in
+a browser like <a class="reference" href="http://selenium.thoughtworks.com/index.html">Selenium</a>.  Selenium is nice as
+well, but automating it fully seems really really hard.  If you want
+to test websites that require Javascript to function, well... but I'm
+okay limiting myself.  Similarly Twill itself requires some limiting.
+And, to be practical, it wouldn't be that hard to create something
+that could run Selenium code without a browser.  But Twill is more
+compact.</p>
+<p>Anyway, I created some rough code.  You can look at <a class="reference" href="http://ianbicking.org/examples/twill_js/suite.html">a demo</a>, or check out
+the svn repository at <a class="reference" href="http://svn.colorstudy.com/home/ianb/twill_js/">http://svn.colorstudy.com/home/ianb/twill_js/</a></p>
+</div>
+ <div class="dates" align="right">
+Created 15 Nov '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>Hmmm... My opinion on this mixed. Competition is a good thing, but at the same I can see lots of opportunity for collaboration. With so many testing tools around, it would be fun to do some kind of &quot;Testing Tools Summit&quot; to share ideas and compare notes. Maybe host it in conjuction with a &quot;Python Web Frameworks Summit&quot;. :-)</p>
+<p>Do you think Selenium is just too complicated to get going or do you think it's just lacking documentation? What are your top 3 three things you'd like to see (or see fixed or see changed) in Selenium, that weren't there?</p>
+<p>-Jason &quot;The guy who wrote Selenium&quot; Huggins.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/twill-in-javascript-comment-1.html" rel="nofollow">#</a> <a href="http://blog.ianbicking.org/jrandolph.com/blog">Jason Huggins</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I don't have any real problem with Selenium.  In part I did this because it amused me, but also the ability to do automated/non-browser evaluation of the script is important.  Like I said, it wouldn't be that hard to write a non-browser Selenium interpreter (maybe that even exists), but I just wrote it in this direction.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/twill-in-javascript-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ 
+<div class="document">
+<p>Well, as long as I'm on the topic, this is what I like less about Selenium:</p>
+<ul class="simple">
+<li>There's a lot of up-front complexity that isn't very important, and little things (like how do you start your own test suite) are not as blindingly obvious as they should be.</li>
+<li>Last time I looked at it -- and this was in discussion, so it may have been resolved -- there wasn't many ways to create higher level abstractions of your scripts, to keep the line count down and cut out repetetive parts.  (Note that the featureset provided by my code is, if anything, worse on that regard)</li>
+<li>The names are really long.</li>
+<li>The table is a bit too constrained.  Everything must take 0-2 arguments.</li>
+<li>Interactive development seems like it would be hard -- I am not likely to type Selenium commands out easily.  Interactive creation of Twill in the browser seems quite reasonable (not implemented, of course).</li>
+</ul>
+<p>But all that said, none of those were the reasons I wrote this, nor are they the kind of substantive reasons I would or wouldn't choose Selenium.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/twill-in-javascript-comment-3.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Yeah, I do think the HTML table syntax can be limiting sometimes. I'm starting to prefer Twill's syntax of splitting on whitespace, instead of table tags. If you write your tests in Mozilla Composer or Word or Excel, Selenium's tables thing is not a big deal. I know some people also use PHP or JSP to convert code into the table tags on the fly. Since I spend my whole day in TextPad on Windows, I think I'd rather have a clean syntax that looks good in plain text. I'll blame Selenium's original design on the fact that it started as a JavaScript implementation of the FIT framework, which relies heavily on HTML tables for its test syntax.</p>
+<p>I think both Twill and Selenium are little too terse in its syntax.
+Instead of this (twill syntax):</p>
+<pre class="literal-block">
+# Not too exciting...
+go /examples/twill_js/test.html
+fv 0 age 10
+fv 0 name Ian
+echo Get ready for the submit!
+submit 0
+notfind NOTHING
+follow back
+code 200
+</pre>
+<p>I'd rather have a HyperTalk-inspired syntax like the following:</p>
+<pre class="literal-block">
+-- Not too exciting
+go to /examples/twill_js/test.html
+type 10 into field with name &quot;age&quot;
+type &quot;Ian&quot; into field with name &quot;name&quot;
+print &quot;Get ready for the submit&quot;
+click &quot;submit-me&quot;
+assert page is not null
+go back
+assert response_code is 200
+</pre>
+<p>I think the HyperTalk-esque syntax has the same &quot;non-programmer friendliness&quot; that Selenium table tests or Twill tests have, but in a more literate and self-documentating syntax. However, there are now decades of experience with English-like languages like AppleScript, HyperTalk, (and even COBOL), and most &quot;real programmers&quot; hate those languages, even though in this case, I think it would make sense-- a domain specific language for automating actions on a web page. Most programmers would rather have Ruby, Perl, JavaScript, Python, or Java, etc. But anyway, that's a <em>whole</em> 'nother debate, and I don't think I have time to (re)invent the HyperTalk programming language to improve the readibility of my Selenium tests, even though I'd love to do it. I throw this idea out there just in case someone else in web-land stumbles upon this thread and has a free year to implement it for me, <em>and</em> agrees that HyperTalk was the coolest language ever. :-)</p>
+<p>With that tangent aside, I'm thinking that the logical next steps for Selenium are:</p>
+<ol class="arabic simple">
+<li>To make the HTML table-tag aspect of Selenium tests optional. Split on whitespace instead, like Twill.</li>
+<li>More fully support straight JavaScript test files, for the moments when you need loops, conditionals, functions, etc...</li>
+<li>More fully embracing browser extensions like Selenium Recorder... Browser extensions let Selenium run &quot;outside&quot; of the security sandbox Selenium usually lives in. And being &quot;outside&quot; that box would let users do interesting things like testing or automating any site on the net (not just the the local host where Selenium was installed.) The key words for this are &quot;cross site scripting&quot; and &quot;same origin policy&quot;... and it trips up lots of new users of Selenium.</li>
+</ol>
+<p>Since Selenium &quot;lives in the browser&quot;, you could do (or hopefully soon do) interactive inspection and test creation by using cool tools like JavaScript Shell (<a class="reference" href="http://www.squarefree.com/shell/">http://www.squarefree.com/shell/</a>) to play with a page and create tests. Also, interesting browser extensions like Selenium Recorder (<a class="reference" href="http://seleniumrecorder.mozdev.org/">http://seleniumrecorder.mozdev.org/</a>) are making it even easier to get up and running with Selenium and creating your first tests...</p>
+<p>Anyway, 'tis interesting times to be a web developer and software tester. Lots of cool stuff is getting created these days in this space.</p>
+<p>-Jason</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/twill-in-javascript-comment-4.html" rel="nofollow">#</a> <a href="http://jrandolph.com/blog">Jason Huggins</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Hi, Jason,</p>
+<p>thanks for your positive comments on twill's syntax: I make it up as I go, and (thus far) have mostly been just happy when something
+works.  I do try to keep the syntax <em>simple</em> as opposed to <em>easy</em>, because one of the major use cases for twill is its use by non-programmers; what programmers find easy is often not so simple.  Note also that the twill syntax is very closely linked to
+Python code; for example,:</p>
+<pre class="literal-block">
+go here
+</pre>
+<p>translates directly to:</p>
+<pre class="literal-block">
+go('here')
+</pre>
+<p>This is a very convenient feature for Python programmers and several users seem to be using it this way.</p>
+<p>On a more general note, I'm a bit boggled by Ian's ability to work on 80 billion different projects.  At least for the short term,
+I don't have the capacity to work on a JavaScript version of twill; nor am I sure that it'd be an unambiguously good thing to have,
+unless it were somehow possible to keep the languages virtually identical.  Maybe it is, maybe not.
+However, it may be that Selenium and Twill can get together and have unnatural spawn in the future: perhaps a twill-inspired version
+of Selenium with pwettier syntax?</p>
+<p>Also, let me say: twill aims low.  I want a simple, solid way to script and test Web sites in a fairly black-box-ish manner.  It honestly shouldn't be too much work to get there, and I bet the future will be in recorders and/or test automation technology rather than
+twill-ish languages.  After all, who cares what language the test uses, if the computer can write it for you?</p>
+<p>Finally -- Grig Gheorghiu and I have proposed an Agile Development tutorial for PyCon.  As you no doubt know, Grig is a huge proponent of Selenium.  We will certainly feature both twill and Selenium in our tutorial.  No doubt our febrile imaginations will come up with plans for some orcish melange of twill and Selenium, and I have a hard time resisting a good hack...</p>
+<p>--titus</p>
+<p>p.s. &quot;--&quot; for comments is ungodly!  long live '#'!</p>
+<p>p.p.s.  just kidding ;).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/twill-in-javascript-comment-5.html" rel="nofollow">#</a> <a href="http://www.idyll.org/~t/www-toosl/twill.html">Titus Brown</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p><em>I bet the future will be in recorders and/or test automation technology rather than twill-ish languages. After all, who cares what language the test uses, if the computer can write it for you?</em></p>
+<p>I disagree, I think recordings can never understand what matters and what doesn't, and the result is too fragile.  And once you've done it, if it's not expressed as some at least vaguely sensible language, then it is uneditable.  That language might be in markup, or might not, but I think it really has to be a &quot;language&quot;, not just a literal recording.  Recorders are nice, still, they just aren't complete by themselves.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/twill-in-javascript-comment-6.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;Recorders are nice, still, they just aren't complete by themselves.&quot;</p>
+<p>I agree. Test recorders are kind of like of Ruby on Rails's generators and scaffolding... They both get knocked alot, however, they <em>are</em> very useful when you consider them &quot;the starting point&quot; and not the final production-ready result. Test recorders lower the barrier to entry into the testing framework's language or API--- that, and the kids love 'em. :-) My past experience with macro or test recording is with SQA Robot by Rational (now IBM) and with Microsoft Excel's built in macro utility. In both cases, I used recording to generate a simple, single working script... then went on to edit that raw test into a far more robust and &quot;programmed, not recorded&quot; test suite. The recorders gave me working code from step one, which I then manipulated as needed.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/twill-in-javascript-comment-7.html" rel="nofollow">#</a> <a href="http://jrandolph.com/blog/">Jason Huggins</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Well, maybe it's a matter of degree.  At some point I doubt there will be a need for language innovation -- but recorders can get much better...</p>
+<p>We'll see ;).</p>
+<p>--titus</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/twill-in-javascript-comment-9.html" rel="nofollow">#</a> <a href="http://www.idyll.org/~t/www-toosl/twill.html">Titus Brown</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+ <div class="system-message">
+        <p class="system-message-title">
+        SystemMessage: SEVERE/4 (<string>:4)</p>
+        <p> Missing matching underline for section title overline.</p>
+        <pre>
+---------------------------------------------------------------------------
+Brian Lloyd has developed zope.testrecorder, a cross-browser (IE,
+Firefox, Safari) JavaScript app that records browser events (clicking,</pre>
+        </div> <div align="right"><a href="http://blog.ianbicking.org/twill-in-javascript-comment-19.html" rel="nofollow">#</a> sureshvv</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Quoting Benji York from gmane.comp.web.zope.devel:</p>
+<blockquote>
+<p>Brian Lloyd has developed zope.testrecorder, a cross-browser (IE,
+Firefox, Safari) JavaScript app that records browser events (clicking,
+entering text, etc.) and test assertions (this text box should contain
+this text, this checkbox should be unchecked, etc.) and renders the
+captured events as either an HTML Selenium test or a doctest using
+zope.testbrowser.  It can be installed as a product into Zope 2 or as a
+Python package in Zope 3.</p>
+<p>The rendering framework is pluggable and it's pretty easy to add new
+rendering options for other testing systems (twill, etc.).</p>
+<p>The testrecorder is currently in &quot;beta&quot; form, but is very handy, so if
+anyone wants to use/market/improve/add tests for it, go ahead. :)   Get
+it via Subversion at svn://svn.zope.org/repos/main/zope.testrecorder/trunk</p>
+</blockquote>
+<p>It is very cool.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/twill-in-javascript-comment-20.html" rel="nofollow">#</a> <a href="http://">sureshvv</a></div><hr noshade>
+</blockquote>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

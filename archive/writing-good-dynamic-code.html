@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Writing good (dynamic) code</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Writing good (dynamic) code</h1>
+ 
+<div class="document">
+<p>In an <a class="reference" href="http://programming.reddit.com/info/uky3/comments">article on functional programming</a>
+(<strong>update</strong>: link to Reddit copy; for some reason the
+<a class="reference" href="http://yarivsblog.com/articles/2006/12/11/a-general-theory-of-programming-language-relativity/">original</a> is gone).
+this Python code is declared as bad:</p>
+<pre class="literal-block">
+def respond(channel, msg):
+    if channel.isValid() and msg.body() == &quot;next&quot;:
+        return channel.send(&quot;A2-B3&quot;)
+    else:
+        return channel.send(&quot;bye&quot;)
+</pre>
+<p>(I've corrected the obvious non-Pythonness of the original code, since
+that wasn't the point.)  The author is unhappy that he doesn't know
+the value (i.e. implementation) of <tt class="docutils literal"><span class="pre">channel.isValid</span></tt>, <tt class="docutils literal"><span class="pre">msg.body</span></tt>
+and <tt class="docutils literal"><span class="pre">channel.send</span></tt>.  If he knew the type of <tt class="docutils literal"><span class="pre">channel</span></tt> and <tt class="docutils literal"><span class="pre">msg</span></tt>
+he would know these things.  And realistically these types are going
+to be relatively static, but you can't tell from a localized snippet
+of code.  (Note that type inference doesn't help here at all, since
+with inference the types will be just as mysterious from simple code
+reading.)</p>
+<p>The problem here is that the code has a language of its own.  It talks
+about things like &quot;channels&quot; and &quot;messages&quot; without specifying what
+exactly it means.  These terms probably are all over the code.  And
+once you become familiar with the code base it is probably obvious
+what they mean, and tedious to constantly describe them.</p>
+<p>This is a common situation in frameworks, though in this case the
+&quot;framework&quot; might simply be the rest of the code in the application
+outside of the module or function you are looking at.</p>
+<p>It's often a very good tradeoff to ask the programmer new to your code
+to spend some time familiarizing him or herself with the lay of the
+land -- the basic ideas that are pervasive in your application, the
+objects that form the core of it, the words you use to describe its
+process.</p>
+<p>Generally in Python (and elsewhere) we lack good conventions for doing
+this.  Extracted documentation (ala Javadoc) is horrible for this;
+doctests aren't much better.  Interfaces are generally quite good, if
+you separate the important interfaces from the incidental ones.
+Narratives and code maps are usually the best.  But they often not
+present, or incomplete, or hidden, or not trustworthy.  (Even when
+documentation is <em>true</em> it may still not be <em>trustworthy</em>.)</p>
+<p>We (meaning &quot;we programmers&quot;) should try to do better here.  We should
+also be careful about the tradeoff -- adding new fundamental ideas to
+your code can be a great way to increase the expressiveness and
+cohesiveness of the code.  But it also has a very real cost; it should
+not be done lightly.  It is often better to repeat oneself than to
+introduce a new metaprogramming construct, a new object type, a subtle
+polymorphism, or use higher-level functions.  I know, it feels cool to
+do all these things.  It makes higher level languages seem justified
+-- if you are writing code that looks like C, why not write C?  It
+lets you keep from repeating yourself.  But it's often not worth it.
+It's often better to repeat yourself, to write dumb imperative code,
+to use short statements instead of long expressions, to add extra
+names to your code, to use lots of vertical space, to use a for loop,
+to use fundamental types over custom types, to avoid subclassing, to
+reimplement instead of generalize, to calculate eagerly instead of
+lazily, to bind tightly instead of loosely, to use functions over
+methods... all the things that are so often called bad are usually
+good, because they are usually easy.  People overstate their case on
+these matters because it is hard to keep other people from doing the
+easy thing when it <em>is</em> the wrong thing.  But programming-in-the-small
+(one function, one line, one simple routine) is best done in the easy
+way, even if it isn't as exciting.</p>
+</div>
+ <div class="dates" align="right">
+Created 21 Dec '06<br>
+Modified 08 Jan</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>The post you linked disappeared</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/writing-good-dynamic-code-comment-1.html" rel="nofollow">#</a> <a href="http://www.oluyede.org/blog">Lawrence Oluyede</a></div><hr noshade>
+ 
+<div class="document">
+<p>While it's always been true that the man with only a hammer sees all problems as nails, the man with a toolbag containing a rich collection of function and object-oriented tools can have a tendency to see even the simplest problems as excuses to write a meta-framework that will never be used in any other context.</p>
+<p>Or, as people have been saying for a long time now, and in a phrase that I feel could be interpreted as Pythonic:</p>
+<blockquote>
+&quot;Keep it simple, stupid&quot;</blockquote>
+<p>This is especially important if we want to enourage much wider use of programming skills.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/writing-good-dynamic-code-comment-2.html" rel="nofollow">#</a> <a href="http://www.holdenweb.com/">Steve Holden</a></div><hr noshade>
+ 
+<div class="document">
+<p><a class="reference" href="http://yarivsblog.com/articles/2006/12/11/a-general-theory-of-programming-language-relativity/">http://yarivsblog.com/articles/2006/12/11/a-general-theory-of-programming-language-relativity/</a> leads to a &quot;404 not found&quot;</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/writing-good-dynamic-code-comment-3.html" rel="nofollow">#</a> anonymous</div><hr noshade>
+ 
+<div class="document">
+<p>it seems Yariv has <a class="reference" href="http://yarivsblog.com/articles/2006/12/16/blog-update/">unpublished</a> some posts, including the one you mention.  But I had read it earlier, and I also raised an eyebrow when he illustrated the &quot;correct&quot; way to write code, which to me just seemed to use slightly longer expression chains with identifier names that i guess were supposed to be more descriptive (they were talking about chess pieces or something).  but there was nothing clearer about it at all, if you didnt know <em>those</em> particular names...it did not illustrate any advantage inherent in erlang that couldnt be true for python or most any other language as well.</p>
+<p>anyway ++1 on every point you made.  when writing code that is to be consumed by others, you have to question every little trick and shortcut you think is cool and/or convenient and insure it has a proper and consistent place in the overall concept.  I also try to focus on &quot;narrative&quot; style documentation...since API docs dont say much by themselves.  though I do receive some complaints that illustration through example is &quot;inaccurate&quot;.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/writing-good-dynamic-code-comment-4.html" rel="nofollow">#</a> mike bayer</div><hr noshade>
+ 
+<div class="document">
+<p>Doctests can be narratives.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/writing-good-dynamic-code-comment-5.html" rel="nofollow">#</a> Michael Bernstein</div><hr noshade>
+ 
+<div class="document">
+<p>Google cache link doesn't work for me now.</p>
+<p>You can read the <a class="reference" href="http://programming.reddit.com/info/uky3/comments">original at reddit</a>.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/writing-good-dynamic-code-comment-6.html" rel="nofollow">#</a> silly_coward</div><hr noshade>
+ 
+<div class="document">
+<p>However, terse-ness has merit in efficiency. We use shortcuts in language all the time. Idioms, contractions (not sure if that's the proper name), et al.</p>
+<p>While I agree with the KISS paradigm, sometimes I feel it's getting taken too far in the web-development space. I have no evidence to form an argument, but I do wonder if coding for this level of read-ability will lead to &quot;picture book&quot; code -- code that is overly-simplified to the point of being a hindrance to efficiency.</p>
+<p>Maybe I don't have experiences where using OO and &quot;high-level&quot; concepts has been a hindrance, but I do believe that the benefits out-weigh the cost when everyone understands the concepts. I believe there is a sweet-spot of balance between writing complex code efficiently and elegantly while still being readable and maintainable.</p>
+<p>Extreme terseness can lead to obfu, but extreme verbosity can also have the same effects on maintenance AFAIK.</p>
+<p>It might also be a matter of preference.</p>
+<p>Interesting article -- good argument, but I think coding this way is too extreme. Or perhaps I am simply still too perl-ish for the python world, I dunno.</p>
+<p>:)</p>
+<p>All the best!</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/writing-good-dynamic-code-comment-7.html" rel="nofollow">#</a> j_king</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

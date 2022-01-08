@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>A More Perfect App Server: WSGI Transaction Manager</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>A More Perfect App Server: WSGI Transaction Manager</h1>
+ 
+<div class="document">
+<p><a class="reference" href="http://plope.com/Members/chrism/perfect_appserver/view">Chris McDonough is speculating on a &quot;more perfect app server&quot;</a>.  Of
+course, I'd say that would be a WSGI stack (a-la <a class="reference" href="http://pythonpaste.org">Paste</a>).  But how that works might not be obvious.
+I thought I'd speculate on what a &quot;transaction manager&quot; might look
+like in this system.  I'll just include part of <a class="reference" href="http://svn.pythonpaste.org/home/ianb/transaction_manager.py">the untested code</a>:</p>
+<pre class="literal-block">
+class TransactionManagerMiddleware(object):
+
+    def __init__(self, application):
+        self.application = application
+
+    def __call__(self, environ, start_response):
+        environ['paste.transaction_manager'] = manager = Manager()
+        # This makes sure nothing else traps unexpected exceptions:
+        environ['paste.throw_errors'] = True
+        return wsgilib.catch_errors(application, environ, start_response,
+                                    error_callback=manager.error,
+                                    ok_callback=manager.finish)
+
+class Manager(object):
+
+    def __init__(self):
+        self.aborted = False
+        self.transactions = []
+
+    def abort(self):
+        self.aborted = True
+
+    def error(self, exc_info):
+        self.aborted = True
+        self.finish()
+
+    def finish(self):
+        for trans in self.transactions:
+            if self.aborted:
+                trans.rollback()
+            else:
+                trans.commit()
+</pre>
+<p>And you use it a little like this:</p>
+<pre class="literal-block">
+def my_app(environ, start_response):
+    manager = environ['paste.transaction_manager']
+    manager.transactions.append(MakeTransactionObject())
+    ...
+
+application = TransactionManagerMiddleware(my_app)
+</pre>
+<p>I created the function <tt class="docutils literal"><span class="pre">paste.wsgilib.catch_errors</span></tt> for this, but
+only because it's something that's come up before.  <tt class="docutils literal"><span class="pre">catch_errors</span></tt>
+would be pretty simple if it wasn't for the iterable that applications
+can produce.</p>
+<p>This is only one of several features Chris mentions, but my point is
+one of proof-of-concept -- most of the features he wants can be
+implemented separately and in a highly decoupled way using WSGI
+middleware (or sometimes simply mundane libraries).  The advantages
+aren't just testability, but also simplicity (include what you care
+about, replace what's broken for you) and the potential for the kind
+of distributed development that open source relies on.</p>
+</div>
+ <div class="dates" align="right">
+Created 11 Jul '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>The transaction manager in zope is decoupled and already provides a much more robust and well tested interface.</p>
+<p><a class="reference" href="http://svn.zope.org/ZODB/trunk/src/transaction/">http://svn.zope.org/ZODB/trunk/src/transaction/</a></p>
+<p>Only real dependency is the zope.interface package.</p>
+<p>I know its fashionable to rewrite things from scratch in python, and to bash on zope, but its just sad sometimes how much stuff people put out that just can't meet any real world applications beyond their initial design constraints or toy apps, because they were never written with flexibility in mind or the needed domain expertise.</p>
+<p>the zope developers are solving complex real world problems today, might as well learn something from their expertise.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/more-perfect-app-server-wsgi-transactions-comment-1.html" rel="nofollow">#</a> anonymous</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Sure; this was just an example, and I wasn't proposing it replace anything; that's why it just went in a scratch directory.  The code you link to would replace <tt class="docutils literal"><span class="pre">Manager</span></tt>, and provides interfaces for the transactions themselves; except it calls <tt class="docutils literal"><span class="pre">Manager</span></tt> a <tt class="docutils literal"><span class="pre">Transaction</span></tt>, and the objects it contains <tt class="docutils literal"><span class="pre">DataManager</span></tt>.  A lot of the additional code it provides seems to be for logging and debugging, and two-phase commit.  All good code, I'm sure.</p>
+<p>In generally WSGI/middleware applies to the integration of code like that into the request cycle; if the transaction handling code was linked to WSGI that would be a bad sign.  It's best that the integration code be short, since the transaction code should also be usable outside of a web request, and if the integration code is long then that's a sign the code being integrated is obtuse or incomplete.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/more-perfect-app-server-wsgi-transactions-comment-3.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ 
+<div class="document">
+<p>wrap the Zope transaction manager into a WSGI application interface as above and the world can take advantage of its great maturity.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/more-perfect-app-server-wsgi-transactions-comment-4.html" rel="nofollow">#</a> <a href="http://">mike bayer</a></div><hr noshade>
+ 
+<div class="document">
+<p>I think for 90% of the use cases, Zope's implementation is far too complicated.  In typical cases, you're using a DBAPI driver and you have a database connection (perhaps pooled, but this is an orthogonal issue) per request.  In the end, if there is an exception, you rollback; otherwise you commit.  It isn't that hard.  I'd rather not include a huge chunk of code like that in my webserver unless I absolutely need it.  Minimilism is a very good thing.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/more-perfect-app-server-wsgi-transactions-comment-5.html" rel="nofollow">#</a> <a href="http://clarkevans.com">Clark Evans</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>+100 on the pipelining of components ala WSGI/Paste to get some of this stuff done.  I think wherever it's appropriate to factor something out into WSGI middleware (authentication is a great example, as are sessions, an error renderer, and maybe a txn manager), it feels really good to do so.  I'm going to try to take a closer look at Paste as I continue thinking about what would make a great appserver stack.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/more-perfect-app-server-wsgi-transactions-comment-2.html" rel="nofollow">#</a> Chris McDonough</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

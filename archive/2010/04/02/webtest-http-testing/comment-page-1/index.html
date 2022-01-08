@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
+<script type="text/javascript">/*<![CDATA[*/(function(a){function b(a,b){if(+a)return~a||(d.cookie=h+"=; path=/");j=d.createElement(e),k=d.getElementsByTagName(e)[0],j.src=a,b&&(j.onload=j.onerror=b),k.parentNode.insertBefore(j,k)}function c(){n.api||b(l.shift()||-1,c)}if(this.Mobify)return;var d=document,e="script",f="mobify",g="."+f+".com/",h=f+"-path",i=g+"un"+f+".js",j,k,l=[!1,1],m,n=this.Mobify={points:[+(new Date)],tagVersion:[6,0]},o=/(; |#|&|^)mobify-path=([^&;]*)/g.exec(location.hash+"; "+d.cookie);o?(m=o[2])&&!+(m=sessionStorage[h]||m)&&(l=[!0,"//preview"+g+escape(m)]):(l=a()||l,l[0]&&l.push("//cdn"+i,"//files01"+i)),l.shift()?(d.write('<plaintext style="display:none;">'),setTimeout(c)):b(l[0])})(function(){if(/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)){return[1,"//cdn.mobify.com/sites/ians-blog/production/mobify.js"]}})/*]]>*/</script>
+<!-- END MOBIFY -->
+	<title>Ian Bicking: a blog   ::  WebTest HTTP testing</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta name="generator" content="WordPress 3.4.2" /><!-- LEAVE FOR STATS -->
+	<meta name="description" content="" />
+	<link rel="stylesheet" title="plaintxtSimpler" href="http://blog.ianbicking.org/wp-content/themes/Barthelme-ianb/style.css" type="text/css" media="all" />
+	<link rel="start" href="http://blog.ianbicking.org/" title="Ian Bicking: a blog" />
+	<link rel="alternate" type="application/atom+xml" title="Ian Bicking: a blog Atom Feed" href="http://blog.ianbicking.org/feed/atom/" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog RSS 2.0 Feed" href="http://blog.ianbicking.org/feed/" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog Comments RSS 2.0 Feed" href="http://blog.ianbicking.org/comments/feed/" />
+	<link rel="alternate" type="application/rdf+xml" title="Ian Bicking: a blog RSS 1.0" href="http://blog.ianbicking.org/feed/rdf/" />
+	<link rel="alternate" type="text/xml" title="Ian Bicking: a blog RSS 0.92 Feed" href="http://blog.ianbicking.org/feed/rss/" />
+	<link rel="pingback" href="http://blog.ianbicking.org/xmlrpc.php" />
+	<link rel="openid.server" href="http://www.myopenid.com/server" />
+	<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <link rel="me" type="text/html" href="http://www.google.com/profiles/ianbicking"/>
+		<link rel='archives' title='October 2012' href='http://blog.ianbicking.org/2012/10/' />
+	<link rel='archives' title='February 2012' href='http://blog.ianbicking.org/2012/02/' />
+	<link rel='archives' title='April 2011' href='http://blog.ianbicking.org/2011/04/' />
+	<link rel='archives' title='March 2011' href='http://blog.ianbicking.org/2011/03/' />
+	<link rel='archives' title='September 2010' href='http://blog.ianbicking.org/2010/09/' />
+	<link rel='archives' title='August 2010' href='http://blog.ianbicking.org/2010/08/' />
+	<link rel='archives' title='May 2010' href='http://blog.ianbicking.org/2010/05/' />
+	<link rel='archives' title='April 2010' href='http://blog.ianbicking.org/2010/04/' />
+	<link rel='archives' title='March 2010' href='http://blog.ianbicking.org/2010/03/' />
+	<link rel='archives' title='February 2010' href='http://blog.ianbicking.org/2010/02/' />
+	<link rel='archives' title='January 2010' href='http://blog.ianbicking.org/2010/01/' />
+	<link rel='archives' title='September 2009' href='http://blog.ianbicking.org/2009/09/' />
+	<link rel='archives' title='May 2009' href='http://blog.ianbicking.org/2009/05/' />
+	<link rel='archives' title='April 2009' href='http://blog.ianbicking.org/2009/04/' />
+	<link rel='archives' title='January 2009' href='http://blog.ianbicking.org/2009/01/' />
+	<link rel='archives' title='December 2008' href='http://blog.ianbicking.org/2008/12/' />
+	<link rel='archives' title='November 2008' href='http://blog.ianbicking.org/2008/11/' />
+	<link rel='archives' title='October 2008' href='http://blog.ianbicking.org/2008/10/' />
+	<link rel='archives' title='September 2008' href='http://blog.ianbicking.org/2008/09/' />
+	<link rel='archives' title='August 2008' href='http://blog.ianbicking.org/2008/08/' />
+	<link rel='archives' title='July 2008' href='http://blog.ianbicking.org/2008/07/' />
+	<link rel='archives' title='June 2008' href='http://blog.ianbicking.org/2008/06/' />
+	<link rel='archives' title='May 2008' href='http://blog.ianbicking.org/2008/05/' />
+	<link rel='archives' title='April 2008' href='http://blog.ianbicking.org/2008/04/' />
+	<link rel='archives' title='March 2008' href='http://blog.ianbicking.org/2008/03/' />
+	<link rel='archives' title='February 2008' href='http://blog.ianbicking.org/2008/02/' />
+	<link rel='archives' title='January 2008' href='http://blog.ianbicking.org/2008/01/' />
+	<link rel='archives' title='November 2007' href='http://blog.ianbicking.org/2007/11/' />
+	<link rel='archives' title='October 2007' href='http://blog.ianbicking.org/2007/10/' />
+	<link rel='archives' title='September 2007' href='http://blog.ianbicking.org/2007/09/' />
+	<link rel='archives' title='August 2007' href='http://blog.ianbicking.org/2007/08/' />
+	<link rel='archives' title='July 2007' href='http://blog.ianbicking.org/2007/07/' />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog &raquo; WebTest HTTP testing Comments Feed" href="http://blog.ianbicking.org/2010/04/02/webtest-http-testing/feed/" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://blog.ianbicking.org/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://blog.ianbicking.org/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='More Sentinels' href='http://blog.ianbicking.org/2010/04/02/more-sentinels/' />
+<link rel='next' title='Core Competencies, Silver Lining, Packaging' href='http://blog.ianbicking.org/2010/04/09/core-competencies-silver-lining-packaging/' />
+<meta name="generator" content="WordPress 3.4.2" />
+<link rel='canonical' href='http://blog.ianbicking.org/2010/04/02/webtest-http-testing/' />
+<link rel='shortlink' href='http://blog.ianbicking.org/?p=215' />
+<link rel="stylesheet" href="http://blog.ianbicking.org/wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"  type="text/css" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+        <style type="text/css" media="all">
+/*<![CDATA[*/
+body { font-size: 100%; }
+body { font-family: tahoma, geneva, sans-serif; }
+div.post-header, h2.post-title, p.post-date-single, h2.post-title-single, div.post-entry h1, div.post-entry h2, div.post-entry h3, div.post-entry h4, div.post-entry h5, div.post-entry h6, div.post-entry blockquote, div.post-footer, h3#comment-count, h4#comment-header, div#comments ol li p.comment-metadata, h4#respond { font-family: verdana, geneva, sans-serif; }
+div.post-entry p { text-align: left; }
+div#wrapper { width: 100%; }
+
+/*]]>*/
+</style>
+</head>
+<body>
+
+<div id="wrapper">
+
+	<div id="header" onclick="location.href='http://blog.ianbicking.org/';" style="cursor:pointer;">
+		<h1 id="title"><a href="http://blog.ianbicking.org/" title="Ian Bicking: a blog">Ian Bicking: a blog</a></h1>
+		<p id="description"></p>
+	</div>
+<!-- WP Theme Credits -->
+<div style="display: none;">We can answer on question <a href="http://www.olnevhost.net/vps-hosting.html">what is VPS</a>? and
+what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap dedicated servers</strong></a>?</div>
+<!-- END HEADER -->
+<div id="container">
+	<div id="content" class="widecolumn">
+
+
+		<div id="post-215" class="post single-post">
+			<p class="post-date-single">{ 2010 04 02 }</p>
+			<h2 class="post-title-single">WebTest HTTP testing</h2>
+			<div class="post-entry">
+				<div class="document">
+<p>I&#8217;ve yet to see another testing system for local web testing that I like as much as <a class="reference external" href="http://pythonpaste.org/webtest/">WebTest</a>&#8230; which is perhaps personal bias for something I wrote, but then I don&#8217;t have that same bias towards everything I&#8217;ve written.  Many frameworks build in their own testing systems but I don&#8217;t like the abstractions &#8212; they touch lots of internal things, or skip important steps of the request, or mock out things that don&#8217;t need to be mocked out.  WSGI can make this testing easy.</p>
+<p>There&#8217;s also a hidden feature here: because WSGI is basically just describing HTTP, it can be a means of representing not just incoming HTTP requests, but also outgoing HTTP requests.  If you are running local tests against your application using WebTest, with just a little tweaking you can turn those tests into HTTP tests (i.e., actually connect to a socket).  But doing this is admittedly not obvious; hence this post!</p>
+<p>Here&#8217;s what a basic WebTest test looks like:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">from</span> webtest <span class="kw1">import</span> TestApp<br />
+<span class="kw1">import</span> json<br />
+<br />
+wsgi_app = acquire_wsgi_application_somehow<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+app = TestApp<span class="br0">&#40;</span>wsgi_app<span class="br0">&#41;</span><br />
+<br />
+<span class="kw1">def</span> test_login<span class="br0">&#40;</span><span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; resp = app.<span class="me1">post</span><span class="br0">&#40;</span><span class="st0">'/login'</span>, <span class="kw2">dict</span><span class="br0">&#40;</span>username=<span class="st0">'guest'</span>, password=<span class="st0">'guest'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; resp.<span class="me1">mustcontain</span><span class="br0">&#40;</span><span class="st0">'login successful'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; resp = resp.<span class="me1">click</span><span class="br0">&#40;</span><span class="st0">'home'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; resp.<span class="me1">mustcontain</span><span class="br0">&#40;</span><span class="st0">'&lt;a href=&quot;/profile&quot;&gt;guest&lt;/a&gt;'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="co1"># Or with a little framework integration:</span><br />
+&nbsp; &nbsp; <span class="kw1">assert</span> resp.<span class="me1">templatevars</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'username'</span><span class="br0">&#41;</span> == <span class="st0">'guest'</span><br />
+<br />
+<span class="co1"># Or an API test:</span><br />
+<span class="kw1">def</span> test_user_query<span class="br0">&#40;</span><span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; resp = app.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'/users.json'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">assert</span> <span class="st0">'guest'</span> <span class="kw1">in</span> resp.<span class="me1">json</span><span class="br0">&#91;</span><span class="st0">'userList'</span><span class="br0">&#93;</span><br />
+&nbsp; &nbsp; user_info = <span class="kw2">dict</span><span class="br0">&#40;</span>username=<span class="st0">'guest2'</span>, password=<span class="st0">'guest2'</span>, name=<span class="st0">'Guest'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; resp = app.<span class="me1">post</span><span class="br0">&#40;</span><span class="st0">'/users.json'</span>, content_type=<span class="st0">'application/json'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; body=json.<span class="me1">dumps</span><span class="br0">&#40;</span>user_info<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">assert</span> resp.<span class="me1">json</span> == user_info<br />
+&nbsp;</div>
+<p>The <tt class="docutils literal"><span class="pre">app</span></tt> object is a wrapper around the WSGI application, and each of those methods runs a request and gets the response.  The response object is a WebOb response with several additional helpers for testing (things like <tt class="docutils literal"><span class="pre">.click()</span></tt> which finds a link in HTML and follows it, or <tt class="docutils literal"><span class="pre">.json</span></tt> which loads the body as JSON).</p>
+<p>You <em>don&#8217;t</em> have to be using a WSGI-centric framework like Pylons to use WebTest, it works fine with anything with a WSGI frontend, which is just about everything.  But the point of my post: you don&#8217;t have to use it with a WSGI application at all.  Using <a class="reference external" href="http://pythonpaste.org/wsgiproxy/">WSGIProxy</a>:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">import</span> <span class="kw3">os</span><br />
+<span class="kw1">import</span> <span class="kw3">urlparse</span><br />
+<br />
+<span class="kw1">if</span> <span class="kw3">os</span>.<span class="me1">environ</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'TEST_REMOTE'</span><span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; <span class="kw1">from</span> wsgiproxy.<span class="me1">exactproxy</span> <span class="kw1">import</span> proxy_exact_request<br />
+&nbsp; &nbsp; wsgi_app = proxy_exact_request<br />
+&nbsp; &nbsp; parsed = <span class="kw3">urlparse</span>.<span class="me1">urlsplit</span><span class="br0">&#40;</span><span class="kw3">os</span>.<span class="me1">environ</span><span class="br0">&#91;</span><span class="st0">'TEST_REMOTE'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; app = TestApp<span class="br0">&#40;</span>proxy_exact_request, extra_environ=<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'wsgi.scheme'</span>: parsed.<span class="me1">scheme</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'HTTP_HOST'</span>: parsed.<span class="me1">netloc</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'SERVER_NAME'</span>: parsed.<span class="me1">netloc</span><span class="br0">&#125;</span><span class="br0">&#41;</span><br />
+<span class="kw1">else</span>:<br />
+&nbsp; &nbsp; wsgi_app = acquire_wsgi_application_somehow<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; app = TestApp<span class="br0">&#40;</span>wsgi_app<span class="br0">&#41;</span><br />
+&nbsp;</div>
+<p>It&#8217;s a little crude to control this with an environmental variable (<tt class="docutils literal"><span class="pre">$TEST_REMOTE</span></tt>), but it&#8217;s an easy way to pass an option in when there&#8217;s no better way (and many test runners don&#8217;t make options easy).  The <tt class="docutils literal"><span class="pre">extra_environ</span></tt> option puts in the host and scheme information into each request (the default host WebTest puts in is <tt class="docutils literal"><span class="pre">http://localhost</span></tt>).  WSGIProxy lets you send a request to any host, kind of bypassing DNS, so <tt class="docutils literal"><span class="pre">SERVER_NAME</span></tt> is actually the server the request goes to, while <tt class="docutils literal"><span class="pre">HTTP_HOST</span></tt> is the value of the Host header.</p>
+<p>Going over HTTP there are a couple features that won&#8217;t work.  For instance, you can pass information about your application back to the test code by putting values in <tt class="docutils literal"><span class="pre">environ['paste.testing_variables']</span></tt> (which is how you&#8217;d make <tt class="docutils literal"><span class="pre">resp.templatevars</span></tt> work in the first example).  It&#8217;s also possible to use <tt class="docutils literal"><span class="pre">extra_environ</span></tt> to pass information into your application, for example to get your application to mock out user authentication; this is fairly safe because in production no request can put those same special keys into the environment (using custom HTTP headers means you must carefully filter requests in production).  But custom environ values won&#8217;t work over HTTP.</p>
+<p>The thing that got me thinking about this is the work I&#8217;m doing on <a class="reference external" href="http://cloudsilverlining.org">Silver Lining</a>, where I am taking apps and rearranging the code and modifying the database configuration ad setup to fit this deployment system.  It would be really nice having done that to be able to run some functional tests, and I really want to run them over HTTP.  If an application has tests using something like Selenium or Windmill that would also work great, but those tools can be a bit more challenging to work with and applications still need smaller tests anyway, so being able to reuse tests like these would be most useful.</p>
+</div>
+<p>Automatically generated list of related posts:</p><ol>
+<li><a href='http://blog.ianbicking.org/2009/05/22/webob-decorator/' rel='bookmark' title='WebOb decorator'>WebOb decorator</a> <small>Lately I&#8217;ve been writing a few applications (e.g., PickyWiki and...</small></li>
+<li><a href='http://blog.ianbicking.org/2008/07/30/making-a-proxy-with-wsgi-and-lxml/' rel='bookmark' title='Making a proxy with WSGI and lxml'>Making a proxy with WSGI and lxml</a> <small>You can use WSGI to make rewriting middleware; WebOb specifically...</small></li>
+<li><a href='http://blog.ianbicking.org/2008/04/02/json-rpc-webob-example/' rel='bookmark' title='JSON-RPC WebOb Example'>JSON-RPC WebOb Example</a> <small>I just saw this json-rpc recipe go by as a...</small></li>
+<li><a href='http://blog.ianbicking.org/2010/03/03/toppcloud-renamed-to-silver-lining/' rel='bookmark' title='toppcloud renamed to Silver Lining'>toppcloud renamed to Silver Lining</a> <small>After some pondering at PyCon, I decided on a new...</small></li>
+</ol>											</div><!-- END POST-ENTRY  -->
+			<!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			xmlns:dc="http://purl.org/dc/elements/1.1/"
+			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+		<rdf:Description rdf:about="http://blog.ianbicking.org/2010/04/02/webtest-http-testing/"
+    dc:identifier="http://blog.ianbicking.org/2010/04/02/webtest-http-testing/"
+    dc:title="WebTest HTTP testing"
+    trackback:ping="http://blog.ianbicking.org/2010/04/02/webtest-http-testing/trackback/" />
+</rdf:RDF> -->
+			<div class="post-footer">
+				<p>Posted by Ian Bicking on Friday, April 2nd, 2010, at 4:27 pm, and filed under <a href="http://blog.ianbicking.org/category/programming/" title="View all posts in Programming" rel="category tag">Programming</a>, <a href="http://blog.ianbicking.org/category/python/" title="View all posts in Python" rel="category tag">Python</a>, <a href="http://blog.ianbicking.org/category/web/" title="View all posts in Web" rel="category tag">Web</a>.</p>
+				<p>
+				Comments have a <a href='http://blog.ianbicking.org/2010/04/02/webtest-http-testing/feed/'>feed</a>.</p>
+			</div><!-- END POST-FOOTER -->
+		</div><!-- END POST -->
+
+<div id="comments">
+
+
+
+
+<h4 id="comments">One Comment</h4>
+ <ul class="commentlist">
+		<li class="comment even thread-even depth-1" id="comment-167190">
+				<div id="div-comment-167190" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/b2800bdf0df7003ac2f90b2c1018df83?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Syver Enstad</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/04/02/webtest-http-testing/comment-page-1/#comment-167190">
+			July 9, 2010 at 2:19 am</a>		</div>
+
+		<p>Very cool, I had to try it but discovered that on my machine it didn&#8217;t work if the netloc in the url had a port specification (like this localhost:3000).</p>
+
+<p>Doing this seems to work on my machine:</p>
+
+<pre><code>    parsed_url = urlparse.urlsplit(url)
+    hostAndPort = parsed_url.netloc.split(':')
+    extraEnviron = {
+        'wsgi.url_scheme': parsed_url.scheme,
+        'HTTP_HOST': parsed_url.netloc,
+        }
+    if len(hostAndPort) == 2:
+        extraEnviron['SERVER_NAME'], extraEnviron['SERVER_PORT'] = hostAndPort
+    else:
+        extraEnviron['SERVER_NAME'] = parsed_url.netloc
+    app = TestApp(proxy_exact_request, extra_environ=extraEnviron)
+</code></pre>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+
+<div class="navigation">
+<div class="alignleft"></div>
+<div class="alignright"></div>
+</div>
+
+
+
+
+</div>
+
+		<div class="navigation">
+			<div class="nav-left">&laquo; <a href="http://blog.ianbicking.org/2010/04/02/more-sentinels/" rel="prev">More Sentinels</a></div>
+			<div class="nav-right"><a href="http://blog.ianbicking.org/2010/04/09/core-competencies-silver-lining-packaging/" rel="next">Core Competencies, Silver Lining, Packaging</a> &raquo;</div>
+		</div><!-- END NAVIGATION -->
+
+
+	</div><!-- END CONTENT -->
+</div><!-- END CONTAINER  -->
+
+<div id="sidebar">
+	<ul>
+		<li id="home-link">
+			<h2><a href="http://blog.ianbicking.org/" title="Ian Bicking: a blog">Home</a></h2>
+		</li>
+<li id="text-315934862" class="widget widget_text"><h2 class="widgettitle">About</h2>
+			<div class="textwidget">Ian is a developer with Mozilla, <a href="http://ianbicking.appspot.com/projects">Python open source developer</a>, actually uses <a href="https://plus.google.com/u/0/104537541227697934010/posts">Google+</a> more than <a href="http://twitter.com/ianbicking">twitter</a> and lives in Minneapolis.<br>
+<span class="gittip-0001" gittip-username="ianbicking"></span>
+<script id="gittip-0001"
+  src="https://www.gittip.com/assets/widgets/0001.js"></script>
+</div>
+		</li>
+<li id="text-315934863" class="widget widget_text">			<div class="textwidget"><!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> --></div>
+		</li>
+<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
+		<ul>
+			<li><a href='http://blog.ianbicking.org/2012/10/' title='October 2012'>October 2012</a></li>
+	<li><a href='http://blog.ianbicking.org/2012/02/' title='February 2012'>February 2012</a></li>
+	<li><a href='http://blog.ianbicking.org/2011/04/' title='April 2011'>April 2011</a></li>
+	<li><a href='http://blog.ianbicking.org/2011/03/' title='March 2011'>March 2011</a></li>
+	<li><a href='http://blog.ianbicking.org/2010/09/' title='September 2010'>September 2010</a></li>
+	<li><a href='http://blog.ianbicking.org/2010/08/' title='August 2010'>August 2010</a></li>
+	<li><a href='http://blog.ianbicking.org/2010/05/' title='May 2010'>May 2010</a></li>
+	<li><a href='http://blog.ianbicking.org/2010/04/' title='April 2010'>April 2010</a></li>
+	<li><a href='http://blog.ianbicking.org/2010/03/' title='March 2010'>March 2010</a></li>
+	<li><a href='http://blog.ianbicking.org/2010/02/' title='February 2010'>February 2010</a></li>
+	<li><a href='http://blog.ianbicking.org/2010/01/' title='January 2010'>January 2010</a></li>
+	<li><a href='http://blog.ianbicking.org/2009/09/' title='September 2009'>September 2009</a></li>
+	<li><a href='http://blog.ianbicking.org/2009/05/' title='May 2009'>May 2009</a></li>
+	<li><a href='http://blog.ianbicking.org/2009/04/' title='April 2009'>April 2009</a></li>
+	<li><a href='http://blog.ianbicking.org/2009/01/' title='January 2009'>January 2009</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/12/' title='December 2008'>December 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/11/' title='November 2008'>November 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/10/' title='October 2008'>October 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/09/' title='September 2008'>September 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/08/' title='August 2008'>August 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/07/' title='July 2008'>July 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/06/' title='June 2008'>June 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/05/' title='May 2008'>May 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/04/' title='April 2008'>April 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/03/' title='March 2008'>March 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/02/' title='February 2008'>February 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2008/01/' title='January 2008'>January 2008</a></li>
+	<li><a href='http://blog.ianbicking.org/2007/11/' title='November 2007'>November 2007</a></li>
+	<li><a href='http://blog.ianbicking.org/2007/10/' title='October 2007'>October 2007</a></li>
+	<li><a href='http://blog.ianbicking.org/2007/09/' title='September 2007'>September 2007</a></li>
+	<li><a href='http://blog.ianbicking.org/2007/08/' title='August 2007'>August 2007</a></li>
+	<li><a href='http://blog.ianbicking.org/2007/07/' title='July 2007'>July 2007</a></li>
+		</ul>
+</li>
+<li id="text-315934861" class="widget widget_text">			<div class="textwidget"><a href="/archive/index.html">The Older Archives</a></div>
+		</li>
+<li id="categories-1" class="widget widget_categories"><h2 class="widgettitle">Categories</h2>
+		<ul>
+	<li class="cat-item cat-item-12"><a href="http://blog.ianbicking.org/category/erlang/" title="View all posts filed under Erlang">Erlang</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="http://blog.ianbicking.org/category/html/" title="View all posts filed under HTML">HTML</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="http://blog.ianbicking.org/category/javascript/" title="View all posts filed under Javascript">Javascript</a>
+</li>
+	<li class="cat-item cat-item-15"><a href="http://blog.ianbicking.org/category/licensing/" title="View all posts filed under Licensing">Licensing</a>
+</li>
+	<li class="cat-item cat-item-18"><a href="http://blog.ianbicking.org/category/mozilla/" title="View all posts filed under Mozilla">Mozilla</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="http://blog.ianbicking.org/category/notech/" title="View all posts filed under Non-technical">Non-technical</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="http://blog.ianbicking.org/category/olpc/" title="View all posts filed under OLPC">OLPC</a>
+</li>
+	<li class="cat-item cat-item-14"><a href="http://blog.ianbicking.org/category/packaging/" title="View all posts filed under Packaging">Packaging</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="http://blog.ianbicking.org/category/politics/" title="View all posts filed under Politics">Politics</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="http://blog.ianbicking.org/category/programming/" title="View all posts filed under Programming">Programming</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="http://blog.ianbicking.org/category/python/" title="View all posts filed under Python">Python</a>
+</li>
+	<li class="cat-item cat-item-10"><a href="http://blog.ianbicking.org/category/ruby/" title="View all posts filed under Ruby">Ruby</a>
+</li>
+	<li class="cat-item cat-item-19"><a href="http://blog.ianbicking.org/category/security/" title="View all posts filed under Security">Security</a>
+</li>
+	<li class="cat-item cat-item-16"><a href="http://blog.ianbicking.org/category/silverlining/" title="View all posts filed under Silver Lining">Silver Lining</a>
+</li>
+	<li class="cat-item cat-item-20"><a href="http://blog.ianbicking.org/category/programming/testing/" title="View all posts filed under Testing">Testing</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="http://blog.ianbicking.org/category/web/" title="View all posts filed under Web">Web</a>
+</li>
+	<li class="cat-item cat-item-13"><a href="http://blog.ianbicking.org/category/zopeplon

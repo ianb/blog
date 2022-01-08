@@ -1,0 +1,298 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Fixes What's Wrong With Python</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Fixes What's Wrong With Python</h1>
+ 
+<div class="document">
+<p>Jim Weirich throws down the gauntlet with <a class="reference" href="http://jimweirich.tadalist.com/lists/public/14055">Ten Things a Java
+Programmer Should Know About Ruby</a>: &quot;Fixes what's wrong with
+Python&quot;.</p>
+<p>OK, I actually don't care about that dig, I'm in a friendly mood these
+days.  But it's interesting how many of the points are just as true
+for Python as Ruby; to me this merely confirms that they are extremely
+similar (and maybe that <a class="reference" href="http://dirtsimple.org/2004/12/python-is-not-java.html">this post</a> inspired some of the points).
+Quoting from the list (which no longer numbers ten)
+here's the few that aren't the same for Ruby and Python (ignoring
+trivial or syntactic differences).  My comments are italic:</p>
+<ul class="simple">
+<li>Enjoy closures and blocks <em>(Well, we kind of have closures, but I'll
+concede they are much more limited)</em></li>
+<li>Everything is an expression.</li>
+<li>Boolean methods end in ?. Dangerous methods end in ! <em>(I do actually
+like this use of punctuation, even if most other Ruby punctuation
+annoys me)</em></li>
+<li>Use class methods to define pseudo-compile directives <em>(I don't
+completely understand this one, though I suspect what he's talking
+about is similar to what you can do with metaclasses in Python,
+though it's not conventional as it is in Ruby)</em></li>
+<li>Singleton methods <em>(I don't know what to make of `such methods`_ --
+it's possible and fairly easy in Python, but not syntactically
+encouraged)</em></li>
+<li>you can use string interpolation, ex: <tt class="docutils literal"><span class="pre">&quot;x:</span> <span class="pre">#{&#64;myvar}&quot;</span></tt> instead of
+having to say <tt class="docutils literal"><span class="pre">&quot;x:&quot;</span> <span class="pre">+</span> <span class="pre">myvar</span></tt> <em>(Python's string interpolation is
+OK, but nothing to brag about)</em></li>
+<li>Is a lot like Smalltalk, but doesn't look as funny <em>(Python doesn't
+have any clear Smalltalk heritage, though on a deeper level it's not
+very different; I put no weight in claims that Ruby is somehow more
+OO than Python)</em></li>
+<li>Use blocks for transactional behavior like like File.open does. <em>(You
+have to use ``try:finally:`` in Python, which is more error-prone)</em></li>
+<li>An instance of a class can be extended to be subtly different, without
+needing to subclass. <em>(I'm not sure what he's refering to, though it's
+probably true in Python as well -- e.g., techniques like aliasing a method
+in ``__init__``)</em></li>
+<li>HEREDOC strings with variable interpolation make large chunks of
+output really easy to construct. <em>(The interpolation in Python isn't
+as good, though triple-quoted strings go half-way)</em></li>
+</ul>
+<p>Well, for the most part the list is notable in how few differences
+there are.  If you look at <a class="reference" href="http://www.rubycentral.com/faq/rubyfaq-2.html">this comparison</a> and ignore the points
+that are out of date, you'll notice that there's a difference in
+heritage and perspective (Ruby coming from a Smalltalk-OO background),
+but very little (any?) functional difference besides closures and
+blocks.  And a whole bunch of syntactic differences, but that's
+neither here nor there.</p>
+</div>
+ <div class="dates" align="right">
+Created 01 Feb '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>I read &quot;An instance of a class can be extended to be subtly different, without needing to subclass&quot; to mean simply</p>
+<p>o = Foo()
+o.nonstandardattribute = bar</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-1.html" rel="nofollow">#</a> Jonathan Ellis</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+Yes, I think that's mostly what he means.  Also, you can add and override methods in the same way.  You can change the class directly -- monkey patching -- or you can create an instance and assign a function to an instance variable to override the method that the class contains.  Other uses of first-class functions can accomplish all sorts of things; though honestly how they do that in Ruby (generally) I'm not sure, since it doesn't have &quot;functions&quot; per se, just methods.  I get the impression there's some confusion there, with a couple techniques available.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-2.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>they just write:</p>
+<pre class="literal-block">
+def an_instance.amethod(args)
+ ...
+end
+</pre>
+<p>It is a nice way to write stuff since it also allows for clear specification of class/module methods:</p>
+<pre class="literal-block">
+class Foo
+ # we are in Foo's scope, &quot;self&quot; is Foo
+ def foo() puts &quot;I'm an instance method&quot; end
+ def self.foo() puts &quot;I'm a singleton method of a Class instance&quot; end
+ def self.bar() puts &quot;In java parlance, I'm a static method of class Foo&quot; end
+end
+</pre>
+<p><em>(Formatting fixed; I'm not actually the author of this comment)</em></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-6.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>There's also <a class="reference" href="http://www.rubycentral.com/ref/ref_c_object.html#extend">this</a>:</p>
+<pre class="literal-block">
+module Mod
+  def hello
+    &quot;Hello from Mod.\n&quot;
+  end
+end
+class Klass
+  def hello
+    &quot;Hello from Klass.\n&quot;
+  end
+end
+k = Klass.new
+k.hello       -&gt;      &quot;Hello from Klass.\n&quot;
+k.extend(Mod)         -&gt;      #&lt;Klass:0x4018d554&gt;
+k.hello       -&gt;      &quot;Hello from Mod.\n&quot;
+</pre>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-11.html" rel="nofollow">#</a> <a href="http://byzantine.no/">Alexander Staubo</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>&quot;<tt class="literal"><span class="pre">o</span> <span class="pre">=</span> <span class="pre">Foo();</span> <span class="pre">o.nonstandardattribute</span> <span class="pre">=</span> <span class="pre">bar</span></tt>&quot;</p>
+<p>this can't be done.</p>
+<p>attributes in ruby are set via setter methods</p>
+<pre class="literal-block">
+class Foo
+  def std_attr= v
+    &#64;std_attr = v
+  end
+end
+</pre>
+<p>although the simpler way to do it is</p>
+<pre class="literal-block">
+class Foo
+  attr_writer :std_attr
+end
+</pre>
+<p>what &quot;An instance of a class can be extended to be subtly different, without needing to subclass&quot; actually means is</p>
+<pre class="literal-block">
+s = 'a string'
+class &lt;&lt; s
+  def consonants
+    gsub /[aeiou]/i, ''
+  end
+end
+</pre>
+<p><tt class="literal"><span class="pre">s.consonants</span></tt> will give you <tt class="literal"><span class="pre">&quot;</span> <span class="pre">strng&quot;</span></tt>, but on any other string, it'll raise an undefined method error.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-21.html" rel="nofollow">#</a> <a href="http://v2studio.com/k/code">caio chassot</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>I like both Python and Ruby. I agree with your summation that there isn't much to choose between them; except for blocks/closures, but for me that is all the reason I need to choose Ruby. Blocks are an astonishingly[1] powerful tool that transform the way you write code and interact with a system.</p>
+<p>Until you have experience of them you probably won't get how powerful blocks/closures are. I'm generalising from me, because I didn't get it for a long time, to you. Probably unfairly.</p>
+<ul class="simple">
+<li>[1] I know, I know, superlative overload .. but in this case, I think, well deserved.</li>
+</ul>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-3.html" rel="nofollow">#</a> Rob Lally</div><hr noshade>
+ 
+<div class="document">
+<p>Ack!  Ian, sorry about the gauntlet.  I didn't actually throw it, more like I accidently bdropped it on the floor.</p>
+<p>Last week I asked for suggestions for a &quot;Ten Things Java Programmers Should Know About Ruby&quot; list.  The Ta-Da list you linked to is a (temporary) compilation of all the suggestions coming in, without any editting on my part.  (Obviously, for the list is a &quot;bit&quot; longer than my targetted goal of ten items). It is there so that people can review all the current suggestions before making new ones.  I'm putting together a small presentation for a group of Java programmers and was just soliciting feedback.</p>
+<p>Unfortunately, there is no easy place in a Ta-Da list to capture the above meta-information.  The list is short-lived anyways, it will probably go away when I've compiled my final version.</p>
+<p>For the record, &quot;Fixes what's wrong with Python&quot; does even come close to making the top ten things a _Java_ programmer would need to know.  (For that matter, I wouldn't even put it in a list of things a Python programmer would need to know).  Ruby and Python are much more similar than different (as you point out), especially compared to what makes it as mainstream languages these days.  Your comments on the differences are pretty much right on too.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-4.html" rel="nofollow">#</a> <a href="http://onestepback.org">Jim Weirich</a></div><hr noshade>
+ 
+<div class="document">
+Although a Java developer wouldn't care, one Ruby feature I'm waiting for in Python is continuations (callcc in Ruby, also available in Stackless Python).  Py's generators are a specific kind of (as opposed to a generic) continuation.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-5.html" rel="nofollow">#</a> <a href="http://bitsko.slc.ut.us/">Ken MacLeod</a></div><hr noshade>
+ 
+<div class="document">
+<p>I agree that Python's default string interpolation sucks, but it's simple enough to fix. Just import the sys and Itpl [1] libraries and write sys.stdout=Itpl.filter() to get real string interpolation. Definitely not as clean as native string interpolation, but if that's a deal-breaker for anybody, it's easy enough to fix.</p>
+<p>[1] <a class="reference" href="http://lfw.org/python/Itpl.py">http://lfw.org/python/Itpl.py</a></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-7.html" rel="nofollow">#</a> <a href="http://llimllib.f2o.org">Bill Mill</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+String interpolation by default is a _bad_ thing. It introduces unexpected behavior which are frequently security holes. Explicit interpolate(string, map) of some sort is better.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-14.html" rel="nofollow">#</a> Oliver X</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+How about writing a &quot;Why Python is better than Ruby&quot; point by point and let Ruby guys respond?</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-8.html" rel="nofollow">#</a> James</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I guess I'd be afraid of lots of &quot;Ruby has that too!&quot; responses, but I suppose if prefaced properly maybe that would be okay.  Or it could just go on the Python Wiki, and let collective editing clear out the issues and debate.  The Pattern Repository has a page: <a class="reference" href="http://c2.com/cgi/wiki?PythonVsRuby">http://c2.com/cgi/wiki?PythonVsRuby</a> -- but it's not that up-to-date and there's no clear distinction between exposition and discussion.</p>
+<p>To me, most of it comes down to some vague design principles: Python emphasizes uniformity, and in this way it's much more like Smalltalk.  It also has some different perspectives on how to address the same issues, e.g. loops and first class functions instead of blocks.  There's also some things that I have intuitions about, but haven't tried enough in Ruby to confirm.  E.g., a traditional procedural perspective makes libraries easier to wrap, and encourages two-level wrapping -- a very thin wrapper that interfaces with C, and another wrapper that provides &quot;Pythonic&quot; abstractions over that library.  This is a design technique that I really like; I'm sure people do it in Ruby as well, but I <em>suspect</em> it's not as easy to do the trully thin wrapper in a strict OO world.</p>
+<p>There's some other important design issues that I have with Ruby.  One in particular is the ways you can globally effect the system, and effect the basic types in the system.  Being able to implement (globally and transparently) case-insensitive comparisons of strings is an anti-feature to me.  This is an aspect of Smalltalk I dislike.</p>
+<p>But the big one for me is the libraries and infrastructure.  Python has gained a considerable degree of acceptance, has become part of the standard installation of most Unixy OSes (including Mac OS X), is a first-tier target for open source libraries (there's a lot of C libraries that have Python bindings from day one), and there's a large community of people who have learned how to do interesting and novel things in Python without requiring changes (or even good support!) from the language.  Twisted, for example, would have been a lot easier in Ruby, and yet they seem to be doing pretty well despite that.  All the really exciting stuff in Python these days isn't in the core language, and yet there's a lot of exciting things happening.</p>
+<p>What really discourages me from the comparison and debate is that I don't think there's much to be gained from it.  For Python and Ruby to try to take users from each other is a losing game -- we're both small players, and there's much better and bigger pools of developers we should be trying to attract.  There's also so much more we can say about why you should use either language instead of Java or C# or what-have-you, compared to why you should use Python instead of Ruby or vice versa.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-10.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+I looked at Ruby over two years ago. The ugly Perl-like syntax is a definite turn-off, but the deal-breaker for me was multithreading, or the lack thereof. If you think Python global interpreter lock is bad, Ruby's cooperative multithreading is far worse. This may have been fixed in the last 2 years, however.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-9.html" rel="nofollow">#</a> <a href="http://www.majid.info/">Fazal Majid</a></div><hr noshade>
+ 
+<div class="document">
+Surprises me is no ones mentioned unicode, as in Python &quot;does&quot; while Ruby &quot;doesn't&quot; (yet). Kind of a crucial fact that I imagine Java programmers would definately want to know about.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-12.html" rel="nofollow">#</a> <a href="http://www.phppatterns.com">Harry Fuecks</a></div><hr noshade>
+ 
+<div class="document">
+An excellent point -- it's far more valuable to introduce people to the benefits of dynamic languages than to argue so much about which language to use. And I also suspect that Ruby may have been (and continue to be) a stimulation for Python improvements, as C# has definitely been for Java. Until Ruby, there hasn't been much competition for Python IMO, and now there is.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-13.html" rel="nofollow">#</a> Bruce Eckel</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Definitely - competition for Python is a good thing. I'm sure everyone's tired of hearing about it, but Rails is of course a recent (loud) example. And it's already sprung up a challenger in Python (Subway). I think it clearly raised the bar in terms of overall &quot;polish&quot;, and while often reaching hyperbole, shows the buzz you can get by extensive promotion and attention to detail (docs don't hurt!).</p>
+<p>A difference I've noted though as a &quot;consumer&quot; of web frameworks (I'm no genius) is that Rails was very actively promoted - I've not seen any python web framework promoted anywhere near as much (and I don't mean claims of &quot;10x faster&quot;). Zope and Plone are quite well known, but holy learning curve. They almost make J2EE look simple.  And Rails was very much designed - after being mostly built on the fly assembling Basecamp - to be packaged and presented as <em>something you should use</em> , whereas most python projects strike me as <em>this works well for us, try it, if you like it great. if not, 'roll your own, it's easy</em>. Or all python devs are so busy they have no time to polish and publicly release/evangelize. Of course I'm broadly generalizing, but I think the broad point is valid... I just often get the sense in pythonspace of &quot;well we know it kicks ass, if you're ignorant enough to not realize it, that's your problem&quot;. And that attitude is rarely explicit - it's more often evident in responses to newbies and lack of docs and so on.</p>
+<p>I hope this is taken as constructive criticism, 'cause that's how it's meant. I fear sometimes all you guys who write the guts of python and the serious libs are sometimes not aware of the view from the cheap seats (newcomers).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-15.html" rel="nofollow">#</a> Todd G</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>&gt;. Zope and Plone are quite well known, but holy learning curve.</p>
+<p>I know this is off topic but one thing I don't get is why people always say the Zope has a huge learning curve.
+I have never seen a framework that didn't have a learning curve,
+but comparing zope to J2EE (oh an whatever App server you also need to run your J2EE solution)
+is being way to unfair on zope.  (Have you ever had to set up a tomcat/apache/J2EE/oracle environment, 
+just so you can do some basic persistent web app ;-)</p>
+<p>With zope you can be very productive very quickly.  The more you use it the more 
+you learn and the greater the sophistication of what you can then do.
+But you don't have to get into the bowels from day one.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-16.html" rel="nofollow">#</a> TIm</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Maybe it's the lack of docs. Last time I looked at least. And the near-requirement to setup Squid for any reasonable speed. The big long paper the Quixote guys at MEMS wrote (about why they developed Quixote rather than using Zope) addresses it far better than I ever could.</p>
+<p>And getting a java servlet container up and running these days isn't so bad at all. Dropping jar's in is nice too.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-19.html" rel="nofollow">#</a> <a href="http://nothingcurrently.com">Todd G</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>&quot;An instance of a class can be extended to be subtly different, without needing to subclass&quot; to mean
+using something like Delegator or SimpleDelegate. I wouldn't be suprised if python could do something similar,
+or had a similar mechanism for the pattern.</p>
+<p>They also could mean doing something like:</p>
+<pre class="literal-block">
+str = &quot;&quot;
+puts &quot;Not Moo&quot; unless str.respond_to? &quot;moo&quot;
+class String
+def moo
+      &quot; I AM A SPECIAL STRING I CAN MOO&quot;
+end
+end
+puts &quot;Is moo! &quot; if str.respond_to? &quot;moo&quot;
+</pre>
+<p>Extending the availible methods of the class String at runtime, for all Strings</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-17.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ 
+<div class="document">
+<p>Python has singletons. They are called &quot;modules&quot;.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/fixes-whats-wrong-with-python-comment-23.html" rel="nofollow">#</a> <a href="http://blog.ianbicking.org/geosci.uchicago.edu/~tobis/">Michael Tobis</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

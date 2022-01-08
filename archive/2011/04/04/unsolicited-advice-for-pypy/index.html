@@ -1,0 +1,781 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
+<script type="text/javascript">/*<![CDATA[*/(function(a){function b(a,b){if(+a)return~a||(d.cookie=h+"=; path=/");j=d.createElement(e),k=d.getElementsByTagName(e)[0],j.src=a,b&&(j.onload=j.onerror=b),k.parentNode.insertBefore(j,k)}function c(){n.api||b(l.shift()||-1,c)}if(this.Mobify)return;var d=document,e="script",f="mobify",g="."+f+".com/",h=f+"-path",i=g+"un"+f+".js",j,k,l=[!1,1],m,n=this.Mobify={points:[+(new Date)],tagVersion:[6,0]},o=/(; |#|&|^)mobify-path=([^&;]*)/g.exec(location.hash+"; "+d.cookie);o?(m=o[2])&&!+(m=sessionStorage[h]||m)&&(l=[!0,"//preview"+g+escape(m)]):(l=a()||l,l[0]&&l.push("//cdn"+i,"//files01"+i)),l.shift()?(d.write('<plaintext style="display:none;">'),setTimeout(c)):b(l[0])})(function(){if(/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)){return[1,"//cdn.mobify.com/sites/ians-blog/production/mobify.js"]}})/*]]>*/</script>
+<!-- END MOBIFY -->
+	<title>Ian Bicking: a blog   ::  My Unsolicited Advice For PyPy</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta name="generator" content="WordPress 3.4.2" /><!-- LEAVE FOR STATS -->
+	<meta name="description" content="" />
+	<link rel="stylesheet" title="plaintxtSimpler" href="../../../../wp-content/themes/Barthelme-ianb/style.css" type="text/css" media="all" />
+	<link rel="start" href="../../../../index.html" title="Ian Bicking: a blog" />
+	<link rel="alternate" type="application/atom+xml" title="Ian Bicking: a blog Atom Feed" href="../../../../feed/atom/index.html" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog RSS 2.0 Feed" href="../../../../feed/rss/index.html" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog Comments RSS 2.0 Feed" href="../../../../comments/feed/index.html" />
+	<link rel="alternate" type="application/rdf+xml" title="Ian Bicking: a blog RSS 1.0" href="../../../../feed/rdf/index.html" />
+	<link rel="alternate" type="text/xml" title="Ian Bicking: a blog RSS 0.92 Feed" href="../../../../feed/rss/index.html" />
+	<link rel="pingback" href="../../../../xmlrpc.php" />
+	<link rel="openid.server" href="http://www.myopenid.com/server" />
+	<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <link rel="me" type="text/html" href="http://www.google.com/profiles/ianbicking"/>
+		<link rel='archives' title='October 2012' href='../../../../2012/10/index.html' />
+	<link rel='archives' title='February 2012' href='../../../../2012/02/index.html' />
+	<link rel='archives' title='April 2011' href='../../index.html' />
+	<link rel='archives' title='March 2011' href='../../../03/index.html' />
+	<link rel='archives' title='September 2010' href='../../../../2010/09/index.html' />
+	<link rel='archives' title='August 2010' href='../../../../2010/08/index.html' />
+	<link rel='archives' title='May 2010' href='../../../../2010/05/index.html' />
+	<link rel='archives' title='April 2010' href='../../../../2010/04/index.html' />
+	<link rel='archives' title='March 2010' href='../../../../2010/03/index.html' />
+	<link rel='archives' title='February 2010' href='../../../../2010/02/index.html' />
+	<link rel='archives' title='January 2010' href='../../../../2010/01/index.html' />
+	<link rel='archives' title='September 2009' href='../../../../2009/09/index.html' />
+	<link rel='archives' title='May 2009' href='../../../../2009/05/index.html' />
+	<link rel='archives' title='April 2009' href='../../../../2009/04/index.html' />
+	<link rel='archives' title='January 2009' href='../../../../2009/01/index.html' />
+	<link rel='archives' title='December 2008' href='../../../../2008/12/index.html' />
+	<link rel='archives' title='November 2008' href='../../../../2008/11/index.html' />
+	<link rel='archives' title='October 2008' href='../../../../2008/10/index.html' />
+	<link rel='archives' title='September 2008' href='../../../../2008/09/index.html' />
+	<link rel='archives' title='August 2008' href='../../../../2008/08/index.html' />
+	<link rel='archives' title='July 2008' href='../../../../2008/07/index.html' />
+	<link rel='archives' title='June 2008' href='../../../../2008/06/index.html' />
+	<link rel='archives' title='May 2008' href='../../../../2008/05/index.html' />
+	<link rel='archives' title='April 2008' href='../../../../2008/04/index.html' />
+	<link rel='archives' title='March 2008' href='../../../../2008/03/index.html' />
+	<link rel='archives' title='February 2008' href='../../../../2008/02/index.html' />
+	<link rel='archives' title='January 2008' href='../../../../2008/01/index.html' />
+	<link rel='archives' title='November 2007' href='../../../../2007/11/index.html' />
+	<link rel='archives' title='October 2007' href='../../../../2007/10/index.html' />
+	<link rel='archives' title='September 2007' href='../../../../2007/09/index.html' />
+	<link rel='archives' title='August 2007' href='../../../../2007/08/index.html' />
+	<link rel='archives' title='July 2007' href='../../../../2007/07/index.html' />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog &raquo; My Unsolicited Advice For PyPy Comments Feed" href="feed/index.html" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="../../../../xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="../../../../wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='A Python Web Application Package and Format (we should make one)' href='../../../../index.html?p=250' />
+<link rel='next' title='Git-as-sync, not source-control-as-deployment' href='../../../../index.html?p=277' />
+<meta name="generator" content="WordPress 3.4.2" />
+<link rel='canonical' href='../../../../index.html?p=253' />
+<link rel='shortlink' href='../../../../index.html?p=253' />
+<link rel="stylesheet" href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"  type="text/css" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+        <style type="text/css" media="all">
+/*<![CDATA[*/
+body { font-size: 100%; }
+body { font-family: tahoma, geneva, sans-serif; }
+div.post-header, h2.post-title, p.post-date-single, h2.post-title-single, div.post-entry h1, div.post-entry h2, div.post-entry h3, div.post-entry h4, div.post-entry h5, div.post-entry h6, div.post-entry blockquote, div.post-footer, h3#comment-count, h4#comment-header, div#comments ol li p.comment-metadata, h4#respond { font-family: verdana, geneva, sans-serif; }
+div.post-entry p { text-align: left; }
+div#wrapper { width: 100%; }
+
+/*]]>*/
+</style>
+</head>
+<body>
+
+<div id="wrapper">
+
+	<div id="header" onclick="location.href='http://blog.ianbicking.org/';" style="cursor:pointer;">
+		<h1 id="title"><a href="../../../../index.html" title="Ian Bicking: a blog">Ian Bicking: a blog</a></h1>
+		<p id="description"></p>
+	</div>
+<!-- WP Theme Credits -->
+<div style="display: none;">We can answer on question <a href="http://www.olnevhost.net/vps-hosting.html">what is VPS</a>? and
+what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap dedicated servers</strong></a>?</div>
+<!-- END HEADER -->
+<div id="container">
+	<div id="content" class="widecolumn">
+
+
+		<div id="post-253" class="post single-post">
+			<p class="post-date-single">{ 2011 04 04 }</p>
+			<h2 class="post-title-single">My Unsolicited Advice For PyPy</h2>
+			<div class="post-entry">
+				<div class="document">
+<p>I think the most interesting work in programming languages right now is about the <em>runtime</em>, not syntax or even the languages themselves. Which places PyPy in an interesting position, as they have put a great deal of effort into abstracting out the concept of runtime from the language they are implementing (Python).</p>
+<p>There are of course other runtime environments available to Python. The main environment has and continues to be CPython &#8212; the runtime developed in parallel with the language, and with continuous incremental feedback and improvement by the Python developer community.  It is the runtime that informs and is informed by the language.  It&#8217;s also the runtime that is most easy-going about integrating with C libraries, and by extension it is part of the vague but important runtime environment of &quot;Unix&quot;.  There&#8217;s also Jython and IronPython.  I frankly find these completely uninteresting.  They are runtimes controlled by companies, not communities, and the Python implementations are neither natural parts of their runtime environments, nor do the runtimes include many concessions to make themselves natural for Python.</p>
+<p>PyPy is somewhere different.  It still has a tremendous challenge because Python was not developed <em>for</em> PyPy.  Even small changes to the language seem impossible &#8212; something as seemingly innocuous as making builtins static seems to be stuck in a conservative reluctance to change.  But unlike Jython and IronPython they aren&#8217;t stuck between a rock and a hard place; they just have to deal with the rock, not the hard place.</p>
+<p>So here is my unsolicited advice on what PyPy-the-runtime should consider.  Simple improvements to performance and the runtime are fine, but being incrementally better than CPython only goes so far, and I personally doubt it will ever make a big impact on Python that way.</p>
+<p>PyPy should push hard on <em>concurrency</em> and <em>reliability</em>.  If it is <em>fast enough</em> then that&#8217;s fine; that&#8217;s done as far as I&#8217;m concerned. I say this because I&#8217;m a web programmer, and speed is uninteresting to me.  Certainly opinions will differ.  But to me speed (as it&#8217;s normally defined) is really <em>really</em> uninteresting.  When or if I care about speed I&#8217;m probably more drawn to Cython.  I <em>do</em> care about latency, memory efficiency, scalability/concurrency, resource efficiency, and most of all <em>worst cases</em>.  I don&#8217;t think a JIT addresses any of these (and can even make things worse).  I don&#8217;t know of benchmarks that measure these parameters either.</p>
+<p>I want a runtime with new and novel features; something that isn&#8217;t just incrementally better than CPython.  This itself might seem controversial, as the only point to such novel features would be for people to implement at least some code intended for <em>only</em> PyPy.  But if the features are good enough then I&#8217;m okay with this &#8212; and if I&#8217;m not drawn to write something that will only work on PyPy, I probably won&#8217;t be drawn to use PyPy <em>at all</em>; natural conservatism and inertia will keep me (and most people) on CPython indefinitely.</p>
+<p>What do I want?</p>
+<ul class="simple">
+<li><strong>Microprocesses</strong>.  Stackless and greenlets have given us micro-threads, but it&#8217;s just not the same.  Which is not entirely a criticism &#8212; it shows that unportable features <em>are</em> interesting when they are good features.  But I want the next step, which is processes that don&#8217;t share state.  (And implicitly I don&#8217;t just want standard async techniques, which use explicit concurrency and shared state.)</li>
+<li><strong>Shared objects</strong> across processes with <strong>copy-on-write</strong>; then you can efficiently share objects (like modules!) across concurrent processes without the danger of shared state, but without the overhead of copying <em>everything</em> you want to share.  Lack of this is hurting PHP, as you can&#8217;t have a rich set of libraries and share-nothing without killing your performance.</li>
+<li>I&#8217;d rather see a break in compatibility for C extensions to support this new model, than to abandon what could be PyPy&#8217;s best feature to support CPython&#8217;s C extension ecosystem.  Being a web programmer I honestly don&#8217;t need many C modules, so maybe I&#8217;m biased.  But if the rest of the system is good enough then the C extensions will come.</li>
+<li>Make sure resource sharing that happens outside of the Python environment is really solid.  C libraries are often going to be unfriendly towards microprocesses; make sure what <em>is</em> exposed to the Python environment is solid.  That might even mean a dangerous process mode that can handle ctypes and FFI and where you carefully write Python code that has extra powers, so long as there&#8217;s a strong wall between that code and &quot;general&quot; code that makes use of those services.</li>
+<li><strong>Cython</strong> &#8212; it&#8217;s doing a lot of good stuff, and has a much more conservative but also more predictable path to performance (through things like type annotation).  I think it&#8217;s worth leaning on.  I also have something of a hunch that it could be a good way to do FFI in a safe manner, as Cython already supports multiple targets (Python 2 and 3) from the same codebase.  Could PyPy be another target?</li>
+<li><strong>Runtime introspection of the runtime</strong>.  We have great language introspection (probably much to the annoyance of PyPy developers who have to copy this) but currently runtime introspection is poor-to-nonexistant. What processes are running?  How much memory is each using?  Where? Are they holding on to resources?  Are they blocking on some non-Python library?  How much CPU have they been using?  Then I want to be able to kill processes, send them signals, adjust priorities, etc.</li>
+</ul>
+<p>And I guess it doesn&#8217;t have to be &quot;PyPy&quot;, but a new backend for PyPy to target; it doesn&#8217;t have to be the <em>only</em> path PyPy pursues.</p>
+<p>With a runtime like this PyPy could be an absolutely rocking platform for web development.  Python could be as reliable as, oh&#8230; <a class="reference external" href="../../../../index.html?p=38">PHP</a>? Sorry, I probably won&#8217;t win arguments that way ;)  As good as Erlang! Maybe we could get the benefits of async without the pain of callbacks or Deferreds. And these are features people would <em>use</em>.  Right now I&#8217;m perceiving a problem where there&#8217;s lots of people standing on the sidelines cheering you on but not actually <em>using</em> PyPy.</p>
+<p>So: I wouldn&#8217;t tell anyone what to do, and if someone tries this out I&#8217;ll probably only be on the sidelines cheering you on&#8230; but I really think this could be awesome.</p>
+<p><strong>Update</strong>: there&#8217;s some <a class="reference external" href="http://news.ycombinator.com/item?id=2406920">interesting comments on Hacker News</a> as well.</p>
+</div>
+<p>No related posts.</p>											</div><!-- END POST-ENTRY  -->
+			<!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			xmlns:dc="http://purl.org/dc/elements/1.1/"
+			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+		<rdf:Description rdf:about="http://blog.ianbicking.org/2011/04/04/unsolicited-advice-for-pypy/"
+    dc:identifier="http://blog.ianbicking.org/2011/04/04/unsolicited-advice-for-pypy/"
+    dc:title="My Unsolicited Advice For PyPy"
+    trackback:ping="http://blog.ianbicking.org/2011/04/04/unsolicited-advice-for-pypy/trackback/" />
+</rdf:RDF> -->
+			<div class="post-footer">
+				<p>Posted by Ian on Monday, April 4th, 2011, at 9:23 am, and filed under <a href="../../../../category/programming/index.html" title="View all posts in Programming" rel="category tag">Programming</a>, <a href="../../../../category/python/index.html" title="View all posts in Python" rel="category tag">Python</a>.</p>
+				<p>
+				Comments have a <a href='feed/index.html'>feed</a>.</p>
+			</div><!-- END POST-FOOTER -->
+		</div><!-- END POST -->
+
+<div id="comments">
+
+
+
+
+<h4 id="comments">22 Comments</h4>
+ <ul class="commentlist">
+		<li class="comment even thread-even depth-1 parent" id="comment-194022">
+				<div id="div-comment-194022" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/edcdfd5affb524e0f88ec1a00ed3fe5d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://alexgaynor.net' rel='external nofollow' class='url'>Alex Gaynor</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194022">
+			April 4, 2011 at 9:27 am</a>		</div>
+
+		<p>There&#8217;s a lot to digest here, so this is by no means a comprehensive response, but I know we have a student who&#8217;s preparing a GSOC proposal on adding a PyPy backend to Cython.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment byuser comment-author-admin bypostauthor odd alt depth-2" id="comment-194038">
+				<div id="div-comment-194038" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Ian</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194038">
+			April 4, 2011 at 1:51 pm</a>		</div>
+
+		<p>Interesting.  I [hear elsewhere](<a href="http://www.reddit.com/r/Python/comments/gidcj/my&#95;unsolicited&#95;advice&#95;for&#95;pypy/c1nskvp" rel="nofollow">http://www.reddit.com/r/Python/comments/gidcj/my<em>unsolicited</em>advice<em>for</em>pypy/c1nskvp</a>) that it&#8217;s intended to compile Cython code to plain Python and ctypes.  I guess I can kind of understand this, but it also kind of feels like PyPy is unwilling to commit to any runtime at all &#8212; PyPy after all runs on <em>something</em> but it&#8217;s an unnamed and (I presume) shifting target.  Therefore the only way into PyPy is through the front door &#8212; Python itself, and some things like ctypes that PyPy has committed to supporting.  Cython developers seem to have a lot of opinions about ctypes, I&#8217;d be curious about the tradeoffs they would see in this approach.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+		<li class="comment even thread-odd thread-alt depth-1 parent" id="comment-194023">
+				<div id="div-comment-194023" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/3b425bdab503ae69354abb02a6230825?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://jessenoller.com' rel='external nofollow' class='url'>jesse noller</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194023">
+			April 4, 2011 at 10:07 am</a>		</div>
+
+		<p>I think its an interesting thought experiment &#8211; but I think you grossly underestimate the draw of a significantly faster Python interpreter <em>by itself</em>. Something that&#8217;s blazingly faster than CPython, and has C library compatibility would simply become the de-facto &#8220;future of the python interpreter&#8221; because (and I&#8217;d put money on this) it can support the <em>massive</em> c-extension ecosystem we have, and is generally usable outside of a myopic web application.</p>
+
+<p>That said: Breaking compatibility with CPython means you abandon a massive contingent of the community, though as you say &#8211; if the features are compelling enough, maybe that&#8217;s worth it &#8211; but then again look at the history and adoption of Stackless. Stackless has a compelling series of features, but it&#8217;s never seen widespread adoption.</p>
+
+<p>I think there&#8217;s a middle ground for what your asking for &#8211; and one that nets us both of our unicorns. First, PyPy finishes C extension compatibility. Second, the features your talking about &#8211; ones that can be done on the interpreter level, without changing the <em>language</em> (Runtime introspection of the runtime) should and could be done.</p>
+
+<p>Then, handle shared objects and microprocesses as from pypy import (blah) &#8211; you add low level support as needed for these, and you offer them as pypy specific addons. We&#8217;re in the position now of moving towards a common, shared standard library, with CPython-specific modules marked as such, and there&#8217;s no reason why it couldn&#8217;t be the same for PyPy.</p>
+
+<p>Or you flip it on with a runtime flag :)</p>
+
+<p>There&#8217;s a lot of people cheering PyPy on; but not using it because it&#8217;s not as fast as it could be &#8211; yet, and most of us are locked down to c-extensions we <em>must</em> use. Not because we don&#8217;t want to use PyPy &#8211; it&#8217;s already faster in a lot of respects, but it eats more memory, or doesn&#8217;t support the C extensions.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment byuser comment-author-admin bypostauthor odd alt depth-2 parent" id="comment-194024">
+				<div id="div-comment-194024" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Ian</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194024">
+			April 4, 2011 at 10:29 am</a>		</div>
+
+		<blockquote>
+  <p>but I think you grossly underestimate the draw of a significantly faster Python interpreter <em>by itself</em></p>
+</blockquote>
+
+<p>I personally am more interested in worst cases than best cases, and here I think PyPy will have an incredibly hard time competing with CPython.  Benchmarks tend to be focused on best cases, things that can be reasoned about, not too many interacting pieces.  Performance worst cases are tucked away, hard to test, hard to even know <em>what</em> to test, or what expectations might be.  These are the O(2^n) cases where the programmer never really noticed a particular <em>n</em> accumulating in their code.</p>
+
+<p>CPython has in many ways addressed these issues through the brute force of time and iteration and education.  Bad cases have been solved.  Cases that are too hard to solve have been avoided.  A library has some bad performance, and someone patches it to make it better <em>for CPython</em>.  But all those patches, all that knowledge, is unlikely to translate to PyPy.</p>
+
+<p>Some people&#8217;s work actually looks like a microbenchmark &#8212; scientific work, perhaps, or other data processing.  But for people who are trying to solve more general problems &#8212; to make something that works across data sets not yet seen &#8212; those worst cases are a tremendous draw towards runtime conservatism.</p>
+
+<blockquote>
+  <p>but then again look at the history and adoption of Stackless. Stackless has a compelling series of features, but it’s never seen widespread adoption</p>
+</blockquote>
+
+<p>True.  But Stackless was also fairly overtly rejected by Guido and in turn by the community &#8212; I&#8217;m not sure it failed on the merit of its features alone.  I also think it was a poor compromise to reject Stackless in no small part to allow Jython and IronPython.  But&#8230; there are political concerns that PyPy developers have to keep in mind as well, and a narrow focus like performance will solve those political concerns.  But it solves that problem at the expense of creativity in my opinion.</p>
+
+<blockquote>
+  <p>Second, the features your talking about – ones that can be done on the interpreter level, without changing the <em>language</em> (Runtime introspection of the runtime) should and could be done</p>
+</blockquote>
+
+<p>I&#8217;m not actually sure what changes to &#8220;the language&#8221; means exactly.  Stackless is syntactically just Python, after all.  Greenlets are no more portable, though they are less intrusive to the actual implementation of the runtime.  The C Extension API is not really considered to be &#8220;the language&#8221;.  While we have no primitive to freeze an object, it is not unreasonable that such a thing could be implemented on existing platforms; and even if it can&#8217;t, is it still a change to the language if you implement such a routine?  A pragma or external annotation to a module to declare that it can be frozen doesn&#8217;t seem <em>really</em> like a change, though of course it is likely to be awkward in the way transitional features are.</p>
+
+<p>I think maybe a more accurate way of phrasing what I think you want is: you want existing code to work well on PyPy without change.  That in part means supporting the language as specified, or more accurately as implemented by CPython.  But it&#8217;s expanded to also mean supporting the ecosystem of C extensions.  On this path I&#8217;m not sure there&#8217;s a clear point at which PyPy is free to <em>stop</em> following CPython.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-3 parent" id="comment-194028">
+				<div id="div-comment-194028" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/3b425bdab503ae69354abb02a6230825?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://jessenoller.com' rel='external nofollow' class='url'>jesse noller</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194028">
+			April 4, 2011 at 11:40 am</a>		</div>
+
+		<blockquote>
+  <p>I personally am more interested in worst cases than best cases, and here I think PyPy will have an incredibly hard time competing with CPython. Benchmarks tend to be focused on best cases, things that can be reasoned about, not too many interacting pieces. Performance worst cases are tucked away, hard to test, hard to even know what to test, or what expectations might be. These are the O(2^n) cases where the  programmer never really noticed a particular n accumulating in their code.</p>
+</blockquote>
+
+<p><a href="http://speed.pypy.org/" rel="nofollow">http://speed.pypy.org/</a>, and <a href="http://speed.twistedmatrix.com/" rel="nofollow">http://speed.twistedmatrix.com/</a> would like to talk to you. Speed.pypy.org is at least based on mostly real-world, non synthetic benchmarks (something the Unladen Swallow guys lead). Also, we are in progress for a speed/performance.python.org &#8211; based on the speed.pypy.org project, we will have a single system showing performance of real-world benchmarks for CPython, Jython, PyPy, etc.</p>
+
+<p>So, I disagree with benchmarks being focused solely on the best cases :)</p>
+
+<blockquote>
+  <p>CPython has in many ways addressed these issues through the brute force of time and iteration and education. Bad cases have been solved. Cases that are too hard to solve have been avoided. A library has some bad performance, and someone patches it to make it better for CPython. But all those patches, all that knowledge, is unlikely to translate to PyPy.</p>
+</blockquote>
+
+<p>You&#8217;re right; but the PyPy folks have taken the <em>right</em> approach to that. They have a standing offer &#8211; bring them your slow python library, and they will help you optimize it/make it fast on PyPy. Sure, there&#8217;s plenty of institutional knowledge about CPython trickery to speed things up, but if PyPy&#8217;s goal is &#8220;write python &#8211; we&#8217;ll make it fast&#8221; then things should &#8220;just work&#8221;.</p>
+
+<blockquote>
+  <p>Some people’s work actually looks like a microbenchmark — scientific work, perhaps, or other data processing. But for people who are trying to solve more general problems — to make something that works across data sets not yet seen — those worst cases are a tremendous draw towards runtime conservatism.</p>
+</blockquote>
+
+<p>Oh, not disagreeing that there&#8217;s runtime conservatism: I know there is, I&#8217;m insanely conservative when it comes to the runtime. But PyPy is rapidly becoming a contender in this space, and as we work (we being the PSF and the community) on showing PyPy on <em>equal</em> footing as CPython, I think you&#8217;ll see interest translate to usage as they both get faster, and hit C extension compatibility.</p>
+
+<blockquote>
+  <p>True. But Stackless was also fairly overtly rejected by Guido and in turn by the community — I’m not sure it failed on the merit of its features alone. I also think it was a poor compromise to reject Stackless in no small part to allow Jython and IronPython. But… there are political concerns that PyPy developers have to keep in mind as well, and a narrow focus like performance will solve those political concerns. But it solves that problem at the expense of creativity in my opinion.</p>
+</blockquote>
+
+<p>I&#8217;m going to call foul on this. Attributing the lack of stackless adoption on Guido in any part is folly. The problem is that its features were not compelling enough for people to adopt it. Just like we&#8217;re seeing with the slow adoption of Python 3; compelling features rule the roost (and marketing helps a lot). </p>
+
+<p>And there&#8217;s aren&#8217;t any political concerns. If you think there are; I&#8217;d be happy to address them offline via email since I doubt we want to hijack things, but I&#8217;m pretty comfortable saying that this is not the same community of bygone years. The PSF is here to financially and otherwise support <em>all</em> of Python, and as those of us who were at the language summit know &#8211; there&#8217;s a large amount of encouragement and support from python-core itself for PyPy.</p>
+
+<p>For example &#8211; we&#8217;re working on breaking out the stdlib to work with PyPy. We&#8217;re working on making sure there&#8217;s a pure Python implementation as <em>well</em> as a C fallback for speed for module, so that PyPy isn&#8217;t punished due to lack of a python implementation, etc. </p>
+
+<p>These recent, and significant changes in the thinking of everyone are changing the nature of the game, for the better.</p>
+
+<blockquote>
+  <p>I’m not actually sure what changes to “the language” means exactly. Stackless is syntactically just Python, after all. Greenlets are no more portable, though they are less intrusive to the actual implementation of the runtime. The C Extension API is not really considered to be “the language”. While we have no primitive to freeze an object, it is not unreasonable that such a thing could be implemented on existing platforms; and even if it can’t, is it still a change to the language if you implement such a routine? A pragma or external annotation to a module to declare that it can be frozen doesn’t seem really like a change, though of course it is likely to be awkward in the way transitional features are.</p>
+</blockquote>
+
+<p>My only point is to implement them in a way that makes the code run on CPython, PyPy and IronPython/Jython. If they&#8217;re compartmentalized into extension modules within a slightly expanded Stdlib (marked as @pypy_only) great!</p>
+
+<p>As for the C extension API &#8211; it&#8217;s more of the language than you think (see the stable ABI and other things that have come up). People rely on that heavily, daily &#8211; changing it is almost as hard as changing the core language syntax itself.</p>
+
+<blockquote>
+  <p>I think maybe a more accurate way of phrasing what I think you want is: you want existing code to work well on PyPy without change. That in part means supporting the language as specified, or more accurately as implemented by CPython. But it’s expanded to also mean supporting the ecosystem of C extensions. On this path I’m not sure there’s a clear point at which PyPy is free to stop following CPython.</p>
+</blockquote>
+
+<p>Yes, I want existing code to work well on PyPy without change. And yes, that&#8217;s my fundamental point &#8211; breaking compatibility with CPython is a mistake, even with a compelling feature set. Every day that clicks by sees more and more Python code being written against CPython, which is the <em>reference</em> implementation.</p>
+
+<p>Now, <em>adding</em> features in a way that&#8217;s cross compatible &#8211; that I can get behind. Even if the modules are PyPy specific, it still means that PyPy is compatible with my code today, which is insanely important. If PyPy is faster, supports my existing code, <em>and</em> it has some built-in add on modules that use some dark magic within PyPy to support Actor concurrency, then <em>awesome</em> &#8211; I&#8217;ll switch tomorrow.</p>
+
+<p>Once I have more ram :)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment byuser comment-author-admin bypostauthor odd alt depth-4" id="comment-194036">
+				<div id="div-comment-194036" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Ian</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194036">
+			April 4, 2011 at 1:12 pm</a>		</div>
+
+		<p>Just to narrow in on the &#8220;political&#8221; thing&#8230;</p>
+
+<p>Probably political isn&#8217;t the right word; but I mean choices-that-aren&#8217;t-just-technical.  Thinking back to Stackless again, I remember a lot of enthusiasm, and then after some iterations with Python Core and Guido there was a sense of despair and giving up.  If Stackless-as-a-project could have confidently said &#8220;whatever, we&#8217;ll just keep doing our thing&#8221; then I think it could have seen considerably more uptake.  That it exists and seems fairly viable <em>now</em> is a testament to it from a technical perspective, considering that it was widely seen as abandoned and a red herring for a long time.  Somehow it just refused to die.</p>
+
+<p>Python 3, in contrast, is an alternate Python implementation that persists without being held up to any Darwinian implementation standard.  People don&#8217;t say &#8220;well, they can write Python 3, and if anyone starts using it we&#8217;ll see, but let&#8217;s let the market decide&#8221;.  This isn&#8217;t a criticism, but it&#8217;s a question of process, consensus, and something I maybe incorrectly labelled as &#8220;politics&#8221;.  I don&#8217;t believe <em>build it and they will come</em> is a great strategy (though its opposite <em>make sure people will come then build it</em> is also not a great strategy).  For PyPy to be &#8220;accepted&#8221; by the community doesn&#8217;t mean it needs market dominance.  It needs to feel <em>acceptable</em>, even to the people who aren&#8217;t using it.  </p>
+
+<p>And if it isn&#8217;t clear, I respect giving these concerns some weight in deciding where to go with PyPy &#8212; when I called a concern political it wasn&#8217;t disparaging.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+</ul>
+</li>
+		<li class="comment even depth-2 parent" id="comment-194027">
+				<div id="div-comment-194027" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/e24117602b944aa72b2709e245d829fc?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Jonathan</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194027">
+			April 4, 2011 at 11:23 am</a>		</div>
+
+		<p>It&#8217;s worth mentioning that in the brave new world where PyPy reigns supreme, a lot of existing C extensions don&#8217;t need to be C extensions any more. You can write them in native Python with, in theory, almost no performance hit. I do not have a lot of experience writing such extensions, but my sense from perusing the source of, say, Numpy is that much of the code (e.g., ref counting) is just &#8220;dealing&#8221; with the Python interpreter, and a fair portion of what remains is inevitable clumsiness that results from writing C in a Pythonic manner &#8212; a list comprehension becomes 10 lines of loops and variable assignments, etc. </p>
+
+<p>In other words, the complexity and bulk of the code belie the &#8220;core functionality&#8221; of the module itself. That largely disappears with PyPy. </p>
+
+<p>I am by no means minimizing the gargantuan task of &#8220;porting&#8221; the huge C module ecosystem back to Python, but it&#8217;s the possibility of doing should be taken into consideration.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment odd alt depth-3 parent" id="comment-194030">
+				<div id="div-comment-194030" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/3b425bdab503ae69354abb02a6230825?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://jessenoller.com' rel='external nofollow' class='url'>jesse noller</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194030">
+			April 4, 2011 at 11:43 am</a>		</div>
+
+		<p>Oh, totally. I&#8217;d be perfectly happy never to see another c extension module ever again &#8211; pure python made <em>insanely fast</em> by pypy is what I want!</p>
+
+<p>But we have a real ecosystem, right now.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-4" id="comment-194041">
+				<div id="div-comment-194041" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/8dd1d1bcff94f53d1a2dec1a8f0cd7a6?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Casey Duncan</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194041">
+			April 4, 2011 at 4:02 pm</a>		</div>
+
+		<p>Maybe I&#8217;m being pessimistic, but unless the JIT can also optimize data structures as well as code, it will always be possible to write significantly faster code in C for certain tasks. Using the same algorithm, I can currently write C code that is commonly 3 orders of magnitude or better than the equivalent python code, for math heavy tasks. </p>
+
+<p>There are many things that I, and the C compiler, do to make the code more efficient that the JIT can and does do as well. Things like inlining, branch minimization, less dynamic memory usage, efficient use of registers, etc. But one thing I don&#8217;t know how it can do is organize the data in memory efficiently, in a general manner. Utilizing memory in a linear fashion is highly optimized in today&#8217;s CPUs, so much so that there are entire units in processors dedicated to this (SIMD). Random access of data, much like branching of code, is far less efficient when that data is too large to remain cached.</p>
+
+<p>Unless it is possible at runtime to optimize data structures as well as code, I doubt that things like numpy, and special-purpose number crunching C extensions, will be going away anytime soon, if ever.</p>
+
+<p>That said, I do enjoy watching the success that pypy has been having, and I can only hope that all those smart folks prove me wrong.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+		<li class="comment odd alt thread-even depth-1 parent" id="comment-194026">
+				<div id="div-comment-194026" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/4ba4faf2fc5818d37c0aed6acb5b69a2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://agentultra.com' rel='external nofollow' class='url'>jking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194026">
+			April 4, 2011 at 10:40 am</a>		</div>
+
+		<p><a href="http://pypy.readthedocs.org/en/latest/architecture.html" rel="nofollow">http://pypy.readthedocs.org/en/latest/architecture.html</a></p>
+
+<p>By those goals it would appear that PyPy is doing quite well.</p>
+
+<p>Like Parrot in many respects, they&#8217;ve shifted from simply trying to implement one language to being a &#8220;framework&#8221; for building dynamic languages. Python just happens to be their benchmark where Perl 6 happens to be Parrot&#8217;s.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-2" id="comment-194032">
+				<div id="div-comment-194032" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/3d1877e21c369bc5870dbf262a3e3948?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Mitchell</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194032">
+			April 4, 2011 at 12:39 pm</a>		</div>
+
+		<p>Quibble: Parrot didn&#8217;t shift &#8211; it was always envisioned as multilingual.  So many other mistakes, but not that one.  </p>
+
+<p>Main point (somewhat off topic to OP): Perl 6, as very distinct from Parrot, has been one of very few attempts to date to create a &#8220;framework&#8221; for language implementation in general, static as well as dynamic.  This, at the level of language, not (only) VM.</p>
+
+<p>The story being: pay the painful cost of creating a non-cripplingly powerful and flexible language, compilation, and runtime infrastructure (mostly language &#8211; it&#8217;s startling how much language choices dial the rest to anywhere from straightforward to intractable) once, thus making it rather easy to implement (most all) other languages using it.</p>
+
+<p>Thus radically changing the pace of language evolution.  Instead of &#8220;Please, tiny[1] developer community of one of the few variants (PyPy) of one of the few active languages (Python), I&#8217;d like you to build me feature X (above wish list), even though you can only share out the cost at a very low level (VM and C/Java/Haskell libraries) and very high level (CS papers), so that I might consider spending a high migration cost to switch to your language and/or variant and join your small community&#8221;, instead you could have &#8220;hey, I just saw a fun paper on microthreading implementation on modern x86, so I wrote up a new module on the EcumenicalPackageIndex &#8211; it should be a seamless drop-under for all languages which have a threading library adaptor to the Threading2 monad api &#8211; download and play &#8211; feedback encouraged &#8211; new rev next week&#8221;.  Languages and their implementation could be evolving soooo much more rapidly than at present.
+([1] Actually, PyPy is perhaps the best-case non-tiny of this class.)</p>
+
+<p>Now, without Perl 6, we seem stuck waiting for Haskell-derived dynamic languages, or a decade plus of sheer human-wave brute-force succession of new languages, and major revs of old ones, until some other language crosses the &#8220;I&#8217;ll not cripple you before you even get started&#8221; critical power threshold.</p>
+
+<p>(Anyone who thinks tech advances rapidly&#8230; hasn&#8217;t been paying attention.)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-194031">
+				<div id="div-comment-194031" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/33784f56d525264873bb054da81ad690?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Tom</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194031">
+			April 4, 2011 at 12:18 pm</a>		</div>
+
+		<p>It sounds like what you really want is erlang and not python.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1 parent" id="comment-194033">
+				<div id="div-comment-194033" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ef0ed749a263aeefda2a47789f998c1c?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://dunderboss.blogspot.com' rel='external nofollow' class='url'>Philip Jenvey</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194033">
+			April 4, 2011 at 12:53 pm</a>		</div>
+
+		<p>I think improving the performance of Python is one of the most important tasks the Python community faces. We&#8217;re a general purpose lang popular on the server side, claiming that performance doesn&#8217;t matter or won&#8217;t make a big impact is just a cop-out.</p>
+
+<p>The only way for PyPy to attract the conservative users you mention is to continue the speed improvements while making it reliable and as compatible with CPython as possible. When it&#8217;s a simple, speedier drop-in replacement those users will eventually come. Experimental new features aren&#8217;t going to attract conservative users.</p>
+
+<p>So kudos to the PyPy crew for narrowing their focus over the past couple years to work on these goals (particularly CPyExt for drawing those stuck with extensions). Before that they seemed to be a more academicically driven project that produced many experimental features (like sandboxing or the lazily computed thunk objspace), more like you&#8217;re encouraging. I don&#8217;t want to tell anyone what to do either, but for now I prefer the narrower focus for PyPy of mostly just working at kicking CPython&#8217;s butt in perf benchmarks.</p>
+
+<p>I think the recent resurgence in server-side Javascript the past few years is mostly due to their runtime performance gains. You can thank the performance competitions between their major runtimes for that (all runtimes controlled by companies, btw)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment byuser comment-author-admin bypostauthor odd alt depth-2" id="comment-194035">
+				<div id="div-comment-194035" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Ian</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194035">
+			April 4, 2011 at 12:58 pm</a>		</div>
+
+		<blockquote>
+  <p>I think the recent resurgence in server-side Javascript the past few years is mostly due to their runtime performance gains. You can thank the performance competitions between their major runtimes for that (all runtimes controlled by companies, btw)</p>
+</blockquote>
+
+<p>All the more serious Javascript runtimes are runtimes dedicated to Javascript (except Rhino, but I don&#8217;t think it&#8217;s really part of that resurgence).  Also the diversity and company control has led Javascript to get better performance (easy to compete on), but <em>painfully</em> slow improvements to the language itself.  Some good things there&#8230; but not a great model.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-194034">
+				<div id="div-comment-194034" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/302fedef4ec535ea80aafa9713512d70?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">RobW</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194034">
+			April 4, 2011 at 12:57 pm</a>		</div>
+
+		<p>I agree with Tom. Personally, I&#8217;ve made a few projects at work using a combination of Python and Erlang.</p>
+
+<p>A few points:</p>
+
+<ol>
+<li><p>Python and Erlang made opposite trade-offs. Erlang had to make some tough concessions to be fault-tolerant and highly concurrent, where ease of binding to C/C++ was one of the things it had to ditch (lest you want to let C/C++ crash the VM, which goes against fault-tolerance). Don&#8217;t try to make Python be Erlang. You can&#8217;t get there from here. Instead, utilize projects like py-interface and erlport to let each language do what they do best.</p></li>
+<li><p>It&#8217;s suicide to suggest Python (in any form) forsake its library support. CPython&#8217;s libraries, both built-in and 3rd party, is the main reason why I use Python at work and not Lisp. :-) If it were just web stuff, I&#8217;d use Erlang + Lisp.</p></li>
+<li><p>Humbly confessing that you are more interested in web programming and a performance profile that matches the problems you solve doesn&#8217;t make other people&#8217;s requirements go away. I would be extremely disappointed if the PyPy devs took your advice because that would nullify any chance that <em>I</em> could use PyPy. Most of my projects are in industrial automation and such, and <em>I</em> am almost never interested in web apps. If you make a programming language implementation, you can&#8217;t be concerned with just one particular developer&#8217;s interests.</p></li>
+<li><p>All that said, there&#8217;s no reason why concurrency, etc. shouldn&#8217;t be improved. It just shouldn&#8217;t be the first priority. </p></li>
+</ol>
+
+<p>I&#8217;ve gotten great results using Python code to implement external processes used by Erlang &#8220;port processes&#8221;, where the combination of Erlang and Python are better than one language alone. For example, I&#8217;m using ctypes and comtypes to talk to COM/DCOM where the reads/writes are from Python behind-the-scenes but Erlang is a distributed front-end that can restart the Python process if it crashes (which can happen sometimes due to ctypes/comtypes and COM/DCOM issues crashing the Python VM).</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1 parent" id="comment-194037">
+				<div id="div-comment-194037" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/b39960e730b15f563437fd96165a0932?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Stan Seibert</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194037">
+			April 4, 2011 at 1:43 pm</a>		</div>
+
+		<p>As someone who uses Python for physics, I can say the only thing stopping me from making PyPy my default interpreter is the lack of compatibility with C extension modules.  Numpy alone would cover 20% of my usage, and the rest is an extension module that wraps a large body of C++.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-2" id="comment-194044">
+				<div id="div-comment-194044" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/2f2ca3900ef33896dbd5d158c803d4bd?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://cfbolz.de' rel='external nofollow' class='url'>Carl Friedrich Bolz</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194044">
+			April 5, 2011 at 3:39 am</a>		</div>
+
+		<p>Are you by chance talking about PyROOT? If yes, PyPy has a slow-moving plan to support that and make it really fast: <a href="http://morepypy.blogspot.com/2010/07/cern-sprint-report-wrapping-c-libraries.html" rel="nofollow">http://morepypy.blogspot.com/2010/07/cern-sprint-report-wrapping-c-libraries.html</a></p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-194039">
+				<div id="div-comment-194039" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/e06064361f4e9fb1bd46046b78fae409?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://morepypy.blogspot.com' rel='external nofollow' class='url'>Jacob Hallén</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194039">
+			April 4, 2011 at 1:54 pm</a>		</div>
+
+		<p>Thanks for the advice, but I think it is severely misplaced. We are on the verge of being able to serve the Python community with a faster and in all essentials compatible implementation of Python. This is not the time to go off into research land and solve the problems of concurrency in a multi-cpu environment. This is the time to consolidate and make sure we actually solve people&#8217;s problems and to catch up with the development of CPython.</p>
+
+<p>I&#8217;m sure the problems of concurrency will still be there when PyPy is mature enough as a platform to be suitable for further wild experiments. It is the Python implementation that is best suited for such work, and probably one of a very few to be considered when all programming languages are taken into account.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-194064">
+				<div id="div-comment-194064" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/b6b35719792852ae43a0fa78b66aa57b?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Matt Campbell</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194064">
+			April 8, 2011 at 4:35 pm</a>		</div>
+
+		<p>As a web developer-administrator, I&#8217;d also like to see the features that Ian discussed.  FWIW, the C extension modules that I use are MySQLdb, PIL, and PyCrypto.  And I could probably do without the latter two in the web application processes themselves by delegating some work to separate Unix processes.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-194065">
+				<div id="div-comment-194065" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/b6b35719792852ae43a0fa78b66aa57b?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Matt Campbell</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194065">
+			April 8, 2011 at 6:59 pm</a>		</div>
+
+		<p>On further consideration, it might be useful to ask why microprocesses are desirable.  Why isn&#8217;t a pool of Unix processes, each having one thread, good enough?</p>
+
+<p>To be sure, one consideration is memory usage.  And a JIT compiler exacerbates this problem.  But I wonder if PyPy can adopt any techniques from the Dalvik VM (from Android) to increase the proportion of memory pages that can be shared between processes.  Or PyPy could implement the memory dumping technique used by the Emacs compilation procedure to reduce the memory usage of multiple Emacs processes.</p>
+
+<p>Are there any other reasons to favor microprocesses over good old Unix processes?</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-194212">
+				<div id="div-comment-194212" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/f3ba3ecffd20251d73749afbfa636786?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.python.org' rel='external nofollow' class='url'>Nick Coghlan</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194212">
+			May 4, 2011 at 12:24 am</a>		</div>
+
+		<p>It&#8217;s a question of prioritisation and goal-setting. The pypy+cpyext combination currently has an excellent set of measurable goals to work towards:</p>
+
+<ul>
+<li>implement missing CPython features (2.x series is now complete on that front, so they can move on to the 3.x only features)</li>
+<li>make execution of real world applications faster (primarily as measured by the results on speed.pypy.org)</li>
+<li>supporting more C extension modules (a lot of extension modules actually have buggy reference counting, but get away with it due to the CPython interpreter&#8217;s own internal reference counts inflating the numbers, as when it comes to refcounts 10 vs 11 is a minor accounting error but 0 vs 1 is disastrous).</li>
+</ul>
+
+<p>For building enthusiasm and motivation, it&#8217;s hard to go past a set of concrete goals like that. CPython has nothing that is anywhere near that clear, which is why we have adopted &#8220;improve test coverage&#8221; as a general &#8220;get involved&#8221; type goal (it gives people a chance to create patches with a high chance of being accepted, helps flush out lingering bugs in dark corners of the standard library, and generally holds the implementation to a higher standard in the future).</p>
+
+<p>Now, if people specifically wanted to work on the kinds of things that you suggest, then we&#8217;d be amongst the first to recommend PyPy as a better platform for experimentation than CPython. However, when we suggest that to people, we currently get pushback on the idea. You know why? Because PyPy isn&#8217;t yet a viable drop-in replacement for CPython, so they don&#8217;t want to work on an implementation that is PyPy specific.</p>
+
+<p>So even though PyPy is already a <em>much</em> better platform for these ideas than CPython will ever be (e.g. getting rid of refcounting is a prerequisite to basically any interesting copy-on-write based memory savings), the PyPy devs have the right idea in targeting drop-in replacement levels of compatibility. The day that a Linux distro decides to point /usr/bin/python at a PyPy installation rather than a CPython one to provide an immediate performance boost without any additional effort on the part of application developers will be an impressive achievement for all concerned (and my personal assumption regarding that day is that it really is a matter of &#8220;when&#8221; rather than &#8220;if&#8221;).</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-194233">
+				<div id="div-comment-194233" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/9598ae319be753b20f97f21ed10ca7ed?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://blog.visucore.com' rel='external nofollow' class='url'>Wladimir</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="comment-page-1/index.html#comment-194233">
+			May 6, 2011 at 1:16 am</a>		</div>
+
+		<p>Matt: I fully agree with you. It would be incredibly nice if cPython or PyPy addressed this, and made it possible to share as much as possible (at least in CoW fashion) between processes. Currently, if you have 20 Python processes, each of them imports all the modules on its own heap. This can result in a large amount of memory wasted. On small devices and cheap hosting accounts, this is a killer. I know that dmalcolm did some research in this regard, but he decided to focus on other issues.
+If anyone is going to work on this, please contact me, I&#8217;d like to help. I am not deep enough into Python internals to start on my own, at this moment, but I&#8217;m willing to learn :)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+
+<div class="navigation">
+<div class="alignleft"></div>
+<div class="alignright"></div>
+</div>
+
+
+
+
+</div>
+
+		<div class="navigation">
+			<div class="nav-left">&laquo; <a href="../../../../index.html?p=250" rel="prev">A Python Web Application Package and Format (we should make one)</a></div>
+			<div class="nav-right"><a href="../../../../index.html?p=277" rel="next">Git-as-sync, not source-control-as-deployment</a> &raquo;</div>
+		</div><!-- END NAVIGATION -->
+
+
+	</div><!-- END CONTENT -->
+</div><!-- END CONTAINER  -->
+
+<div id="sidebar">
+	<ul>
+		<li id="home-link">
+			<h2><a href="../../../../index.html" title="Ian Bicking: a blog">Home</a></h2>
+		</li>
+<li id="text-315934862" class="widget widget_text"><h2 class="widgettitle">About</h2>
+			<div class="textwidget">Ian is a developer with Mozilla, <a href="http://ianbicking.appspot.com/projects">Python open source developer</a>, actually uses <a href="https://plus.google.com/u/0/104537541227697934010/posts">Google+</a> more than <a href="http://twitter.com/ianbicking">twitter</a> and lives in Minneapolis.<br>
+<span class="gittip-0001" gittip-username="ianbicking"></span>
+<script id="gittip-0001"
+  src="https://www.gittip.com/assets/widgets/0001.js"></script>
+</div>
+		</li>
+<li id="text-315934863" class="widget widget_text">			<div class="textwidget"><!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> --></div>
+		</li>
+<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
+		<ul>
+			<li><a href='../../../../2012/10/index.html' title='October 2012'>October 2012</a></li>
+	<li><a href='../../../../2012/02/index.html' title='February 2012'>February 2012</a></li>
+	<li><a href='../../index.html' title='April 2011'>April 2011</a></li>
+	<li><a href='../../../03/index.html' title='March 2011'>March 2011</a></li>
+	<li><a href='../../../../2010/09/index.html' title='September 2010'>September 2010</a></li>
+	<li><a href='../../../../2010/08/index.html' title='August 2010'>August 2010</a></li>
+	<li><a href='../../../../2010/05/index.html' title='May 2010'>May 2010</a></li>
+	<li><a href='../../../../2010/04/index.html' title='April 2010'>April 2010</a></li>
+	<li><a href='../../../../2010/03/index.html' title='March 2010'>March 2010</a></li>
+	<li><a href='../../../../2010/02/index.html' title='February 2010'>February 2010</a></li>
+	<li><a href='../../../../2010/01/index.html' title='January 2010'>January 2010</a></li>
+	<li><a href='../../../../2009/09/index.html' title='September 2009'>September 2009</a></li>
+	<li><a href='../../../../2009/05/index.html' title='May 2009'>May 2009</a></li>
+	<li><a href='../../../../2009/04/index.html' title='April 2009'>April 2009</a></li>
+	<li><a href='../../../../2009/01/index.html' title='January 2009'>January 2009</a></li>
+	<li><a href='../../../../2008/12/index.html' title='December 2008'>December 2008</a></li>
+	<li><a href='../../../../2008/11/index.html' title='November 2008'>November 2008</a></li>
+	<li><a href='../../../../2008/10/index.html' title='October 2008'>October 2008</a></li>
+	<li><a href='../../../../2008/09/index.html' title='September 2008'>September 2008</a></li>
+	<li><a href='../../../../2008/08/index.html' title='August 2008'>August 2008</a></li>
+	<li><a href='../../../../2008/07/index.html' title='July 2008'>July 2008</a></li>
+	<li><a href='../../../../2008/06/index.html' title='June 2008'>June 2008</a></li>
+	<li><a href='../../../../2008/05/index.html' title='May 2008'>May 2008</a></li>
+	<li><a href='../../../../2008/04/index.html' title='April 2008'>April 2008</a></li>
+	<li><a href='../../../../2008/03/index.html' title='March 2008'>March 2008</a></li>
+	<li><a href='../../../../2008/02/index.html' title='February 2008'>February 2008</a></li>
+	<li><a href='../../../../2008/01/index.html' title='January 2008'>January 2008</a></li>
+	<li><a href='../../../../2007/11/index.html' title='November 2007'>November 2007</a></li>
+	<li><a href='../../../../2007/10/index.html' title='October 2007'>October 2007</a></li>
+	<li><a href='../../../../2007/09/index.html' title='September 2007'>September 2007</a></li>
+	<li><a href='../../../../2007/08/index.html' title='August 2007'>August 2007</a></li>
+	<li><a href='../../../../2007/07/index.html' title='July 2007'>July 2007</a></li>
+		</ul>
+</li>
+<li id="text-315934861" class="widget widget_text">			<div class="textwidget"><a href="../../../../archive/index.html">The Older Archives</a></div>
+		</li>
+<li id="categories-1" class="widget widget_categories"><h2 class="widgettitle">Categories</h2>
+		<ul>
+	<li class="cat-item cat-item-12"><a href="../../../../category/erlang/index.html" title="View all posts filed under Erlang">Erlang</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="../../../../category/html/index.html" title="View all posts filed under HTML">HTML</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="../../../../category/javascript/index.html" title="View all posts filed under Javascript">Javascript</a>
+</li>
+	<li class="cat-item cat-item-15"><a href="../../../../category/licensing/index.html" title="View all posts filed under Licensing">Licensing</a>
+</li>
+	<li class="cat-item cat-item-18"><a href="../../../../category/mozilla/index.html" title="View all posts filed under Mozilla">Mozilla</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="../../../../category/notech/index.html" title="View all posts filed under Non-technical">Non-technical</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="../../../../category/olpc/index.html" title="View all posts filed under OLPC">OLPC</a>
+</li>
+	<li class="cat-item cat-item-14"><a href="../../../../category/packaging/index.html" title="View all posts filed under Packaging">Packaging</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="../../../../category/politics/index.html" title="View all posts filed under Politics">Politics</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="../../../../category/programming/index.html" title="View all posts filed under Programming">Programming</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="../../../../category/python/index.html" title="View all posts filed under Python">Python</a>
+</li>
+	<li class="cat-item cat-item-10"><a href="../../../../category/ruby/index.html" title="View all posts filed under Ruby">Ruby</a>
+</li>
+	<li class="cat-item cat-item-19"><a href="../../../../category/security/index.html" title="View all posts filed under Security">Security</a>
+</li>
+	<li class="cat-item cat-item-16"><a href="../../../../category/silverlining.1" title="View all posts filed under Silver Lining">Silver Lining</a>
+</li>
+	<li class="cat-item cat-item-20"><a href="../../../../category/programming/testing/index.html" title="View all posts filed under Testing">Testing</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="../../../../category/web/index.html" title="View all posts filed under Web">Web</a>
+</li>
+	<li class="cat-item cat-item-13"><a href="../../../../category/zopeplone/index.html" title="View all posts filed under Zope/Plone">Zope/Plone</a>
+</li>
+		</ul>
+</li>
+<li id="search-2" class="widget widget_search"><form id="searchform" method="get" action="../../../../index.html">
+	<div>
+		<input id="s" name="s" type="text" value="" tabindex="1" size="10" />
+		<input id="searchsubmit" name="searchsubmit" type="submit" value="Find" tabindex="2" />
+	</div>
+</form> </li>
+		<li id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widgettitle">Recent Posts</h2>
+		<ul>
+				<li><a href="../../../../index.html?p=291" title="Why doctest.js is better than Python&#8217;s doctest">Why doctest.js is better than Python&#8217;s doctest</a></li>
+				<li><a href="../../../../index.html?p=283" title="Python Application Package">Python Application Package</a></li>
+				<li><a href="../../../../index.html?p=277" title="Git-as-sync, not source-control-as-deployment">Git-as-sync, not source-control-as-deployment</a></li>
+				<li><a href="../../../../index.html?p=253" title="My Unsolicited Advice For PyPy">My Unsolicited Advice For PyPy</a></li>
+				<li><a href="../../../../index.html?p=250" title="A Python Web Application Package and Format (we should make one)">A Python Web Application Package and Format (we should make one)</a></li>
+				</ul>
+		</li>
+<li id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widgettitle">Recent Comments</h2>
+<ul id="recentcomments"><li class="recentcomments"><a href='http://www.mirsa.com.tr' rel='external nofollow' class='url'>havalandırma</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://redealmeidense.com.br/portalx/modules/' rel='external nofollow' class='url'>this website</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Eric Pierce on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Paul Brian on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://benjiyork.com' rel='external nofollow' class='url'>Benji York</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320">Why doctest.js is better than Python&#8217;s doctest</a></li></ul></li>
+	</ul>
+</div>
+
+	<div id="footer">
+		<p>
+			&copy; 2013 Ian<!--
+Does this commenting make me evil?
+			|
+			Thanks, <a href="http://wordpress.org/" title="WordPress">WordPress</a>
+			|
+			<a href="http://www.plaintxt.org/themes/barthelme/" title="Barthelme for WordPress" rel="follow">Barthelme</a> theme by <a href="http://scottwallick.com/" title="scottwallick.com" rel="follow">Scott</a>
+			| <!-- The following is a link to the theme author's sponsor. Please consider its smallness and that Scott was nice enough to make this theme publically available. -->
+			Sponsor: <a href="http://www.active-sandals.com/womreefsan.html" title="Support: Reef Sandals">Reef Sandals</a>
+			|
+			Valid <a href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1" title="Valid XHTML 1.0 Strict" rel="nofollow">XHTML</a> &amp; <a href="http://jigsaw.w3.org/css-validator/validator?uri=http://blog.ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no" title="Valid CSS" rel="nofollow">CSS</a>
+			|
+			-->
+			RSS: <a href="../../../../feed/rss/index.html" title="Ian Bicking: a blog RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Posts</a> &amp; <a href="../../../../comments/feed/index.html" title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Comments</a>
+		</p>
+	</div>
+
+</div><!-- END WRAPPER -->
+
+	<!-- Somehow 39 queries occured in 1.651 seconds. Magic! -->
+	<!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
+	<script type='text/javascript' src='../../../../wp-includes/js/comment-reply.js?ver=3.4.2'></script>
+
+<!-- Google Analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script>
+
+</body>
+</html>

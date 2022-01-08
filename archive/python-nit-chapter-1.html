@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Python nit, chapter 1</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Python nit, chapter 1</h1>
+ <p>I like Python.  But there are little things that aren't quite right to me.  In this extended series I will gripe about them.</p>
+
+<p> First up, <tt>string.join</tt> (or <tt>str.join</tt> as we should now call it).  We all know the basic gripe, this looks funny:
+
+<pre>
+>>> sep = '\n'
+>>> doc = sep.join(lines)
+</pre>
+
+It should be:
+
+<pre>
+>>> doc = join(lines, sep)
+</pre>
+
+But I realized the <i>real</i>problem is about typography as much as the order of the arguments.  Because most of the time when I'm joining things, I'm doing it like:
+
+<pre>
+>>> doc = '\n'.join(sep)
+</pre>
+
+The <tt>'</tt> doesn't line up with the <tt>.join</tt> at all.  Other string methods aren't a problem, because you never call them on string literals (except maybe <tt>split</tt>, but then only to save a few keystrokes).  </p>
+
+<p> I can understand why Guido didn't want to add a <tt>join</tt> method to sequencees.  And some people do tend to panic when they consider more builtins (mostly purists who like the idea of a small language).  Anyway, it's still a gripe for me.</p>
+ <div class="dates" align="right">
+Created 24 Oct '03<br>
+Modified 14 Dec '04</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ You can always tweak Python to your own taste by adding this oneliner to your script:
+<br />
+
+<br />
+<tt>def join(alist,sep='\n'): return sep.join(alist)</tt>
+<br />
+
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment523.html" rel="nofollow">#</a> <a href="http://heltenkelt.se">Tommy Sundström</a></div><hr noshade>
+ <a href="http://mail.python.org/pipermail/python-dev/2003-October/039093.html" target="_blank">I hate one liners</a>.  One person does <tt>join(alist, sep='\n')</tt>, another does <tt>join(alist, sep=' ')</tt>, another does <tt>join(alist, sep='')</tt>.  No good for sharing.
+ <div align="right"><a href="http://blog.ianbicking.org/comment524.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ I fully agree. Python is fun and intuitive. I love convince people how far it is. Each time I use sep.join(seq) I feel really a shame and not able to convince that Python is intuitive anymore. I think we are a lot to think that and that it should be changed.
+<br />
+
+<br />
+Thank to publish that thought.
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment525.html" rel="nofollow">#</a> <a href="http://vivian.vdesmedt.com/">Vivian De Smedt</a></div><hr noshade>
+ I agree. Some builtins are simply useful enough to add.
+ <div align="right"><a href="http://blog.ianbicking.org/comment526.html" rel="nofollow">#</a> Tim</div><hr noshade>
+ I agree. str.join is jarring.
+ <div align="right"><a href="http://blog.ianbicking.org/comment527.html" rel="nofollow">#</a> Brandon</div><hr noshade>
+ join is a function that has string inputs and string output.  As a builtin, it would be lost in a list of more general functions.  By making it a string method, it is placed where it is easy to find.  Yes, its operation is somewhat unexpected, but it makes sense when you think about it.
+ <div align="right"><a href="http://blog.ianbicking.org/comment528.html" rel="nofollow">#</a> Lloyd</div><hr noshade>
+ >>> str.join(' ', ('Polly','wants','a','cracker'))
+<br />
+'Polly wants a cracker'
+<br />
+>>> join = str.join
+<br />
+>>> join(' ', ('this','works','too'))
+<br />
+'this works too'
+<br />
+
+<br />
+If you don't like people doing sep.join(iterator), you may start your own crusade -- oh, you've already done it :)
+ <div align="right"><a href="http://blog.ianbicking.org/comment529.html" rel="nofollow">#</a> Baczek</div><hr noshade>
+ >>> from string import join
+<br />
+>>> doc = join(["foo", "bar"], "\n")
+<br />
+>>> print doc
+<br />
+foo
+<br />
+bar
+<br />
+
+<br />
+
+<br />
+?
+ <div align="right"><a href="http://blog.ianbicking.org/comment530.html" rel="nofollow">#</a></div><hr noshade>
+ The string module is on its way out, so that won't be valid forever.
+ <div align="right"><a href="http://blog.ianbicking.org/comment531.html" rel="nofollow">#</a> Brett</div><hr noshade>
+ The string module isn't going anywhere.  Don't believe everything you read on comp.lang.python.
+ <div align="right"><a href="http://blog.ianbicking.org/comment532.html" rel="nofollow">#</a> <a href="http://online.effbot.org">Fredrik Lundh</a></div><hr noshade>
+ Also note that "join" wasn't made a string method to "make it easy to find"; it's a string method because we had to figure out some way make join work on multiple string types back when Unicode was added.  At that time, we imagined that Python might grow even more string types (how about encoded strings to save space, or binary buffers?), and it wasn't obvious how to create a "join" primitive that would find the right implementation, without having to know about all available types.  We finally decided that dispatching on the separator made more sense than, say, dispatching on the first list item.
+<br />
+
+<br />
+Given this, the obvious solution was to make the "join(seq, sep)" function call "sep.__join__(seq)".  Changing __join__ to join was a pretty small step; after all, there might be cases where it would make sense to write sep.join(seq) in application code, at least if you happened to have the separator in a variable with a suitable name.
+<br />
+
+<br />
+The "sep.join(seq) is more pythonic" is a much later concept.
+<br />
+
+<br />
+And for what it's worth, the "let's dispatch on the separator" approach didn't work in practice; in order to handle sequences with both 8-bit and unicode strings, both implementations now know about the other string type.
+<br />
+
+<br />
+So instead of a single function that does the right thing (but has to be taught about each new string type), we now have two separate join methods that both knows about the other string type.  If we add another string type, we'll end up with three implementations, each of which has to know about two different types.  And so on.
+<br />
+
+<br />
+But who cares about new string types these days; it's not like anyone's actually using strings now that we have iterators ;-)
+ <div align="right"><a href="http://blog.ianbicking.org/comment533.html" rel="nofollow">#</a> <a href="http://online.effbot.org">Fredrik Lundh</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

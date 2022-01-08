@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Declarative Classes</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Declarative Classes</h1>
+ After thinking about <a href="http://blog.colorstudy.com/ianb/weblog/2003/09/15.html#P6">metaclasses
+and reloading</a> a little bit, it should be clear that the simple
+approach won't work.  You can't update a class (and especially a
+class's <tt>__init__</tt>) and expect all the instances to be valid.
+Maybe you add an instance variable, or take a new argument to the
+__init__ that specifies the behavior, or cache some values.  Because
+you can't rerun <tt>__init__</tt>, you can't ensure valid objects. <p>
+
+There are a few solutions to this, all of which require a different
+style of defining classes than is typical in Python. <p>
+
+One would be to make <tt>__init__</tt> idempotent; that is, you can
+call <tt>__init__</tt> multiple times without changing the instance.
+Presumably you also store the original arguments so you can
+reconstruct the <tt>__init__</tt> call completely.  Using something
+like <a href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/160164">Michael
+Hudson's recipe</a> you can keep track of all the instances, and
+reinitialize them. <p>
+
+Another would be to make changes to <tt>__init__</tt> less common.
+This can be achieved by using higher-level definitions.  <a href="http://peak.telecommunity.com/">PEAK</a> is an interesting
+framework which does some of this.  (See the <a href="http://peak.telecommunity.com/tut.pdf">Tutorial</a> (PDF),
+section 2.2)  <p>
+
+In essence you can consider PEAK's bindings to be using declaration in
+favor of execution.  Python has a strong bias to execution.  Instances
+variables aren't declared; you simply create them and they exist.
+Methods aren't declared; they are just functions attached to classes.
+Local variables aren't declared, you just start using them.  A
+<tt>property</tt> isn't declared; you explicitly construct it and bind
+it.  Classes aren't declared; they are created (which is the source of
+this specific reloading problem). <p>
+
+PEAK's bindings seem to be a way of creating a declared class.  Many
+typical patterns -- patterns which typically would be implemented
+idiomatically -- are instead turned into explicit structures.  For
+instance, <tt>binding.Once</tt> (pg. 13) encapsulates a basic
+memoizing pattern, where you calculate a value lazily then store the
+value for future accesses.  You can implement this idiomatically,
+perhaps like:
+
+<pre>
+class Car(object):
+    def height__get(self):
+        try:
+            return self.__height
+        except AttributeError:
+            baseHeight = self.roof.top - self.chassis.bottom
+            self.__height = self.wheels.radius + self.baseHeight
+            return self.__height
+</pre>
+
+It's not difficult to understand what's happening there by reading the
+code.  But a tool (like a reload-enabling metaclass) <i>cannot</i>
+understand that code.  In the case of reloading and instance
+variables, we might want an explicit declaration of what variables
+instances should have, and a default value for that variable.  Given
+that we can fix up old instances. <p>
+
+Of course, reloading is only a very specific case, and not the most
+interesting case either.  Persistence is so "interesting" that it's
+practically cliche.  Publishing, security, interfaces -- these all
+benefit from declarative structures. <p>
+
+I think the challenge is in making the declarations small (they
+quickly become a conceptual burden) and dynamic, so that they can reap
+the benefits of Python.
+ <div class="dates" align="right">
+Created 17 Sep '03<br>
+Modified 14 Dec '04</div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>What can WSGIKit do for you?</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>What can WSGIKit do for you?</h1>
+ 
+<div class="document">
+<p><strong>Note:</strong> WSGIKit has been renamed as <em>Python Paste</em></p>
+<p>Well, I <a class="reference" href="what-is-wsgikit.html">tried to explain WSGIKit</a>, but I'm not
+entirely sure how successful that was.  People asked for diagrams, but
+I don't think in terms of diagrams (even if I appreciate that it's
+very useful for other people), so I'm not sure what one would look
+like.  I made a couple diagrams for my <a class="reference" href="http://www.imagescape.com/software/docs/wsgikit-pycon2005/">WSGIKit PyCon presentation</a>, which
+may or may not help.</p>
+<p>But anyway, I want to write about <em>what WSGIKit can do for you, the
+framework developer</em>.  To do this, I want to explain Webware's
+relation to WSGIKit, which is a concrete example of how this stuff can
+fit together.</p>
+<ul>
+<li><p class="first">Webware has a package (<tt class="docutils literal"><span class="pre">wsgikit.webkit</span></tt>) that implements the
+Webware API.  It's included with WSGIKit because it's a
+reimplementation of Webware.  If you didn't want to reimplement your
+framework, or you wanted to do all your framework development in
+your repository, you wouldn't necessarily add a subpackage, you'd
+just use your normal distribution.</p>
+</li>
+<li><p class="first">The Webware package turns Servlets into WSGI applications.  While
+this effects a whole bunch of stuff, in a lot of ways it's actually
+pretty simple.  If you look at <a class="reference" href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/webkit/wkservlet.py">wsgikit.webkit.wkservlet.Servlet</a>,
+the core WSGI application logic is in <tt class="docutils literal"><span class="pre">__call__</span></tt> (though, I
+suppose, spread out over <a class="reference" href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/webkit/wkresponse.py">Response</a>
+and <a class="reference" href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/webkit/wktransaction.py">Transaction</a>
+as well).</p>
+<p>This may or may not be feasible for other projects.  <tt class="docutils literal"><span class="pre">Servlet</span></tt>
+happened to not be using <tt class="docutils literal"><span class="pre">__call__</span></tt>, so I could add that method.
+<a class="reference" href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/urlparser.py">wsgikit.urlparser.URLParser</a> uses some
+simple rules to construct WSGI applications -- it loads modules,
+then looks for the symbol <tt class="docutils literal"><span class="pre">application</span></tt>, which is a ready-made
+WSGI application, or a symbol matching the module name, which is a
+factory for WSGI applications.  The Webware Servlet subclass is a
+factory for Servlet instances, which are themselves WSGI
+applications.</p>
+<p>Some frameworks would be able to use this, or maybe offer
+modifications of this, while other frameworks will have to implement
+new URL parsers.</p>
+</li>
+<li><p class="first">So far just one application template is included,
+<a class="reference" href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/app_templates/webkit_zpt/">wsgikit/app_templates/webkit_zpt</a>.
+This is used by <a class="reference" href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/app_setup.py">app_setup</a> to create
+a blank application file layout (the <a class="reference" href="http://wsgikit.org/docs/TodoTutorial.html#setting-up-the-files">tutorial</a>
+makes use of this).  Frameworks can have multiple templates (e.g.,
+someone could write a <tt class="docutils literal"><span class="pre">webkit_cheetah</span></tt> template), and the
+application templates can provide new commands.  So sometime I'm
+planning to add a <tt class="docutils literal"><span class="pre">app-setup</span> <span class="pre">servlet</span> <span class="pre">&lt;servlet_name&gt;</span></tt> command to
+<tt class="docutils literal"><span class="pre">webkit_zpt</span></tt> that will create a new blank servlet and template.
+None of the application template stuff is required, but I think it's
+a very helpful aid to new users (and convenient for experienced
+users too).</p>
+</li>
+<li><p class="first">There's a function in <a class="reference" href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/server.py">wsgikit.server</a> that when it
+sees a <tt class="docutils literal"><span class="pre">webkit_dir</span></tt> configuration value, loads up the
+<a class="reference" href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/webkit/wsgiwebkit.py">wsgikit.webkit.wsgwebkit.webkit()</a>
+stack of middleware, that provides all the functions Webware
+provides.  I want to make this kind of configuration and application
+assembly pluggable, but for now it'd probably mean hardcoding
+something for each framework in there.  Actually, I plan to rename
+<tt class="docutils literal"><span class="pre">webkit_dir</span></tt> to something like <tt class="docutils literal"><span class="pre">publish_dir</span></tt>, as there's nothing
+Webware-specific about it, just file-publishing-specific.  But I'm
+<em>very</em> reluctant to turn configuration into something complicated,
+so right now I'm expecting to code many use cases into <tt class="docutils literal"><span class="pre">server</span></tt>
+instead of making configuration more generic or general.</p>
+</li>
+</ul>
+<p>OK, so if you set up your framework to work with WSGIKit, what would
+you get out of it?</p>
+<ul class="simple">
+<li>You get <tt class="docutils literal"><span class="pre">app-setup</span></tt> if you make application templates.  You can
+make such a thing on your own (Webware had <tt class="docutils literal"><span class="pre">MakeAppWorkDir</span></tt> for
+instance).  But this script provides a somewhat consistent
+experience for users, and convenience functions (e.g., <tt class="docutils literal"><span class="pre">app-setup</span>
+<span class="pre">--template=webkit_zpt</span></tt> is implemented like <a class="reference" href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/app_templates/webkit_zpt/command.py">this</a>).
+<tt class="docutils literal"><span class="pre">app-setup</span> <span class="pre">list</span></tt> will show your framework, for a little free
+advertising.</li>
+<li>You get a configuration setup.  It's fairly simple -- and maybe it
+can stay fairly simple.  The same configuration file works for both
+servers and applications, and can hold information specific to your
+framework or applications.</li>
+<li>You get glue for various servers.  There's a couple supported now,
+including a simple HTTP server, a print-to-stdout server, a
+CGI-script-generating server, and an SCGI forking server.  There
+will be more in the future.</li>
+<li>Servers can be restarted automatically when code changes
+(configurable), dealing with the dreaded stale code problem.</li>
+<li>Access to a bunch of reusable components and libraries, like serving
+of static files, catching errors and providing a variety of reports,
+session management, authentication, and more to come.</li>
+<li>Less code in your framework.</li>
+<li>As much backward compatibility as we can muster.  Deployment and
+configuration changes, but most everything else shouldn't.</li>
+</ul>
+<p>I also think the test and documentation framework is heading in a good
+direction.</p>
+<p>You don't have to use all of this to pick features and code out of
+WSGIKit if you wish.  A lot of what I'm looking to provide with
+WSGIKit is a good experience for users, both new and experienced, and
+part of what that means is having other people put things together in
+intelligent ways instead of leaving it up to each developer to do so.
+Wouldn't it be great to tell someone evaluating Python web programming
+to download one (maybe big) hunk of code, run <tt class="docutils literal"><span class="pre">app-setup</span> <span class="pre">list</span></tt> to
+see a dozen available Python frameworks, <tt class="docutils literal"><span class="pre">app-setup</span> <span class="pre">list</span> <span class="pre">-v</span></tt> to get
+extended descriptions, <tt class="docutils literal"><span class="pre">app-setup</span> <span class="pre">--template=X</span> <span class="pre">create</span> <span class="pre">~/test_X;</span> <span class="pre">cd</span>
+<span class="pre">~/test_X;</span> <span class="pre">wsgi-server</span></tt> to get a demo of any of the frameworks set up?
+That's not the end-all-be-all of resolving issues with Python web
+development, but I think it's an accessible goal <em>right now</em>, and
+worth doing.</p>
+</div>
+ <div class="dates" align="right">
+Created 16 Apr '05<br>
+Modified 23 Apr '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>when you say it detects stale code, how deep does the detection reach?</p>
+<p>let's say I have a servlet script A.  inside A it says
+...
+import foo
+...</p>
+<p>does wsgikit detect changes to foo?</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/what-can-wsgikit-do-for-you-comment-1.html" rel="nofollow">#</a> <a href="http://spyced.blogspot.com">Jonathan Ellis</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+WSGIKit looks through all the modules in <tt class="literal"><span class="pre">sys.modules</span></tt> and restarts the entire server if one of them changes.  It is not initiated by a request, but rather runs in a separate thread and polls the files regularly.  You can also make it look at extra files, like a configuration file, and restart when those change too.  It doesn't reload modules, which is much more challenging to do correctly, though at some point I'll probably have it look at modules and see if some are explicitly marked to be reloadable.  E.g., Webware servlet files (but <em>not</em> the files they import) can generally be reloaded.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/what-can-wsgikit-do-for-you-comment-2.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+Yeah, restarting is the easy way out.  No shame in taking the easy way sometimes!  That is what Spyce has to do for anything it doesn't compile itself.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/what-can-wsgikit-do-for-you-comment-3.html" rel="nofollow">#</a> <a href="http://spyced.blogspot.com">Jonathan Ellis</a></div><hr noshade>
+ 
+<div class="document">
+<p>BTW, to accomodate pathnames with spaces in them (common on Windows) you may want your reloader code to do something like this</p>
+<p>args = ['&quot;' + re.sub('&quot;', r'&quot;', i) + '&quot;' for i in args]</p>
+<p>before spawning the subprocess.</p>
+<p>I also like to run python -u (if the speed hit matters they shouldn't have the modules checker turned on).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/what-can-wsgikit-do-for-you-comment-4.html" rel="nofollow">#</a> <a href="http://spyced.blogspot.com">Jonathan Ellis</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+eh, your wiki nuked the backslash in that sub() call.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/what-can-wsgikit-do-for-you-comment-5.html" rel="nofollow">#</a> <a href="http://spyced.blogspot.com">Jonathan Ellis</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>What happens if you use literal block text, like so:</p>
+<pre class="literal-block">
+\bleh
+</pre>
+<p>Yep.  Seems to work.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/what-can-wsgikit-do-for-you-comment-8.html" rel="nofollow">#</a> <a href="http://wookimus.net/~chewie">Chad Walstrom</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+Your pycon presentation is exactly what i needed to understand wsgi and wsgikit ! thanks</div>
+ <div align="right"><a href="http://blog.ianbicking.org/what-can-wsgikit-do-for-you-comment-6.html" rel="nofollow">#</a> anonymous</div><hr noshade>
+ 
+<div class="document">
+Given the current state of Python web programming I would say that WSGI is a good standard to leverage, but I don't think that &quot;thin glue&quot; accurately describes a real-world WSGI implementation. Even if WSGI is the most efficient way to bring the plethora of ideas into focus, it's really more like &quot;thick glue&quot; or &quot;mortar&quot;. Fitting some of this stuff together is more like building with rocks than bricks. If this analogy is good, then the goal is not to chip every piece into a new shape, but to knock off the protruding edges so that they can be fitted.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/what-can-wsgikit-do-for-you-comment-7.html" rel="nofollow">#</a> <a href="http://eradman.com">Eric Radman</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

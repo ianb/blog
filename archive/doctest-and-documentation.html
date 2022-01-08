@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Doctest and documentation</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Doctest and documentation</h1>
+ <p>
+
+<a href="http://python.org/doc/current/lib/module-doctest.html"><tt>doctest</tt></a>
+(<a href="http://www.python.org/pycon/dc2004/papers/4/">see also this
+presentation</a>) is a very clever way to do Python testing.
+Especially for smaller, highly decoupled functions doctest is
+wonderfully easy to develop for.  However, it can be a bit of a pain
+-- it is extremely literal.  It expects the output to be
+<i>exactly</i> what you say it will be, down to the smallest bit of
+whitespace.  I think this sucks.
+
+<p>
+
+This is justified with the idea that doctest tests are documentation
+as well as tests.  The documentation should be completely correct, and
+people shouldn't be surprised when they try the examples out themselves.
+
+<p>
+
+This does not give the reader the credit they deserve.  Readers are
+highly capable of understanding that there are imporant aspects to
+documentation, and there are incidental aspects.  In
+<tt>&lt;SomeObject instance at 0x401edc0c&gt;</tt> it's pretty easy to
+figure out that <tt>0x401edc0c</tt> is not an important value.  The <a href="http://python.org/doc/current/lib/node140.html">accepted</a> way
+to deal with this is to make sure such a value never gets printed.
+This also applies to <i>all</i> dictionaries, which have an
+unpredictable key order, and output that includes newlines, which
+doctest can't parse.
+
+
+<p>
+
+Another suggestion in <a href="http://www.python.org/pycon/dc2004/papers/4/note23.html">future
+directions for doctest</a> (from the presentation) is that there be a
+series of pretty-printers that display values in a canonical form,
+removing addresses, ordering dictionary keys, etc.
+
+<p>
+
+This is absolutely the wrong idea if you are creating documentation.
+Those explicit pretty printers or funny expressions (like <tt>foo() ==
+{"Hermione": "hippogryph", "Harry": "broomstick"}</tt>, as opposed to
+printing the output of <tt>foo()</tt>) are a distraction.  This is
+fine if you are using doctest as a unittest replacement (which is a
+valid way to avoid unittest's verbosity), but it's no good in
+documentation.
+
+<p>
+
+I think instead that doctest should support both pluggable pretty
+printers -- pretty printers that aren't explicitly invoked in test
+expressions -- and that there also be pluggable string equality
+functions.  (Actually I'm unsure about the pretty printers, but very
+sure about the string equality functions.)
+
+<p>
+
+For instance, I have a bunch of code that tests HTML output.  I don't
+care about the order of the attributes, so I have a function that
+parses the HTML and ignores attribute order.  That this happens
+magically behind the scenes doesn't bother me for documentation -- I
+expect my readers to ignore the same details that the equality
+function ignores.  I don't want to use some alternate way to represent
+HTML -- I <i>don't</i> expect the readers to understand some funny
+nested structure.  And the entire point of the narrative form of
+doctest is defeated if I use the equality function explicitly, because
+my output becomes meaningless while all information is stored in the
+expressions.  That's awkward and ugly.
+
+<p>
+
+In other cases, people may be using floats but aren't concerned with
+the fact that binary-encoded floats are unpredictable (e.g.,
+<tt>1.9</tt> is displayed as <tt>1.8999999999999999</tt>).  This
+detail about float implementations matters a lot in some
+circumstances, but it should be up to the documentation author
+whether they want to highlight that difference.  For this case an
+equality test might look like:
+
+<pre>
+def floatEqual(s1, s2):
+    try:
+        return float(s1) == float(s2)
+    except ValueError:
+        return False
+</pre>
+
+<p>
+
+Wildcards are another useful way to highlight the interesting part of
+the output.  I've used <tt>...</tt> as a wildcard that's
+documentation-friendly, so you might use the output <tt>&lt;SomeObject
+instance at ...&gt;</tt>.
+
+<p>
+
+I played with some of these ideas in <a href="http://colorstudy.com/cgi-bin/viewcvs.cgi/trunk/DataTest/datatest/doctesthacks.py?rev=34&view=markup">doctesthacks</a>
+which, as the name implies, is a bit of a hack.  Unfortunately doctest
+wasn't designed to be modified in this way.
+
+<p>
+
+(I was reminded of these testing issues after reading about <a href="http://weblog.hotales.org/view/python/2004/08/07/0">std.utest</a>,
+which is a unittest alternative.)
+
+<p>
+
+<b>Update:</b> <a href="http://mail.python.org/pipermail/python-dev/2004-July/046395.html">maybe some of these changes are in the works?</a>
+ <div class="dates" align="right">
+Created 08 Aug '04<br>
+Modified 14 Dec '04</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ There is a recent spurt of development of doctest in python CVS:
+<br />
+
+<br />
+<a href="http://cvs.sourceforge.net/viewcvs.py/python/python/dist/src/Lib/doctest.py" target="_blank">http://cvs.sourceforge.net/viewcvs.py/python/python/dist/src/Lib/doctest.py</a>
+<br />
+
+<br />
+(A much appreciated spurt.)
+ <div align="right"><a href="http://blog.ianbicking.org/comment283.html" rel="nofollow">#</a> Michael</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Starting with Selenium</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Starting with Selenium</h1>
+ 
+<div class="document">
+<p>I spent most of today working with <a class="reference" href="http://confluence.public.thoughtworks.org/display/SEL/Home">Selenium</a>, throwing out a bunch of
+emails to its <a class="reference" href="http://lists.public.thoughtworks.org/pipermail/selenium-devel/2005-March/thread.html">devel list</a>.  I'm pretty excited about it.</p>
+<p>There's a lot of complicated stuff about Selenium out there, but it's
+actually really simple.  Grig <a class="reference" href="http://agiletesting.blogspot.com/2005/03/quick-update-on-selenium-in-testrunner.html">added</a> to his <a class="reference" href="http://agiletesting.blogspot.com/2005/03/web-app-testing-with-python-part-2.html">previous post</a> with a
+shorter description, and Jason Huggans <a class="reference" href="http://lists.public.thoughtworks.org/pipermail/selenium-users/2005-January/000060.html">post</a> also had a quick start
+for Windows/IE.  Here's my quick start:</p>
+<ul class="simple">
+<li>Check out svn://... somewhere where your web server can see it.
+Lets say it's in <tt class="docutils literal"><span class="pre">/selenium</span></tt>.  This must be the same web server
+that your application is on.</li>
+<li>Go view <tt class="docutils literal"><span class="pre">/selenium/javascript/TestRunner.html</span></tt></li>
+</ul>
+<p>Voila!  Was that so hard?  All that server instrumentation stuff,
+Twisted stuff, etc... really, just don't worry about that.  Maybe
+later, but it's no place to start.</p>
+<p>Now, go to <tt class="docutils literal"><span class="pre">selenium/javascript/tests/</span></tt> and edit <tt class="docutils literal"><span class="pre">TestSuite.html</span></tt>
+to add more tests (or get rid of the ones that are there), and copy
+one of the files like <tt class="docutils literal"><span class="pre">TestOpen.html</span></tt> to start your own test (both
+files are extremely simple -- one's a list of links, the other is a
+table of commands).</p>
+<p>There's more of course, but there's always more.  One thing that
+caught me is that you must refer to links and submit buttons using a
+limited number of <a class="reference" href="http://selenium.thoughtworks.com/testrunner.html#element-locators">Element Locators</a> -- by id (but I don't give my
+links ids!), with a Javascript DOM expression (icky
+domNamesEverywhere!), or with <a class="reference" href="http://www.w3schools.com/xpath/">XPath</a>.  I chose XPath, even though I've
+never used XPath, and here's my mini-tutorial:</p>
+<p>To follow a link by its text:</p>
+<pre class="literal-block">
+//a[text()='link text']
+</pre>
+<p>I haven't tried this, but maybe it would work more fuzzily:</p>
+<pre class="literal-block">
+//a[contains(text(), 'partial text')]
+</pre>
+<p>And for a submit button:</p>
+<pre class="literal-block">
+//input[&#64;type='submit']
+</pre>
+<p>Or:</p>
+<pre class="literal-block">
+//input[&#64;value='Button Description']
+</pre>
+<p>Anyway, hopefully we'll get this information into the documentation,
+and a quick start with Selenium will become more approachable.</p>
+<p>I also started working on some infrastructure.  The first is expanding
+and improving a script that takes <a class="reference" href="http://hathawaymix.org/Software/TCPWatch">tcpwatch</a> logs and turns them into
+test scripts (<tt class="docutils literal"><span class="pre">tcpwatch_scriptgen.py</span></tt>).  I previously generated <a class="reference" href="http://pbp.berlios.de/">PBP</a>
+scripts (and in the future probably <a class="reference" href="http://issola.caltech.edu/~t/twill/README.html">Twill</a> scripts); now you can also
+make Selenium scripts.</p>
+<p>The second is a CGI-based test suite.  You can use a URL like
+<tt class="docutils literal"><span class="pre">/selenium/javascript/TestRunner.html?test=/path/to/TestSuite.html</span></tt>
+to use something other than
+<tt class="docutils literal"><span class="pre">selenium/javascript/tests/TestSuite.html</span></tt> -- which is nice, because
+you don't want to mix your application tests with the Selenium code.
+Anyway, you point it to the <tt class="docutils literal"><span class="pre">selenium_suite.py</span></tt> CGI script and it'll
+index all the suites you put in some directory.</p>
+<p>Oh... and that CGI program can also turn comma-separated-value files
+into HTML tables, so you can write or edit your tests in a spreadsheet
+(which, I think, is an improvement over an HTML editor).  And now
+<tt class="docutils literal"><span class="pre">tcpwatch_scriptgen.py</span></tt> can create both CSV files and HTML tables.</p>
+<p>All of this, temporarily, is located in <a class="reference" href="http://svn.colorstudy.com/home/ianb/webtest_experiement/">http://svn.colorstudy.com/home/ianb/webtest_experiement/</a>
+-- but it'll move
+someplace more permanent later.  Maybe there will be a place for it in
+the Selenium repository, otherwise I'll put it in the Webware
+repository.</p>
+</div>
+ <div class="dates" align="right">
+Created 05 Mar '05<br>
+Modified 21 Apr '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>Great post, Ian. I was going to send you an email to suggest you post your experiences so that we can keep the Selenium momentum going, but you were one step ahead of me...Good thing I checked your blog first.</p>
+<p>Hopefully we can combine your post with some of the stuff I wrote on the Twisted server and contribute this way to the Selenium documentation.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/starting-with-selenium-comment-1.html" rel="nofollow">#</a> <a href="http://agiletesting.blogspot.com">Grig Gheorghiu</a></div><hr noshade>
+ 
+<div class="document">
+<p>This is great stuff! :-) The Selenium project is benefiting immeasurably now that we've caught the attention of Ian and Grig!</p>
+<p>About converting tcpwatch logs into Selenium scripts... What you wrote is very cool. A frequently asked question from new users is whether we have test recording utility... Now we have one. :-). I think it will probably catch most general cases, but, not everything that can be tested shows up in the TCP stream. If I have some JavaScript widgets in my page that do not trigger a trip to the server, they probably won't be picked up by your tool... And Selenium was specifically developed to test apps that that use JavaScript. So I think to capture everything, the event capturing (and translation into a test script) needs to be handled by JavaScript not in the TCP stream.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/starting-with-selenium-comment-2.html" rel="nofollow">#</a> <a href="http://blog.ianbicking.org/selenium.thoughtworks.com">Jason Huggins</a></div><hr noshade>
+ 
+<div class="document">
+<p>Thanks for the quick start.  It is sooo fast to get started using this software.  I wish the docs were clearer on that because most people want to dive in and start using it and worry about Twisted later.  This post shows how easy it is!</p>
+<p>One thing: if you want to click by partial text you should use</p>
+<p>//a[contains('partial text',text() )]</p>
+<p>as the Xpath expression, and it works like a charm.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/starting-with-selenium-comment-3.html" rel="nofollow">#</a> anonymous</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>sorry I was wrong with my XPath expression too, haven't figured it out yet.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/starting-with-selenium-comment-4.html" rel="nofollow">#</a> <a href="http://">anonymous</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>OK I got it for real this time, sorry about cloggin up your blog feel free to remove my old comments</p>
+<p>To test for a partial text, the proper XPAth expression should be:
+//a[contains(., 'partial text')]</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/starting-with-selenium-comment-5.html" rel="nofollow">#</a> <a href="http://">anonymous</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

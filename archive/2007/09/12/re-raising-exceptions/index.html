@@ -1,0 +1,972 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
+<script type="text/javascript">/*<![CDATA[*/(function(a){function b(a,b){if(+a)return~a||(d.cookie=h+"=; path=/");j=d.createElement(e),k=d.getElementsByTagName(e)[0],j.src=a,b&&(j.onload=j.onerror=b),k.parentNode.insertBefore(j,k)}function c(){n.api||b(l.shift()||-1,c)}if(this.Mobify)return;var d=document,e="script",f="mobify",g="."+f+".com/",h=f+"-path",i=g+"un"+f+".js",j,k,l=[!1,1],m,n=this.Mobify={points:[+(new Date)],tagVersion:[6,0]},o=/(; |#|&|^)mobify-path=([^&;]*)/g.exec(location.hash+"; "+d.cookie);o?(m=o[2])&&!+(m=sessionStorage[h]||m)&&(l=[!0,"//preview"+g+escape(m)]):(l=a()||l,l[0]&&l.push("//cdn"+i,"//files01"+i)),l.shift()?(d.write('<plaintext style="display:none;">'),setTimeout(c)):b(l[0])})(function(){if(/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)){return[1,"//cdn.mobify.com/sites/ians-blog/production/mobify.js"]}})/*]]>*/</script>
+<!-- END MOBIFY -->
+	<title>Ian Bicking: a blog   ::  Re-raising Exceptions</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta name="generator" content="WordPress 3.4.2" /><!-- LEAVE FOR STATS -->
+	<meta name="description" content="" />
+	<link rel="stylesheet" title="plaintxtSimpler" href="../../../../wp-content/themes/Barthelme-ianb/style.css" type="text/css" media="all" />
+	<link rel="start" href="../../../../index.html" title="Ian Bicking: a blog" />
+	<link rel="alternate" type="application/atom+xml" title="Ian Bicking: a blog Atom Feed" href="../../../../feed/atom/index.html" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog RSS 2.0 Feed" href="../../../../feed/rss/index.html" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog Comments RSS 2.0 Feed" href="../../../../comments/feed/index.html" />
+	<link rel="alternate" type="application/rdf+xml" title="Ian Bicking: a blog RSS 1.0" href="../../../../feed/rdf/index.html" />
+	<link rel="alternate" type="text/xml" title="Ian Bicking: a blog RSS 0.92 Feed" href="../../../../feed/rss/index.html" />
+	<link rel="pingback" href="../../../../xmlrpc.php" />
+	<link rel="openid.server" href="http://www.myopenid.com/server" />
+	<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <link rel="me" type="text/html" href="http://www.google.com/profiles/ianbicking"/>
+		<link rel='archives' title='October 2012' href='../../../../2012/10/index.html' />
+	<link rel='archives' title='February 2012' href='../../../../2012/02/index.html' />
+	<link rel='archives' title='April 2011' href='../../../../2011/04/index.html' />
+	<link rel='archives' title='March 2011' href='../../../../2011/03/index.html' />
+	<link rel='archives' title='September 2010' href='../../../../2010/09/index.html' />
+	<link rel='archives' title='August 2010' href='../../../../2010/08/index.html' />
+	<link rel='archives' title='May 2010' href='../../../../2010/05/index.html' />
+	<link rel='archives' title='April 2010' href='../../../../2010/04/index.html' />
+	<link rel='archives' title='March 2010' href='../../../../2010/03/index.html' />
+	<link rel='archives' title='February 2010' href='../../../../2010/02/index.html' />
+	<link rel='archives' title='January 2010' href='../../../../2010/01/index.html' />
+	<link rel='archives' title='September 2009' href='../../../../2009/09/index.html' />
+	<link rel='archives' title='May 2009' href='../../../../2009/05/index.html' />
+	<link rel='archives' title='April 2009' href='../../../../2009/04/index.html' />
+	<link rel='archives' title='January 2009' href='../../../../2009/01/index.html' />
+	<link rel='archives' title='December 2008' href='../../../../2008/12/index.html' />
+	<link rel='archives' title='November 2008' href='../../../../2008/11/index.html' />
+	<link rel='archives' title='October 2008' href='../../../../2008/10/index.html' />
+	<link rel='archives' title='September 2008' href='../../../../2008/09/index.html' />
+	<link rel='archives' title='August 2008' href='../../../../2008/08/index.html' />
+	<link rel='archives' title='July 2008' href='../../../../2008/07/index.html' />
+	<link rel='archives' title='June 2008' href='../../../../2008/06/index.html' />
+	<link rel='archives' title='May 2008' href='../../../../2008/05/index.html' />
+	<link rel='archives' title='April 2008' href='../../../../2008/04/index.html' />
+	<link rel='archives' title='March 2008' href='../../../../2008/03/index.html' />
+	<link rel='archives' title='February 2008' href='../../../../2008/02/index.html' />
+	<link rel='archives' title='January 2008' href='../../../../2008/01/index.html' />
+	<link rel='archives' title='November 2007' href='../../../11/index.html' />
+	<link rel='archives' title='October 2007' href='../../../10/index.html' />
+	<link rel='archives' title='September 2007' href='../../index.html' />
+	<link rel='archives' title='August 2007' href='../../../08/index.html' />
+	<link rel='archives' title='July 2007' href='../../../07/index.html' />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog &raquo; Re-raising Exceptions Comments Feed" href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/feed/" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="../../../../xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="../../../../wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='9/11/2007' href='../../11/9112007/index.html' />
+<link rel='next' title='FlatAtompub' href='../flatatompub/index.html' />
+<meta name="generator" content="WordPress 3.4.2" />
+<link rel='canonical' href='index.html' />
+<link rel='shortlink' href='http://blog.ianbicking.org/?p=29' />
+<link rel="stylesheet" href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"  type="text/css" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+        <style type="text/css" media="all">
+/*<![CDATA[*/
+body { font-size: 100%; }
+body { font-family: tahoma, geneva, sans-serif; }
+div.post-header, h2.post-title, p.post-date-single, h2.post-title-single, div.post-entry h1, div.post-entry h2, div.post-entry h3, div.post-entry h4, div.post-entry h5, div.post-entry h6, div.post-entry blockquote, div.post-footer, h3#comment-count, h4#comment-header, div#comments ol li p.comment-metadata, h4#respond { font-family: verdana, geneva, sans-serif; }
+div.post-entry p { text-align: left; }
+div#wrapper { width: 100%; }
+
+/*]]>*/
+</style>
+</head>
+<body>
+
+<div id="wrapper">
+
+	<div id="header" onclick="location.href='http://blog.ianbicking.org/';" style="cursor:pointer;">
+		<h1 id="title"><a href="../../../../index.html" title="Ian Bicking: a blog">Ian Bicking: a blog</a></h1>
+		<p id="description"></p>
+	</div>
+<!-- WP Theme Credits -->
+<div style="display: none;">We can answer on question <a href="http://www.olnevhost.net/vps-hosting.html">what is VPS</a>? and
+what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap dedicated servers</strong></a>?</div>
+<!-- END HEADER -->
+<div id="container">
+	<div id="content" class="widecolumn">
+
+
+		<div id="post-29" class="post single-post">
+			<p class="post-date-single">{ 2007 09 12 }</p>
+			<h2 class="post-title-single">Re-raising Exceptions</h2>
+			<div class="post-entry">
+				<div class="document">
+<p>After reading Chris McDonough&#8217;s <a class="reference external" href="http://plope.com/Members/chrism/now_not_to_write_python">What Not To Do When Writing Python Software</a>, it occurred to me that many people don&#8217;t actually know <em>how</em> to properly re-raise exceptions.  So a little mini-tutorial for Python programmers, about exceptions&#8230;</p>
+<p>First, this is bad:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">try</span>:<br />
+&nbsp; &nbsp; some_code<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="kw1">except</span>:<br />
+&nbsp; &nbsp; revert_stuff<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">raise</span> <span class="kw2">Exception</span><span class="br0">&#40;</span><span class="st0">&quot;some_code failed!&quot;</span><span class="br0">&#41;</span><br />
+&nbsp;</div>
+<p>It is bad because all the information about how <tt class="docutils literal"><span class="pre">some_code()</span></tt> failed is lost.  The traceback, the error message itself.  Maybe it was an expected error, maybe it wasn&#8217;t.</p>
+<p>Here&#8217;s a modest improvement (but still not very good):</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">try</span>:<br />
+&nbsp; &nbsp; some_code<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="kw1">except</span>:<br />
+&nbsp; &nbsp; <span class="kw1">import</span> <span class="kw3">traceback</span><br />
+&nbsp; &nbsp; <span class="kw3">traceback</span>.<span class="me1">print_exc</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; revert_stuff<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">raise</span> <span class="kw2">Exception</span><span class="br0">&#40;</span><span class="st0">&quot;some_code failed!&quot;</span><span class="br0">&#41;</span><br />
+&nbsp;</div>
+<p><tt class="docutils literal"><span class="pre">traceback.print_exc()</span></tt> prints the original traceback to stderr. Sometimes that&#8217;s the best you can do, because you really want to recover from an unexpected error.  But if you aren&#8217;t recovering, <em>this</em> is what you should do:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">try</span>:<br />
+&nbsp; &nbsp; some_code<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="kw1">except</span>:<br />
+&nbsp; &nbsp; revert_stuff<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">raise</span><br />
+&nbsp;</div>
+<p>Using <tt class="docutils literal"><span class="pre">raise</span></tt> with no arguments re-raises the last exception. Sometimes people give a blank <em>never use &#8220;except:&#8220;</em> statement, but this particular form (<tt class="docutils literal"><span class="pre">except:</span></tt> + <tt class="docutils literal"><span class="pre">raise</span></tt>) is okay.</p>
+<p>There&#8217;s another form of <tt class="docutils literal"><span class="pre">raise</span></tt> that not many people know about, but can also be handy.  Like <tt class="docutils literal"><span class="pre">raise</span></tt> with no arguments, it can be used to keep the traceback:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">try</span>:<br />
+&nbsp; &nbsp; some_code<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="kw1">except</span>:<br />
+&nbsp; &nbsp; <span class="kw1">import</span> <span class="kw3">sys</span><br />
+&nbsp; &nbsp; exc_info = <span class="kw3">sys</span>.<span class="me1">exc_info</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; maybe_raise<span class="br0">&#40;</span>exc_info<span class="br0">&#41;</span><br />
+<br />
+<span class="kw1">def</span> maybe_raise<span class="br0">&#40;</span>exc_info<span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="kw1">for</span> some reason this seems like it should be raised:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">raise</span> exc_info<span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>, exc_info<span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span>, exc_info<span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span><br />
+&nbsp;</div>
+<p>This can be handy if you need to handle the exception in some different part of the code from where the exception happened.  But usually it&#8217;s not that handy; it&#8217;s an obscure feature for a reason.</p>
+<p>Another case when people often clobber the traceback is when they want to add information to it, e.g.:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">for</span> lineno, line <span class="kw1">in</span> <span class="kw2">enumerate</span><span class="br0">&#40;</span><span class="kw2">file</span><span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; <span class="kw1">try</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; process_line<span class="br0">&#40;</span>line<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">except</span> <span class="kw2">Exception</span>, exc:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">raise</span> <span class="kw2">Exception</span><span class="br0">&#40;</span><span class="st0">&quot;Error in line %s: %s&quot;</span> % <span class="br0">&#40;</span>lineno, exc<span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp;</div>
+<p>You keep the error message here, but lose the traceback.  There&#8217;s a couple ways to keep that traceback.  One I sometimes use is to retain the exception, but change the message:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">except</span> <span class="kw2">Exception</span>, exc:<br />
+&nbsp; &nbsp; args = exc.<span class="me1">args</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="kw1">not</span> args:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; arg0 = <span class="st0">''</span><br />
+&nbsp; &nbsp; <span class="kw1">else</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; arg0 = args<span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><br />
+&nbsp; &nbsp; arg0 += <span class="st0">' at line %s'</span> % lineno<br />
+&nbsp; &nbsp; exc.<span class="me1">args</span> = arg0 + args<span class="br0">&#91;</span><span class="nu0">1</span>:<span class="br0">&#93;</span><br />
+&nbsp; &nbsp; <span class="kw1">raise</span><br />
+&nbsp;</div>
+<p>It&#8217;s a little awkward.  Technically (though it&#8217;s deprecated) you can raise <em>anything</em> as an exception.  If you use <tt class="docutils literal"><span class="pre">except</span> <span class="pre">Exception:</span></tt> you won&#8217;t catch things like string exceptions or other weird types. It&#8217;s up to you to decide if you care about these cases; I generally ignore them.  It&#8217;s also possible that an exception won&#8217;t have <tt class="docutils literal"><span class="pre">.args</span></tt>, or the string message for the exception won&#8217;t be derived from those arguments, or that it will be formatted in a funny way<br />
+(<tt class="docutils literal"><span class="pre">KeyError</span></tt> formats its message differently, for instance).  So this isn&#8217;t foolproof.  To be a bit more robust, you can get the exception like this:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">except</span>:<br />
+&nbsp; &nbsp; exc_class, exc, tb = <span class="kw3">sys</span>.<span class="me1">exc_info</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp;</div>
+<p><tt class="docutils literal"><span class="pre">exc_class</span></tt> will be a string, if someone does something like <tt class="docutils literal"><span class="pre">raise</span> <span class="pre">&quot;not</span> <span class="pre">found&quot;</span></tt>.  There&#8217;s a reason why that style is deprecated. Anyway, if you really want to mess around with things, you can then do:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+new_exc = <span class="kw2">Exception</span><span class="br0">&#40;</span><span class="st0">&quot;Error in line %s: %s&quot;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; % <span class="br0">&#40;</span>lineno, exc <span class="kw1">or</span> exc_class<span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+<span class="kw1">raise</span> new_exc.__class__, new_exc, tb<br />
+&nbsp;</div>
+<p>The confusing part is that you&#8217;ve changed the exception class around, but you have at least kept the traceback intact.  It can look a little odd to see <tt class="docutils literal"><span class="pre">raise</span> <span class="pre">ValueError(...)</span></tt> in the traceback, and <tt class="docutils literal"><span class="pre">Exception</span></tt> in the error message.</p>
+<p>Anyway, a quick summary of proper ways to re-raise exceptions in Python.  May your tracebacks prosper!</p>
+<p><strong>Update:</strong> Kumar notes the problem of errors in your error handler.  Things get more long winded, but here&#8217;s the simplest way I know of to deal with that:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">try</span>:<br />
+&nbsp; &nbsp; <span class="kw3">code</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="kw1">except</span>:<br />
+&nbsp; &nbsp; exc_info = <span class="kw3">sys</span>.<span class="me1">exc_info</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">try</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; revert_stuff<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">except</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1"># If this happens, it clobbers exc_info, which is why we had</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1"># to save it above</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">import</span> <span class="kw3">traceback</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">print</span> &gt;&gt; <span class="kw3">sys</span>.<span class="me1">stderr</span>, <span class="st0">&quot;Error in revert_stuff():&quot;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw3">traceback</span>.<span class="me1">print_exc</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">raise</span> exc_info<span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>, exc_info<span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span>, exc_info<span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span><br />
+&nbsp;</div>
+</div>
+<p>No related posts.</p>											</div><!-- END POST-ENTRY  -->
+			<!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			xmlns:dc="http://purl.org/dc/elements/1.1/"
+			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+		<rdf:Description rdf:about="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/"
+    dc:identifier="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/"
+    dc:title="Re-raising Exceptions"
+    trackback:ping="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/trackback/" />
+</rdf:RDF> -->
+			<div class="post-footer">
+				<p>Posted by Ian Bicking on Wednesday, September 12th, 2007, at 10:16 am, and filed under <a href="../../../../category/python/index.html" title="View all posts in Python" rel="category tag">Python</a>.</p>
+				<p>
+				Comments have a <a href='http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/feed/'>feed</a>.</p>
+			</div><!-- END POST-FOOTER -->
+		</div><!-- END POST -->
+
+<div id="comments">
+
+
+
+
+<h4 id="comments">23 Comments</h4>
+ <ul class="commentlist">
+		<li class="comment even thread-even depth-1" id="comment-861">
+				<div id="div-comment-861" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/10d0082f6312bba553f5907677370bf5?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://rpatterson.net' rel='external nofollow' class='url'>Ross Patterson</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-861">
+			September 12, 2007 at 1:00 pm</a>		</div>
+
+		<p>Scratch that, stupid mistake on my part.  Still might be worth mentioning try/finally while we&#8217;re talking about this:</p>
+
+<pre><code>try:
+    some_code()
+finally:
+    cleanup_stuff()
+</code></pre>
+
+<p>when cleanup stuff needs to be executed whether there is an error not.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1" id="comment-862">
+				<div id="div-comment-862" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-862">
+			September 12, 2007 at 1:03 pm</a>		</div>
+
+		<p>No!  <code>finally:</code> blocks are <em>always</em> run, success or failure.  You don&#8217;t want to <code>revert_stuff()</code> always, you only want to do it in the case of an exception.  <code>except:/raise</code> does that.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-863">
+				<div id="div-comment-863" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/10d0082f6312bba553f5907677370bf5?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://rpatterson.net' rel='external nofollow' class='url'>Ross Patterson</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-863">
+			September 12, 2007 at 1:05 pm</a>		</div>
+
+		<p>Heh, yup caught that right after I posted it. :)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-864">
+				<div id="div-comment-864" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/3e7e975f0fa432f4ae6604f72c132309?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://farmdev.com/' rel='external nofollow' class='url'>Kumar McMillan</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-864">
+			September 12, 2007 at 1:20 pm</a>		</div>
+
+		<p>Thanks for posting, Ian.  Like many of us, I had to learn all this the hard way ;)</p>
+
+<p>Along the lines of your last example,</p>
+
+<pre><code>raise new_exc.__class__, new_exc, tb
+</code></pre>
+
+<p>it is very tempting to do this:</p>
+
+<pre><code>except:
+    exc_class, exc, tb = sys.exc_info()
+    raise exc_class("%s (occurred while Foo'ing)" % exc), None, tb
+</code></pre>
+
+<p>but this introduces a very subtle bug where if the exception constructor accepts a non-standard number of args then it will give you a very confusing error with a traceback leading to the wrong place.  This bit me once and I had to update a lot of code (!) so I thought it was worth pointing out.  Creating a new exception like you did is the safe approach.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment byuser comment-author-ianb bypostauthor even thread-even depth-1" id="comment-865">
+				<div id="div-comment-865" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-865">
+			September 12, 2007 at 1:29 pm</a>		</div>
+
+		<p><code>UnicodeEncode/DecodeError</code> is probably the worse &#8212; it has a particularly complicated constructor.  And it&#8217;s pretty common to boot.  And it breaks my recipe about modifying <code>exc.args</code> too &#8212; the message there is actually in <code>exc.args[-1]</code>, not <code>exc.args[0]</code> (or the closest thing to a single message).  Adding to <code>exc.args</code> also doesn&#8217;t work in that case, as any extra items are just ignored.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-866">
+				<div id="div-comment-866" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cef73ce48ef6de5d8c27e6f085057814?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://darkness.codefu.org' rel='external nofollow' class='url'>Dale Sedivec</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-866">
+			September 12, 2007 at 1:30 pm</a>		</div>
+
+		<p><a href="http://docs.python.org/lib/module-sys.html" rel="nofollow">http://docs.python.org/lib/module-sys.html</a> says:</p>
+
+<blockquote>Warning: Assigning the traceback return value to a local variable in a function that is handling an exception will cause a circular reference. This will prevent anything referenced by a local variable in the same function or by the traceback from being garbage collected. Since most functions don&#8217;t need access to the traceback, the best solution is to use something like exctype, value = sys.exc_info()[:2] to extract only the exception type and value. If you do need the traceback, make sure to delete it after use (best done with a try &#8230; finally statement) or to call exc_info() in a function that does not itself handle an exception. Note: Beginning with Python 2.2, such cycles are automatically reclaimed when garbage collection is enabled and they become unreachable, but it remains more efficient to avoid creating cycles.</blockquote>
+
+<p>This passage has always scared me a little bit, so I&#8217;ve made a point to either <code>del exc_info</code> (<code>exc_info</code> as you&#8217;ve used in your examples) or just not assign it to a local variable.  So above you could <code>maybe_raise(sys.exc_info())</code> to avoid creating the cycle, or just have <code>maybe_raise</code> call <code>sys.exc_info()</code> itself.  I think.</p>
+
+<p>For trivial examples this isn&#8217;t a deal-breaker, but I&#8217;d imagine this could cause a lot of extra memory to be allocated if the exception handling is frequently used.  (Of course, that&#8217;s not very exceptional, is it?)</p>
+
+<p>(Also, the Markdown code you&#8217;re using doesn&#8217;t seem to get &#8220;&lt;<a href="http://whatever&#038;gt" rel="nofollow">http://whatever&#038;gt</a>;&#8221; right, nor &#8220;&gt; foo&#8221; for a blockquote?  And it seems like I can&#8217;t get a &lt; in a code section?  Or is that just a broken preview?)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1 parent" id="comment-890">
+				<div id="div-comment-890" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/c82b7991f8e83a990aab7cdc48dde9ce?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Paul Winkler</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-890">
+			September 13, 2007 at 8:43 am</a>		</div>
+
+		<p>I&#8217;m fond of this little function for those cases when I don&#8217;t want to re-raise but I still want to know what happened:</p>
+
+<pre><code>def log_exception(level=logging.ERROR):
+    """Log the most recent exception and traceback
+    at the given level (default ERROR).
+    """
+    f = cStringIO.StringIO()
+    traceback.print_exc(file=f)
+    logging.getLogger().log(level=level, msg=f.getvalue())
+</code></pre>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment odd alt depth-2 parent" id="comment-136202">
+				<div id="div-comment-136202" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/5666019ae946f06e81d3729416b76d9d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Hari</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-136202">
+			November 2, 2009 at 2:07 pm</a>		</div>
+
+		<p>Paul, You can achieve the same with the following inline code:</p>
+
+<pre><code>logging.getLogger("Exception ignored during finally", exc_info=1)
+</code></pre>
+
+<p>However, what I like to do in such a scenario is is to conditionally propagate the exception, something like this (for a db operation):</p>
+
+<pre><code>success = 0
+try:
+    do_db_operation()
+    success = 1
+finally:
+    if not success:
+        try:
+            do_rollback()
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            logging.getLogger("Exception in cleanup ignored due to a pending exception on stack", exc_info=1)
+    else:
+        do_commit()
+</code></pre>
+
+<p>The advantage is that if the db operation fails (say a constraint violation), then it does a rollback (while making sure to not stomp on the original exception), but when the operation succeeds, any exception in commit is taken seriously and so is propagated.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-3" id="comment-136203">
+				<div id="div-comment-136203" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/5666019ae946f06e81d3729416b76d9d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Hari</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-136203">
+			November 2, 2009 at 2:10 pm</a>		</div>
+
+		<p>Ooops&#8230; sorry, the logging call has a typo, it should be:</p>
+
+<pre><code>            logging.getLogger().error("Exception in cleanup ignored due to a pending exception on stack", exc_info=1)
+</code></pre>
+
+<p>or simply:</p>
+
+<pre><code>            logging.getLogger().exception("Exception in cleanup ignored due to a pending exception on stack")
+</code></pre>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+</ul>
+</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-894">
+				<div id="div-comment-894" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/b414e31ca2b5066c5795738e564b2291?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Rafał Dowgird</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-894">
+			September 13, 2007 at 11:40 am</a>		</div>
+
+		<p>Adding information to exceptions has been very nicely implemented in Java &#8211; you can pass the original exception to your exception&#8217;s constructor and get a chained stack trace. 
+Flame away, but I think that Java beats Python in this area .</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-909">
+				<div id="div-comment-909" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/66234f9514ade7c8b61943869c3d9ada?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">nex</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-909">
+			September 14, 2007 at 8:13 am</a>		</div>
+
+		<p>There may be some very useful information in the above blog post, but I only skimmed it and walked away with the suspicion that it&#8217;s all bullshit. Here&#8217;s why (in the hope that you&#8217;ll fix this, Ian): In <em>none</em> of the examples the except clause mentions a specific exception. (It wouldn&#8217;t have to be a real exception, FooException would do for the purposes of an explanation.) I.e. <em>all</em> of the examples are doing it WRONG.</p>
+
+<p>Of course you&#8217;re throwing away information when you <code>try</code> something, and if it fails, no matter how exactly it fails, you always react in exactly the same way and raise an exception of your own that pretends to tell users/developers what actually happened. The information that is now hopelessly lost is whether that error handling was actually appropriate, whether the <code>except</code> clause actually dealt with the original exception that had come up.</p>
+
+<p>On the other hand, it is entirely plausible that I know for sure that when accessing my <code>user_dict</code> raises a <code>KeyError</code> (not <em>any</em> error, mind you!), it is appropriate to react by swallowing that error and raising my own <code>UserDoesntExistException</code>. It is entirely plausible that, in this case, there&#8217;s no benefit to be gained from re-raising that <code>KeyError</code> and bothering the users of my library with implementation details that they don&#8217;t need to care about.</p>
+
+<p>However, it&#8217;s important to make the relevant <code>except</code> clause specific to <code>KeyError</code> &#8212; it would be a mistake to lazily write <code>except:</code> instead of <code>except KeyError:</code>.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-914">
+				<div id="div-comment-914" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/21e10bea0de20a200e5c7801e10227a9?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Brian Clapper</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-914">
+			September 14, 2007 at 8:52 am</a>		</div>
+
+		<p><em>Adding information to exceptions has been very nicely implemented in Java &#8211; you can pass the original exception to your exception’s constructor and get a chained stack trace. Flame away, but I think that Java beats Python in this area .</em></p>
+
+<p>That feature showed up in Java in the 1.4 release, I believe. It wasn&#8217;t there originally; I know, because I had to implement it myself before Java 1.4 was out. It&#8217;s also not a feature of the language, per se; it&#8217;s a feature of how the exception library classes are written. Seems to me that one could add the capability of nested, or wrapped, exceptions to Python easily enough.</p>
+
+<p>It <em>is</em> a useful solution to the problem, because you get tracebacks for everything in the chain of nested exceptions. A little verbose at times, but a useful compromise.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment byuser comment-author-ianb bypostauthor even thread-even depth-1" id="comment-915">
+				<div id="div-comment-915" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-915">
+			September 14, 2007 at 9:07 am</a>		</div>
+
+		<p>nex: when you respond to something after only skimming the article, you run the risk of looking dumb.  Like now.  When you <em>re-raise</em> an exception, you are looking for <em>unexpected</em> exceptions.  You don&#8217;t know what the exception is.  And you don&#8217;t have to swallow it, that&#8217;s exactly what I&#8217;m showing in this article.</p>
+
+<p>re: Java &#8212; I believe (maybe only in py3k&#8230;?) that the traceback object is being added as an instance variable in the exception, which will probably make this all easier, and similar to in Java.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-917">
+				<div id="div-comment-917" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/3e7e975f0fa432f4ae6604f72c132309?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://farmdev.com/' rel='external nofollow' class='url'>Kumar McMillan</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-917">
+			September 14, 2007 at 9:21 am</a>		</div>
+
+		<p>Cascading tracebacks is an interesting idea.  I wonder if it would be annoying or useful if you actually saw each traceback, terminating at the spots you had caught/re-raised.  In the current one-traceback world of Python, life is simpler, but in those rare cases where an exception is raised in your exception-handling code then you might as well be writing PHP4: you have to retrace your steps, uncomment stuff, etc, before you can figure out the root cause.  Of course one could hand-code cascading tracebacks with the <code>traceback.print_exc()</code> recipe above but if there was a way to make python do this automatically that might be useful.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-918">
+				<div id="div-comment-918" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/66234f9514ade7c8b61943869c3d9ada?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">nex</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-918">
+			September 14, 2007 at 10:11 am</a>		</div>
+
+		<p>Thanks for the quick reply, Ian! Now I know why my suspicion was dumb. I got confused when you mentioned recovering from unexpected errors. Is there actually a way to recover from the error (then it can&#8217;t be unexpected, as we did anticipate it, and we should have explicitly declared which error we&#8217;re trying to recover from), or is the program going to abort with failure anyways? I don&#8217;t think the latter case is what &#8220;What Not To Do When Writing Python Software&#8221; was talking about, and when people use <code>except:</code> in that latter case, they&#8217;re most often doing it wrong.</p>
+
+<p>Then again, this is exactly what you&#8217;re tackling here, teaching people how to do it <strong>right</strong>. So, all is well; but I think my confusion is excusable, since re-raising actually doesn&#8217;t necessarily imply that you&#8217;re dealing with a catastrophic failure and are going to abort without an attempt of recovery. That&#8217;s just one case. (Another case, for example, would be guarding against a <em>specific</em> error, trying to handle it, and having the error handling fail. I can think of more examples, but I&#8217;m sure you can do so as well.)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-921">
+				<div id="div-comment-921" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/10d0082f6312bba553f5907677370bf5?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://rpatterson.net' rel='external nofollow' class='url'>Ross Patterson</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-921">
+			September 14, 2007 at 11:12 am</a>		</div>
+
+		<p>Re: Adding information to exceptions/Java</p>
+
+<p>Would the [tb_next](<a href="http://docs.python.org/ref/types.html#traceback" rel="nofollow">http://docs.python.org/ref/types.html#traceback</a> &#8220;Python Language Reference&#8221;) attribute of traceback objects serve this purpose?</p>
+
+<p>Ross</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment byuser comment-author-ianb bypostauthor even thread-even depth-1" id="comment-922">
+				<div id="div-comment-922" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-922">
+			September 14, 2007 at 11:20 am</a>		</div>
+
+		<p><code>tb_next</code> can be used to walk through the frames of the traceback; the traceback object looks kind of like a linked list of calling frames.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-925">
+				<div id="div-comment-925" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/b414e31ca2b5066c5795738e564b2291?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Rafał Dowgird</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-925">
+			September 14, 2007 at 11:45 am</a>		</div>
+
+		<p>Re: Traceback as an instance variable in exceptions</p>
+
+<p>Traceback as an instance variable is a good start, combined with an optional &#8217;cause exception&#8217; instance variable would practically yield the Java solution. Well, this and support in the &#8216;language culture&#8217; &#8211; making people actually use it :-)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-16242">
+				<div id="div-comment-16242" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/3b28c2ff1904a2b8f051f0992deabfb6?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.flyingsymbols.com' rel='external nofollow' class='url'>David Hogarty</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-16242">
+			March 26, 2008 at 12:39 pm</a>		</div>
+
+		<p>(accidental double post, sorry)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-16243">
+				<div id="div-comment-16243" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/3b28c2ff1904a2b8f051f0992deabfb6?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.flyingsymbols.com' rel='external nofollow' class='url'>David Hogarty</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-16243">
+			March 26, 2008 at 12:45 pm</a>		</div>
+
+		<p>Ian, was just attempting to use the &#8216;add message&#8217; recipe, and found it had a type error:</p>
+
+<pre><code>except Exception, exc:
+    args = exc.args
+    if not args:
+        arg0 = ''
+    else:
+        arg0 = args[0]
+    arg0 += ' at line %s' % lineno
+    exc.args = arg0 + args[1:]
+    raise
+</code></pre>
+
+<p>the second to last line should be </p>
+
+<pre><code>exc.args = (arg0,) + args[1:]
+</code></pre>
+
+<p>Here&#8217;s a slightly more worked-out example, maybe a little over-functional 
+in style, but it&#8217;s flexible. With the <code>prepend_exc_str</code> function
+(defined later), you can do:</p>
+
+<pre><code>def prepend():
+    try:
+        dummy = b # throws NameError
+    except Exception, exc:
+        prepend_exc_str(exc, 'Message: ')
+        raise
+prepend()
+</code></pre>
+
+<p>and get the result:</p>
+
+<pre><code>Traceback (most recent call last):
+  File "msg_add.py", line 44, in ?
+    prepend()
+  File "msg_add.py", line 31, in prepend
+    dummy = b # throws NameError
+NameError: Message: global name 'b' is not defined
+</code></pre>
+
+<p>Here&#8217;s the code, ready to change for other forms of message modification:</p>
+
+<pre><code>def prepend_str(main, str):
+    return str + main
+
+def append_str(main, str):
+    return main + str
+
+def modify_exc_str_func(func):
+    def inner_func(exc, str):
+        # modifies exception in-place, so no return value
+        # based on original by Ian Bicking:
+        # &lt;a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/" rel="nofollow"&gt;http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/&lt;/a&gt;
+        args = exc.args
+        if not args:
+            arg0 = ''
+        else: arg0 = args[0]
+        arg0 = func(arg0, str)
+        exc.args = (arg0,) + args[1:]
+    return inner_func
+
+prepend_exc_str = modify_exc_str_func(prepend_str)
+append_exc_str = modify_exc_str_func(append_str)
+</code></pre>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-28325">
+				<div id="div-comment-28325" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/a72e34437ff2a048717b7b964940b0b3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Holger</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-28325">
+			August 19, 2008 at 3:08 am</a>		</div>
+
+		<p>Very helpful discussion. A Late comment:</p>
+
+<p>The issue of re-raising base Exception instead of the original exception to avoid non-standard exception class constructors (like e.g. UnicodeEncodeError) could be addressed by dynamically creating a derived exception class:</p>
+
+<pre><code>def reraise(exc_info=(None, None, None), errorMsg=''):
+    """Re-raise the latest exception given by exc_info tuple (as returned by
+    sys.exc_info()) with additional errorMsg text.
+    Exceptions with non-standard constructors get re-raised as derived
+    exceptions, with recorded original error message and original traceback.
+    Parameters:
+        exc_info: (, , )
+            tuple
+        errorMsg: error message text to add to the exception error message
+    """
+    excClass, exc, tb = exc_info
+    try:
+        # re-raise original exception with added custom error message
+        raise excClass, excClass("%s: %s" % (exc, errorMsg)), tb
+    except TypeError:
+        if excClass == TypeError:
+            # original exception is TypeError, which has a standard constructor:
+            # safe to re-raise this way
+            raise excClass, excClass("%s: %s" % (exc, errorMsg)), tb
+
+        # TypeError due to non-standard exception constructor 
+        if issubclass(excClass, Exception):
+            # raise derived exception class with added custom error message
+            class CustomInfoException(excClass):
+                def __init__(self, info='', args=[]):
+                    self._info = info
+                    excClass.__init__(self, *args)
+
+                def __str__(self):
+                    return "%s: %s" % (excClass.__str__(self), self._info)
+
+            CustomInfoException.__name__ = excClass.__name__
+            raise CustomInfoException, \
+                  CustomInfoException(info=errorMsg, args=exc.args), tb
+        else:
+            # raise base Exception class with added original exception
+            # message plus custom error message. Safe for old string exceptions.
+            raise Exception, \
+                  Exception("%s: %s: %s"
+                            % (getattr(excClass, '__name__', excClass), exc or
+                               excClass, errorMsg)), tb
+</code></pre>
+
+<p>As a derived class, the re-raised exception would even be caught later on if a dedicated exception
+handler for the original exception existed somewhere further up the call stack.</p>
+
+<p>In action:</p>
+
+<pre><code>&amp;gt;&amp;gt;&amp;gt; a = u'\xe4'
+&amp;gt;&amp;gt;&amp;gt; def foo(s):
+ ...     try:
+ ...             b = str(s)
+ ...     except:
+ ...             reraise(sys.exc_info(), "really common problem")
+ ...
+ &amp;gt;&amp;gt;&amp;gt; foo(a)
+ Traceback (most recent call last):
+   File "", line 1, in ?
+   File "", line 5, in foo
+   File "", line 3, in foo
+ __main__.UnicodeEncodeError: 'ascii' codec can't encode character u'\xe4' in position 0: ordinal
+ not in range(128): really common problem
+&amp;gt;&amp;gt;&amp;gt;
+</code></pre>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-42935">
+				<div id="div-comment-42935" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/a72e34437ff2a048717b7b964940b0b3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Holger</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-42935">
+			September 12, 2008 at 2:16 am</a>		</div>
+
+		<p>Correction:
+issubclass() raises an error itself when fed with a non-class first argument, so reraise() should be:</p>
+
+<pre><code>def reraise(exc_info=(None, None, None), errorMsg=''):
+    """Re-raise the latest exception given by exc_info tuple (as returned by
+    sys.exc_info()) with additional errorMsg text.
+    Exceptions with non-standard constructors get re-raised as derived
+    exceptions, with recorded original error message and original traceback.
+    Parameters:
+        exc_info: (&lt;exception class&gt;, &lt;exception instance&gt;, &lt;traceback object&gt;)
+            tuple
+        errorMsg: error message text to add to the exception error message
+    """
+    excClass, exc, tb = exc_info
+    try:
+        # re-raise original exception with added custom error message
+        raise excClass, excClass("%s: %s" % (exc, errorMsg)), tb
+    except TypeError:
+        if excClass == TypeError:
+            # original exception is TypeError, which has a standard constructor:
+            # safe to re-raise this way
+            raise excClass, excClass("%s: %s" % (exc, errorMsg)), tb
+
+        # TypeError due to non-standard exception constructor 
+        if isinstance(excClass, (types.ClassType, type)) \
+           and issubclass(excClass, Exception):
+            # raise derived exception class with added custom error message
+            class CustomInfoException(excClass):
+                def __init__(self, info='', args=[]):
+                    self._info = info
+                    excClass.__init__(self, *args)
+
+                def __str__(self):
+                    return "%s: %s" % (excClass.__str__(self), self._info)
+
+            CustomInfoException.__name__ = excClass.__name__
+            raise CustomInfoException, \
+                  CustomInfoException(info=errorMsg, args=exc.args), tb
+        else:
+            # raise base Exception class with added original exception
+            # message plus custom error message. Safe for old string exceptions.
+            raise Exception, \
+                  Exception("%s: %s: %s"
+                            % (getattr(excClass, '__name__', excClass), exc or
+                               excClass, errorMsg)), tb
+</code></pre>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-147150">
+				<div id="div-comment-147150" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/71769ccb36542192a8e45a13bc89979a?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://buriy.com' rel='external nofollow' class='url'>Yuri Baburov</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2007/09/12/re-raising-exceptions/comment-page-1/#comment-147150">
+			January 12, 2010 at 2:11 pm</a>		</div>
+
+		<p>Well, in simple cases, when you don&#8217;t need to change message and just do re-raise,
+you can use the simple <code>raise exc_info[1], None, exc_info[2]</code></p>
+
+<p>Your <code>raise exc_info[0], exc_info[1], exc_info[2]</code> is incorrect, at least, in Python 2.5!</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+
+<div class="navigation">
+<div class="alignleft"></div>
+<div class="alignright"></div>
+</div>
+
+
+
+
+</div>
+
+		<div class="navigation">
+			<div class="nav-left">&laquo; <a href="../../11/9112007/index.html" rel="prev">9/11/2007</a></div>
+			<div class="nav-right"><a href="../flatatompub/index.html" rel="next">FlatAtompub</a> &raquo;</div>
+		</div><!-- END NAVIGATION -->
+
+
+	</div><!-- END CONTENT -->
+</div><!-- END CONTAINER  -->
+
+<div id="sidebar">
+	<ul>
+		<li id="home-link">
+			<h2><a href="../../../../index.html" title="Ian Bicking: a blog">Home</a></h2>
+		</li>
+<li id="text-315934862" class="widget widget_text"><h2 class="widgettitle">About</h2>
+			<div class="textwidget">Ian is a developer with Mozilla, <a href="http://ianbicking.appspot.com/projects">Python open source developer</a>, actually uses <a href="https://plus.google.com/u/0/104537541227697934010/posts">Google+</a> more than <a href="http://twitter.com/ianbicking">twitter</a> and lives in Minneapolis.<br>
+<span class="gittip-0001" gittip-username="ianbicking"></span>
+<script id="gittip-0001"
+  src="https://www.gittip.com/assets/widgets/0001.js"></script>
+</div>
+		</li>
+<li id="text-315934863" class="widget widget_text">			<div class="textwidget"><!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> --></div>
+		</li>
+<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
+		<ul>
+			<li><a href='../../../../2012/10/index.html' title='October 2012'>October 2012</a></li>
+	<li><a href='../../../../2012/02/index.html' title='February 2012'>February 2012</a></li>
+	<li><a href='../../../../2011/04/index.html' title='April 2011'>April 2011</a></li>
+	<li><a href='../../../../2011/03/index.html' title='March 2011'>March 2011</a></li>
+	<li><a href='../../../../2010/09/index.html' title='September 2010'>September 2010</a></li>
+	<li><a href='../../../../2010/08/index.html' title='August 2010'>August 2010</a></li>
+	<li><a href='../../../../2010/05/index.html' title='May 2010'>May 2010</a></li>
+	<li><a href='../../../../2010/04/index.html' title='April 2010'>April 2010</a></li>
+	<li><a href='../../../../2010/03/index.html' title='March 2010'>March 2010</a></li>
+	<li><a href='../../../../2010/02/index.html' title='February 2010'>February 2010</a></li>
+	<li><a href='../../../../2010/01/index.html' title='January 2010'>January 2010</a></li>
+	<li><a href='../../../../2009/09/index.html' title='September 2009'>September 2009</a></li>
+	<li><a href='../../../../2009/05/index.html' title='May 2009'>May 2009</a></li>
+	<li><a href='../../../../2009/04/index.html' title='April 2009'>April 2009</a></li>
+	<li><a href='../../../../2009/01/index.html' title='January 2009'>January 2009</a></li>
+	<li><a href='../../../../2008/12/index.html' title='December 2008'>December 2008</a></li>
+	<li><a href='../../../../2008/11/index.html' title='November 2008'>November 2008</a></li>
+	<li><a href='../../../../2008/10/index.html' title='October 2008'>October 2008</a></li>
+	<li><a href='../../../../2008/09/index.html' title='September 2008'>September 2008</a></li>
+	<li><a href='../../../../2008/08/index.html' title='August 2008'>August 2008</a></li>
+	<li><a href='../../../../2008/07/index.html' title='July 2008'>July 2008</a></li>
+	<li><a href='../../../../2008/06/index.html' title='June 2008'>June 2008</a></li>
+	<li><a href='../../../../2008/05/index.html' title='May 2008'>May 2008</a></li>
+	<li><a href='../../../../2008/04/index.html' title='April 2008'>April 2008</a></li>
+	<li><a href='../../../../2008/03/index.html' title='March 2008'>March 2008</a></li>
+	<li><a href='../../../../2008/02/index.html' title='February 2008'>February 2008</a></li>
+	<li><a href='../../../../2008/01/index.html' title='January 2008'>January 2008</a></li>
+	<li><a href='../../../11/index.html' title='November 2007'>November 2007</a></li>
+	<li><a href='../../../10/index.html' title='October 2007'>October 2007</a></li>
+	<li><a href='../../index.html' title='September 2007'>September 2007</a></li>
+	<li><a href='../../../08/index.html' title='August 2007'>August 2007</a></li>
+	<li><a href='../../../07/index.html' title='July 2007'>July 2007</a></li>
+		</ul>
+</li>
+<li id="text-315934861" class="widget widget_text">			<div class="textwidget"><a href="../../../../archive/index.html">The Older Archives</a></div>
+		</li>
+<li id="categories-1" class="widget widget_categories"><h2 class="widgettitle">Categories</h2>
+		<ul>
+	<li class="cat-item cat-item-12"><a href="../../../../category/erlang/index.html" title="View all posts filed under Erlang">Erlang</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="../../../../category/html/index.html" title="View all posts filed under HTML">HTML</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="../../../../category/javascript/index.html" title="View all posts filed under Javascript">Javascript</a>
+</li>
+	<li class="cat-item cat-item-15"><a href="../../../../category/licensing/index.html" title="View all posts filed under Licensing">Licensing</a>
+</li>
+	<li class="cat-item cat-item-18"><a href="../../../../category/mozilla/index.html" title="View all posts filed under Mozilla">Mozilla</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="../../../../category/notech/index.html" title="View all posts filed under Non-technical">Non-technical</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="../../../../category/olpc/index.html" title="View all posts filed under OLPC">OLPC</a>
+</li>
+	<li class="cat-item cat-item-14"><a href="../../../../category/packaging/index.html" title="View all posts filed under Packaging">Packaging</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="../../../../category/politics/index.html" title="View all posts filed under Politics">Politics</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="../../../../category/programming/index.html" title="View all posts filed under Programming">Programming</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="../../../../category/python/index.html" title="View all posts filed under Python">Python</a>
+</li>
+	<li class="cat-item cat-item-10"><a href="../../../../category/ruby/index.html" title="View all posts filed under Ruby">Ruby</a>
+</li>
+	<li class="cat-item cat-item-19"><a href="../../../../category/security/index.html" title="View all posts filed under Security">Security</a>
+</li>
+	<li class="cat-item cat-item-16"><a href="../../../../category/silverlining.1" title="View all posts filed under Silver Lining">Silver Lining</a>
+</li>
+	<li class="cat-item cat-item-20"><a href="../../../../category/programming/testing/index.html" title="View all posts filed under Testing">Testing</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="../../../../category/web/index.html" title="View all posts filed under Web">Web</a>
+</li>
+	<li class="cat-item cat-item-13"><a href="../../../../category/zopeplone/index.html" title="View all posts filed under Zope/Plone">Zope/Plone</a>
+</li>
+		</ul>
+</li>
+<li id="search-2" class="widget widget_search"><form id="searchform" method="get" action="../../../../index.html">
+	<div>
+		<input id="s" name="s" type="text" value="" tabindex="1" size="10" />
+		<input id="searchsubmit" name="searchsubmit" type="submit" value="Find" tabindex="2" />
+	</div>
+</form> </li>
+		<li id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widgettitle">Recent Posts</h2>
+		<ul>
+				<li><a href="../../../../index.html?p=291" title="Why doctest.js is better than Python&#8217;s doctest">Why doctest.js is better than Python&#8217;s doctest</a></li>
+				<li><a href="../../../../index.html?p=283" title="Python Application Package">Python Application Package</a></li>
+				<li><a href="../../../../index.html?p=277" title="Git-as-sync, not source-control-as-deployment">Git-as-sync, not source-control-as-deployment</a></li>
+				<li><a href="../../../../index.html?p=253" title="My Unsolicited Advice For PyPy">My Unsolicited Advice For PyPy</a></li>
+				<li><a href="../../../../index.html?p=250" title="A Python Web Application Package and Format (we should make one)">A Python Web Application Package and Format (we should make one)</a></li>
+				</ul>
+		</li>
+<li id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widgettitle">Recent Comments</h2>
+<ul id="recentcomments"><li class="recentcomments"><a href='http://www.mirsa.com.tr' rel='external nofollow' class='url'>havalandırma</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://redealmeidense.com.br/portalx/modules/' rel='external nofollow' class='url'>this website</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Eric Pierce on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Paul Brian on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://benjiyork.com' rel='external nofollow' class='url'>Benji York</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320">Why doctest.js is better than Python&#8217;s doctest</a></li></ul></li>
+	</ul>
+</div>
+
+	<div id="footer">
+		<p>
+			&copy; 2013 Ian Bicking<!--
+Does this commenting make me evil?
+			|
+			Thanks, <a href="http://wordpress.org/" title="WordPress">WordPress</a>
+			|
+			<a href="http://www.plaintxt.org/themes/barthelme/" title="Barthelme for WordPress" rel="follow">Barthelme</a> theme by <a href="http://scottwallick.com/" title="scottwallick.com" rel="follow">Scott</a>
+			| <!-- The following is a link to the theme author's sponsor. Please consider its smallness and that Scott was nice enough to make this theme publically available. -->
+			Sponsor: <a href="http://www.active-sandals.com/womreefsan.html" title="Support: Reef Sandals">Reef Sandals</a>
+			|
+			Valid <a href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1" title="Valid XHTML 1.0 Strict" rel="nofollow">XHTML</a> &amp; <a href="http://jigsaw.w3.org/css-validator/validator?uri=http://blog.ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no" title="Valid CSS" rel="nofollow">CSS</a>
+			|
+			-->
+			RSS: <a href="../../../../feed/rss/index.html" title="Ian Bicking: a blog RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Posts</a> &amp; <a href="../../../../comments/feed/index.html" title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Comments</a>
+		</p>
+	</div>
+
+</div><!-- END WRAPPER -->
+
+	<!-- Somehow 39 queries occured in 1.279 seconds. Magic! -->
+	<!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
+	<script type='text/javascript' src='../../../../wp-includes/js/comment-reply.js?ver=3.4.2'></script>
+
+<!-- Google Analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script>
+
+</body>
+</html>

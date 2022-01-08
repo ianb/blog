@@ -1,0 +1,211 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>So many accessors...</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>So many accessors...</h1>
+ <div style="text-align: center;">
+
+<span style="background-color: rgb(51, 153, 255);">(Were you looking for </span><a href="websig.html" style="background-color: rgb(51, 153, 255);">Web-SIG</a><span style="background-color: rgb(51, 153, 255);">?)</span><br /></div><p>Both <a href="http://cheetahtemplate.org">Cheetah</a> and ZPT's <a href="http://dev.zope.org/Wikis/DevSite/Projects/ZPT/TALES%20Specification%201.3">TALES</a>
+use a sort of soft sense of traversal.  When you call
+<tt>\$person.address.city</tt> in Cheetah (or
+<tt>person/address/city</tt> in TALES) that might be equivalent to
+<tt>person().address().city()</tt>, or maybe
+<tt>person['address'].city</tt> or <tt>person().address()['city']</tt>
+or any number of combinations.
+
+</p><p>
+
+This is really convenient.  You don't have to think too much about
+what each object is.  You are, after all, giving explicit names
+(address, city), and these names explain just what you are trying to
+do (different from if it meant <tt>person(address)[city]</tt>).
+What's really the difference between a dictionary and an attribute?  A
+property and a method that takes zero arguments?
+
+</p><p>
+
+Part of the justification of this is that both Cheetah and ZPT/TALES
+are for displaying information.  Your template isn't supposed to
+<i>do</i> anything, it's not supposed to have side-effects.  So any
+methods you call shouldn't matter.  And attributes and dictionaries
+have always been fuzzy -- every object has its <tt>__dict__</tt> after
+all.
+
+</p><p>
+
+But even in spite of these objects, what really is the value of these
+different kinds of accessors?  Does <tt>person.address</tt> really
+mean something different than <tt>person['address']</tt>?  And what
+use is a method object really, do you often want to know what
+<tt>person.address</tt> is <i>in addition to</i>
+<tt>person.address<b>()</b></tt>?
+
+</p><p>
+
+I think there are justifications for Python's various accessors, but I
+also think there's real value in simplifying these.  We have some of
+that with <tt>property</tt> (and in one man's opinion, yay), and that
+allows us to avoid many methods (my general policy is that getting a
+property should never have side-effects, but otherwise zero-argument
+methods are fair game for propertyization).  The attribute/dictionary
+distinction still exists, though.
+
+</p><p>
+
+I think my general rule will be: don't use <tt>__getitem__</tt> unless
+you really want to create something dictionary-like.  (Or maybe if you
+want to use attributes that aren't valid Python identifiers; then
+__getitem__ and __getattr__ maybe should be synonyms)
+</p>
+ <div class="dates" align="right">
+Created 22 Oct '03<br>
+Modified 25 Jan '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ I'm in complete agreement with you about a "prohibition"
+<br />
+against attribute access causing side-effects, so long as
+<br />
+we're careful to define side-effects in terms of the
+<br />
+"true job" of the object, not "infrastructure" within the
+<br />
+object (which is to say caching, lazy evaluation, etc.,
+<br />
+would all implicitly induce side-effects in that they would,
+<br />
+respectively, update the cache, set the lazy pointer, etc.)
+<br />
+
+<br />
+But to your real point :-) I like to think of the different
+<br />
+accessors as different <i>namespaces</i>. For a long time,
+<br />
+I've wanted to unify those namespaces, but I've finally
+<br />
+realized it's not always possible or desirable to do so.
+<br />
+
+<br />
+In fact, in some recent design work I've been doing (no snarky
+<br />
+comments, here, Ian :-) ) on a more intuitive XML <-> Python
+<br />
+object mapping, I've been considering how to deal with the
+<br />
+plethora of namespaces XML has. I'm not even talking about
+<br />
+actual <i>XML Namespaces</i>, but, rather, the different
+<br />
+dimensions along which one can assign names in XML, like
+<br />
+tags/elements, attributes, entities, namespace prefixes, and
+<br />
+so forth.
+<br />
+
+<br />
+In figuring out how to "intuitively" map that to Python, I'm
+<br />
+trying to wrap my head around the idea of using __getattr__
+<br />
+and __getitem__ and so forth to break things up and provide
+<br />
+separate namespaces mapping (inasmuch as it's possible) to
+<br />
+the appropriate XML counterparts.
+<br />
+
+<br />
+The point of this long-winded comment being that it's quite
+<br />
+possibly instructive to think of .foo and ['foo'] as giving
+<br />
+access to namespaces within the object. Viewed from that
+<br />
+perspective, I'm even all for adding more namespaces and
+<br />
+syntactic sugar to support them :-) (of course, then we
+<br />
+risk wandering into Perl territory).
+<br />
+
+<br />
+Imagine a Python that mapped these delimiters to "special"
+<br />
+object methods that you could use to provide various
+<br />
+namespaces of interest in your domain:
+<br />
+
+<br />
+foo$bar
+<br />
+foo@bar
+<br />
+foo{'bar'}
+<br />
+foo!bar (not possible?)
+<br />
+foo?bar
+<br />
+foo
+<br />
+foo<br />
+<br />
+foo[[bar]]
+<br />
+foo{{bar}}
+<br />
+
+<br />
+I guess there are probably technical reasons to discard a bunch of these (e.g., [[bar]] creates a list within there, and {{bar}} a dict, right?)
+<br />
+
+<br />
+But I hope you get my point :-) I mean, aside from destroying Python, which I assure you is not my aim. I'm just thinking aloud here, really.
+ <div align="right"><a href="http://blog.ianbicking.org/comment518.html" rel="nofollow">#</a> Tripp Lilley</div><hr noshade>
+ I don't usually see people using both __getattr__ and __getitem__ namespaces very effectively -- though the critique holds more for getitem.  For instance, on <a href="http://www.python.org/sigs/web-sig/" target="_blank">Web-SIG</a> there are some proposals to have things like <tt>response['Content-Type'] = 'text/html'</tt>.  (Not biting anyone's head off, these are just early proposals)
+<br />
+
+<br />
+The idea is that we have a namespace of methods, but then we have this __getitem__ namespace on the response just sitting around doing nothing.  The problem is backtracking -- seeing the response being used as a dictionary, is there any reason you'd assume it was referring to response headers?  This is the case for most __getitem__ implementation, except in very clear mapping structures.  It's fine to do <tt>response.headers['Content-Type'] = 'text/html'</tt>, but it's important to contextualize that dictionary access with the <tt>headers</tt> attribute.  At which point, why not allow <tt>response.headers.content_type = 'text/html'</tt>?  Or maybe not...
+ <div align="right"><a href="http://blog.ianbicking.org/comment519.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ In JavaScript, the method/attribute and dictionary namespaces are the same; Python's separation of these namespaces allows you to create methods (in one namespace) that implement an object with a clean dictionary-like or array-like interface (in the other).  Unifying them would mean that your methods would show up in your item namespace, and you'd just have to hope your users didn't happen to store something under the key 'lookup' or '_lookup' or whatever as an item.
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment520.html" rel="nofollow">#</a> <a href="http://pobox.com/~kragen">Kragen Sitaker</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

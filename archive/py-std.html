@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>py.std</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>py.std</h1>
+ 
+<div class="document">
+<p>So, I was chatting about &quot;helpers&quot; with <a class="reference" href="http://groovie.org">Ben Bangert</a> on #webware, and thinking about adding stuff to
+<tt class="docutils literal"><span class="pre">__builtins__</span></tt>, like <tt class="docutils literal"><span class="pre">html_quote</span></tt> and the like.  Hey, don't you
+judge me!  Anyway, I think I like <tt class="docutils literal"><span class="pre">string.encode('html')</span></tt> more.</p>
+<p>But anyway, I was thinking about how to make this stuff somewhat
+easier.  And I was thinking about a discussion on Py-Dev about <a class="reference" href="http://mail.python.org/pipermail/python-dev/2005-November/058058.html">adding
+a dedent method to strings</a>.
+The rationale was that inline strings that match up with surrounding
+whitespace need dedenting (ala <tt class="docutils literal"><span class="pre">textwrap.dedent</span></tt>).  Why not just use
+<tt class="docutils literal"><span class="pre">textwrap.dedent</span></tt>?  My <a class="reference" href="http://mail.python.org/pipermail/python-dev/2005-November/058070.html">opinion</a>
+is that the value is too small for the overhead.  And this kind of
+overhead happens often.</p>
+<p>I also think the overhead shouldn't exist.  Managing import statements
+is obnoxious.  When they represent real dependencies or namespace
+operations that's fine -- I'd even say it is good.  I like namespaces,
+really.  But managing the <em>imports</em> is annoying.</p>
+<p>In this case, I might be 100 lines into a module, and I'm writing a
+string.  If I really want to use <tt class="docutils literal"><span class="pre">textwrap.dedent</span></tt>, I have to go up
+to the top of the file, add <tt class="docutils literal"><span class="pre">import</span> <span class="pre">textwrap</span></tt> and return to my
+previous location.  And, since I know the standard library pretty well
+now and tend to use it, it is not uncommon for modules to start with
+15 lines of imports.  That just sucks!</p>
+<p>Then I remember about the <a class="reference" href="http://codespeak.net/py/current/doc/">py-lib</a> which has <a class="reference" href="http://codespeak.net/py/current/doc/misc.html#the-py-std-hook">py.std</a>.
+Using it I wouldn't have to import <tt class="docutils literal"><span class="pre">textwrap</span></tt>, I'd just use
+<tt class="docutils literal"><span class="pre">py.std.textwrap.dedent</span></tt> immediately.  Does that string seem too
+long?  I don't think so; it's not the length that is bothersome to me
+(it helps <a class="reference" href="magic-and-backtracing-code.html">backtracking</a>, and that's good), it's the disturbance
+of my workflow to add import statements, when I feel like I'm just
+feeding the compiler.  There's good reasons to be explicit, but this
+is just as explicit as an import (maybe moreso).  Unlike an import it
+is <em>fully localized</em> to the code fragment that uses the module.</p>
+<p>Now putting <tt class="docutils literal"><span class="pre">std</span></tt> in <tt class="docutils literal"><span class="pre">__builtins__</span></tt> is something I could stand
+behind.</p>
+</div>
+ <div class="dates" align="right">
+Created 08 Dec '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;I have to go up to the top of the file&quot;</p>
+<p>No, you don't.  If you want a local import, use a local import.  Import != include; it's perfectly okay to import things only when and where you need them.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/py-std-comment-1.html" rel="nofollow">#</a> <a href="http://effbot.org">Fredrik</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Yeah, but...
+There is a certain feeling of sequentialness involved in importing, #include-ing, and &lt;!--#include--&gt;ing everything atop the file, so that you can tell, at a glance, exactly which files have to be visible at parse/compile time to make the the code worky-worky.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/py-std-comment-3.html" rel="nofollow">#</a> Chris</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>Adding stuff to __builtins__ is bad. BoboPOS, Principia, Zope 1 and 2 all did that - not very much, just a couple of things (maybe even just 1) - like <tt class="docutils literal"><span class="pre">get_transaction()</span></tt>. Not really knowing when or where that statement comes from makes it awfully painful to debug when you've got something breaking there.</p>
+<p>A pattern that Zope 3 uses, and which I've started to adopt for my own projects, is a concept of API modules. The main one for Zope 3 is <tt class="docutils literal"><span class="pre">zapi</span></tt>, and it houses many common functions. And it doesn't define them - it pulls them in from other packages. The nice trick that Zope 3 does with <tt class="docutils literal"><span class="pre">zapi</span></tt> and the packages it pulls from is that it uses <tt class="docutils literal"><span class="pre">zope.interface</span></tt>. There's an interface defined for all of the modules an IZAPI sub-interfaces all of them. The <tt class="docutils literal"><span class="pre">zope.interface</span></tt> package then brings other niceties - it's easy to generate an <tt class="docutils literal"><span class="pre">__all__</span></tt> for zapi so that no extra bits are accidentally included in the zapi namespace; and it ties in to Zope 3's API documentation tool like all other registered interfaces, so it's easy to look up to see the documentation on any of the items in the API. The API doesn't define any new objects - as far as I've found there's no <tt class="docutils literal"><span class="pre">zapi.foo.bar</span></tt> or deeper nesting. It's a flat namespace. Many of the functions are things that are commonly used to query the greater registries of the component architecture.</p>
+<p>And lastly - <tt class="docutils literal"><span class="pre">zapi</span></tt> pulls things into it. I can't start pushing my own things in there (well, I probably could without much clever hacking, but it would defeat the purpose). It's nice knowing that its behavior is the same everywhere.</p>
+<p>Anyways, I've started implementing something like this in a toolkit that I've been building on top of Zope. I noticed there were some very common functions that I was using - a lot - so I started following the same model. It's a nice solution, I think - I only put items into the API that are proving to be very common. They're well documented. They're all kept in the packages that make sense to them and then collected together by <tt class="docutils literal"><span class="pre">myapi</span></tt>, and now I have easy access to <tt class="docutils literal"><span class="pre">myapi.flash(...)</span></tt> and <tt class="docutils literal"><span class="pre">myapi.getCacheForObject()</span></tt> (Zope 3's getCacheForObject didn't do enough for me, so I wrote my own). Something has to earn its spot in there. So far, it's working out quite nice</p>
+<p>But other than that - I honestly don't mind managing the imports. VIM makes it so easy to jump to the top of the document and back to where I was editing; most of the time if I need to do a few imports I just split the frame so I can jump up to the imports in one frame while still seeing my code on the bottom (so I remember what I'm importing). I've also started using its &quot;search for this word exactly&quot; feature (<tt class="docutils literal"><span class="pre">#</span></tt> and <tt class="docutils literal"><span class="pre">*</span></tt> keys) to quickly scan through my imports when the list looks really big and I want to quickly check if I'm still using all the named items. In other editors too, if I need access to my import list, it's no big thing to just split the frame and always keep the imports on top.</p>
+<p>Or I just program away and then run the code and go &quot;d'oh!&quot; for every name error that comes from me forgetting to import because I didn't want to interrupt my workflow. But that doesn't happen much.</p>
+<p>Anyways - I think that <tt class="docutils literal"><span class="pre">import</span></tt> is one of the best things about Python. It's the first thing that I miss when I have to use just about any other language out there.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/py-std-comment-2.html" rel="nofollow">#</a> <a href="http://toulouse.amber.org/">Jeff Shell</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I propose this as something that is entirely <em>complimentary</em> to importing, not in conflict with it.  If you understand what <tt class="docutils literal"><span class="pre">std</span></tt> means, then it's also just as explicit as importing.  It's really just another import mechanism which is more convenient in certain (fairly common) circumstances.  One could argue (as the paragraph on py.std does) that this is actually <em>more</em> explicit because it never allows module-relative imports.  I think it's only really useful if it is idiomatic, or even better built in (without hacking <tt class="docutils literal"><span class="pre">__builtins__</span></tt>), but it's a very simple idiom.  The implementation in the py lib is actually just this:</p>
+<pre class="literal-block">
+import sys
+
+class Std(object):
+    def __init__(self):
+        self.__dict__ = sys.modules
+
+    def __getattr__(self, name):
+        try:
+            m = __import__(name)
+        except ImportError:
+            raise AttributeError(&quot;py.std: could not import %s&quot; % name)
+        return m
+
+std = Std()
+</pre>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/py-std-comment-4.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>+1</p>
+<dl class="docutils">
+<dt>Aside: one of the things I hate most (there aren't many) coming to Python from Java is the ability to import a package and then be able to navigate to any subpackage using dot notation. Example:</dt>
+<dd><pre class="first last doctest-block">
+&gt;&gt;&gt; import PythonCard
+&gt;&gt;&gt; PythonCard.components.button
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+AttributeError: 'module' object has no attribute 'components'
+</pre>
+</dd>
+<dt>I have a dream of being able to do this (does anyone else hate the <tt class="docutils literal"><span class="pre">from</span></tt> keyword?):</dt>
+<dd><pre class="first last doctest-block">
+&gt;&gt;&gt; import my.deeply.nested.package.function as func  # results in error
+</pre>
+</dd>
+<dt>Which usually starts out as:</dt>
+<dd><pre class="first last doctest-block">
+&gt;&gt;&gt; import my.deeply.nested.package as package
+&gt;&gt;&gt; package.function(...)
+</pre>
+</dd>
+<dt>And then mutates to this when we realize we're only using a single function in that package:</dt>
+<dd><pre class="first last doctest-block">
+&gt;&gt;&gt; from my.deeply.nested.package import function as func
+</pre>
+</dd>
+</dl>
+<p>And that requires me to rearrange the entire line, which is annoying. And as if that weren't enough trouble with Python's import mechanism, why in the heck couldn't they make the __import__ function &quot;just work&quot; like it's supposed to (i.e. <tt class="docutils literal"><span class="pre">col</span> <span class="pre">=</span> <span class="pre">__import__(&quot;sqlobject.col&quot;)</span></tt> should have the same effect as <tt class="docutils literal"><span class="pre">import</span> <span class="pre">sqlobject.col</span> <span class="pre">as</span> <span class="pre">col</span></tt>)?</p>
+<p>Maybe the &quot;std&quot; object could be enhanced to fix that problem too. The only downside I can see here might be performance (try exploring std in Pyshell--it's a bit slow on my PIII 733 (then again, Eclipse is nearly useless on this machine)). On the positive side, it's much easier to explore the standard library this way, which is another thing I miss from Java. Eclipse allowed me to explore Java api's through the auto-complete feature, providing JavaDoc tooltips when available--very productive. But now I'm asking for a good IDE which is an entirely different subject. I guess I should check out PyDev again sometime.</p>
+<p>Wow, I think you hit a sore spot there.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/py-std-comment-5.html" rel="nofollow">#</a> <a href="http://www.openpolitics.com/pieces/">Daniel</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

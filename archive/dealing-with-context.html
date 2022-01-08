@@ -1,0 +1,411 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Dealing with Context</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Dealing with Context</h1>
+ <p>
+
+I'm writing some code where every action has a context.  Mostly this
+is to track who does what in a multi-user system, as well as some
+logging and preferences.
+
+<p>
+
+Usually when you have a bunch of state that gets passed around, that
+state is "self", a sort of implicit first argument to all your
+functions.  This works well in the scope of a class, but what about
+when you have many classes, and many methods that need to share some
+state?
+
+<p>
+
+Currently I'm passing a context object around as the first argument to
+many of these methods.  More than would seem immediately necessary, as
+it's easier to pass the context around now than realize that some deep
+method needs the context, and a whole chain of method signatures have
+to be changed to pass the context in.
+
+<p>
+
+In the end I don't really like any of it.  This argument feels like a
+wart on every method.  Are there other ways to pass around context?
+
+<p>
+
+Zope 2 does this through Acquisition, which takes the form of a
+wrapper around nearly every object you deal with, and the wrapper adds
+the contextual information.  Acquisition is evil for other reasons,
+but it works fairly well here.
+
+<p>
+
+Other systems use global variables for this context.  That works well
+in a single-process system.  What about a threaded system?  I could
+key the context off the thread name, creating a kind of
+system-local/thread-global value.  I've never felt confident about
+doing that, though.
+
+<p>
+
+Other techniques?  I don't really know what Zope 3 is doing for this
+-- I feel like adaptation is somehow involved, but there's got to be
+more to it than that.
+ <div class="dates" align="right">
+Created 02 Aug '04<br>
+Modified 14 Dec '04</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ Ug, I feel your pain. I think that the cflow AspectJ construct provides some hint of what I would like to see in a solution.
+<br />
+
+<br />
+See <a href="http://dev.eclipse.org/viewcvs/indextech.cgi/~checkout~/aspectj-home/doc/progguide/semantics-pointcuts.html" target="_blank">http://dev.eclipse.org/viewcvs/indextech.cgi/~checkout~/aspectj-home/doc/progguide/semantics-pointcuts.html</a> for some detail on cflow.
+<br />
+
+<br />
+Best of luck,
+<br />
+John
+ <div align="right"><a href="http://blog.ianbicking.org/comment234.html" rel="nofollow">#</a> <a href="http://johnheintz.homeip.net">John D. Heintz</a></div><hr noshade>
+ Rather than passing it to every function, you can make a global "context server" that any function that needs the context can access. You could make a module that handles this (which will automatically be global) and have methods on it. For multi-threaded access, the module can handle locking if you need that, so clients can block while you're making changes to the context. (Does this make sense, or am I missing something?)
+<br />
+
+<br />
+The point is that if something needs to be passed to *many* different functions, objects, or methods, it's probably an aspect of the *system* that everyone should have easy access to, not something that should be shuffled along the call stack.
+ <div align="right"><a href="http://blog.ianbicking.org/comment235.html" rel="nofollow">#</a> <a href="http://keithdevens.com/">Keith</a></div><hr noshade>
+ By multithreaded, I don't just mean threadsafe, but that each thread has its own context.  So I can't just put it in a global data structure, unless that structure is somehow parameterized by thread.  Which is pretty doable -- threading.currentThread().getName() seems to return a good key -- but I'm not sure I feel entirely comfortable with that.  Maybe I shouldn't worry and it'll be fine, but since it will be a central component I don't want to find later that it was a really bad idea ;)
+ <div align="right"><a href="http://blog.ianbicking.org/comment236.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ Re: aspects; I would be a little fearful to use aspects for something like this, as it's almost global to the application, and would mean all the code would get touched.  Since aspect-oriented programming seems to work on a source-level (actually transforming the source), that could mean all sorts of crazy results.  Most aspect-oriented use cases are things that strike me as a response to an inflexible language, and usually not necessary for Python, so hopefully that level of effort isn't necessary.
+ <div align="right"><a href="http://blog.ianbicking.org/comment237.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ ian: the stuff with using currentThread as a key is exactly what I do with TooFPy to put stuff into a thread-bound context. This isn't a guarantee that this is the best idea one can have, but at least you won't be alone to feel the pain if things blow up in our faces ;-)
+ <div align="right"><a href="http://blog.ianbicking.org/comment238.html" rel="nofollow">#</a> <a href="http://pyds.muensterland.org/">Georg Bauer</a></div><hr noshade>
+ (I have nothing to do with it but) Zope 3 has a nicely abstracted thread globals approach, actually.  I think I remember hearing it was the same sort of key approach.  It's in a C extension, and has some docs and unit tests.  Check in <a href="http://svn.zope.org/Zope3/trunk/src/zope/thread/" target="_blank">http://svn.zope.org/Zope3/trunk/src/zope/thread/</a> if you want to browse around.  Pretty much everything in 'zope' that's not 'zope.app' is intended to be used outside of the zope app server.  Dependencies are specified in DEPENDENCIES.cfg in each package--I don't think the thread code has any.
+ <div align="right"><a href="http://blog.ianbicking.org/comment239.html" rel="nofollow">#</a> Gary Poster</div><hr noshade>
+ Just talked with Jim Fulton about the Zope 3 code--it's actually slated to be in Python 2.4.  Most of the work was done Armin Rigo...see <a href="http://aspn.activestate.com/ASPN/Mail/Message/c++-sig/2106853" target="_blank">http://aspn.activestate.com/ASPN/Mail/Message/c++-sig/2106853</a> for mailing list thread if you want more.
+ <div align="right"><a href="http://blog.ianbicking.org/comment240.html" rel="nofollow">#</a> Gary Poster</div><hr noshade>
+ Three issues about the threading:
+<br />
+
+<br />
+1) threading.currentThread() returns a new-style object, so for simple needs, you can just add attr's to it.
+<br />
+
+<br />
+2) If you're going to roll your own mapping keyed off of currentThread(), you might as well skip all of the threading-module overhead and just use thread.get_ident() directly.
+<br />
+
+<br />
+3) I've had serious issues with e.g. mod_python reusing thread id's in concurrently running threads (!). So be careful. One of these days, I need to track that buglet down... :(
+ <div align="right"><a href="http://blog.ianbicking.org/comment241.html" rel="nofollow">#</a> Robert Brewer</div><hr noshade>
+ I'm a big Nevow fan (I also wrote some recipes about Nevow in the Cookbook). By design Nevow passes 2 arguments to its methods:
+<br />
+
+<br />
+a context, which represents the current object space state
+<br />
+
+<br />
+a data argument, which contains the return value from the data_* method.
+<br />
+
+<br />
+Using the context you can pretty much do anything, also remembering objects with a precise interface that can be retrieved later, here is a little example of how this would work:
+<br />
+
+<br />
+class Page(rend.Page):
+<br />
+    def render_stuff(self, context, data):
+<br />
+        context.remember(data, ISomeData)
+<br />
+
+<br />
+Which can be retrieved later with:
+<br />
+
+<br />
+class SecondPage(rend.Page):
+<br />
+    def render_otherStuff(self, context, data):
+<br />
+        my_data = context.locate(ISomeData)
+<br />
+
+<br />
+In the context is stored every information about the connection, like the request object:
+<br />
+
+<br />
+        request = context.locate(IRequest)
+<br />
+
+<br />
+Also the Session is there:
+<br />
+
+<br />
+        session = context.locate(ISession)
+<br />
+
+<br />
+and the current processed tag from the template:
+<br />
+
+<br />
+        context.tag
+<br />
+
+<br />
+I think this is the most complete implementation of 'passing a context around'.
+ <div align="right"><a href="http://blog.ianbicking.org/comment242.html" rel="nofollow">#</a> <a href="http://vvolonghi.blogspot.com">Valentino Volonghi</a></div><hr noshade>
+ This adaptation thing might be getting out of hand ;)  Really, <tt>context.locate(ISession)</tt> is just like attribute access, except the attributes themselves have namespaces (i.e., <tt>ISession</tt> belongs to a namespace, where <tt>'ISession'</tt> wouldn't).  I'm not sure how I feel about that.  (And why <tt>context.locate(ISession)</tt> instead of <tt>ISession(context)</tt>?)  <a href="http://blog.colorstudy.com/ianb/weblog/2003/10/12.html#P12" target="_blank">I thought</a> that adaptation and traversal overlap considerably, though I'm still not sure what it means or how it helps.  Why <tt>context.remember(data, ISomeData)</tt> instead of  <tt>context.someData = data</tt>?  Except maybe the namespace thing, are namespaces <i>really</i> that important?
+<br />
+
+<br />
+Anyway, I'm glad to see that thread-local data is going to be built in to Python.  That way at least I can implement a simpler thread-local system, knowing that even if the particular techniques I use aren't perfect there will be a well-supported, analogous technique in the future.  (I don't want to deal with a C extension at the moment.)
+ <div align="right"><a href="http://blog.ianbicking.org/comment243.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ ISession and other various interfaces are in a separate module, I just directly wrote the interface name for verbosity needs ;)
+<br />
+
+<br />
+In this specific case the interface is used just like a name.
+<br />
+
+<br />
+    def remember(self, adapter, interface=None):
+<br />
+        """Remember an object that implements some interfaces.
+<br />
+        Later, calls to .locate which are passed an interface implemented
+<br />
+        by this object will return this object.
+<br />
+        
+<br />
+        If the 'interface' argument is supplied, this object will only
+<br />
+        be remembered for this interface, and not any of
+<br />
+        the other interfaces it implements.
+<br />
+        """
+<br />
+        if interface is None:
+<br />
+            interfaceList = megaGetInterfaces(adapter)
+<br />
+            if not interfaceList:
+<br />
+                interfaceList = [dataqual]
+<br />
+        else:
+<br />
+            interfaceList = [qual(interface)]
+<br />
+        if self._remembrances is None:
+<br />
+            self._remembrances = {}
+<br />
+        for interface in interfaceList:
+<br />
+            self._remembrances[interface] = adapter
+<br />
+        return self
+<br />
+
+<br />
+This is the specific context.remember() implementation inside Nevow. So Adaptation doesn't come into play with this example although it may seems at first glance. This is also why ISession(context) is not a way of having the session object from the context, since providing ISession with context would require context providing also IRequest, IHand and a lot more (user needed also) interfaces, which can't be done, also, you would end up with a huge context class that provides a method for every method of a request/session/so_on. As you can see, instead, interfaces are rather a key inside a dict.
+<br />
+
+<br />
+context.someData = data
+<br />
+
+<br />
+could have been used actually, but since context.someData is not namespaced you can have some collisions (remember that using context.remember() you give the user the possibility to remember all the objects he needs to, so I can have some collisions).
+<br />
+
+<br />
+HTH, I should post more on my blog actually... :P
+ <div align="right"><a href="http://blog.ianbicking.org/comment244.html" rel="nofollow">#</a> <a href="http://vvolonghi.blogspot.com">Valentino Volonghi</a></div><hr noshade>
+ argh... sorry about that code, I should have known :)
+<br />
+
+<br />
+....def remember(self, adapter, interface=None):
+<br />
+........"""Remember an object that implements some interfaces.
+<br />
+........Later, calls to .locate which are passed an interface implemented
+<br />
+........by this object will return this object.
+<br />
+........
+<br />
+........If the 'interface' argument is supplied, this object will only
+<br />
+........be remembered for this interface, and not any of
+<br />
+........the other interfaces it implements.
+<br />
+........"""
+<br />
+........if interface is None:
+<br />
+............interfaceList = megaGetInterfaces(adapter)
+<br />
+............if not interfaceList:
+<br />
+................interfaceList = [dataqual]
+<br />
+........else:
+<br />
+............interfaceList = [qual(interface)]
+<br />
+........if self._remembrances is None:
+<br />
+............self._remembrances = {}
+<br />
+........for interface in interfaceList:
+<br />
+............self._remembrances[interface] = adapter
+<br />
+........return self
+ <div align="right"><a href="http://blog.ianbicking.org/comment245.html" rel="nofollow">#</a> <a href="http://vvolonghi.blogspot.com">Valentino Volonghi</a></div><hr noshade>
+ Ian, you are right on target with your observations.
+<br />
+
+<br />
+First, interfaces were chosen instead of strings (for example, implementing __getattr__ on Context) because they are namespaced.
+<br />
+
+<br />
+Second, ISession(ctx) should absolutely be used instead of ctx.locate(ISession), and I plan on implementing that soon in my copious spare time.
+<br />
+
+<br />
+Finally, context objects in nevow are chained in order to keep track of state across asynchronous callbacks. context.remember remembers an object for an interface at that particular context, and context.locate (or eventually IFoo(ctx)) searches through this parent chain if that particular interface isn't immediately available. This allows me to do things like:
+<br />
+
+<br />
+- reuse context objects across multiple page renders (in the case where a template is precompiled and certain things happen once but other things happen every page render)
+<br />
+
+<br />
+- implement locate() in different ways in different places; the normal Context objects used to represent a DOM node implement locate as described above, but other IContext implementors implement it by directly returning some object or by being a factory for interface implementors
+<br />
+
+<br />
+- implement very explicit acquisition, should anyone choose to use it. Before writing Woven and Nevow I wrote a few very large applications in Zope and was struck by the power and simplicity of in-a inheritance, but burned a few times by it's implicitness. Thus, I wanted to build in a way to pass information from parent to children pages into nevow. The context chain is used to accomplish this.
+<br />
+
+<br />
+Also, twisted.python.context is relevant to this discussion. It is used to implicitly pass state during the execution of a function, and it uses some form of thread identity checking to provide a unique context to each thread. (Read the implementation, it is short.) It is used like this:
+<br />
+
+<br />
+<tt>
+<br />
+from twisted.python import context
+<br />
+
+<br />
+context.call({'any keys': 'any values'}, someFunction, someArgument, someKeyword='argument')
+<br />
+</tt>
+<br />
+
+<br />
+Then later, during the execution of someFunction or any function called by someFunction:
+<br />
+
+<br />
+<tt>
+<br />
+from twisted.python import context
+<br />
+
+<br />
+context.get('any keys')
+<br />
+</tt>
+<br />
+
+<br />
+Thanks for the interesting blog posts as always!
+<br />
+
+<br />
+dp
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment246.html" rel="nofollow">#</a> <a href="http://ulaluma.com/pyx">Donovan Preston</a></div><hr noshade>
+ Uuuhhh... I feel happy now that I know I was wrong about adaptation in remembrance. I'm looking forward the day I will be able to write ISession(context).
+ <div align="right"><a href="http://blog.ianbicking.org/comment247.html" rel="nofollow">#</a> <a href="http://vvolonghi.blogspot.com">Valentino Volonghi</a></div><hr noshade>
+ I think there is often a good case for explicitly passing around a context object, 
+<br />
+just because it's explicit. I've seen enough problems with acquisition contexts
+<br />
+in Zope 2 to appreciate this -- Zope 2 doesn't hide it perfectly, which means you have to
+<br />
+understand contexts anyway to use it, and the trickery only becomes more voodoo-like ('__of__',
+<br />
+'aq_inner', etc). An explicit context has the important benefit in that it is *simple*.
+<br />
+
+<br />
+You can sometimes reduce the amount of context being passed around by making context an
+<br />
+instance variable and centralizing instance construction so that the context is passed
+<br />
+through upon creation. I know that's vague, but it's a pattern I sometimes see.
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment248.html" rel="nofollow">#</a> Martijn Faassen</div><hr noshade>
+ In java the Aspects can work at bytecode level too but i don't know if this is posible in python. 
+<br />
+For more examples  see <a href="http://aspectwerkz.codehaus.org/." target="_blank">http://aspectwerkz.codehaus.org/.</a>
+ <div align="right"><a href="http://blog.ianbicking.org/comment249.html" rel="nofollow">#</a> oier</div><hr noshade>
+ I agree with Martijn Faassen. Either keep it explicit, or make it an attribute. If only a few methods need it, leave it as a parameter to the methods. Otherwise, make it a parameter to the constructor. If you're just passing context along to some other dependent objects, maybe consider making it an attrobute of those objects instead.
+<br />
+
+<br />
+Another way of looking at it is like this: Say you started with a bunch of ordinary functions (no objects). You realized after awhile that all of these functions took at least the same three parameters. So, you make a class to encapsulate those three parameters, and thus make the "context" of those functions (now methods) implicit. Now, time goes by, and you realize that you're passing yet another parameter to all (or almost all) of these functions. This additional parameter, unfortunately named "context" as well, looks like it's part of this class's encapsulated context as well. So, move it into the class, along with the first three. Granted, this is a very mechanical view of OO, but it often works for me.
+<br />
+
+<br />
+I don't know your specific situation, so this is all based on an abstract notion I have of your real problem, but I'd be skeptical of any metaprogramming solution to--what seems to me--too simple of a problem to warrant it.
+ <div align="right"><a href="http://blog.ianbicking.org/comment250.html" rel="nofollow">#</a> <a href="http://ramenfest.com/">Dave Benjamin</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

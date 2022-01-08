@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Still Pretty Cheap Debugging Trick</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Still Pretty Cheap Debugging Trick</h1>
+ After reading Uche Ogbuji's <a href="http://www.oreillynet.com/pub/wlg/5204">cheap debugging
+trick</a>, I looked a bit more at <tt>inspect.stack()</tt>.  It wasn't
+very hard to make a sort of ad hoc traceback, but without actually
+causing an exception.  My particular motivation was a case where some
+code was being cause twice where it should only be called once.  I
+sometimes just put <tt>assert 0</tt> in someplace to find when it is
+called, but then it would catch the first correct usage and never get
+to the second.  So I put a function call in the overly-called code,
+<tt>logPoint()</tt>, and I got a list of tracebacks.  The code:
+
+<pre>
+import inspect
+from cStringIO import StringIO
+
+def logPoint(msg=''):
+    stack = inspect.stack()
+    # get rid of logPoint's part of the stack:
+    stack = stack[1:]
+    stack.reverse()
+    output = StringIO()
+    if msg:
+        output.write(str(msg) + '\n')
+    for stackLine in stack:
+        frame, filename, line, funcname, lines, unknown = stackLine
+        if filename.endswith('/unittest.py'):
+            # unittest.py code is a boring part of the traceback
+            continue
+        if filename.startswith('./'):
+            filename = filename[2:]
+        output.write('%s:%s in %s:\n' % (filename, line, funcname))
+        output.write('  %s\n' % ''.join(lines)[:-1])
+    s = output.getvalue()
+    # I actually logged the result, but you could also print it:
+    print s
+</pre>
+
+<b>Update:</b> Maybe <tt>print_stack()</tt> in the <a href="http://python.org/doc/current/lib/module-traceback.html">traceback</a> is an easier way to do this?  The only real advantage to this way is that you can hide parts of the stack that are boring -- usually the framework, be it unittest, a web framework, the interactive interface, etc.
+ <div class="dates" align="right">
+Created 05 Aug '04<br>
+Modified 14 Dec '04</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ It looks like there's an extra parenthesis on the line, "if (filename.endswith".
+ <div align="right"><a href="http://blog.ianbicking.org/comment277.html" rel="nofollow">#</a> <a href="http://stompstompstomp.com/weblog/technical">Mathieu Fenniak</a></div><hr noshade>
+ Indeed; fixed.
+ <div align="right"><a href="http://blog.ianbicking.org/comment278.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ I wonder whether your code would be acceptable as a replacement for traceback.print_stack() - for people who don't want it to use the exception hack. Not that I've ever had a problem with that.
+ <div align="right"><a href="http://blog.ianbicking.org/comment279.html" rel="nofollow">#</a> <a href="http://www.mechanicalcat.net/richard/log">Richard Jones</a></div><hr noshade>
+ iRichard, If that's a really problem, why not just change traceback.print_stack() to use sys._getframe()?
+<br />
+
+<br />
+(traceback.print_stack() and traceback.print_stack(sys._getframe()) gives the same output)
+ <div align="right"><a href="http://blog.ianbicking.org/comment280.html" rel="nofollow">#</a> <a href="http://effbot.org">Fredrik</a></div><hr noshade>
+ See also <a href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52215" target="_blank">http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52215</a> which shows how to dump the local variables from each frame as well.  That makes the debugging really easy.
+ <div align="right"><a href="http://blog.ianbicking.org/comment281.html" rel="nofollow">#</a> <a href="http://www.rogerbinns.com">Roger Binns</a></div><hr noshade>
+ Wouldn't trace.py (the sys.settrace wrapper) be as clean a way to have solved the original problem?
+ <div align="right"><a href="http://blog.ianbicking.org/comment282.html" rel="nofollow">#</a> <a href="http://www.thok.org/bloggery/">Mark Eichin</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

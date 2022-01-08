@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Testing Install Procedures</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Testing Install Procedures</h1>
+ 
+<div class="document">
+<p>I've been trying to test installation procedures for <a class="reference" href="http://pythonpaste.org">Paste</a> as I get ready for a release.  This is
+hard, because I've installed everything piecewise as I've been doing
+development.</p>
+<p>So I've created a script to set up a non-root installation of Python,
+suitable for testing installation procedures.  It follows the
+instructions located <a class="reference" href="http://peak.telecommunity.com/DevCenter/EasyInstall#non-root-installation">in the setuptools documentation</a>;
+it's located in <a class="reference" href="http://svn.colorstudy.com/home/ianb/non_root_python.py">non_root_python.py</a>.</p>
+<p>To do testing I've created a new user on my system, so I don't mix
+things up with my normal development, and so I have nothing to lose.
+Then I use it like:</p>
+<pre class="literal-block">
+/usr/bin/python non_root_python.py --no-site-packages --clear
+</pre>
+<p>In the process it copies (symlinks) the standard library into
+<tt class="docutils literal"><span class="pre">~/lib/pythonX.Y</span></tt> (and <tt class="docutils literal"><span class="pre">site-packages</span></tt> unless you use
+<tt class="docutils literal"><span class="pre">--no-site-packages</span></tt>).</p>
+<p>The <tt class="docutils literal"><span class="pre">--clear</span></tt> argument can be used to reset the system quickly, so
+you can restart your installation process from zero.</p>
+<p>I also use <tt class="docutils literal"><span class="pre">--include-package=sqlite</span> <span class="pre">--include-package=_sqlite</span></tt> to
+copy those modules/packages from <tt class="docutils literal"><span class="pre">site-packages</span></tt>, because
+easy_install doesn't install pysqlite very well.</p>
+<p>You have to make sure <tt class="docutils literal"><span class="pre">~/bin</span></tt> is first in your <tt class="docutils literal"><span class="pre">$PATH</span></tt>, but it's
+pretty straight-forward.  I'll have to test the Windows installation
+procedure later.</p>
+</div>
+ <div class="dates" align="right">
+Created 26 Sep '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>This whole project sounds <em>so</em> cool.  I agree with the people who think you're taking python to the next level of usability and power.  Very impressive work.  Thank you.</p>
+<p>I just have to find the time to figure out just what it is you're actually doing &lt;g&gt;.  (I know the basics from following this blog.  I mean actually finding the time to do those detail tasks like RTFM/browse the source code and examples to learn how to really use this beast).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/testing-install-procedures-comment-1.html" rel="nofollow">#</a> <a href="http://boilingtoads.blogspot.com">Bob Joad</a></div><hr noshade>
+ 
+<div class="document">
+<p>Hello, Ian.</p>
+<p>I'm on a Windows XP box and 'd like to trial your installation procedure.</p>
+<p>Should I just use trunk from SVN?</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/testing-install-procedures-comment-2.html" rel="nofollow">#</a> <a href="http://developers.org.ua">Max Ischenko</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Hi Max.  The instructions in this document should more-or-less work, including installing the application itself; that would be a good place to start:</p>
+<blockquote>
+<a class="reference" href="http://svn.pythonpaste.org/Paste/apps/Todo_SQLObject_ZPT/trunk/docs/index.txt">http://svn.pythonpaste.org/Paste/apps/Todo_SQLObject_ZPT/trunk/docs/index.txt</a></blockquote>
+<p>The Subversion repository will be moving around a little (probably tonight) as I put in place the newly refactored core Paste project.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/testing-install-procedures-comment-3.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>And definitely tell me how it goes, I'm quite curious.  Platform issues always catch me where I least expect them.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/testing-install-procedures-comment-4.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Hmm, I wanted to start simple, but the following command failed:</p>
+<pre class="literal-block">
+D:\Projects\3rd-party\paste\bin&gt;easy_install.py -v -f http://pythonpaste.org/package_index.html \
+   --script-dir=bin    PasteWebKit ZPTKit 'SQLObject&gt;=0.7a' WSGIUtils
+error: Could not find distribution for Requirement('PasteWebKit', [], ())
+</pre>
+<p>I checked package index by hand, it looks fine.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/testing-install-procedures-comment-9.html" rel="nofollow">#</a> <a href="http://developers.org.ua">Max Ischenko</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>We've done something remotely like this in PDK. Our acceptance test framework runs each test in a freshly installed sandbox. The sandbox is a temporary directory and the process running in the sandbox has PATH and PYTHONPATH set.</p>
+<p>Our system is written in bash. Bash has been a nice choice for us as our application is command line based. What better test environment than the shell? The framework is just a quick hack that I knocked out. It has been expanded to run tests in parallel, have pretty green/read pass/fail indicators, etc.</p>
+<p>The best thing I did was _not_ log output from the tests by default. Because of that debugging is often as simple as placing a sh invocation in the middle of a test. That gives you an interactive shell in the sandbox at the requested point. This is so convenient that I don't run pdk from my development directory. I virtually always invoke it from an acceptance test sandbox.</p>
+<p>svn://svn.progeny.com/cl/pdk/trunk/run_atest</p>
+<p>--
+Darrin</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/testing-install-procedures-comment-10.html" rel="nofollow">#</a> <a href="http://willowbend.cx/">Darrin Thompson</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

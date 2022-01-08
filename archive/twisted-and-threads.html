@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Twisted and Threads</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Twisted and Threads</h1>
+ <p>
+
+There seems to be some confusion about Twisted's <a href="http://twistedmatrix.com/documents/howto/async">asynchronous
+programming</a>, and the use of threads and blocking code.
+
+<p>
+
+As a quick primer, everything in Twisted runs in a single process.
+Which means when one piece of code is running the entire server
+process is dedicated to that code, and no other request can be
+handled.  Twisted handles this with a sort of event-driven
+programming.  When you have long-running code, you chop it up into
+pieces where each piece is short, then you let the event processor
+call those pieces in turn (the <a href="http://twistedmatrix.com/documents/howto/reactor-basics">"reactor"</a>
+in Twisted terminology).  These use something called a <a href="http://twistedmatrix.com/documents/howto/defer">"Deferred"</a>
+and look something like:
+
+<pre>
+def blocking_code():
+    val = init_val() # <-- not blocking
+    val = inner_blocking_code(val)
+    return val + 10
+
+def non_blocking_code():
+    val = init_val()
+    d = inner_non_blocking_code(val)
+    d.addCallback(non_blocking_code_adder)
+    return d
+
+def non_blocking_code_adder(val):
+    return val + 10
+</pre>
+
+<tt>inner_non_block_code</tt> is a modified version of
+<tt>inner_blocking_code</tt>, which uses events and returns a Twisted
+<tt>Deferred</tt> object.  <i>Someday</i> that deferred will produce a
+value; when it does <tt>non_blocking_code_adder</tt> will be called.
+If someone wants to use the "return" value of
+<tt>non_blocking_code</tt> they will add another callback, and so on.
+The call stack we've gotten used to is gone -- instead a series of
+callbacks replaces it.  (I'm only a Twisted tourist, so feel free to
+correct me in comments if I've got this wrong)
+
+<p>
+
+This is a little weird, but there are advantages that I won't talk
+about here (mostly performance and some people find concurrent
+programming easier/safer with this style).
+
+<p>
+
+A big part of this example was the <tt>inner_blocking_code</tt> to
+<tt>inner_non_blocking_code</tt> rewrite.  That rewrite may very well
+be hard to do.  Or maybe that blocking code exists in a library you
+don't control, and most Python libraries are blocking.  Once this
+occurs to people, a lot of people think Twisted is unusable in a lot
+of situations -- and if you <i>don't</i> handle blocking code, your
+Twisted server <i>will</i> be broken.  At this point people sometimes
+dismiss Twisted as being too limited.  I was most recently reminded of
+this by <a href="http://pyds.muensterland.org/stories/21.html">this
+post</a>, but the confusion is very common.
+
+<p>
+
+Let's say you can't refactor <tt>inner_blocking_code</tt>; then you
+can do:
+
+<pre>
+from twisted.internet import threads
+def inner_non_blocking_code(val):
+    return threads.deferToThread(inner_blocking_code, val)
+</pre>
+
+Twisted will then run <tt>inner_blocking_code</tt> in a different
+thread, and when the function returns it will trigger the Deferred
+that <tt>threads.deferToThread</tt> returns.
+
+<p>
+
+Threads in Twisted aren't great -- you've gone to all that trouble to
+factor your program into an asynchronous style, but you still have to
+run threads (which you may have been trying to avoid) -- but at least
+it's <i>possible</i>.  Twisted doesn't put up walls, even if it might
+put up some hurdles.
+ <div class="dates" align="right">
+Created 10 Nov '03<br>
+Modified 14 Dec '04</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ I didn't say that twisted was too limited - actually I think it's too powerfull in some regards ;-) - but that a switch of PyDS to twisted as core would require too much changes to PyDS. Of course, I still could push longrunning code into threads with twisted - but that wouldn't gain me much over the current medusa+threads situation. I already could refactor PyDS to be more eventdriven by hooking into medusa. Of course this would require writing some stuff that's already there with twisted.
+<br />
+
+<br />
+As I wrote already, had I known twisted when I started PyDS, I might even have used twisted as the base for PyDS and not medusa. But as it is the switch of PyDS from medusa+threads to twisted-threads would be problematic (because of parts of the system that can't be easily broken into smaller chunks, like the rendering stuff) and the change to twisted+threads would be much work without that much gain for PyDS (as I could already reach many of the goals of such a transition with it's current core).
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment599.html" rel="nofollow">#</a> <a href="http://pyds.muensterland.org/">Georg Bauer</a></div><hr noshade>
+ The point with Twisted threads is that you can start the threading (and enter your section of blocking code) at any level you want.  If you really want, you can start processing in a thread almost immediately, turning Twisted (against its will ;) into a threaded application server.  You don't have to adopt the Twisted style throughout.
+<br />
+
+<br />
+But you also had another point -- if you eschew the Twisted style it becomes questionable that Twisted is worth the effort.
+ <div align="right"><a href="http://blog.ianbicking.org/comment600.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ Is there difference between a Twisted "Deferred" object and a "Future" as used in various asynchronous frameworks and concurrent languages?
+ <div align="right"><a href="http://blog.ianbicking.org/comment601.html" rel="nofollow">#</a> <a href="http://avdi.org">Avdi</a></div><hr noshade>
+ Nevermind - I did a little reading and it looks like you can attach callbacks to a "Deferred", making it more akin to a Proactor.
+ <div align="right"><a href="http://blog.ianbicking.org/comment602.html" rel="nofollow">#</a> <a href="http://avdi.org">Avdi</a></div><hr noshade>
+ Ian, thanks.  This is a terrific explanation of how Twisted's threading model works.  Also a terrific explanation of the Twisted culture's resistance to, but not denial of, the necessity for threads in some situations.  I loved the "hurdles but no walls" comment.
+<br />
+
+<br />
+Avdi, yes, Deferreds are conceptually more like a Future than a Proactor.  A Proactor typically manages multiple streams of callbacks, whereas a Deferred represents an asynchronous control flow for a single call.
+ <div align="right"><a href="http://blog.ianbicking.org/comment603.html" rel="nofollow">#</a> <a href="http://www.twistedmatrix.com/users/glyph/">Glyph Lefkowitz</a></div><hr noshade>
+ Turning the calculation inside out can often be accomplished by generators.  Placing yields throughout your calculation code gives you a simple way to cut a procedure into separate steps, and the generator's .next makes a pretty good callback.
+ <div align="right"><a href="http://blog.ianbicking.org/comment604.html" rel="nofollow">#</a> Scott</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

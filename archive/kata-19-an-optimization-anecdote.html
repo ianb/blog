@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Kata 19: an optimization anecdote</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Kata 19: an optimization anecdote</h1>
+ <p> I spent some time last night working on <a href="http://pragprog.com/pragdave/Practices/Kata/KataNineteen.rdoc,v">Kata
+19</a> (these Katas are little programming exercises, a nice
+programming break from writing Useful Code).  This was definitely
+the hardest one I've done so far -- you find paths between words,
+where words are connected if they only differ by one letter.  For
+example: beast to least to leant to leans to loads to loons to
+loops. </p>
+
+<p> The algorithm I used was pretty quick.  Searches take at most
+0.1sec, return the shortest path, and do not block on impossible
+paths.  It does a breadth-first search, starting from both the first
+and terminal words (finding where they meet somewhere in the
+middle).</p>
+
+<p>The problem was that it was really slow to start up.  Reading my
+dictionary of 96 thousand words took about 53sec (and 166Mb of memory)
+on my Athlon 650MHz PC.  Once it is loaded it is really fast.  Perfect
+for a word-path-finding-server.  But I don't think this justifies a
+persistent server.</p>
+
+<p>Here is this <a href="http://ianbicking.org/software/kata19orig.py">original
+code</a>.  I then set upon optimizing the start time.  Here's the
+things that worked well:
+
+<ul>
+
+  <li> I was creating a dictionary that looked like <tt>{'hat':
+  Set(['_at', 'h_t', 'ha_']), ...}</tt>.  Instead of calculating all
+  these permutations up-front, I calculated them as needed.  Down to
+  31sec (22sec gained) and 124Mb. </li>
+
+  <li> Garbage collection was hitting.  I could tell because the
+  reading would stall at random times (when the GC was doing work).  I
+  didn't need this garbage collection while I was reading data in,
+  because I knew no circular garbage was being created (and not much
+  non-circular garbage was created either).  Using the <a href="http://www.python.org/doc/current/lib/module-gc.html"><tt>gc</tt></a>
+  module, I turned this off.  Down to 17sec (14sec gained), doesn't
+  help memory. </li>
+
+  <li> I used <a href="http://www.python.org/doc/current/lib/module-sets.html">sets</a>
+  in several places.  One of the central data
+  structures was a dictionary that looked like <tt>{'_at': Set(['hat',
+  'bat', 'sat', ...]), ...}</tt>.  But I never used set operations on
+  those values, I only iterated over them.  I changed it to a
+  list.  Down to 9sec (8sec gained), 75Mb memory. </li>
+
+</ul>
+
+Those were all the effective changes I made.  I tried some other
+things, to little or no effect:
+
+<ul>
+
+  <li> Using <tt>.setdefault(word_with_unders, []).append(word)</tt>
+  for creating the dictionary.  Gained about 0.5sec over using
+  <tt>.has_key(word_with_unders)</tt>.  Using exceptions here lost me
+  7sec -- that should only be done when you are expecting very
+  few misses. </li>
+  
+  <li> I iterate over <tt>range(len(word))</tt> for each word.  Since
+  words show up in the dictionary in sorted order, I tried caching the
+  <tt>range</tt> result (since I'd only need a handful of different
+  ranges for the entire run).  No significant effect. </li>
+
+  <li> <tt>range</tt> vs. <tt>xrange</tt>: no difference. </li>
+
+  <li> Avoiding globals, by putting <tt>range=range</tt> in the method
+  signature.  No significant gain. </li>
+
+  <li> <tt>"%s_%s" % (word[:i], word[i+1:])</tt> vs. <tt>word[:i] +
+  word[i+1:]</tt>.  Actually lost 2sec.  Probably using <tt>%</tt>
+  instead of <tt>+</tt> for stings will only help when the strings are
+  long (these are very short). </li>
+
+  <li> The dictionary has <tt>'s</tt> at the end of some words.  There
+  was no significant diffence between <tt>if "'" in word: word =
+  word.split("'")[0]</tt> and <tt>if word.endswith("'s"): word =
+  word[:-2]</tt>. Using <tt>line.strip()</tt> to get rid of
+  <tt>\n</tt> wasn't significantly faster than <tt>line[:-1]</tt>
+  either. </li>
+
+</ul>
+
+The other big optimization changed the nature of the program slightly.
+If you only want to test the path between two words (say <tt>hat</tt>
+and <tt>bee</tt>), then you only need to load words of that length
+(length 3 in this case).  You can ignore all the other words.  By
+doing this I could load the necessary parts of the dictionary in about
+1.5sec, and use only 36Mb (it depends somewhat on what length words,
+of course).  As a baseline, I can read the entire word list into a
+Python dictionary in about 0.8sec. </p>
+
+<p>By using <a href="http://psyco.sourceforge.net/">Psyco</a> I can
+cut the 8sec (with all the little optimizations) down to 3.5sec, using
+<tt>psyco.full()</tt> It only brings the original down to 41sec (and
+increases memory to 180Mb), which is still pretty slow.  Pysco plus
+turning GC off gives us 11sec, which is pretty good -- it does better
+when we tell Psyco <tt>psyco.bind(load_words)</tt> (i.e., tell Psyco
+to only try to optimize the one function: 11sec vs 15sec).  In
+contast, <tt>psyco.bind</tt> doesn't even effect our optimized
+<tt>load_words</tt>, only <tt>psyco.full</tt> helps there.  </p>
+
+<p> I'm pretty happy with the <a href="http://ianbicking.org/software/kata19.py">finished program</a>.
+For the most part all the important, time-critical parts are already
+in C -- they are dictionaries, sets, and lists.  These data
+structures make algorithm implementation in Python really easy and
+scalable all at once.  While you could write this in C for more
+performance, it would take a lot of work just to get something
+that worked, and a lot more work to match the speed of Python's
+built-in data structures.  Maybe a language like <a href="http://www.ocaml.org/">OCaml</a> or <a href="http://www.haskell.org/">Haskell</a> could match (or beat)
+Python's agility and performance.  I'd be curious. </p>
+
+<p> For more on Python optimization: <a href="http://www.python.org/doc/essays/list2str.html">loop
+optimization</a>, another anecdote, and <a href="http://effbot.org/zone/image-histogram-optimization.htm">an
+anecdote using images</a>.  <a href="http://manatee.mojam.com/~skip/python/fastpython.html">Some 
+specific tips</a>, and <a href="http://trific.ath.cx/resources/python/optimization/">some
+general tips</a></p>
+ <div class="dates" align="right">
+Created 26 Oct '03<br>
+Modified 14 Dec '04</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ Just a minor nit: sets aren't in C yet. They're a 100% Python library module. If there's enough interest (and I think there is) they'll become a builtin (see <a href="http://python.org/peps/pep-0218.html)." target="_blank">http://python.org/peps/pep-0218.html).</a>
+ <div align="right"><a href="http://blog.ianbicking.org/comment535.html" rel="nofollow">#</a> Johannes Gijsbers</div><hr noshade>
+ I didn't bother optimising the initial dictionary loading: instead I built a precompiled dictionary for each word-length. As graphs of linked word-nodes, they're pretty small.
+<br />
+
+<br />
+[epiphany:~/Code/kata19] cmiller% ./nodef.rb ruby gold
+<br />
+dictionary loaded in: 0.397383s
+<br />
+ruby => rubs => cubs => cues => cued => cued => coed => cold => gold
+<br />
+261 nodes touched in 0.020318s
+<br />
+
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment536.html" rel="nofollow">#</a> <a href="http://fishbowl.pastiche.org/">Charles Miller</a></div><hr noshade>
+ Erk. Just noticed the bug in the output. :)
+ <div align="right"><a href="http://blog.ianbicking.org/comment537.html" rel="nofollow">#</a> <a href="http://fishbowl.pastiche.org/">Charles Miller</a></div><hr noshade>
+ My coworker and I had a good time with this kata.
+<br />
+
+<br />
+After finishing it I created a corollary. Find the longest word chain. For example, the longest word chain for all three letter words is [asp ask ark are abe aye rye rae ray say sky ski sri uri uzi]. That took 210 milliseconds to find.
+<br />
+
+<br />
+I highly recommend trying the corollary.
+<br />
+
+<br />
+My longest time are for the 8 letter words. The chain is 30 words long and it takes 991 milliseconds to find.
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment538.html" rel="nofollow">#</a> <a href="http://gstaff.org">Chris Grindstaff</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

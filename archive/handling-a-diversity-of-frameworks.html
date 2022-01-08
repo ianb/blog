@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Handling a Diversity of Frameworks</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Handling a Diversity of Frameworks</h1>
+ 
+<div class="document">
+<p>Python is often criticized -- as much from within as without -- for
+its <a class="reference" href="http://wiki.python.org/moin/WebProgramming">proliferation of web frameworks</a>.  And yes, there's a
+lot -- and the list on that Wiki doesn't even cover them all, or
+account for the miniature frameworks built into applications.  For
+instance, <a class="reference" href="http://jtauber.com/leonardo">Leonardo</a> and <a class="reference" href="http://python.org/pypi">PyPI</a> each have ad hoc frameworks, just to give
+two examples.</p>
+<p>People suggest different ways of &quot;solving&quot; this problem of diversity,
+and say that this is the reason Python isn't as popular for web
+programming as PHP or Java or some other language.  But I think it's
+time we just get over it -- the &quot;problem&quot; can't be solved.  Java and
+PHP both have lots of frameworks, just like Python; this is simply the
+inevitable result of a diverse use base, and there's simply no way to
+stifle diversity and reimplementation in an open source community.
+Instead of reducing the options, we should work on handling the
+situation we have, of enabling a multitude of options instead of just
+complaining about it.</p>
+<p>What does that mean?</p>
+<ol class="arabic simple">
+<li>Installation should be easy.</li>
+<li>Aspects of an environment should be implemented in a
+framework-neutral fashion when possible.</li>
+<li>For specific domains, specific &quot;frameworks&quot; (some of which might
+not yet exist) can achieve dominance without having to address all
+needs.</li>
+<li>Applications made up of pieces using several frameworks should be
+possible and workable.</li>
+<li>We develop more agreement on best practices.</li>
+<li>In some areas diversity can be reduced when we've decoupled
+specific features and identified the best implementation of those
+features.</li>
+<li>Adopting a framework is less commitment, and moving to a different
+framework no longer requires anything like a full rewrite.</li>
+<li>Strong decoupling is achieved to significantly increase reusability and
+testability.</li>
+</ol>
+<p>We don't need some Killer Framework To Rule Them All -- we should work
+on an army of frameworks instead of a single Goliath.</p>
+<p>The obvious way to do this is with <a class="reference" href="http://www.python.org/peps/pep-0333.html">WSGI</a>.  So far my experience
+with using other people's WSGI-enabled applications (or applying WSGI
+changes myself) has been quite successful -- when you follow the spec
+things Just Work.</p>
+<p>But it shouldn't stop with simple WSGI backends to current frameworks
+(even if that's the right place to start).  We should start pushing
+functionality deeper into the WSGI stack as <a class="reference" href="http://www.python.org/peps/pep-0333.html#middleware-components-that-play-both-sides">middleware</a>,
+and providing fine-grained WSGI applications that can be usefully
+integrated into other applications.</p>
+<p>I think Python has a unique opportunity here:</p>
+<ul class="simple">
+<li>It's hard to do this in Java because static typing makes loosely
+coupled stacks hard to implement.  They <em>do</em> have a standard for
+interoperability -- the servlet spec -- but there's no agreement on
+the extra abstractions they need to deal with typing issues and
+achieve real decoupling (with things like IoC containers).</li>
+<li>PHP simply lacks the abstractions necessary.  It's not even clear
+what &quot;framework&quot; means in PHP -- there <em>are</em> frameworks, but they
+are seldom well partitioned entities.  Maybe it <em>could</em> be done, but
+on a community level they lack the right focus.</li>
+<li>Ruby doesn't have multiple frameworks that anyone cares about.</li>
+<li>Perl is stuck in the past.</li>
+<li>.NET is... well, as a community there's the potential to do this,
+but I don't think diversity has bloomed there.  Maybe it will, but
+the non-MS-oriented .NET community is very young.</li>
+</ul>
+<p>Instead of wishing Python web programming was more like language X, we
+have the opportunity to do something new.  We can turn this perceived
+flaw of diversity into a real benefit.</p>
+<p>This isn't innovative like a whiz-bang new feature, and it's not new
+like proprietary-world new.  This is the kind of innovation open
+source has been good at; integration, making things work together in
+new ways, realizing the benefits of distributed development.  This is
+real innovation, it's just not innovation that the proprietary world
+tends to pay attention to.  But working programmers know the value of
+this work.</p>
+<p>This is what I've been working on in <a class="reference" href="http://pythonpaste.org">Paste</a>; but an integration framework is only as
+good as the number of things that are integrated.  I could use more
+help; simply <em>using</em> Paste is help.  So please, the project needs more
+eyes and more diversity.  <a class="reference" href="why-web-programming-matters-most.html">And it matters</a>.</p>
+</div>
+ <div class="dates" align="right">
+Created 11 Jul '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>While I agree somewhat that the sheer number of frameworks isn't necessarily a problem, I don't sense lock-in or incompatibility as being a huge stumbling block for many. I still think it's a business-like concern over support (i.e. documentation, books (eventually) and number of other users of the software) that is most people's concern.</p>
+<p>&quot;Am I going to build our department intranet in this framework and then it'll be dead by the time I'm done?&quot; Sure people have the source, but in many cases not the time or skills to evolve and improve a framework like a community of users.</p>
+<p>This is one thing that has drastically helped R*ils. As many similar projects do, they have a smaller core of developers who are dang good, and a much larger orbit of others -- designers, general webmonkeys, occasional programmers, beginners, etc. Many Python projects seem to get stuck at the small group of good devs - and never make it to the &quot;attracting a crowd&quot; part. Many possible reasons, some valid, some junk, but I still think this is the magic [but mundane] step to increasing visibility (<a class="reference" href="why-web-programming-matters-most.html">http://blog.ianbicking.org/why-web-programming-matters-most.html</a>).</p>
+<p>Eventually, a Python framework will show up in a nice package, with a non-PythonGuru friendly face and crowd (lesser mortals aren't scared away by the high priests on the project), and start attracting much more attention. Maybe Mssr Holovaty's package, maybe not (haven't seen it!). But I think once that (inevitably) happens, it will set the terms. Sorta like how the IMG tag came about maybe.</p>
+<p>That said, if it happens on a shared spec like WSGI and your other efforts, that's even better. But I suspect that will be resolved by a large-visibility project choosing to implement it rather than the project needing to for its own success. i.e., top-down as opposed to bottom-up. Just missing the obvious top right now...</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/handling-a-diversity-of-frameworks-comment-1.html" rel="nofollow">#</a> <a href="http://">ToddG</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<blockquote>While I agree somewhat that the sheer number of frameworks isn't necessarily a problem, I don't sense lock-in or incompatibility as being a huge stumbling block for many. I still think it's a business-like concern over support (i.e. documentation, books (eventually) and number of other users of the software) that is most people's
+concern.</blockquote>
+<p>If you can switch frameworks reasonably easily (and incrementally), then you can follow support and popularity.  That's why I think lock in is a big problem.  That said, in practice lock in isn't terrible right now, with one notable exception (that starts with a Z), but it's still more than it should be.</p>
+<blockquote>
+That said, if it happens on a shared spec like WSGI and your other efforts, that's even better. But I suspect that will be resolved by a large-visibility project choosing to implement it rather than the project needing to for its own success. i.e., top-down as opposed to bottom-up. Just missing the obvious top right now...</blockquote>
+<p>I think (?) that Zope 3 probably already runs on WSGI.  When the Twisted people asked Jim Fulton what it would take to get them to use Twisted instead of their Medusa fork, he asked them to do it via WSGI.  Twisted <a class="reference" href="http://twistedmatrix.com/projects/web2/">web2</a> (which had a 0.1 release recently) included native WSGI support, and Zope 3 should at least come along soon.  I doubt Zope 2 would be that hard either, though what I'd really like is a Zope 2 WSGI Server Product, so that you could run WSGI applications under Zope.  Really I should just stop talking about it and write it, because it shouldn't be that hard.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/handling-a-diversity-of-frameworks-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I should expand on the importance of being able to switch:</p>
+<p>An environment where people can move from one framework to another will allow a real Darwinian process, and the emergence of a smaller set of &quot;winners&quot;.  Right now frameworks linger on forever, because there's no honest way for them to die.  Either the developers abandon their users -- many of whom are often clients who trusted the developer's original choice of framework -- or the project keeps going and further development continues on it.  Neither is good; either you are bad to your customers, or you create a partisan environment where each group of developers works in isolation to create the same set of features in their different frameworks.</p>
+<p>The coupling of typical frameworks makes this worse.  It's hard to be a polished framework when you have to implement a large number of features.  As a result, frameworks typically implement a few features well, and some features poorly.  As a result the selection process is haphazard, because you have to decide which features are important to you (and you don't really know), and you have to accept compromises in other features.  With a decoupled stack, you can choose the best piece for each level of that stack.  Sometimes there will still be vague choices -- different valid quality implementations, which appeal to different segments.  But I think at each level there will arise a small set of choices, each with real reasons for existing even in the presence of other implementations.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/handling-a-diversity-of-frameworks-comment-3.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>You are of course right on the huge value of being able to switch - or &quot;evolve away&quot; from a specific framework. As seen in the Java world with some people moving away from Struts to more recent setups like Spring, JSF, [today's new favorite], etc., but not needing to move it all at once.</p>
+<p>I guess I was loosely speaking more so of the possible reasons for thriving/dying of contenders. Most likely both parts are needed: not being locked-in at a lower level will allow more dynamism in the upper levels, which should lead to a few &quot;obvious choices&quot; as you point out [and I tried to point out as needed to really expand the visibility of pyweb stuff].</p>
+<p>Perhaps akin to having your living room furniture bolted down and/or integrated into your flooring - requiring tearing up the floor to change things [current scenario], and having all your furniture on wheels on a nice smooth floor - easy rearrangement [planned]. Alright I'll stop killing analogies now...</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/handling-a-diversity-of-frameworks-comment-4.html" rel="nofollow">#</a> <a href="http://t74.com">ToddG</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Whenever I hear the word &quot;framework&quot; my alarm bells ring.
+And I think that's the case with many people in IT.</p>
+<p>But sometimes it does make sense to us a framework.</p>
+<p>Choosing a (web) framework means taking risks.
+(Risk of &quot;wrong&quot; web framework selection, risk of steep learning curve, etc.)
+The smaller the choice the easier is the selection.</p>
+<p>To be on the safe side, many people want to go mainstream.
+But there is no Python web framework mainstream. Sigh.</p>
+<p>In order to be successful and survive, frameworks need a critical mass of users and developers. I think the diversity of Python web frameworks prevents one of those to get the critical mass. (I would say that Rails reached such a critical mass.)</p>
+<p>As long as none of the Python web frameworks reaches such critical mass, they can't profit from self-energising (positive feedback) effects.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/handling-a-diversity-of-frameworks-comment-5.html" rel="nofollow">#</a> Bishi</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I know people are wary of frameworks, and <a class="reference" href="frameworks-libraries-conceptual-scalability.html">I am too</a>.  But to clarify the discussion, &quot;framework&quot; can mean two things:</p>
+<ol class="arabic simple">
+<li>A set of conventions.</li>
+<li>A library that tries to generalize logic.</li>
+</ol>
+<p>The first is the natural result of dealing with a specific domain.  This is why <em>all</em> web applications use a framework, even if it's a custom framework for the application.  This set of conventions needs to be sufficient, as well -- the standard <tt class="docutils literal"><span class="pre">cgi</span></tt> module isn't sufficient, so if you use it you'll still end up creating a framework if your application is very large or general at all.  And even that module is a mini-framework -- just not a very good mini-framework.</p>
+<p>There's a real overhead to conventions, so if a framework is just (1) then it's still a problem.  There's new words, new constructs, new interfaces, and those tend to infuse the code that uses a framework.  If they don't, if those concepts are internal to the library, then it's not very framework-like.  But it can't be helped sometime, you can only hope you use terminology that is clear, minimal (but sufficient), and maps well to the domain, and is conventional.  Custom frameworks are most minimal, but least conventional, and tend to embody many nonconventional ideas of the application author.</p>
+<p>The second -- generalizing logic -- is much more dangerous, though often just as necessary.  For instance, if you didn't generalize logic a web application might start with:</p>
+<pre class="literal-block">
+if PATH_INFO.startswith('/contact'):
+    import contact_form
+    contact_form.run()
+elif PATH_INFO.startswith('/article') and PATH_INFO.endswith('/view'):
+    import article_view
+    article_view.run()
+</pre>
+<p>And so on.  Because a simple thing like URL parsing is very logic-heavy.  And if you use something like SimpleHTTPServer, you'll end up writing exactly that code.  <strong>Or</strong> you'll end up writing code that imports modules and does path matching generally, moving that &quot;code&quot; into &quot;data&quot; (a URL mapping or an algorithm for resolving URLs).  Then you've created your own logic-generalizing framework.</p>
+<p>In this case you hope the framework is minimal and transparent, and follows several important rules (which I have in my head and somewhere on disk, but I haven't written down on this blog).</p>
+<p>Paste has a little of both kinds of framework, and leaves a bunch up to frameworks that run on top of it.  This causes problems, but I can only say that I think hard about the issues and I'm designing Paste with these issues in mind.  Decoupling makes a framework more minimal, because it is locally-understandable, and Paste is all about decoupling.  A common infrastructure encourages convention.  And a wide base demands that the domain be well covered.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/handling-a-diversity-of-frameworks-comment-6.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>&gt; Adopting a framework is less commitment, and moving to a different framework no longer requires anything like a full rewrite.</p>
+<p>The idea of switching frameworks easily just doesn't make sense to me.  For the sake of this comment, I think a framework has two parts:</p>
+<ol class="arabic simple">
+<li>A framework lays out a set of interfaces that people can plug into.  When people choose Aquarium, Aquarium lets them swap out Web servers, how they do their URLs, how they do their sessions, etc.  All of this is tied to using simple API's that Aquarium provides, and then swapping in new pieces that implement those API's.  Those API's are fixed so that what implements those API's can change.  You can't have the backend and the API's changing at the same time, nor should you need to.</li>
+<li>A framework often lays down a methodology for solving a domain of problems.  For instance, Aquarium lays down the way I think many Web applications should be developed.  For instance, it distinguishes controllers from views.  Changing from having controllers and views to something else, such as having just views and other stuff (like Zope) can never be easy.  It requires a rewrite.</li>
+</ol>
+<p>So if you want to change frameworks all the time, the API's have to be overly simple and it can't suggest a methodology.  What's the point? ;)  You're better off just providing a library for whatever real functionality you provide and not calling it a framework at all.</p>
+<p>(That's just my $0.02.  Keep up the good work :) )</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/handling-a-diversity-of-frameworks-comment-7.html" rel="nofollow">#</a> <a href="http://jjinux.blogspot.com/">Shannon -jj Behrens</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

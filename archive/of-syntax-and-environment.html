@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Of Syntax and Environment</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Of Syntax and Environment</h1>
+ 
+<div class="document">
+<p>I was reading Robert Lefkowitz's post <a class="reference" href="http://r0ml.blogs.com/fot/2005/02/what_makes_a_pr.html">What makes a programming
+language great?</a> (<a class="reference" href="http://www.livejournal.com/users/glyf/29038.html">via his son</a>).</p>
+<p>In it he (kind of) argues against overly-simple core languages.
+Thinking back to the <a class="reference" href="http://www.paulgraham.com/hundred.html">2003 PyCon Keynote</a>, wherein I thought Paul
+Graham was off his rocker, I can see Robert's point.  But in doing so
+I think he argues two kinds of simplicity -- both of which are
+arguable, but are also very different.</p>
+<p>There's syntactic simplicity, and the simplicity of homogeneity.
+I.e., pure syntax vs. a pure runtime.</p>
+<p>With syntactic simplicity you get languages like Lisp, Smalltalk,
+Logo, and Tcl (in more-or-less increasing order of simpicity and
+regularity).  Advantages:</p>
+<ul class="simple">
+<li>Not much syntax to learn (and easy syntactic mastery).</li>
+<li>In some cases a highly manipulatable syntax -- leveraged quite a bit
+in Lisp (i.e. macros) and some in Tcl.  People usually don't get
+that far into Logo (though they could).  And maybe a bit strangely
+no one seems to care to go down that path with Smalltalk.</li>
+</ul>
+<p>Non-advantages:</p>
+<ul class="simple">
+<li>Easy to read.  Maybe Perl is hard to read, but humans have no
+trouble reading syntaxes much more complex than the simplest
+programming languages.</li>
+<li>Easy to parse.  You have to be kind of lazy to be driven by this.</li>
+</ul>
+<p>Disadvantages:</p>
+<ul class="simple">
+<li>Might miss out on some expressivity.  Cases where a human and
+computer might unambiguously and naturally parse a shorter form, or
+a more &quot;intuitive&quot; form.  Also, noting that uniformity sometimes
+decreases information (e.g., more punctuation can lead to denser
+information, as each character can convey more information).</li>
+<li>The uniformity might get in the way of making analogs between your
+system and other computer systems, e.g., <tt class="literal"><span class="pre">foreignFunction</span> <span class="pre">with:</span>
+<span class="pre">arg1</span> <span class="pre">with:</span> <span class="pre">arg2</span> <span class="pre">with:</span> <span class="pre">arg3</span></tt>.</li>
+<li>Some things feel shoehorned, e.g. <tt class="literal"><span class="pre">(+</span> <span class="pre">1</span> <span class="pre">1)</span></tt>.</li>
+</ul>
+<p>Note that complex syntaxes can have all these disadvantages as well,
+these are all just generalizations.</p>
+<p>On the other hand, you can have a pure runtime.  Examples include Java
+(excluding JNI), <a class="reference" href="http://squeak.org">Squeak</a>, and many Schemes.  To make a contrast, Lisp
+and Tcl aren't very pure, while Java is yet doesn't have a pure
+syntax.</p>
+<p>Advantages:</p>
+<ul class="simple">
+<li>Safety.  Some Master (i.e., VM designer) knows exactly what can and
+can't happen, and <em>can</em> utilitize this information to make
+commitments in failure conditions and security concerns.  It's still
+hard work to do this, but in a pure system it's at least <em>possible</em>.</li>
+<li>Portability.  Just like you can commit to security, you can commit
+to portable features.</li>
+<li>Hackability.  Things like <tt class="literal"><span class="pre">call-with-current-continuation</span></tt> can be
+done more safely when you have knowledge of the system.</li>
+<li>Transparency (<a class="reference" href="http://www.cincomsmalltalk.com/userblogs/avi/blogView?showComments=true&amp;entry=3284695382">turtles all the way down</a>).  Familiarity with the
+top of the system confers some familiarity with even the deepest
+part of the system.  At least sometimes (<a class="reference" href="http://eclipse.org/aspectj/">not always</a>).</li>
+</ul>
+<p>Non-advantages:</p>
+<ul class="simple">
+<li>Debuggability.  It's often not useful to be able to see all the way
+down.  My lack of microscopic vision <em>enhances</em> my ability to drive
+a car.  It can be useful, but transparency does not <em>require</em> a pure
+runtime.</li>
+<li>Portability.  Oh wait, I included that under advantages too ;)  But
+I don't think homogeneity actually creates very portable systems.
+Portability doesn't just mean insulation, it means adaptation, and
+homogeneous systems tend to adapt poorly to their environment.  You
+can be left with a <a class="reference" href="http://c2.com/cgi/wiki?WirthLanguages">Wirthian</a> <a class="reference" href="http://c2.com/cgi/wiki?BondageAndDisciplineLanguage">B&amp;D</a> attitude towards system access.</li>
+</ul>
+<p>Disadvantages:</p>
+<ul class="simple">
+<li>Difficult to interface with other parts of the system.</li>
+<li>Difficult to interface with libraries that do not fit your model.</li>
+</ul>
+<p>Robert talks about Perl regular expressions, vs. Python's.  In terms
+of syntax Perl's is less regular and more expressive -- Python has no
+native regular expression syntax, and instead uses normal strings.
+But in terms of runtime they are nearly identical -- Python happily
+uses a C backend just like Perl, and even a backend with the same
+heritage <em>(note: I was corrected, and their isn't any shared heritage,
+though they are similarly implemented in C)</em>.  Java would be a 
+counterexample, since I'm guessing Java
+regular expressions are implemented in Java.</p>
+<p>Python, since I can't help but bring it up specifically in every post,
+is a particularly impure runtime.  It's made significant compromises
+in the process.  The <a class="reference" href="gil-of-doom.html">GIL</a> is largely there to make it easier to mix
+Python and C code.  There's been a lot of reluctance to add
+microthreading and continuations to Python, and I think there's also a
+connection, because Python is easier to interface with C if they share
+a stack, and the C stack isn't all that amenable to continuations
+(though it's not impossible; but it truly is impossible with the Java
+stack).</p>
+<p>As a syntax, Python is middling.  It resists (non-traditional)
+punctuation.  It tries to leverage its syntax for multiple uses.  It
+has uniformity of attribute access.  But it's largely programmatically
+opaque, and there's never been any effort to keep it down to a core of
+primitive constructs.</p>
+</div>
+ <div class="dates" align="right">
+Created 05 Feb '05<br>
+Modified 05 Feb '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+    <div align=right><a href="http://blog.ianbicking.org/ofsyntaxandenvironmentcomment1.txt">source</a></div>
+    <pre>&quot;a backend with the same heritage&quot;
+
+Really?  Given that the Python RE backend was written by
+someone who's never used Perl, on a machine without a Perl
+installation, maybe you could explain that sentence?
+</pre> <div align="right"><a href="http://blog.ianbicking.org/ofsyntaxandenvironmentcomment1.html" rel="nofollow">#</a> <a href="http://effbot.org">Fredrik</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I thought Python regular expressions were Perl-compatible in syntax, and somewhere I guess I got the impression they used the PCRE backend, though I might have entirely imagined that.  At least I thought the distinction between <a class="reference" href="http://python.org/doc/current/lib/module-re.html">re</a> and <a class="reference" href="http://www.python.org/doc/1.5.2/lib/module-regex.html">regex</a> was that <tt class="literal"><span class="pre">regex</span></tt> used Emacs-style regular expressions, and <tt class="literal"><span class="pre">re</span></tt> used Perl-style.</p>
+<p>But I'm not saying I'm right or anything.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/ofsyntaxandenvironment-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+    <div align=right><a href="http://blog.ianbicking.org/ofsyntaxandenvironmentcomment3.txt">source</a></div>
+    <pre>In 1.5.2, the RE module used PCRE.  In 1.6 and later, that was
+replaced with a Unicode-aware engine, SRE, which was written from
+scratch, using on the 1.5.2 documentation and test suite as the
+specification.
+
+(guess who wrote it? ;-)
+</pre> <div align="right"><a href="http://blog.ianbicking.org/ofsyntaxandenvironmentcomment3.html" rel="nofollow">#</a> <a href="http://effbot.org">Fredrik</a></div><hr noshade>
+<blockquote>
+ 
+    <div align=right><a href="http://blog.ianbicking.org/ofsyntaxandenvironmentcomment4.txt">source</a></div>
+    <pre>should have been &quot;using only the&quot;
+</pre> <div align="right"><a href="http://blog.ianbicking.org/ofsyntaxandenvironmentcomment4.html" rel="nofollow">#</a> <a href="http://effbot.org">Fredrik</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>The GIL is not only for C-extensions.  Even if you could wave a magic wand and make all C-extensions thread safe, you may decide to keep the GIL, so that Python bytecode operations remain atomic.  Use of the GIL was an engineering choice, to promote performance and simplicity, at the expense of responsiveness.</p>
+<p>Because the GIL guarantees atomic bytecode operations, you can make those operations nice and fast, with no worries about thread context changes in the middle (another thread messing up your ducks while you have them nicely in a row).  Also makes things simpler, because of the checks you can avoid, you can just plow ahead, knowing nothing happens with threading until you release the GIL.</p>
+<p>But you lose responsiveness.  Sometimes a thread is started for naught, because an earlier thread hasn't released the GIL yet.  Would you want something like a GIL at the heart of a real-time system?  Probably not.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/of-syntax-and-environment-comment-5.html" rel="nofollow">#</a> nobody</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

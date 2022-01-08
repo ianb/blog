@@ -1,0 +1,535 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>First Try at Generic Functions</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>First Try at Generic Functions</h1>
+ 
+<div class="document">
+<p>So, after the <a class="reference" href="events-and-sqlobject.html">post on events</a> <a class="reference" href="http://dirtsimple.org">PJE</a> suggested I try using <a class="reference" href="http://www-128.ibm.com/developerworks/library/l-cppeak2/">generic functions</a> for
+events.  I'm still not sure that's where I want to start, since
+there's some more conservative options out there to address this.
+However, I have long meant to use his generic functions, as I think
+they seem pretty neat.</p>
+<p>Installation was easy; following what the <a class="reference" href="http://peak.telecommunity.com/">PEAK homepage</a> says, I ran:</p>
+<pre class="literal-block">
+easy_install -Zf http://peak.telecommunity.com/snapshots/ RuleDispatch
+</pre>
+<p>It was a little problematic, because <a class="reference" href="http://pydispatcher.sourceforge.net/">PyDispatcher</a> also implements a
+<tt class="docutils literal"><span class="pre">dispatch</span></tt> package.  I ended up just uninstalling that, though
+there's probably a better way to do it.</p>
+<p>My first test was an experiment in converting objects to a <a class="reference" href="http://www.crockford.com/JSON/index.html">JSONable</a> form (result <a class="reference" href="http://svn.colorstudy.com/home/ianb/rule_dispatch/">here</a>).  This worked
+very easily, and with no surprises.  Of course, it's an easy problem.
+But still, it's not a given that introducing a new tool to solve an
+easy problem will give an easy result.</p>
+<p>Using this, you can fiddle with the JSON representation of nearly any
+object.  For instance, lets say you get <tt class="docutils literal"><span class="pre">Binary</span></tt> objects (like from
+a database <tt class="docutils literal"><span class="pre">BLOB</span></tt> column), and you want to turn them into
+base64-encoded strings:</p>
+<pre class="literal-block">
+&#64;jsonify.when('isinstance(obj, Binary)')
+def jsonify_binary(obj):
+    return str(obj).encode('base64')
+</pre>
+<p>The only issue I have with the implementation is that it's hard to say
+<em>apply this rule only in this context</em>, because <tt class="docutils literal"><span class="pre">jsonify()</span></tt> doesn't
+have any argument that implies <em>context</em>.  So if you wnat to change
+the representation of an object, but only in the context of one controller
+in your web app, then that doesn't fit into this system.  Dynamically
+scoped variables would probably address this case.</p>
+<p>Anyway, in my second test I threw in a <tt class="docutils literal"><span class="pre">context</span></tt> argument parameter,
+just for this kind of thing.  Especially because in my second test I
+wanted to allow something most other adaptation systems can't --
+detailed tweaking of specific cases based on arbitrary rules that
+don't have any overriding sense to them.  These are exactly the
+rules that make up good UI design, and my second test is for
+generating forms from objects.</p>
+<p>For the second test I added some (experimental) modules to <a class="reference" href="http://formencode.org">FormEncode</a> (new website, BTW): <a class="reference" href="http://svn.colorstudy.com/FormEncode/trunk/formencode/fields.py">fields</a>,
+<a class="reference" href="http://svn.colorstudy.com/FormEncode/trunk/formencode/formgen.py">formgen</a>,
+and <a class="reference" href="http://svn.colorstudy.com/FormEncode/trunk/formencode/sqlformgen.py">sqlformgen</a>
+(the SQLObject-specific form generation routines), and <a class="reference" href="http://svn.colorstudy.com/FormEncode/trunk/tests/test_makeform.py">a test</a>.</p>
+<p>And while the result is by no means complete, and there's still parts
+of the design I don't understand well, again the generic functions
+didn't introduce any surprises.  I suspect when I try different
+combinators or some other tricky thing they will surprise me
+eventually; but of all the parts of this (rather difficult) problem,
+the generic functions seem the easiest.</p>
+</div>
+ <div class="dates" align="right">
+Created 11 Oct '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<blockquote>
+&quot;&quot;&quot;I ended up just uninstalling that, though there's probably a better way to do it.&quot;&quot;&quot;</blockquote>
+<p>If you install both of 'em as <tt class="docutils literal"><span class="pre">--multi-version</span></tt> eggs, you'll be fine as long as you never need both in the same program.</p>
+<blockquote>
+&quot;&quot;&quot;So if you wnat to change the representation of an object, but only in the context of one controller in your web app, then that doesn't fit into this system.&quot;&quot;&quot;</blockquote>
+<p>You're probably aware of this, but you could always add a context argument with a <tt class="docutils literal"><span class="pre">None</span></tt> default value.</p>
+<blockquote>
+&quot;&quot;&quot;Dynamically scoped variables would probably address this case.&quot;&quot;&quot;</blockquote>
+<p>Yep, and I do plan to add support for that to RuleDispatch as soon as I figure out whether my context variables proposal (work in progress) is likely to pass PEPping for stdlib inclusion in 2.5.  Python needs (IMO) a standard way to handle task-specific context variables that can be used with lightweight threads, in place of the thread-local mechanism currenly used by e.g. the Decimal arithmetic context.  Whether it's accepted or not, I'll be writing the library, and making it so generic functions can use it without constant-folding away the variables.  (Currently, any subexpression that doesn't involve a function parameter gets optimized to a constant at method definition time.)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/first-try-at-generic-functions-comment-1.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+ 
+<div class="document">
+<p>It's been a little bit since I've used them (and PJE can correct me if this is not the &quot;preferred&quot; way), but instead of:</p>
+<pre class="literal-block">
+&#64;jsonify.when('isinstance(obj, Binary)')
+...
+</pre>
+<p>you can do:</p>
+<pre class="literal-block">
+&#64;jsonify.when('obj in Binary')
+...
+</pre>
+<p>Saves a little typing, but the meaning isn't immediately obvious to people that don't know the RuleDispatch package (of course, anyone trying to look at code using RuleDispatch without understanding RuleDispatch will have problems anyway)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/first-try-at-generic-functions-comment-2.html" rel="nofollow">#</a> Jay P.</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Since (I don't think) <tt class="docutils literal"><span class="pre">obj</span> <span class="pre">in</span> <span class="pre">Binary</span></tt> will ever be generally equivalent to <tt class="docutils literal"><span class="pre">isinstance(obj,</span> <span class="pre">Binary)</span></tt> I wouldn't want to use that.  I know I'm not necessarily Typical, but generic functions make a lot of intuitive sense to me, and as long as they don't use funny special constructs like this I think other people can pick them up quite easily as well.  And RuleDispatch code reads pretty well, which is something I particularly like, and something that should make the resulting code accessible to people who have little understanding of RuleDispatch.  I didn't read up about it at all before using it -- except to get the import right -- so I don't think you need a thorough understanding to start.  But then I've read about it a while ago, so I might have lingering understanding that I've forgotten about.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/first-try-at-generic-functions-comment-3.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ 
+<div class="document">
+<p>At work we've been using:</p>
+<pre class="literal-block">
+&#64;jsonify.when(Binary)
+...
+</pre>
+<p>-Chris</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/first-try-at-generic-functions-comment-4.html" rel="nofollow">#</a> Chris L</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>That only works with <tt class="docutils literal"><span class="pre">&#64;dispatch.on</span></tt>, not <tt class="docutils literal"><span class="pre">&#64;dispatch.generic</span></tt>, unless you use a <tt class="docutils literal"><span class="pre">dispatch.strategy.PositionalSignature</span></tt> with a <em>sequence</em> of classes, not a single class.  E.g.:</p>
+<pre class="literal-block">
+from dispatch.strategy import PositionalSignature
+
+&#64;jsonify.when(PositionalSignature([Binary]))
+def jsonify(ob):
+    # ...
+</pre>
+<p>As you can see, this is more trouble than it's worth, unless you're writing code that dynamically adds methods and doesn't want to have to do string manipulation:</p>
+<pre class="literal-block">
+def register_jsonifier(cls, func):
+    &#64;jsonify.when(PositionalSignature([cls]))
+    def foo(ob): return func(ob)
+</pre>
+<p>However, because of the way condition strings are interpreted, you could just as easily write:</p>
+<pre class="literal-block">
+def register_jsonifier(cls, func):
+    &#64;jsonify.when(&quot;isinstance(ob,cls)&quot;)
+    def foo(ob): return func(ob)
+</pre>
+<p>Because the reference to <tt class="docutils literal"><span class="pre">cls</span></tt> is resolved immediately and treated as a constant thereafter.  So it's really pretty rare that you'd want to delve into the object-based interface to the criteria system.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/first-try-at-generic-functions-comment-5.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+    <div align=right><a href="http://blog.ianbicking.org/firsttryatgenericfunctionscomment6.diff">source</a></div>
+    <pre>Complex voodoo magic goes on here.
+
+For this example...
+
+@jsonify.when('isinstance(obj, Binary)')
+def jsonify_binary(obj):
+    return str(obj).encode('base64')
+
+
+Why not instead use something like:
+
+def jsonify(obj):
+    if isinstance(obj, Binary):
+        return str(obj).encode('base64')
+
+
+Instead you are adding more requirements, dependencies, and making the code harder to read.
+
+I know this was just an exercise in playing around with generic functions, but please think of simplicity.
+
+Please let me know what this method gives over simple if else?
+
+
+
+Here is a rewritten version of your jsonify.py using if else instead of .
+
+
+
+def jsonify(obj):
+    # @@: Should this match all iterables?
+    if isinstance(obj, (int, float, str, unicode)):
+        return jsonify_simple(obj)
+
+    else if isinstance(obj, (list, tuple)):
+        return jsonify_list(obj)
+
+    else if isinstance(obj, dict)'):
+        return jsonify_dict(obj):
+
+    else if isinstance(obj, sqlobject.SQLObject):
+        return jsonify_sqlobject(obj):
+
+    else if hasattr(obj, &quot;__json__&quot;):
+        return jsonify_explicit(obj):
+
+    else if isinstance(obj, sqlobject.SQLObject.SelectResultsClass):
+        return jsonify_select_results(obj):
+
+
+def jsonify_simple(obj):
+    return obj
+
+def jsonify_list(obj):
+    return [jsonify(v) for v in obj]
+
+def jsonify_dict(obj):
+    result = {}
+    for name in obj:
+        if not isinstance(name, (str, unicode)):
+            raise ValueError(
+                &quot;Cannot represent dictionaries with non-string keys in JSON (found: %r)&quot; % name)
+        result[name] = jsonify(obj[name])
+    return result
+
+def jsonify_sqlobject(obj):
+    result = {}
+    result['id'] = obj.id
+    for name in obj.sqlmeta.columns.keys():
+        result[name] = getattr(obj, name)
+    return result
+
+def jsonify_explicit(obj):
+    return obj.__json__()
+
+def jsonify_select_results(obj):
+    return jsonify_list(obj)
+
+
+
+
+The difference is that all your rules are in the same place.  Which makes the ordering of rules easier to see.
+
+Another difference is that there are a few less lines...  but I could change the if/else example to use less with less readability too.
+
+The main difference is that the if else version would work in more places, and more random python programmers would understand it.
+</pre> <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctionscomment6.html" rel="nofollow">#</a> <a href="http://www.madecollective.com/">Rene Dudfield</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;&quot;&quot;Please let me know what this method gives over simple if else?&quot;&quot;&quot;</p>
+<p>It gains you the ability to add support for new types in the module where the type is created, without having to modify the module where the <tt class="docutils literal"><span class="pre">jsonify()</span></tt> generic function is defined.  Essentially, it generalizes the idea of a registry or hook function or lookup table, or visitor, or any number of other common &quot;framework&quot; patterns, but without needing to use those things.  The function can simply be extended by any code that wants to, using a uniform approach.</p>
+<p>&quot;&quot;&quot;The difference is that all your rules are in the same place.&quot;&quot;&quot;</p>
+<p>Being able to extend the rules in an open-ended way is the feature that generic functions bring here.  It means that if module A contains some type that I'd like to pass to module B, which uses <tt class="docutils literal"><span class="pre">jsonify()</span></tt> to encode the object, then I in module C can declare a jsonification method for the type in module A, and I don't have to modify module A, module B, or the module containing jsonify!  For example, suppose that I'd like to be able to send Decimal objects to the browser.  If the object had to have a <tt class="docutils literal"><span class="pre">__json__</span></tt> method, that wouldn't work because I'd have to modify the decimal type.  And if Ian used if-then's, I'd have to patch his function or persuade him to add Decimal support.  But, by using a generic function, he has given me the freedom to just define a method in my application that provides the needed support.  I simply do this somewhere in my application's code:</p>
+<pre class="literal-block">
+from decimal import Decimal
+from jsonify import jsonify
+
+&#64;jsonify.when(&quot;isinstance(obj,Decimal)&quot;)
+def jsonify_decimal(obj):
+    # etc...
+</pre>
+<p>And that's it, I'm done.  It's a &quot;non-framework&quot; framework mechanism.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctions-comment-7.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+<blockquote>
+ 
+    <div align=right><a href="http://blog.ianbicking.org/firsttryatgenericfunctionscomment8.txt">source</a></div>
+    <pre>Assuming you can not change the original modules source...
+
+A way to do that is without generic functions is below:
+
+from decimal import Decimal
+from jsonify import jsonify
+
+jsonify_orig = jsonify
+def jasonify_mods(obj):
+    if isinstance(obj,Decimal):
+        ...
+    else:
+        return jsonify_orig
+
+jsonify = jasonify_mods
+
+
+Why are generic functions better than this technique?
+</pre> <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctionscomment8.html" rel="nofollow">#</a> <a href="http://www.madecollective.com/">Rene Dudfield</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;&quot;&quot;Why are generic functions better than this technique?&quot;&quot;&quot;</p>
+<ol class="arabic simple">
+<li>Your technique will not affect any modules that used <tt class="docutils literal"><span class="pre">from</span> <span class="pre">jsonify</span> <span class="pre">import</span> <span class="pre">jsonify</span></tt> to obtain the function, because they won't see your replacement version.</li>
+<li>Your technique degrades performance linearly with the number of types added, while generic functions use a dispatch tree that uses hash tables, binary search, or other lookup techniques as appropriate.  The dispatch tree is automatically balanced to test the most discriminating criteria first.  So, adding a new type in the JSON example has virtually no effect on performance of the <tt class="docutils literal"><span class="pre">jsonify()</span></tt> function, versus one extra function-call of overhead added by your approach for each new type.</li>
+<li>Your technique can only add tests at the highest precedence level, which means that if there's any overlap in conditions between what you are adding, and what exists, you will need to code a more complex &quot;if&quot; rule, and you will need to know what other existing rules overlap.  (Which means that only linear extension is possible, and that some tests will be repeated unnecessarily.)</li>
+<li>Your technique cannot take advantage of any overlap in the conditions being tested.  For example, the various <tt class="docutils literal"><span class="pre">isinstance()</span></tt> calls in your version repeatedly walk the object's class' <tt class="docutils literal"><span class="pre">__mro__</span></tt> to see if it contains the target classes.  The generic function, however, will do this walk <em>once</em>, no matter how many types are registered, and then call the correct function.</li>
+<li>Your code is buggy; it should return <tt class="docutils literal"><span class="pre">jsonify_orig(obj)</span></tt>.  :)</li>
+</ol>
+<p>In other words, generic functions are far superior to monkeypatching for creating an extensible operation, which is why the Python standard library uses a simple form of them for things like copying and pickling.  However, the RuleDispatch generic function implementation supports automating the registration process and lookup tables for simple functions (using <tt class="docutils literal"><span class="pre">&#64;dispatch.on</span></tt>) and allows for building dispatch trees on arbitrary computations with full generic functions (using <tt class="docutils literal"><span class="pre">&#64;dispatch.generic</span></tt>).</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctions-comment-9.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+<blockquote>
+ 
+    <div align=right><a href="http://blog.ianbicking.org/firsttryatgenericfunctionscomment10.txt">source</a></div>
+    <pre>1.
+If the patching was done first it will work.  The code needs to be changed to 
+use the full import jsonify and then jsonify.jasonify = jasonify_mod
+
+2.
+As the code stands, if/else is quicker.  Quicker to load(less imports) and quicker to run.
+I will take your word for it that maybe there could be a performance improvement with generic functions in other cases...  however my speed tests(see below) seem to point otherwise.
+
+Also note that if/else can translate easily into fast code(psyco or C).  So if you do have a performance problem, if/else will be faster, or you could easily change it to use some other dispatch method.  The if/else code with psyco runs 5.2 times faster, making it about 150 times faster than the generic dispatch version.  When psyco is used it fails to run at all with generic functions.
+
+
+3.
+You need to know what other rules exist with generic functions too.  Or at least what order they are applied.
+
+Good point about only being able to put it at the top, unless you add extra code.
+
+
+4.
+Interesting optimization.  However generic functions are still slower in my tests.
+
+5.
+Thanks for spotting the error!  Ps. there are lots of warnings in your src/protocols/_speedups.c file ;) With the default debian compiler gcc4.02.
+
+
+For the case where you can not change the existing source, then generic functions seem to have a use.  However there are other methods available which can work fine(arguably better).  Maybe there are other use cases for them where they make more sense.  However for the cases here, if/else works fine.
+
+
+
+
+
+Below is a version of jsonify with a speed test at the bottom.  The if/else version is about 30 times faster.  Not including the extra module load time.  jsonify2.py is the if/else version, jsonify.py is the generic function version with the timing code attached to the bottom.
+
+Perhaps there could be a problem with my machine, so you can repeat the test on your own to check if you would like.
+
+
+time python2.4 jsonify.py 
+Time for just the running parts.  Not including module load time.  9.05578112602
+
+real	0m9.659s
+user	0m9.428s
+sys	0m0.167s
+
+time python2.4 jsonify2.py 
+Time for just the running parts.  Not including module load time.  0.386996984482
+
+real	0m0.805s
+user	0m0.721s
+sys	0m0.070s
+
+
+
+import sqlobject
+
+def jsonify(obj):
+    # @@: Should this match all iterables?
+    if isinstance(obj, (int, float, str, unicode)):
+        return jsonify_simple(obj)
+
+    elif isinstance(obj, (list, tuple)):
+        return jsonify_list(obj)
+
+    elif isinstance(obj, dict):
+        return jsonify_dict(obj)
+
+    elif isinstance(obj, sqlobject.SQLObject):
+        return jsonify_sqlobject(obj)
+
+    elif hasattr(obj, &quot;__json__&quot;):
+        return jsonify_explicit(obj)
+
+    elif isinstance(obj, sqlobject.SQLObject.SelectResultsClass):
+        return jsonify_select_results(obj)
+
+
+def jsonify_simple(obj):
+    return obj
+
+def jsonify_list(obj):
+    return [jsonify(v) for v in obj]
+
+def jsonify_dict(obj):
+    result = {}
+    for name in obj:
+        if not isinstance(name, (str, unicode)):
+            raise ValueError(
+                &quot;Cannot represent dictionaries with non-string keys in JSON (found: %r)&quot; % name)
+        result[name] = jsonify(obj[name])
+    return result
+
+def jsonify_sqlobject(obj):
+    result = {}
+    result['id'] = obj.id
+    for name in obj.sqlmeta.columns.keys():
+        result[name] = getattr(obj, name)
+    return result
+
+def jsonify_explicit(obj):
+    return obj.__json__()
+
+def jsonify_select_results(obj):
+    return jsonify_list(obj)
+
+
+
+if __name__ == &quot;__main__&quot;:
+    import time
+    a = range(100)
+    b = {&quot;asdf&quot;:2}
+    class AA:
+        def __json__(self):
+            return &quot;asdf&quot;
+    c = AA()
+
+    t1 = time.time()
+    for x in range(10000):
+        r1 = jsonify(a)
+        r2 = jsonify(b)
+        r3 = jsonify(c)
+
+    t2 = time.time()
+    print &quot;Time for just the running parts.  Not including module load time.  %s&quot; % (t2 - t1)
+</pre> <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctionscomment10.html" rel="nofollow">#</a> <a href="http://www.madecollective.com/">Rene Dudfield</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Would you mind using restructured text for your comments?  Whatever you're doing instead is <em>very</em> hard to read.</p>
+<p>You seem to be missing the point, by the way.  If a library is trying to provide an extensible function, it's silly to make everyone monkeypatch it and disallow anybody from importing it.  And, with the linear reduction in speed caused by monkeypatching, there will sooner or later be a breakeven point where the generic function is faster.</p>
+<p>Right now, very little of RuleDispatch is in C, so that breakpoint might take several people adding their own type lookups.  But as time goes on and RuleDispatch gets faster, the breakeven point comes sooner as well.  Also, with more expensive tests than simple isinstance() checks, the repeated checking will reach the breakeven point faster as well.  Import time also won't matter with code that is using dozens of generic functions, not just one.</p>
+<p>You also are wrong about not needing generic functions in cases where you can change the source.  There are still reasons why you'd use them:</p>
+<ol class="arabic simple">
+<li>Writing optimal if-then trees for large and complex rule sets is difficult to do correctly</li>
+<li>A collection of rules is more likely to have 1-to-1 correspondence with business rules or requirements, and therefore easier to track/verify</li>
+<li>An application that gets customized rules for different customers will need a modularly-extensible rule system, that doesn't require all the rules to be in a single hand-tuned tree.</li>
+</ol>
+<p>In other words, generic functions are useful for the same reason Python is more useful than assembly language.  You can always write the same code in assembly, but it's easier with a high-level specification that's automatically translated.  The key is simply that it have performance that's &quot;good enough&quot;, and for complex code with expensive tests, generic functions can already do better than a human for optimization, in terms of time to produce a correct and efficient decision tree.</p>
+<p>Eventually, they'll beat even your example here, which by the way is a bit like saying, &quot;see, I can write C code that runs faster than Python&quot;.  Well, duh.  Try the test with a dozen extra types added by monkeypatching (not by-hand inlining as shown), and see what the speed difference is.  I don't know what the breakeven point for this example is, but I can guarantee there'll be one.  Past that breakpoint, monkeypatching will keep getting slower and slower, but the generic function will continue to have basically the same performance.  And the more complex your ruleset and tests, the sooner that breakpoint will be reached.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctions-comment-12.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>'''You seem to be missing the point, by the way. If a library is trying to provide an extensible function, it's silly to make everyone monkeypatch it and disallow anybody from importing it. And, with the linear reduction in speed caused by monkeypatching, there will sooner or later be a breakeven point where the generic function is faster.'''</p>
+<p>No.  You can use a function from other modules after changing it at runtime.</p>
+<p>'''Eventually, they'll beat even your example here, which by the way is a bit like saying, &quot;see, I can write C code that runs faster than Python&quot;. Well, duh. Try the test with a dozen extra types added by monkeypatching (not by-hand inlining as shown), and see what the speed difference is.'''</p>
+<p>Performance for generic functions seems to be slower until you have 40 different source files for if/else.  However it is not 40 different types.  If you put the rules in less source files, then it is lots quicker still.  From my tests the break even point if they are in the same file, would be about 1000 rules.  With psyco, the break even point for if/else would be 120 source files... not that I tested it with 120, just that the performance behaviour is consistent with this when using 40.</p>
+<p>So generic functions need to be optimized for those cases where you do not have 40 different source files.  Otherwise the claim of better performance can not be made.  I can't think of a real life example where people actually have 40 different source files for these types of rules, but I'm sure there are cases.  The other place where generic functions are faster is if you make lots of duplicated slow rules.</p>
+<p>For simplicity of reading, sit ten random python programmers in front of the two examples, and see which one is understood more easily.</p>
+<p>For simplicity of debugging, try debugging your C code compared to some if/else rules written in python.</p>
+<p>I think if people understand generic functions, and if there are lots of rules that can not be kept in the same place, then they would be easier to maintain.</p>
+<p>Thanks for pointing out why generic functions are useful.  It has been interesting playing around with them.  I hope I have helped you see some reasons why they are not useful.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctions-comment-13.html" rel="nofollow">#</a> <a href="http://www.madecollective.com/">Rene Dudfield</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;&quot;&quot;Performance for generic functions seems to be slower until you have 40 different source files for if/else.&quot;&quot;&quot;</p>
+<p>Not true - see my test results below.  Adding just <em>two</em> monkeypatches to your hand-tuned jsonify brings your benchmark down to being 50% <em>slower</em> than the generic function version.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctions-comment-15.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Oops.  I mean 35% slower.  I was looking at 2.xx vs 3.xx without including the 'xx's in the division.  :)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctions-comment-16.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Regarding the benchmark, I tried it out this evening and noticed a couple of things.  First, the timing figures you quote above show a 23.4X slowdown, not 30X.</p>
+<p>Second, I sped up the test by a factor of three by changing one rather simple thing.  Ian's rule checking for <tt class="docutils literal"><span class="pre">hasattr(obj,&quot;__json__&quot;)</span></tt> is unnecessary; I simply made <tt class="docutils literal"><span class="pre">jsonify_explicit</span></tt> the default and let it raise an error otherwise, since that's what happens anyway.  (Making the same change to your version doesn't result in as much of a speedup, but I did it anyway so that it's an apples to apples comparison.)</p>
+<p>Also, by doing a bit of profiling, I saw that much of the remaining difference in time comes from the fact that RuleDispatch's equivalent to <tt class="docutils literal"><span class="pre">isinstance()</span></tt> is still in Python, not C.  So, I spent another 30 minutes or so whipping up a Pyrex version, and thus sped up the test by another factor of 2.</p>
+<p>My final stats, having modified both your version and Ian's version to have the simpler logic, and using the C <tt class="docutils literal"><span class="pre">isinstance</span></tt> code, are 1.58 seconds for your hand-tuned version, vs. 2.88 seconds for the generic function version.  (I used <tt class="docutils literal"><span class="pre">time.clock()</span></tt>, which is more accurate for timing purposes, and for both measurements I took the best of 3 runs.)  So, the end result is that the generic function version takes about 1.37 times as long to run, which is not bad for stacking up against your hand-optimized code.</p>
+<p>But this still isn't a fair comparison, since you proposed to extend the function via monkeypatching.  So, I tested a simple version using only one level of monkeypatching:</p>
+<pre class="literal-block">
+def jsonify(obj):
+    # &#64;&#64;: Should this match all iterables?
+    if isinstance(obj, (list, tuple)):
+        return jsonify_list(obj)
+    return jsonify2(obj)
+
+def jsonify2(obj):
+    if isinstance(obj, (int, float, str, unicode)):
+        return jsonify_simple(obj)
+    elif isinstance(obj, dict):
+        return jsonify_dict(obj)
+    elif isinstance(obj, sqlobject.SQLObject):
+        return jsonify_sqlobject(obj)
+    elif isinstance(obj, sqlobject.SQLObject.SelectResultsClass):
+        return jsonify_select_results(obj)
+    return jsonify_explicit(obj)
+</pre>
+<p>This code runs in 2.91 seconds (best of 3), so it's <em>already</em> at breakeven compared to the generic function!  So, I then added a <tt class="docutils literal"><span class="pre">Decimal</span></tt> case wrapper to both scripts, and reran the timings.  Result: the monkeypatching version takes 3.88 seconds (best of 3), and the generic function version took 2.88 seconds - exactly the same as the case without Decimal.  (I did not modify the test to actually include any Decimal values, but of course the monkeypatching approach slowed down anyway.)</p>
+<p>Anyway, it appears that as soon as you monkeypatch more than once or twice for something like this, generic functions will start coming out ahead.  And if they don't, you can always post the results on a blog somewhere and I'll tune up the implementation so that they <strong>do</strong> come out ahead.  ;)</p>
+<p>(The C speedup for <tt class="docutils literal"><span class="pre">isinstance()</span></tt> checks is now in the RuleDispatch SVN version, by the way.)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctions-comment-14.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I am glad you have sped up your generic functions.  If they can be within 5-10x of the if/else method, generic functions become much more worthwhile imho.  At 1.3x the speed they become awesome!</p>
+<p>Can you please post the code to your changes so that I can verify them?</p>
+<p>btw, my version was not 'hand optimized'.  I copy-pasted the rules from the other version.  Your version is hand optimized... changing the rules, and adding a C version for some rules.  By changing the order of the __json__ changed the behaviour of the code.  Possibly breaking it in circumstances(when an sql object sqlobject.SQLObject.SelectResultsClass has a __json__ method).</p>
+<p>Or did I get the way the rules work wrong?  I assumed they would be tested from first declared to last declared.</p>
+<p>Is there a way you can make that particular type of rule faster?  That is the hasattr(obj, &quot;__json__&quot;) type condition.  It would seem to be a very common one for this use with types.  I have seen it used elsewhere eg, __str__, __html__, etc.  Or maybe that is not why the original generic function was slower.</p>
+<p>The interesting thing to note here, is that the slowness of one condition had more effect on the generic function version than the if/else version. Is that right?  I can't understand why that condition accounts for such a slowdown with generic functions.</p>
+<p>To be clear, my proposed approach is to keep things in one file, with the rules in the one place.  Only if absolutely necessary do you override functionality in different files.  I think it is better to refactor than to patch with conditions hidden in different files.</p>
+<p>I also see the useful things of generic functions for when there are lots of rules spread across lots of files you may not own.</p>
+<p>If you can get them as fast or faster than if/else rules, then I can definitely see myself using them for game programming.  Especially if you can get it to work with psyco.</p>
+<p>ps.  Are you aiming to have these in python at some point?  Is it not released yet?  I can't find the documentation for it on your page.  I did find <a class="reference" href="http://peak.telecommunity.com/PyCon05Talk/">http://peak.telecommunity.com/PyCon05Talk/</a> though.  Pretty good that I could figure it out(I think) without documentation, and only a blog post to go by.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctions-comment-17.html" rel="nofollow">#</a> <a href="http://www.madecollective.com/">Rene Dudfield</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>For the best explanation of Generic Functions and there benefits look here <a class="reference" href="http://www.gigamonkeys.com/book/object-reorientation-generic-functions.html">http://www.gigamonkeys.com/book/object-reorientation-generic-functions.html</a></p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/firsttryatgenericfunctions-comment-11.html" rel="nofollow">#</a> Anthony Tarlano</div><hr noshade>
+</blockquote>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Thinking about the  Python Standard Library</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Thinking about the  Python Standard Library</h1>
+ <p>
+
+Andrew Kuchling wrote in <a href="http://www.amk.ca/diary/archives/cat_python.html#003382">Toward
+Python's future</a> advocating an emphasis on the standard library.
+<a href="http://www.airynothing.com/cgi-bin/mt-comments.cgi?entry_id=3382">The
+comments</a> are filled with many supporters (and I also agree).  But
+what does it really mean?  (Note: I actually come at this as an
+outsider; I haven't really contributed much to the core of Python, I
+merely use what they give me)
+
+<p>
+
+First: what purpose does the standard library serve?
+
+<ol>
+
+  <li> Packages that use the standard library only require "python",
+  making installation easier. </li>
+
+  <li> The standard library maintains backward compatibility.
+  Upgrading Python also involves upgrading the standard library, but
+  that's usually not a problem.  Even security fixes are applied
+  carefully; e.g., <tt>Cookie.SmartCookie</tt> is a security hole, but
+  using it only emits a warning, it wasn't removed, nor was
+  <tt>Cookie.Cookie</tt> (which is <tt>SmartCookie</tt>) replaced with
+  a secure version. </li>
+
+  <li> The standard library discourages diversity of implementations.
+  This is both a good and bad thing.  It's good when the standard
+  implementation is good; it's not so great when it isn't.  Though I
+  think it's arguable that a suboptimal standard implementation isn't
+  that bad.  For instance, people criticize the <a href="http://python.org/doc/current/lib/module-logging.html">logging</a>
+  module for being too complicated; but its presence means that people
+  are encouraged to build simpler systems on top of the logging
+  module, instead of creating wholely independent implementations.
+  This helps keep the community on the same page, and changes can be
+  folded back into the standard library.  But some bad modules are an
+  albatross around the neck of the community -- for instance, the <a href="http://python.org/doc/current/lib/module-cgi.html">cgi</a> module. </li>
+
+  <li> Because the standard library is "standard" it can't be too
+  specialized or place many requirements on your program.  I've
+  written about the <a href="http://blog.colorstudy.com/ianb/weblog/2004/03/13.html#P72">difference
+  between libraries and frameworks</a> before; the standard library
+  avoids frameworks.  I get annoyed with many of the framework-like
+  modules that <i>are</i> in the standard library.  A lot of them seem
+  to come from Java (SAX, unittest, logging, ...). </li>
+
+</ol>
+
+And I see some problems with the standard library:
+
+<ol>
+
+  <li> When modules get into the standard library, they tend to
+  stagnate.  This has a lot to do with the backward compatibility
+  requirements. </li>
+
+  <li> Authors who don't consider their module to be "complete" are
+  reluctant to have it in the standard library. </li>
+
+  <li> When new modules (or new module features) are added to Python,
+  developers who depend on those modules have to deal with older
+  Python versions.  So the installation isn't eased until the module
+  has been in Python for a couple years. </li>
+
+  <li> There's not a lot of direction about which module you should
+  use, when there are alternatives.  <a href="http://python.org/doc/current/lib/module-httplib.html">httplib</a>, <a href="http://python.org/doc/current/lib/module-urllib.html">urllib</a>
+or <a href="http://python.org/doc/current/lib/module-urllib2.html">urllib2</a>?
+<a href="http://python.org/doc/current/lib/os-process.html">os</a> or
+<a href="http://python.org/doc/current/lib/module-commands.html">commands</a>?
+  <a href="http://python.org/doc/current/lib/module-time.html">time</a> or
+<a href="http://python.org/doc/current/lib/module-datetime.html">datetime</a>?
+  <a href="http://python.org/doc/current/lib/module-thread.html">thread</a>
+or <a href="http://python.org/doc/current/lib/module-threading.html">threading</a>?
+At first, you might
+  think it's easy to figure out which: whichever one is older.  But
+  usually one module doesn't include all of the other module's
+  features.  E.g., <a href="http://python.org/doc/current/lib/module-email.html">email</a> is the preferred way of
+  dealing with email messages; but <a href="http://python.org/doc/current/lib/module-rfc822.html">rfc822</a>
+feels more reasonable when you just want to
+  parse and represent headers. </li>
+
+  <li> There's <a href="http://python.org/doc/current/lib/modindex.html">too damn many
+modules</a>, and the numbers just get larger. </li>
+
+  <li> It can be hard to find modules.  I still discover standard
+  modules from time to time.  Just looking through them now, I notice
+<a href="http://python.org/doc/current/lib/module-linecache.html">linecache</a> </li>
+
+  <li> Lots of modules seem too trivial, e.g., must <a href="http://python.org/doc/current/lib/module-pwd.html">pwd</a> and
+<a href="http://python.org/doc/current/lib/module-grp.html">grp<a> be
+two separate modules? </li>
+
+</ol>
+
+So if we enhance the standard library, how might that work?  Well, one
+option is to go with a minimal Python base, and make installation and
+dependencies easy to handle.  E.g., <a href="http://python.org/pypi">PyPI</a> becomes an authoritative source
+for modules, and you can download and install modules automatically
+from there.  This is similar to <a href="http://www.cpan.org/">CPAN</a>, which people say is great.  I've
+only used it a tiny amount, but it seemed like a pain in the ass to
+me.  And I'd hope we could avoid duplicating good systems like apt and
+rpm; I'd like to see PyPI become a repository for those systems that
+already have formalized techniques for installation, upgrading, and
+dependency checking, rather than an alternate mechanism.
+
+<p>
+
+I think minimalism isn't actually all that hot.  Programmers often get
+a little too excited about minimalism.  If all it does is save disk
+space, it's not worth it -- people who really need minimal Python
+installs are fully capable of making them.  The default should be a
+rich environment.  A minimal installation is just a way to dodge many
+of the negative aspects of the standard library -- but the negative
+aspects are also connected to the positive aspects.
+
+<p>
+
+Or, we continue the way we have been, but just try harder.  We start
+restructuring the documentation, hiding deprecated modules, including
+more suggestive notes in the documentation, etc.  We enhance modules
+in-place, with an eye to backward compatibility, but growing new
+functions and interfaces for enhanced functionality.  Modules have to
+be backported (at least to 2.2, even better to 2.1 for many Zope and
+Jython users); this way users who depend on new features don't have to
+abandon older Python versions.  People who want to be backward
+compatible will have to distribute the backported modules, and use
+import tricks to load them as necessary; not very clean, but workable.
+
+<p>
+
+I have another idea as well -- we tackle the version issue.  Right now
+there's not a very good way to deal with multiple versions of a
+library being simultaneously installed.  You can install the library
+in different locations and fiddle with sys.path, but this is fragile
+and when it breaks it usually breaks in mightily confusing ways.  Or
+you can install the library under different names (e.g.,
+<tt>module_v_21</tt>), which seems a bit more crude but probably won't
+lead to as much confusion.
+
+<p>
+
+If packages can specify the version they require (on import or in
+<tt>setup.py</tt>), then we could start making backward-incompatible
+changes to modules.  The Python distribution becomes quite a bit
+bigger, as it would keep the old versions, but disk space and network
+bandwidth is cheap.  This would be great for system administration,
+because conflicts would be much less likely.  There's some
+complexities.  E.g., version 1 of package X might require at least
+version 2.1 of package Y; but will it work with version 2.2?  3.0?
+When package X is created, neither 2.2 or 3.0 exist, so it's an
+unknown.  Maybe the package Y authors are aware of the issue, but can
+they indicate compatibility for package X?  Well, there's lots of
+issues -- it's a hard problem.  But I feel that solving this problem
+would suddenly make substantive reform of the standard library a
+possibility, without losing the stability which is such a virtue.
+
+<p>
+
+Anyway, those are some of my thoughts.
+ <div class="dates" align="right">
+Created 02 Oct '04<br>
+Modified 14 Dec '04</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ One good thing I heard about C# is versioning in class level.
+ <div align="right"><a href="http://blog.ianbicking.org/comment374.html" rel="nofollow">#</a> <a href="http://smejmoon.lv">Girts</a></div><hr noshade>
+ you may be interested in knowing that in rubyland there is an ongoing effort to do this kind of thing.
+<br />
+
+<br />
+Actually, there are two different projects, the Ruby Production Archive and RubyGems. 
+<br />
+
+<br />
+They have some philosophical differences that you may want to consider when thinking of a pkg system for python. 
+<br />
+Also consider the tcl pkg system.
+<br />
+
+<br />
+Beware of not considering CPAN the unique/best system. 
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment375.html" rel="nofollow">#</a> <a href="http://verbat.blogspot.com">verbat</a></div><hr noshade>
+ Please forget about linecache again :)
+ <div align="right"><a href="http://blog.ianbicking.org/comment376.html" rel="nofollow">#</a> <a href="http://starship.python.net/crew/mwh/blog">Michael Hudson</a></div><hr noshade>
+ "Beware of not considering CPAN the unique/best system."
+<br />
+
+<br />
+Too many negatives, I am confused.
+<br />
+
+<br />
+One of the nice things about Ruby in this case is its path-based includes (as opposed to Python, where the path is kind of inferred from the import).  It makes it much easier to be explicit about what exactly you are trying to get.  And I'm sure it has its own problems as well, like leading to local configuration values getting put into the code.  There's an up and down to everything.
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment377.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ If I was able just to prentend that current stdlib never release and I could do anything on it's codebase before releasing to public I would:
+<br />
+
+<br />
+1. put it into hierarchical namespace
+<br />
+2. make naming style consistent
+<br />
+3. make functional/OO style consistent
+<br />
+4. purge/rework a lot of current modules
+<br />
+
+<br />
+Of course, I realize that this would require a huge resources and would never be accepted by the community.
+<br />
+
+<br />
+Obviously we need a strategy to actually improve on stdlib but I'm not sure if it's exist after all.
+ <div align="right"><a href="http://blog.ianbicking.org/comment378.html" rel="nofollow">#</a> <a href="http://ischenko.blogspot.com">Max Ischenko</a></div><hr noshade>
+ Python 3.0 will have changes that are not compatible with 2.x python, So we could do this reorganization there, and the best part is that we can do a backport of everything so all the comunity can discuss and help in the making of this reorganization.
+ <div align="right"><a href="http://blog.ianbicking.org/comment379.html" rel="nofollow">#</a> Leonardo Santagada</div><hr noshade>
+ Sorry, could you expand on how "... <i>the cgi module is an albatross </i>..." - I use this module preferably to web-frameworks because of its shear simplicity.
+<br />
+I'm about to tackle a large high-volume site, my first of any worthwhile dimension and would like to know <b>why NOT</b> use cgi.
+<br />
+Thanks
+ <div align="right"><a href="http://blog.ianbicking.org/comment380.html" rel="nofollow">#</a> jean-marc</div><hr noshade>
+ Some more thought on how to provide multiple versioning of modules might enable a tidy-up of the standard libraries to occur in an evolutionary way.  If not, I suspect no action will be taken. So I like this idea.
+<br />
+
+<br />
+Newer, rationalised and development-class modules could be supplied in an "uppermost layer", and "sink down" into lower levels when they become more tested and stable.
+<br />
+
+<br />
+I like the idea of this kind of mechanism for user-written code, also. This can be used to apply temporary fixes to a software product that can eventually settle down to a base-product layer after confidence in stability has been won.
+<br />
+
+<br />
+Better IDE-tools to allow module browsing and re-organising will become more essential. Perhaps we should have plain web-apps based on someone's brave decision to support Quixote or some other framework to act as the official Python Local Facilities PLF.  PLF being the documentation-server, tutorial server, installation builder/manager and very basic IDE and run-time environment. So, not going as far as Zope, being much more general in audience target  but cerrtainly Zope-like. Personally I am in favour of a larger distribution that makes standard Python adoption a better experience.
+ <div align="right"><a href="http://blog.ianbicking.org/comment381.html" rel="nofollow">#</a> <a href="http://www.jorjun.org.uk">jorjun</a></div><hr noshade>
+ Requiring nothing but a standard Python install is a <b>big</b> benefit for an application. I have certainly written code which uses suboptimal library modules, just because the suboptimal ones are standard. So improving PyPI, while a worthy goal, isn't the end of the story.
+<br />
+
+<br />
+In fact, just getting <b>Python</b> installed can be enough of an issue to be a problem. For some recent work, I ended up proposing TCL (ack, spit) because of the existence of Tclkit - a one-file executable which included TCL and a load of libraries. And binaries for most common Unix flavours, and windows, are available for download. Zero-cost install with no need for a compiler is a <i>major</i> benefit in highly heterogeneous environments (where you can't rely on much beyond the base OS, and that varies, and change control policies vary enough to make being able to install and/or rely on a standard scripting language pretty much impossible). [Real life - who needs it :-(]
+ <div align="right"><a href="http://blog.ianbicking.org/comment382.html" rel="nofollow">#</a> Paul Moore</div><hr noshade>
+ You say we should avoid repeating apt and rpm. That's all very well, but what about us windows users? I doubt Microsoft is willign to leverage windows update, windows' closest analogue to this, and I'm really not sure how, say, Mac OS, or some of the less mainstream OSes would cope with this.
+<br />
+
+<br />
+Or what if you're not root on a unix box? you can't rely on apt or RPM then.
+<br />
+
+<br />
+So we're going to have to write a package manager for these situations anyway. While I agree that interaction with apt an rpm is a good idea, it should not mean we shouldn't write our own.
+ <div align="right"><a href="http://blog.ianbicking.org/comment383.html" rel="nofollow">#</a> Moof</div><hr noshade>
+ attn: jean-marc: "why NOT use cgi..."
+<br />
+
+<br />
+At the risk of going off-topic, if you are talking about Apache web server, look into mod_python (latest version needs Apache2) either alone or with spyce, or else FastCGI (also possibly with spyce). What you want to avoid (and why you want to avoid simple CGI) is loading the python interpreter and your program every time a user requests a page. You can get away with this on low volume sites but if you ramp up, overall responsiveness tanks. This is based on my experience....
+<br />
+ <div align="right"><a href="http://blog.ianbicking.org/comment384.html" rel="nofollow">#</a> <a href="http://N.A.">rickburque</a></div><hr noshade>
+ I think the minimalistic approach is bad. Most of the functionality existing in the std should be there, just in a better way. I think the std should cater for 90% of your average python programs.
+<br />
+
+<br />
+Versioning starts complicating things alot. And requires the programmer to do alot of extra legwork that he shouldn't have to do.
+<br />
+
+<br />
+'trying harder' also won't cut it because we arn't just talking about adding documentation, we are taling about the need to redesign some modules from scratch so that they provide thier functionality in a sane way.
+<br />
+
+<br />
+What I would like to suggest is to start putting much stricter requirements on std libraries. When a new std library is added and not used enough, but it in the 'from future import *', if a modules is really old (say the 1.x series) put it in a 'from obsolete import *' and simmilar.
+<br />
+There are very few language features that are regreted in the language because they are added with such carefulessness, smae thing should be with std modules. They should be really used alot by the community, advocated, pushed, stress tested, simple to use, powerful, etc.. etc... before they are considered to be added.
+<br />
+
+<br />
+I do not think waiting till 3.0 is a good idea. It will be too late. What I think should be done is to create a std python project to try and create a basic and improved std that could be used instead of the python one that would already work with the latest python. It should be created (or backed) by people who have a strong position in the python community so that it wont be 'just another python module'
+ <div align="right"><a href="http://blog.ianbicking.org/comment385.html" rel="nofollow">#</a> Daniel Brodiet</div><hr noshade>
+ I reckon "too late" is a tad dramatic -- it's not like a sizable proportion of Python developers have signed a petition saying they're going to quit and go back to Perl unless someone re-organises the standard library. :) 
+<br />
+
+<br />
+I like the idea of versioned modules. It's not  necessarily even that hard to do. Rename mymodule.py to mymodule-1.2.4.py and add a new mymodule.py that just imports mymodule-1.2.4 and copies all of the variables in...
+ <div align="right"><a href="http://blog.ianbicking.org/comment386.html" rel="nofollow">#</a> <a href="http://www.deadlybloodyserious.com/Python/">Garth T Kidd</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

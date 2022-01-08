@@ -1,0 +1,1427 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
+<script type="text/javascript">/*<![CDATA[*/(function(a){function b(a,b){if(+a)return~a||(d.cookie=h+"=; path=/");j=d.createElement(e),k=d.getElementsByTagName(e)[0],j.src=a,b&&(j.onload=j.onerror=b),k.parentNode.insertBefore(j,k)}function c(){n.api||b(l.shift()||-1,c)}if(this.Mobify)return;var d=document,e="script",f="mobify",g="."+f+".com/",h=f+"-path",i=g+"un"+f+".js",j,k,l=[!1,1],m,n=this.Mobify={points:[+(new Date)],tagVersion:[6,0]},o=/(; |#|&|^)mobify-path=([^&;]*)/g.exec(location.hash+"; "+d.cookie);o?(m=o[2])&&!+(m=sessionStorage[h]||m)&&(l=[!0,"//preview"+g+escape(m)]):(l=a()||l,l[0]&&l.push("//cdn"+i,"//files01"+i)),l.shift()?(d.write('<plaintext style="display:none;">'),setTimeout(c)):b(l[0])})(function(){if(/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)){return[1,"//cdn.mobify.com/sites/ians-blog/production/mobify.js"]}})/*]]>*/</script>
+<!-- END MOBIFY -->
+	<title>Ian Bicking: a blog   ::  lxml: an underappreciated web scraping library</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta name="generator" content="WordPress 3.4.2" /><!-- LEAVE FOR STATS -->
+	<meta name="description" content="" />
+	<link rel="stylesheet" title="plaintxtSimpler" href="../../../../wp-content/themes/Barthelme-ianb/style.css" type="text/css" media="all" />
+	<link rel="start" href="../../../../index.html" title="Ian Bicking: a blog" />
+	<link rel="alternate" type="application/atom+xml" title="Ian Bicking: a blog Atom Feed" href="../../../../feed/atom/index.html" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog RSS 2.0 Feed" href="../../../../feed/rss/index.html" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog Comments RSS 2.0 Feed" href="../../../../comments/feed/index.html" />
+	<link rel="alternate" type="application/rdf+xml" title="Ian Bicking: a blog RSS 1.0" href="../../../../feed/rdf/index.html" />
+	<link rel="alternate" type="text/xml" title="Ian Bicking: a blog RSS 0.92 Feed" href="../../../../feed/rss/index.html" />
+	<link rel="pingback" href="../../../../xmlrpc.php" />
+	<link rel="openid.server" href="http://www.myopenid.com/server" />
+	<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <link rel="me" type="text/html" href="http://www.google.com/profiles/ianbicking"/>
+		<link rel='archives' title='October 2012' href='../../../../2012/10/index.html' />
+	<link rel='archives' title='February 2012' href='../../../../2012/02/index.html' />
+	<link rel='archives' title='April 2011' href='../../../../2011/04/index.html' />
+	<link rel='archives' title='March 2011' href='../../../../2011/03/index.html' />
+	<link rel='archives' title='September 2010' href='../../../../2010/09/index.html' />
+	<link rel='archives' title='August 2010' href='../../../../2010/08/index.html' />
+	<link rel='archives' title='May 2010' href='../../../../2010/05/index.html' />
+	<link rel='archives' title='April 2010' href='../../../../2010/04/index.html' />
+	<link rel='archives' title='March 2010' href='../../../../2010/03/index.html' />
+	<link rel='archives' title='February 2010' href='../../../../2010/02/index.html' />
+	<link rel='archives' title='January 2010' href='../../../../2010/01/index.html' />
+	<link rel='archives' title='September 2009' href='../../../../2009/09/index.html' />
+	<link rel='archives' title='May 2009' href='../../../../2009/05/index.html' />
+	<link rel='archives' title='April 2009' href='../../../../2009/04/index.html' />
+	<link rel='archives' title='January 2009' href='../../../../2009/01/index.html' />
+	<link rel='archives' title='December 2008' href='../../index.html' />
+	<link rel='archives' title='November 2008' href='../../../11/index.html' />
+	<link rel='archives' title='October 2008' href='../../../10/index.html' />
+	<link rel='archives' title='September 2008' href='../../../09/index.html' />
+	<link rel='archives' title='August 2008' href='../../../08/index.html' />
+	<link rel='archives' title='July 2008' href='../../../07/index.html' />
+	<link rel='archives' title='June 2008' href='../../../06/index.html' />
+	<link rel='archives' title='May 2008' href='../../../05/index.html' />
+	<link rel='archives' title='April 2008' href='../../../04/index.html' />
+	<link rel='archives' title='March 2008' href='../../../03/index.html' />
+	<link rel='archives' title='February 2008' href='../../../02/index.html' />
+	<link rel='archives' title='January 2008' href='../../../01/index.html' />
+	<link rel='archives' title='November 2007' href='../../../../2007/11/index.html' />
+	<link rel='archives' title='October 2007' href='../../../../2007/10/index.html' />
+	<link rel='archives' title='September 2007' href='../../../../2007/09/index.html' />
+	<link rel='archives' title='August 2007' href='../../../../2007/08/index.html' />
+	<link rel='archives' title='July 2007' href='../../../../2007/07/index.html' />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog &raquo; lxml: an underappreciated web scraping library Comments Feed" href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/feed/" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="../../../../xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="../../../../wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='The Magic Sentinel' href='../../03/the-magic-sentinel/index.html' />
+<link rel='next' title='A Few Corrections To &#8220;On Packaging&#8221;' href='../../14/a-few-corrections-to-on-packaging/index.html' />
+<meta name="generator" content="WordPress 3.4.2" />
+<link rel='canonical' href='index.html' />
+<link rel='shortlink' href='http://blog.ianbicking.org/?p=85' />
+<link rel="stylesheet" href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"  type="text/css" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+        <style type="text/css" media="all">
+/*<![CDATA[*/
+body { font-size: 100%; }
+body { font-family: tahoma, geneva, sans-serif; }
+div.post-header, h2.post-title, p.post-date-single, h2.post-title-single, div.post-entry h1, div.post-entry h2, div.post-entry h3, div.post-entry h4, div.post-entry h5, div.post-entry h6, div.post-entry blockquote, div.post-footer, h3#comment-count, h4#comment-header, div#comments ol li p.comment-metadata, h4#respond { font-family: verdana, geneva, sans-serif; }
+div.post-entry p { text-align: left; }
+div#wrapper { width: 100%; }
+
+/*]]>*/
+</style>
+</head>
+<body>
+
+<div id="wrapper">
+
+	<div id="header" onclick="location.href='http://blog.ianbicking.org/';" style="cursor:pointer;">
+		<h1 id="title"><a href="../../../../index.html" title="Ian Bicking: a blog">Ian Bicking: a blog</a></h1>
+		<p id="description"></p>
+	</div>
+<!-- WP Theme Credits -->
+<div style="display: none;">We can answer on question <a href="http://www.olnevhost.net/vps-hosting.html">what is VPS</a>? and
+what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap dedicated servers</strong></a>?</div>
+<!-- END HEADER -->
+<div id="container">
+	<div id="content" class="widecolumn">
+
+
+		<div id="post-85" class="post single-post">
+			<p class="post-date-single">{ 2008 12 10 }</p>
+			<h2 class="post-title-single">lxml: an underappreciated web scraping library</h2>
+			<div class="post-entry">
+				<div class="document">
+<p>When people think about web scraping in Python, they usually think <a class="reference external" href="http://www.crummy.com/software/BeautifulSoup/">BeautifulSoup</a>.  That&#8217;s okay, but I would encourage you to also consider <a class="reference external" href="http://codespeak.net/lxml/">lxml</a>.</p>
+<p>First, people think BeautifulSoup is better at parsing broken HTML.  <strong>This is not correct.</strong>  lxml parses broken HTML quite nicely.  I haven&#8217;t done any thorough testing, but at least <a class="reference external" href="http://www.crummy.com/software/BeautifulSoup/documentation.html#Parsing%20HTML">the BeautifulSoup broken HTML example</a> is parsed better by lxml (which knows that <tt class="docutils literal"><span class="pre">&lt;td&gt;</span></tt> elements should go inside <tt class="docutils literal"><span class="pre">&lt;table&gt;</span></tt> elements).</p>
+<p>Second, people feel lxml is harder to install.  This is correct.  <strong>BUT</strong>, lxml 2.2alpha1 includes an option to compile static versions of the underlying C libraries, which should improve the installation experience, especially on Macs.  To install this new way, try:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+$ STATIC_DEPS=true easy_install <span class="st0">'lxml&gt;=2.2alpha1'</span><br />
+&nbsp;</div>
+<p>One you have lxml installed, you have a great parser (which happens to be <a class="reference external" href="../../../03/30/python-html-parser-performance/index.html">super-fast</a> and that is <strong>not a tradeoff</strong>).  You get a fairly familiar API based on <a class="reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#module-xml.etree.ElementTree">ElementTree</a>, which though a little strange feeling at first, offers a compact and canonical representation of a document tree, compared to more traditional representations.  But there&#8217;s more&#8230;</p>
+<p>One of the features that should be appealing to many people doing screen scraping is that you get CSS selectors.  You can use XPath as well, but usually that&#8217;s more complicated (<a class="reference external" href="http://css2xpath.appspot.com/?css=div.pad%20a&amp;amp;format=html">for example</a>).  Here&#8217;s <a class="reference external" href="http://crowtheries.net/?p=60">an example I found</a> getting links from a menu in a page in BeautifulSoup:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">from</span> BeautifulSoup <span class="kw1">import</span> BeautifulSoup<br />
+<span class="kw1">import</span> <span class="kw3">urllib2</span><br />
+soup = BeautifulSoup<span class="br0">&#40;</span><span class="kw3">urllib2</span>.<span class="me1">urlopen</span><span class="br0">&#40;</span><span class="st0">'http://java.sun.com'</span><span class="br0">&#41;</span>.<span class="me1">read</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+menu = soup.<span class="me1">findAll</span><span class="br0">&#40;</span><span class="st0">'div'</span>,attrs=<span class="br0">&#123;</span><span class="st0">'class'</span>:<span class="st0">'pad'</span><span class="br0">&#125;</span><span class="br0">&#41;</span><br />
+<span class="kw1">for</span> subMenu <span class="kw1">in</span> menu:<br />
+&nbsp; &nbsp; links = subMenu.<span class="me1">findAll</span><span class="br0">&#40;</span><span class="st0">'a'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">for</span> link <span class="kw1">in</span> links:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">print</span> <span class="st0">&quot;%s : %s&quot;</span> % <span class="br0">&#40;</span>link.<span class="kw3">string</span>, link<span class="br0">&#91;</span><span class="st0">'href'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+&nbsp;</div>
+<p>Here&#8217;s the same example in lxml:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">from</span> lxml.<span class="me1">html</span> <span class="kw1">import</span> parse<br />
+doc = parse<span class="br0">&#40;</span><span class="st0">'http://java.sun.com'</span><span class="br0">&#41;</span>.<span class="me1">getroot</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="kw1">for</span> link <span class="kw1">in</span> doc.<span class="me1">cssselect</span><span class="br0">&#40;</span><span class="st0">'div.pad a'</span><span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; <span class="kw1">print</span> <span class="st0">'%s: %s'</span> % <span class="br0">&#40;</span>link.<span class="me1">text_content</span><span class="br0">&#40;</span><span class="br0">&#41;</span>, link.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'href'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp;</div>
+<p>lxml generally knows more about HTML than BeautifulSoup.  Also I think it does well with the small details; for instance, the lxml example will match elements in <tt class="docutils literal"><span class="pre">&lt;div</span> <span class="pre">class=&quot;pad</span> <span class="pre">menu&quot;&gt;</span></tt> (space-separated classes), which the BeautifulSoup example does not do (obviously there are other ways to search, but <a class="reference external" href="http://www.crummy.com/software/BeautifulSoup/documentation.html#Searching%20by%20CSS%20class">the obvious and documented technique</a> doesn&#8217;t pay attention to HTML semantics).</p>
+<p>One feature that I think is really useful is <tt class="docutils literal"><span class="pre">.make_links_absolute()</span></tt>.  This takes the base URL of the page (<tt class="docutils literal"><span class="pre">doc.base</span></tt>) and uses it to make all the links absolute.  This makes it possible to relocate snippets of HTML or whole sets of documents (as with <a class="reference external" href="http://svn.colorstudy.com/home/ianb/PageCollector/trunk">this program</a>).  This isn&#8217;t just <tt class="docutils literal"><span class="pre">&lt;a</span> <span class="pre">href&gt;</span></tt> links, but stylesheets, inline CSS with <tt class="docutils literal"><span class="pre">&#64;import</span></tt> statements, <tt class="docutils literal"><span class="pre">background</span></tt> attributes, etc.  It doesn&#8217;t see quite <em>all</em> links (for instance, links in Javascript) but it sees most of them, and works well for most sites.  So if you want to make a local copy of a site:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">from</span> lxml.<span class="me1">html</span> <span class="kw1">import</span> parse, open_in_browser<br />
+doc = parse<span class="br0">&#40;</span><span class="st0">'http://wiki.python.org/moin/'</span><span class="br0">&#41;</span>.<span class="me1">getroot</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+doc.<span class="me1">make_links_absolute</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+open_in_browser<span class="br0">&#40;</span>doc<span class="br0">&#41;</span><br />
+&nbsp;</div>
+<p><tt class="docutils literal"><span class="pre">open_in_browser</span></tt> serializes the document to a temporary file and then opens a web browser (using <a class="reference external" href="http://docs.python.org/library/webbrowser.html">webbrowser</a>).</p>
+<p>Here&#8217;s <a class="reference external" href="http://svn.colorstudy.com/home/ianb/recipes/lxmldiff.py">an example</a> that compares two pages using <tt class="docutils literal"><span class="pre">lxml.html.diff</span></tt>:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+<span class="kw1">from</span> lxml.<span class="me1">html</span>.<span class="me1">diff</span> <span class="kw1">import</span> htmldiff<br />
+<span class="kw1">from</span> lxml.<span class="me1">html</span> <span class="kw1">import</span> parse, tostring, open_in_browser, fromstring<br />
+<br />
+<span class="kw1">def</span> get_page<span class="br0">&#40;</span>url<span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; doc = parse<span class="br0">&#40;</span>url<span class="br0">&#41;</span>.<span class="me1">getroot</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; doc.<span class="me1">make_links_absolute</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> tostring<span class="br0">&#40;</span>doc<span class="br0">&#41;</span><br />
+<br />
+<span class="kw1">def</span> compare_pages<span class="br0">&#40;</span>url1, url2, selector=<span class="st0">'body div'</span><span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; basis = parse<span class="br0">&#40;</span>url1<span class="br0">&#41;</span>.<span class="me1">getroot</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; basis.<span class="me1">make_links_absolute</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; other = parse<span class="br0">&#40;</span>url2<span class="br0">&#41;</span>.<span class="me1">getroot</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; other.<span class="me1">make_links_absolute</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; el1 = basis.<span class="me1">cssselect</span><span class="br0">&#40;</span>selector<span class="br0">&#41;</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><br />
+&nbsp; &nbsp; el2 = other.<span class="me1">cssselect</span><span class="br0">&#40;</span>selector<span class="br0">&#41;</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><br />
+&nbsp; &nbsp; diff_content = htmldiff<span class="br0">&#40;</span>tostring<span class="br0">&#40;</span>el1<span class="br0">&#41;</span>, tostring<span class="br0">&#40;</span>el2<span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; diff_el = fromstring<span class="br0">&#40;</span>diff_content<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; el1.<span class="me1">getparent</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">insert</span><span class="br0">&#40;</span>el1.<span class="me1">getparent</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">index</span><span class="br0">&#40;</span>el1<span class="br0">&#41;</span>, diff_el<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; el1.<span class="me1">getparent</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">remove</span><span class="br0">&#40;</span>el1<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> basis<br />
+<br />
+<span class="kw1">if</span> __name__ == <span class="st0">'__main__'</span>:<br />
+&nbsp; &nbsp; <span class="kw1">import</span> <span class="kw3">sys</span><br />
+&nbsp; &nbsp; doc = compare_pages<span class="br0">&#40;</span><span class="kw3">sys</span>.<span class="me1">argv</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span>, <span class="kw3">sys</span>.<span class="me1">argv</span><span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span>, <span class="kw3">sys</span>.<span class="me1">argv</span><span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; open_in_browser<span class="br0">&#40;</span>doc<span class="br0">&#41;</span><br />
+&nbsp;</div>
+<p>You can use it like:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+$ python lxmldiff.<span class="me1">py</span> \<br />
+<span class="st0">'http://wiki.python.org/moin/BeginnersGuide?action=recall&amp;amp;#038;rev=70'</span> \<br />
+<span class="st0">'http://wiki.python.org/moin/BeginnersGuide?action=recall&amp;amp;#038;rev=81'</span> \<br />
+<span class="st0">'div#content'</span><br />
+&nbsp;</div>
+<p>Another feature lxml has is form handling.  All the cool sexy new sites use minimal forms, but searching for &quot;registration forms&quot; I get <a class="reference external" href="http://www.actuaryjobs.com/cform.html">this nice complex form</a>.  Let&#8217;s look at it:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+&gt;&gt;&gt; <span class="kw1">from</span> lxml.<span class="me1">html</span> <span class="kw1">import</span> parse, tostring<br />
+&gt;&gt;&gt; doc = parse<span class="br0">&#40;</span><span class="st0">'http://www.actuaryjobs.com/cform.html'</span><span class="br0">&#41;</span>.<span class="me1">getroot</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&gt;&gt;&gt; doc.<span class="me1">forms</span><br />
+<span class="br0">&#91;</span>&lt;Element form at <span class="nu0">-48232164</span>&gt;<span class="br0">&#93;</span><br />
+&gt;&gt;&gt; form = doc.<span class="me1">forms</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><br />
+&gt;&gt;&gt; form.<span class="me1">inputs</span>.<span class="me1">keys</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#91;</span><span class="st0">'thank_you_title'</span>, <span class="st0">'City'</span>, <span class="st0">'Zip'</span>, ... <span class="br0">&#93;</span><br />
+&nbsp;</div>
+<p>Now we have a form object.  There&#8217;s two ways to get to the fields: <tt class="docutils literal"><span class="pre">form.inputs</span></tt>, which gives us a dictionary of all the actual <tt class="docutils literal"><span class="pre">&lt;input&gt;</span></tt> elements (and textarea and select).  There&#8217;s also <tt class="docutils literal"><span class="pre">form.fields</span></tt>, which is a dictionary-like object.  The dictionary-like object is convenient, for instance:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+&gt;&gt;&gt; form.<span class="me1">fields</span><span class="br0">&#91;</span><span class="st0">'cEmail'</span><span class="br0">&#93;</span> = <span class="st0">'me&amp;#64;example.com'</span><br />
+&nbsp;</div>
+<p>This actually updates the input element itself:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+&gt;&gt;&gt; tostring<span class="br0">&#40;</span>form.<span class="me1">inputs</span><span class="br0">&#91;</span><span class="st0">'cEmail'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+<span class="st0">'&lt;input type=&quot;input&quot; name=&quot;cEmail&quot; size=&quot;30&quot; value=&quot;test2&quot;&gt;'</span><br />
+&nbsp;</div>
+<p>I think it&#8217;s actually a nicer API than <a class="reference external" href="http://formencode.org/htmlfill.html">htmlfill</a> and can serve the same purpose on the server side.</p>
+<p>But then you can also use the same interface for scraping, by filling fields and getting the submission.  That looks like:</p>
+<div class="dean_ch" style="white-space: wrap;"><br />
+&gt;&gt;&gt; <span class="kw1">import</span> <span class="kw3">urllib</span><br />
+&gt;&gt;&gt; action = form.<span class="me1">action</span><br />
+&gt;&gt;&gt; data = <span class="kw3">urllib</span>.<span class="me1">urlencode</span><span class="br0">&#40;</span>form.<span class="me1">form_values</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&gt;&gt;&gt; <span class="kw1">if</span> form.<span class="me1">method</span> == <span class="st0">'GET'</span>:<br />
+... &nbsp; &nbsp; <span class="kw1">if</span> <span class="st0">'?'</span> <span class="kw1">in</span> action:<br />
+... &nbsp; &nbsp; &nbsp; &nbsp; <span class="me1">action</span> += <span class="st0">'&amp;amp;#038;'</span> + data<br />
+... &nbsp; &nbsp; <span class="kw1">else</span>:<br />
+... &nbsp; &nbsp; &nbsp; &nbsp; <span class="me1">action</span> += <span class="st0">'?'</span> + data<br />
+... &nbsp; &nbsp; <span class="me1">data</span> = <span class="kw2">None</span><br />
+&gt;&gt;&gt; resp = <span class="kw3">urllib</span>.<span class="me1">urlopen</span><span class="br0">&#40;</span>action, data<span class="br0">&#41;</span><br />
+&gt;&gt;&gt; resp_doc = parse<span class="br0">&#40;</span>resp<span class="br0">&#41;</span>.<span class="me1">getroot</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp;</div>
+<p>Lastly, there&#8217;s <a class="reference external" href="http://codespeak.net/lxml/lxmlhtml.html#cleaning-up-html">HTML cleaning</a>.  I think all these features work together well, do useful things, and it&#8217;s based on an actual understanding HTML instead of just treating tags and attributes as arbitrary.  (Also if you really like jQuery, you might want to look at <a class="reference external" href="http://pypi.python.org/pypi/pyquery">pyquery</a>, which is a jQuery-like API on top of lxml).</p>
+</div>
+<p>Automatically generated list of related posts:</p><ol>
+<li><a href='../../../../2007/09/24/lxmlhtml/index.html' rel='bookmark' title='lxml.html'>lxml.html</a> <small>Over the summer I did quite a bit of work...</small></li>
+<li><a href='../../../07/30/making-a-proxy-with-wsgi-and-lxml/index.html' rel='bookmark' title='Making a proxy with WSGI and lxml'>Making a proxy with WSGI and lxml</a> <small>You can use WSGI to make rewriting middleware; WebOb specifically...</small></li>
+<li><a href='../../../03/30/python-html-parser-performance/index.html' rel='bookmark' title='Python HTML Parser Performance'>Python HTML Parser Performance</a> <small>In preparation for my PyCon talk on HTML I thought...</small></li>
+<li><a href='../../../../2010/01/29/new-way-to-deploy-web-apps/index.html' rel='bookmark' title='A new way to deploy web applications'>A new way to deploy web applications</a> <small>Deployment is one of the things I like least about...</small></li>
+<li><a href='../../../../index.html?p=250' rel='bookmark' title='A Python Web Application Package and Format (we should make one)'>A Python Web Application Package and Format (we should make one)</a> <small>At PyCon there was an open space about deployment, and...</small></li>
+</ol>											</div><!-- END POST-ENTRY  -->
+			<!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			xmlns:dc="http://purl.org/dc/elements/1.1/"
+			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+		<rdf:Description rdf:about="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/"
+    dc:identifier="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/"
+    dc:title="lxml: an underappreciated web scraping library"
+    trackback:ping="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/trackback/" />
+</rdf:RDF> -->
+			<div class="post-footer">
+				<p>Posted by Ian Bicking on Wednesday, December 10th, 2008, at 9:19 pm, and filed under <a href="../../../../category/html/index.html" title="View all posts in HTML" rel="category tag">HTML</a>, <a href="../../../../category/programming/index.html" title="View all posts in Programming" rel="category tag">Programming</a>, <a href="../../../../category/python/index.html" title="View all posts in Python" rel="category tag">Python</a>.</p>
+				<p>
+				Comments have a <a href='http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/feed/'>feed</a>.</p>
+			</div><!-- END POST-FOOTER -->
+		</div><!-- END POST -->
+
+<div id="comments">
+
+
+
+
+<h4 id="comments">51 Comments</h4>
+ <ul class="commentlist">
+		<li class="comment even thread-even depth-1" id="comment-63143">
+				<div id="div-comment-63143" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/f00c63fcf2340e6bd261e7310705a23f?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Fred Blasdel</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63143">
+			December 10, 2008 at 10:14 pm</a>		</div>
+
+		<p>One major benefit of BeautifulSoup being pure Python is that I can (and do) run it on Google AppEngine.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1" id="comment-63144">
+				<div id="div-comment-63144" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63144">
+			December 10, 2008 at 10:16 pm</a>		</div>
+
+		<p>Yeah, I&#8217;m actually using it on GAE as well.  I don&#8217;t think lxml will be on GAE anytime in the near, middle, or maybe distant future.  This is very sad for me.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-63145">
+				<div id="div-comment-63145" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/49b31b7264aa9367f83872a4112312d6?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://jehiah.cz/' rel='external nofollow' class='url'>Jehiah</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63145">
+			December 10, 2008 at 10:32 pm</a>		</div>
+
+		<p>nice writeup &amp; examples. thanks.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-63147">
+				<div id="div-comment-63147" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/dd09bb9578bc657e099818e47cdfb6f5?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Richard</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63147">
+			December 10, 2008 at 11:51 pm</a>		</div>
+
+		<p>I used to use Beautiful Soup but found it failed too often for bad markup. Then I tried lxml.html and haven&#8217;t looked back.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-63149">
+				<div id="div-comment-63149" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/bfb472f562084084602388c4cf1640b0?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://ulaluma.com/pyx' rel='external nofollow' class='url'>Donovan Preston</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63149">
+			December 11, 2008 at 12:08 am</a>		</div>
+
+		<p>Thanks to this blog post, I now have lxml installed on OS X. I wasn&#8217;t able to get it compiled before. Thanks! Looking forward to playing with it. Especially looking forward to using CSS selectors.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-63167">
+				<div id="div-comment-63167" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/c29d090dbaf6ca8aad346f9e2ee0bf95?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://imdbpy.sf.net/' rel='external nofollow' class='url'>Davide Alberani</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63167">
+			December 11, 2008 at 2:37 am</a>		</div>
+
+		<p>Both BeautifulSoup and lxml have their merits.
+If someone wants to try a (still partial but perfectly working) XPath support for BeautifulSoup, it can be found here: <a href="http://www3.itu.edu.tr/~uyar/bsoupxpath/" rel="nofollow">http://www3.itu.edu.tr/~uyar/bsoupxpath/</a>.</p>
+
+<p>It was developed by H. Turgut Uyar to be used in the IMDbPY project, and I think it&#8217;s an excellent piece of code (and it would be nice if it could be fully developed and maybe even included in BeautifulSoup).</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-63170">
+				<div id="div-comment-63170" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/8d6047e2746cf1c12d0fe8042e07372c?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://blog.pythonaro.com' rel='external nofollow' class='url'>Giacomo</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63170">
+			December 11, 2008 at 3:21 am</a>		</div>
+
+		<p>From the <strong>lxml</strong> documentation:
+<em>&#8220;BeautifulSoup is a Python package that parses broken HTML. While libxml2 (and thus lxml) can also parse broken HTML, BeautifulSoup is a bit more forgiving <strong>and has superiour support for encoding detection.</strong>
+lxml can benefit from the parsing capabilities of BeautifulSoup through the lxml.html.soupparser module&#8221;</em></p>
+
+<p>[ed note: noted, and I've changed the docs here to be a little clearer lxml can often parse better than BeautifulSoup, but the note on encoding detection remains correct]</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-63175">
+				<div id="div-comment-63175" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/d32dcb5b8f204e150f1b46078680e797?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://avinashv.net' rel='external nofollow' class='url'>Avinash Vora</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63175">
+			December 11, 2008 at 4:51 am</a>		</div>
+
+		<p>Hmm, while I agree with you, I feel you are being extremely misleading here.  Your first example comparing the two libraries has the superfluous <code>menu</code> and <code>links</code> temporary variables in the BeautifulSoup code whereas you forgo them in the lxml example.  Granted, the lxml code <em>is</em> slightly cleaner.</p>
+
+<p>lxml is completely awesome, though.  Mirroring other comments, it is too bad there isn&#8217;t a way to make it run on GAE.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-63178">
+				<div id="div-comment-63178" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/27cb35316df01975c84bec8531227926?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Andy Baker</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63178">
+			December 11, 2008 at 5:09 am</a>		</div>
+
+		<p>Nice and timely as I need to do a bit of parsing soon. One feature I would kill for is something that could convert all CSS to inline (for HTML emails). Anyone seen any code to do this?</p>
+
+<p>[ed note: it's been discussed on the lxml mailing list, mostly combining cssutils with the CSS selector support, but it's never quite happened]</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-63179">
+				<div id="div-comment-63179" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/88a6b125dc74a8912f8cd89e39e5e441?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">R.Lacko</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63179">
+			December 11, 2008 at 5:28 am</a>		</div>
+
+		<p>Nice summarization of lxml features, thanks</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-63180">
+				<div id="div-comment-63180" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/b9b2548af72d0a9e86a2bfe9df6ad1d2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Raphael Ritz</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63180">
+			December 11, 2008 at 5:33 am</a>		</div>
+
+		<p>@Andy: do you mean something like this?
+<a href="http://mahonata.com/maho/css2inline.pl" rel="nofollow">http://mahonata.com/maho/css2inline.pl</a></p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-63184">
+				<div id="div-comment-63184" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/b50b582686d8fd1ca6170eb2ad54b7b6?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://blog.borho.net' rel='external nofollow' class='url'>mbo</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63184">
+			December 11, 2008 at 5:52 am</a>		</div>
+
+		<p>not to forget xpath, which is extremely powerful for scraping and easy to use with lxml</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-63193">
+				<div id="div-comment-63193" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ce4ec22e8cf4865d9611f07303089eb6?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://jizura.com' rel='external nofollow' class='url'>Love Encounter Flow</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63193">
+			December 11, 2008 at 7:35 am</a>		</div>
+
+		<p>@Avinash Vora: &#8220;extremely misleading [...] superfluous menu and links temporary variables in the BeautifulSoup code whereas you forgo them in the lxml example&#8221;—i do not feel those variables to be misleadingly superfluous, although they could be skipped. </p>
+
+<p>i’ve done a bit of screen-scraping with BeautifulSoup myself, and this is approximately the way i would’ve written the snippet. the main reason is documentation; it is just so much clearer to say ‘ok i get the <em>menu</em> with [incantation a]’, so lets step over its elements, and from each element, i ‘get the relevant <em>links</em> using [incantation b]’, and so on (granted, the expression filtering out the links is a very short and clear one, but it is a fact that BeautifulSoup would greatly profit from an overall nicer, simpler, API, and a jQuery/pyquery-like selector syntax). </p>
+
+<p>i second that installing lxml can be a hassle; i only managed to make it run on windows by manually downloading and installing a binary package. definitely one great advantage of BeautifulSoup: a single fairly short *.py file, and you’re good to go.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1 parent" id="comment-63202">
+				<div id="div-comment-63202" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/8fa0b5c093d668f413d03c7545002bd7?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://notyet' rel='external nofollow' class='url'>john aman</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63202">
+			December 11, 2008 at 9:27 am</a>		</div>
+
+		<p>I&#8217;ve just installed virtualenv.  Using the activate script so now
+I have</p>
+
+<pre><code>(env) /home/john@Ibex64:~$ STATIC_DEPS=true easy_install lxml
+... more than 1000 lines later (my xterm scroll bufsize)
+...
+src/lxml/lxml.etree.c: ~ 1000 errors
+...
+src/lxml/lxml.etree.c:128124: error: expected ‘)’ before ‘*’ token
+src/lxml/lxml.etree.c:128139: error: expected ‘)’ before ‘*’ token
+src/lxml/lxml.etree.c:128154: error: expected ‘)’ before ‘*’ token
+src/lxml/lxml.etree.c:128169: error: expected ‘)’ before ‘*’ token
+src/lxml/lxml.etree.c:128184: error: expected ‘)’ before ‘*’ token
+error: Setup script exited with error: command 'gcc' failed with exit status 1
+</code></pre>
+
+<p>Where the heck is src at this point?  Better yet, any clue how I can fix this? Or should I try without STATIC_DEPS?
+Thanks</p>
+
+<p>[ed note: if you don't see it say "Downloading libxml2 into libs/libxml2-2.7.2.tar.gz" then STATIC_DEPS didn't work, and probably you don't have the appropriate libxml2-dev and libxslt-dev packages; probably I should have specified <code>easy_install lxml&gt;=2.2alpha</code>]</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-2" id="comment-87162">
+				<div id="div-comment-87162" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/d80313f3250e1a756033e5e1b4c77ad4?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Luke</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-87162">
+			March 11, 2009 at 9:41 am</a>		</div>
+
+		<p>I&#8217;m also experiencing these errors &#8212; Can&#8217;t seem to figure out how to overcome them.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment byuser comment-author-ianb bypostauthor odd alt depth-2 parent" id="comment-87163">
+				<div id="div-comment-87163" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-87163">
+			March 11, 2009 at 9:45 am</a>		</div>
+
+		<p>As is usually the case with these kind of compile errors, the actual error message is at the top of that long stream of errors.  (The error itself is, sadly, probably not that readable either &#8212; but it will probably be able some missing file.)  It might be, for instance, that you don&#8217;t have the <code>python-dev</code> package installed.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-3 parent" id="comment-87170">
+				<div id="div-comment-87170" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/d80313f3250e1a756033e5e1b4c77ad4?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Luke</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-87170">
+			March 11, 2009 at 10:24 am</a>		</div>
+
+		<p>How do I install that?</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment byuser comment-author-ianb bypostauthor odd alt depth-4 parent" id="comment-87174">
+				<div id="div-comment-87174" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-87174">
+			March 11, 2009 at 10:46 am</a>		</div>
+
+		<p>On Linux there&#8217;s usually a package called <code>python-dev</code> or <code>python2.5-dev</code>, or something along those lines.  You&#8217;d use apt-get or yum or whatever the appropriate package manager to install that.  On Windows there are some pre-built libraries for lxml that you can use.  On a Mac you need to install the Mac developer tools.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-5" id="comment-87187">
+				<div id="div-comment-87187" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/d80313f3250e1a756033e5e1b4c77ad4?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Luke</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-87187">
+			March 11, 2009 at 12:21 pm</a>		</div>
+
+		<p>Hey thanks for all your help &#8212; Got everything past the install hurdles.</p>
+
+<p>Of course, now I&#8217;m running into some other problems using PyQuery (when it tries to import etree from lxml)</p>
+
+<p>Here are the relevant lines from the traceback:</p>
+
+<p>File &#8220;/usr/lib/python2.4/site-packages/pyquery-0.3.1-py2.4.egg/pyquery/cssselectpatch.py&#8221;, line 6, in ?
+    from lxml.cssselect import Pseudo, XPathExpr, XPathExprOr, Function, css<em>to</em>xpath
+  File &#8220;/usr/lib/python2.4/site-packages/lxml-2.2alpha1-py2.4-linux-i686.egg/lxml/cssselect.py&#8221;, line 8, in ?
+    from lxml import etree
+ImportError: libxslt.so.1: cannot open shared object file: No such file or directory</p>
+
+<p>I&#8217;m deep in the rabbit hole now ;)</p>
+
+<p>I may just go back to using BeautifulSoup &#8212; it does have the benefit of being 100% python  &#8212; these libxml2 and libxslt bindings have caused me no end of headaches &#8212; I&#8217;m working on linux in the cloud &#8212; my local Mac OS X box is working fine.</p>
+
+<p>-Luke</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-63216">
+				<div id="div-comment-63216" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/1ff2088cf41915b40c7397e0c0a0b660?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://palladion.com/' rel='external nofollow' class='url'>Tres Seaver</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63216">
+			December 11, 2008 at 11:48 am</a>		</div>
+
+		<p>@john_aman:</p>
+
+<p>I was just able to run this in a virtualenv without using
+the activate script:</p>
+
+<pre><code>$ /path/to/virtualenv --no-site-packages ~/lxmltest
+...
+$ cd ~/lxmltest
+$ STATIC_DEPS=true bin/easy_install lxml
+...
+NOTE: Trying to build without Cython, pre-generated 'src/lxml/lxml.etree.c' needs to be available.
+Using build configuration of libxml2 2.7.2 and libxslt 1.1.24
+Building against libxml2/libxslt in the following directory: /tmp/easy_install-_JbKqA/lxml-2.2alpha1/build/tmp/libxml2/lib
+Adding lxml 2.2alpha1 to easy-install.pth file
+
+Installed /home/tseaver/lxmltest/lib/python2.4/site-packages/lxml-2.2alpha1-py2.4-linux-i686.egg
+Processing dependencies for lxml
+Finished processing dependencies for lxml
+</code></pre>
+
+<p>It did download, compile, and link with the versions of
+libxml2 and libxslt required by lxml (the box I tried this
+on is Centos4, whose native versions are too old).</p>
+
+<p>FWIW, I never use the &#8216;activate&#8217; bit at all when working
+in a virtualenv;  I don&#8217;t know whether</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-63223">
+				<div id="div-comment-63223" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/37fe5078adbcf302af0ee3ccd3ed081d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Chris</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63223">
+			December 11, 2008 at 12:59 pm</a>		</div>
+
+		<p>I recently found BeautifulSpoon which provides a xpath-like API to BeautifulSoup:</p>
+
+<pre><code>from spoon import Spoon
+import urllib2
+
+spoon = Spoon(urllib2.urlopen("http://java.sun.com").read())
+for link in spoon._.div(class_="pad")._.a:
+    print "%s: %s" % (link.inner_html(), link["@href"])
+</code></pre>
+
+<p><a href="http://code.google.com/p/beautifulspoon/" rel="nofollow">http://code.google.com/p/beautifulspoon/</a></p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-63235">
+				<div id="div-comment-63235" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/6334a5c6f93503b16a9fad8b7ceed799?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://jystewart.net/process/' rel='external nofollow' class='url'>James Stewart</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63235">
+			December 11, 2008 at 3:05 pm</a>		</div>
+
+		<p>We switched from BeautifulSoup to lxml for a parser project about eight months ago and saw a significant performance increase (I can&#8217;t remember the numbers, but I think we were looking at an order of magnitude speed-up of our overall parsing code that was almost entirely thanks to lxml). To keep everyone happy I implemented a fallback to BeautifulSoup if lxml balked at any page we were looking at, but I think that code&#8217;s rarely been necessary.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-63242">
+				<div id="div-comment-63242" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/a625ab43e3a4a4b5d8d275c66e2b0235?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Christof</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63242">
+			December 11, 2008 at 4:19 pm</a>		</div>
+
+		<p>@Andy @ed.: I tried something like this (combining lxml and cssutils) in a small proove of concept: <a href="http://code.google.com/p/cssutils/source/browse/trunk/examples/style.py" rel="nofollow">http://code.google.com/p/cssutils/source/browse/trunk/examples/style.py</a></p>
+
+<p>I have not developed it any further yet but I guess it may be a starting point and the code is not very complicated I think.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-63281">
+				<div id="div-comment-63281" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/2c7952b2d3b40db27cd69ea26411b312?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.californiaresortlife.com' rel='external nofollow' class='url'>Mighty California</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63281">
+			December 11, 2008 at 11:04 pm</a>		</div>
+
+		<p>Great Article &#8211; I&#8217;m can smell Beautiful Soup cooking already.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-63322">
+				<div id="div-comment-63322" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cf021c09bf5b67c354e4c1a47bfd33c6?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Perenzo</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63322">
+			December 12, 2008 at 6:17 am</a>		</div>
+
+		<p>Hi, great article. The main drawback I see in lxml is that it is not pure Python. I tested some XML frameworks for writing a small implementation of a template language for GAE and BeautifulSoup turned out to be the worst. I then switched to Genshi which I think is the best and most robust pure Python XML parser I know. It also supports XPath and therefore also CSS selectors if you use the cssselector module of lxml for translating to XPath. Just the interface is quite difficult to understand but very powerful. For people interested in this feature have a look at this: <a href="http://code.google.com/p/pyxer/source/browse/trunk#trunk/src/pyxer/template" rel="nofollow">http://code.google.com/p/pyxer/source/browse/trunk#trunk/src/pyxer/template</a></p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-63335">
+				<div id="div-comment-63335" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/8fa0b5c093d668f413d03c7545002bd7?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://notyet' rel='external nofollow' class='url'>john aman</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63335">
+			December 12, 2008 at 7:09 am</a>		</div>
+
+		<p>Thanks to all.</p>
+
+<p>@Ian, @Tres:  The first real problem? My stupidity. python2.5-dev not installed.  I should have landed here much sooner but for Ubuntu makes installing packages so damn easy.  2nd problem &#8211; running at 64 bit is a bit like warp speed to this MSDOS 2.0 old timer.  Years of DOS and windoze development may also have corrupted my neural network.  Now I get to this:</p>
+
+<pre><code>(env)john@ibex:~$ STATIC_DEPS=true easy_install 'lxml&amp;gt;=2.2alpha1'
+...
+Downloading libxslt into libs/libxslt-1.1.24.tar.gz
+Unpacking libxslt-1.1.24.tar.gz into build/tmp
+Running "./configure --without-python --disable-dependency-tracking --disable-shared --prefix=/tmp/easy_install-Am4yKQ/lxml-2.2alpha1/build/tmp/libxml2" in build/tmp/libxml2-2.7.2
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... x86_64-unknown-linux-gnu
+...
+
+lxml-2.2alpha1/build/tmp/libxml2/lib/pkgconfig"
+ /usr/bin/install -c -m 644 'libxslt.pc' '/tmp/easy_install-6H0Ks9/lxml-2.2alpha1/build/tmp/libxml2/lib/pkgconfig/libxslt.pc'
+ /usr/bin/install -c -m 644 'libexslt.pc' '/tmp/easy_install-6H0Ks9/lxml-2.2alpha1/build/tmp/libxml2/lib/pkgconfig/libexslt.pc'
+make[2]: Leaving directory `/tmp/easy_install-6H0Ks9/lxml-2.2alpha1/build/tmp/libxslt-1.1.24'
+make[1]: Leaving directory `/tmp/easy_install-6H0Ks9/lxml-2.2alpha1/build/tmp/libxslt-1.1.24'
+NOTE: Trying to build without Cython, pre-generated 'src/lxml/lxml.etree.c' needs to be available.
+Using build configuration of libxml2 2.7.2 and libxslt 1.1.24
+Building against libxml2/libxslt in the following directory: /tmp/easy_install-6H0Ks9/lxml-2.2alpha1/build/tmp/libxml2/lib
+************************
+/usr/bin/ld: /tmp/easy_install-6H0Ks9/lxml-2.2alpha1/build/tmp/libxml2/lib/libexslt.a(exslt.o): relocation R_X86_64_32 against `a local symbol' can not be used when making a shared object; recompile with -fPIC
+************************
+/tmp/easy_install-6H0Ks9/lxml-2.2alpha1/build/tmp/libxml2/lib/libexslt.a: could not read symbols: Bad value
+collect2: ld returned 1 exit status
+error: Setup script exited with error: command 'gcc' failed with exit status 1
+</code></pre>
+
+<p>where error is marked ***********</p>
+
+<p>It seems the linker is failing to link exslt.o into libexslt.a:
+(exslt.o): relocation R<em>X86</em>64_32 against `a local symbol&#8217; can not be used when making a shared object; recompile with -fPIC</p>
+
+<p>Oh, did I mention I&#8217;m new to 64 bit OS?  Perhaps someone can point out how to do all the steps the wget/tar/.configure/make way.  Too old to try to figure out something so easy<em>install.</em>  Not knocking easy_install &#8211; this is a first time failure for me with that program.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-63349">
+				<div id="div-comment-63349" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/8fa0b5c093d668f413d03c7545002bd7?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://notyet' rel='external nofollow' class='url'>john aman</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63349">
+			December 12, 2008 at 8:04 am</a>		</div>
+
+		<p>@Perenzo-</p>
+
+<p>something is wrong at pyxer.appspot.com:</p>
+
+<pre><code>Server Error
+URL: &lt;a href="http://pyxer.appspot.com/guestbook2/commit?message=jlklk" rel="nofollow"&gt;http://pyxer.appspot.com/guestbook2/commit?message=jlklk&lt;/a&gt;
+Module paste.exceptions.errormiddleware:144 in __call__
+&amp;gt;  app_iter = self.application(environ, sr_checker)
+Module paste.exceptions.errormiddleware:138 in __call__
+&amp;gt;  return self.application(environ, start_response)
+Module paste.registry:350 in __call__
+&amp;gt;  app_iter = self.application(environ, start_response)
+</code></pre>
+
+<p>But Ubuntu? sudo apt-get install python-genshi works.  Still want to get this working for the love/speed of c.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-63360">
+				<div id="div-comment-63360" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cf021c09bf5b67c354e4c1a47bfd33c6?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Perenzo</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63360">
+			December 12, 2008 at 8:53 am</a>		</div>
+
+		<p>@john aman: Yeah, thanks for the hint. This seems to be a bug in the Beaker session management for GAE. Don&#8217;t know why they do not fix it:
+<a href="http://pylonshq.com/project/pylonshq/ticket/537" rel="nofollow">http://pylonshq.com/project/pylonshq/ticket/537</a></p>
+
+<p>BTW. I tried to rewrite the example using Genshi and cssselector an it looks like this:</p>
+
+<pre><code>from genshi import HTML
+from lxml import cssselect
+import urllib2
+
+stream = HTML(urllib2.urlopen('http://java.sun.com').read())
+xpath = cssselect.css_to_xpath('div.pad a')
+substream = stream.select(xpath)
+print substream
+</code></pre>
+
+<p>Well the handling of the streams is not trivial but powerful: <a href="http://genshi.edgewall.org/wiki/Documentation/streams.html" rel="nofollow">http://genshi.edgewall.org/wiki/Documentation/streams.html</a></p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-63402">
+				<div id="div-comment-63402" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/8fa0b5c093d668f413d03c7545002bd7?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://notyet' rel='external nofollow' class='url'>john aman</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63402">
+			December 12, 2008 at 1:54 pm</a>		</div>
+
+		<p>Ian, <em>you <strong>and</strong> your readers</em> rock!</p>
+
+<p>From Stefan Behnel follow-up message (posting here for the doc value):</p>
+
+<pre><code>(env)john@ibex:~$   CFLAGS="$CFLAGS -fPIC" STATIC_DEPS=true easy_install "lxml&amp;gt;=2.2alpha1"
+</code></pre>
+
+<p>And the results:</p>
+
+<pre><code>...
+Building against libxml2/libxslt in the following directory: /tmp/easy_install-Nzp53T/lxml-2.2alpha1/build/tmp/libxml2/lib
+Adding lxml 2.2alpha1 to easy-install.pth file
+
+Installed /home/john/env/lib/python2.5/site-packages/lxml-2.2alpha1-py2.5-linux-x86_64.egg
+Processing dependencies for lxml&amp;gt;=2.2alpha1
+Finished processing dependencies for lxml&amp;gt;=2.2alpha1
+</code></pre>
+
+<p>sorry about the &#8220;&amp; gt;&#8221;&#8216;s should be lxml>= &#8230;</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-63403">
+				<div id="div-comment-63403" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/3b64d374f8e9d300c5df083fc0c5f506?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://powertwenty.com/kpd/blog' rel='external nofollow' class='url'>Kevin Dahlhausen</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63403">
+			December 12, 2008 at 2:09 pm</a>		</div>
+
+		<p>Ian, thanks for posting about lxml.  I hadn&#8217;t known about it and your post came just as I was starting a small screen-scraping project.   Using CSS selectors in lxml is heavenly.  It <em>almost</em> makes screen scraping fun.  At any rate, it&#8217;s helping me make rapid progress.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-63741">
+				<div id="div-comment-63741" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/02a9892c7cf09b125d45153b50c763ca?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Harry</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-63741">
+			December 15, 2008 at 3:41 pm</a>		</div>
+
+		<p>Is it possible to use <code>make_links_absolute</code> with pyquery? I&#8217;ve messed around with the library source but haven&#8217;t had any luck!</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-65184">
+				<div id="div-comment-65184" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/6408f974b762e3bec67d5545174cc981?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.cowpy.com' rel='external nofollow' class='url'>Cowmix</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-65184">
+			December 22, 2008 at 11:41 am</a>		</div>
+
+		<p>I tried the simple example:</p>
+
+<pre><code>from lxml.html import parse
+doc = parse('http://java.sun.com').getroot()
+for link in doc.cssselect('div.pad a'):
+    print '%s: %s' % (link.text_content(), link.get('href'))
+</code></pre>
+
+<p>&#8230; and I got this error: </p>
+
+<pre><code>D:\Data\src\cornfluence&amp;gt;python parsedb.py
+Traceback (most recent call last):
+  File "parsedb.py", line 14, in 
+    for link in doc.cssselect('div.pad a'):
+AttributeError: 'NoneType' object has no attribute 'cssselect'
+</code></pre>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-70366">
+				<div id="div-comment-70366" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/f82e5f8db5a3a9516e83ca8e01e87726?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://noahgift.com' rel='external nofollow' class='url'>Noah Gift</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-70366">
+			January 10, 2009 at 4:10 am</a>		</div>
+
+		<p>That little tip on installing on OS X saved me a potential night of drama, as I was installing &#8220;Zine&#8221;.</p>
+
+<p>STATIC<em>DEPS=true easy</em>install &#8216;lxml&gt;=2.2alpha1&#8242;</p>
+
+<p>Thanks!</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-70397">
+				<div id="div-comment-70397" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/e4b96d6901c4d39449c91f1606748c7f?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.aplopio.com' rel='external nofollow' class='url'>Grease</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-70397">
+			January 10, 2009 at 6:50 am</a>		</div>
+
+		<p>Regarding installing lxml &#8230; think I found a very easy way if you&#8217;re using ubuntu &#8230; search for lxml in the synaptic package manager , and the install is just a few clicks away :)</p>
+
+<p>PS: the version available on synaptic may not be the very latest</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-84506">
+				<div id="div-comment-84506" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/7facd6a5ff245d8c71824fec6e7e73d6?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Shawn Wheatley</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-84506">
+			March 1, 2009 at 9:25 pm</a>		</div>
+
+		<p>I&#8217;m on a Mac (10.5.6). I tried the suggested line with an added sudo to install in my site-packages:</p>
+
+<pre><code>STATIC_DEPS=true sudo easy_install 'lxml&amp;gt;=2.2alpha1'
+</code></pre>
+
+<p>but it didn&#8217;t pull down libxml and libxslt. I ended up running it without sudo and it worked fine up until installation. Then I just re-ran with sudo and it grabbed the egg it just built. That did it, and now I have lxml installed. Thanks, Ian!</p>
+
+<p>PS Ian: your Markdown link is 404ing right now&#8230;</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-88240">
+				<div id="div-comment-88240" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/564c9859792281cc1b58252e8ddeb186?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.urheberrecht.org/' rel='external nofollow' class='url'>Pascal</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-88240">
+			March 14, 2009 at 1:07 pm</a>		</div>
+
+		<p>Using &#8220;STATIC<em>DEPS=true easy</em>install lxml&#8221; worked great on three Intel Macs using the python.org Python 2.5.4 &#8212; two of these Macs running 10.5 and one running 10.4.</p>
+
+<p>Doing the same thing on a PPC Mac (10.4 and python.org 2.5.4) I had unfortunately no success. It fails with:</p>
+
+<p>&#8220;ar cru .libs/testdso.a  testdso.o
+ranlib .libs/testdso.a
+creating testdso.la
+(cd .libs &amp;&amp; rm -f testdso.la &amp;&amp; ln -s ../testdso.la testdso.la)
+gcc -DHAVE<em>CONFIG</em>H -I. -I./include -I./include  -D<em>REENTRANT      -arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -O2 -pedantic -W -Wformat -Wunused -Wimplicit -Wreturn-type -Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts -Wuninitialized -Wparentheses -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Winline -Wredundant-decls -c xmllint.c
+/bin/sh ./libtool &#8211;tag=CC   &#8211;mode=link gcc  -arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -O2 -pedantic -W -Wformat -Wunused -Wimplicit -Wreturn-type -Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts -Wuninitialized -Wparentheses -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Winline -Wredundant-decls  -arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o xmllint xmllint.o ./libxml2.la -lpthread -lz -liconv -lm<br />
+gcc -arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -O2 -pedantic -W -Wformat -Wunused -Wimplicit -Wreturn-type -Wswitch -Wcomment -Wtrigraphs -Wformat -Wchar-subscripts -Wuninitialized -Wparentheses -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Winline -Wredundant-decls -arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o xmllint xmllint.o  ./.libs/libxml2.a -lpthread -lz /usr/lib/libiconv.dylib -lm<br />
+/usr/libexec/gcc/i686-apple-darwin8/4.0.1/ld: for architecture i386
+/usr/libexec/gcc/i686-apple-darwin8/4.0.1/ld: warning /usr/lib/libiconv.dylib cputype (18, architecture ppc) does not match cputype (7) for specified -arch flag: i386 (file not loaded)
+/usr/libexec/gcc/i686-apple-darwin8/4.0.1/ld: Undefined symbols:
+_libiconv
+_libiconv</em>close
+<em>libiconv</em>open
+collect2: ld returned 1 exit status
+lipo: can&#8217;t open input file: /var/tmp//ccm2sHDw.out (No such file or directory)
+make[2]: *** [xmllint] Error 1
+make[1]: *** [all-recursive] Error 1
+make: *** [all] Error 2<br />
+&#8220;</p>
+
+<p>Any suggestions would be very much appreciated!</p>
+
+<p>Thanks, Pascal</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-93053">
+				<div id="div-comment-93053" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/19c251d82bf6a7fd06dbae1bd97bd301?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.dassnagar.net/' rel='external nofollow' class='url'>Web Developer - Shom</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-93053">
+			April 2, 2009 at 5:28 am</a>		</div>
+
+		<p>Thanks for this beautiful post. I haven&#8217;t try lxml till now because I was not sure whether it will be as useful as beautiful soap or not. But after reading this post I changed my mind and I will surely try lxml.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-95745">
+				<div id="div-comment-95745" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/70b4c02ff9c63951cef8cf3ca01593af?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.dassnagar.co.uk/' rel='external nofollow' class='url'>Pamela Scoot</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-95745">
+			April 9, 2009 at 5:52 am</a>		</div>
+
+		<p>Thank you for clarifying the reasons to use lxml . Many have doubt about lxml and rumor is going on that lxml is not comfortable to use comparing BeautifulSoup. But your post has given a urge to rethink over the matter.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1 parent" id="comment-113672">
+				<div id="div-comment-113672" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ebc7fb0b3d69db2a5d02dcc7b4fd1b07?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">JohnMc</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-113672">
+			June 25, 2009 at 5:26 pm</a>		</div>
+
+		<p>Ian,</p>
+
+<p>first, thanks lxml is a hoot. I&#8217;ll grant that getting lxml install is a bit of a pain but not that bad. Using the STATIC_DEPS suggestion was a big help as well.</p>
+
+<p>However I have noticed something working through your web scraping examples.</p>
+
+<p>Working through this &#8211;</p>
+
+<p>from lxml.html import parse
+doc = parse(&#8216;http://java.sun.com&#8217;).getroot()
+for link in doc.cssselect(&#8216;div.pad a&#8217;):
+    print &#8216;%s: %s&#8217; % (link.text_content(), link.get(&#8216;href&#8217;))</p>
+
+<p>I receive a failure on the parse().getroot() statement. However if I do the following &#8212; </p>
+
+<p>import urllib
+from lxml.html import *
+content = urllib.urlopen(&#8216;http://java.sun.com&#8217;).read()
+doc = fromstring(content)
+for link in doc.cssselect(&#8216;div.pad a&#8217;):
+    print &#8216;%s: %s&#8217; % (link.text_content(), link.get(&#8216;href&#8217;))</p>
+
+<p>it works.
+Have you seen this behavior before?</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment byuser comment-author-ianb bypostauthor odd alt depth-2" id="comment-113673">
+				<div id="div-comment-113673" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-113673">
+			June 25, 2009 at 6:32 pm</a>		</div>
+
+		<p>No, not at all &#8212; I just tried it and it worked fine.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even depth-2" id="comment-115072">
+				<div id="div-comment-115072" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/c6f262962091e641c3212bb5de837577?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.mdgart.com' rel='external nofollow' class='url'>mauro.degiorgi@gmail</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-115072">
+			July 3, 2009 at 11:47 am</a>		</div>
+
+		<p>You must insert the trailing slash:</p>
+
+<p>doc = parse(’http://java.sun.com/’).getroot()</p>
+
+<p>work :) dont ask me why&#8230;</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-125779">
+				<div id="div-comment-125779" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/caefdae4dd3f8369263dcf7452d3e46a?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.bestdealvps.com' rel='external nofollow' class='url'>jesse</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-125779">
+			August 25, 2009 at 2:58 pm</a>		</div>
+
+		<p>Has anybody looked at <a href="http://scrapy.org/" rel="nofollow">http://scrapy.org/</a>.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-133623">
+				<div id="div-comment-133623" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/935737ca0488fe9c65062216b8bdea77?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Neutrino</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-133623">
+			October 16, 2009 at 1:57 am</a>		</div>
+
+		<p>Lxml is one of those Python libraries that should be really high profile given its usefulness. Sadly it is also one of those odd projects peculiar to open source that doesn&#8217;t have a forum and as a consequence receives little attention from anyone not prepared to maintain a database of mailing lists on every workstation they use for every single piece of software or technology subject they are interested in.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-141395">
+				<div id="div-comment-141395" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ad8345eb6e12a82fc66e34f070bfc871?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.izleporno.net' rel='external nofollow' class='url'>pornoizle</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-141395">
+			December 4, 2009 at 12:26 pm</a>		</div>
+
+		<p>i second that installing lxml can be a hassle; i only managed to make it run on windows by manually downloading and installing a binary package. definitely one great advantage of BeautifulSoup: a single fairly short *.py file, and you’re good to go.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-150037">
+				<div id="div-comment-150037" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/bf3f8fbc1e9a8bd8b2305ce54335037f?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Benjamin Sergeant</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-150037">
+			February 1, 2010 at 12:17 pm</a>		</div>
+
+		<p>I don&#8217;t know how much code goes in the cpython code but maybe if the division is well defined between C calls to libxml libs one could write some wrappers to simulate libxml calls using ElementTree which is one of python battery (not sure about the xpath support). Not a small project but something that could be usefull for say Google App Engine users or Jython/IronPython/Pypy users.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-151030">
+				<div id="div-comment-151030" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/8a1cda0c0066344c564b70a1d56644da?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://marissamendoza.net' rel='external nofollow' class='url'>sikis</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-151030">
+			February 8, 2010 at 3:05 am</a>		</div>
+
+		<p>Nice summarization of lxml features, thanks.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-160873">
+				<div id="div-comment-160873" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/b8bc08d73445bec100fbefe77c51eade?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://pietersz.co.uk/' rel='external nofollow' class='url'>Graeme Pietersz</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-160873">
+			April 29, 2010 at 6:25 am</a>		</div>
+
+		<p>Thanks for this: it encouraged me to use lxml. I used lxml to import data from HTML to a database (I should have been generating those pages from a database in the first place, but thats another story).</p>
+
+<p>I used xml.sax for something similar (except it was an XML file that time) a few months ago, and lxml was much easier to work with.</p>
+
+<p>No installation problems on Mandriva Linux &#8212; lxml was in the repos so a tick and a click was all that was needed. As Grease  suggests, if you use an OS with a package manager, its the easiest way to install almost anything.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-163750">
+				<div id="div-comment-163750" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/d8bf668e9e41a3698818a47bc5e39ef3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Herbert Roitblat</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-163750">
+			May 29, 2010 at 12:24 pm</a>		</div>
+
+		<p>I am trying to install lxml in an active virtual environment on Ubuntu 10.04 64-bit on a Dell xps, Python 2.6.5.</p>
+
+<p>I used this command from the top of the virtual environment:</p>
+
+<p>STATIC<em>DEPS=true bin/easy</em>install lxml</p>
+
+<p>This is the result I got:</p>
+
+<p>make[1]: Leaving directory <code>/tmp/easy_install-N4_xs4/lxml-2.2.6/build/tmp/libxslt-1.1.26'
+NOTE: Trying to build without Cython, pre-generated 'src/lxml/lxml.etree.c' needs to be available.
+Using build configuration of libxml2 2.7.7 and libxslt 1.1.26
+Building against libxml2/libxslt in the following directory: /tmp/easy_install-N4_xs4/lxml-2.2.6/build/tmp/libxml2/lib
+/usr/bin/ld: /tmp/easy_install-N4_xs4/lxml-2.2.6/build/tmp/libxml2/lib/libxslt.a(xslt.o): relocation R_X86_64_32 against</code>.rodata.str1.8&#8242; can not be used when making a shared object; recompile with -fPIC
+/tmp/easy<em>install-N4</em>xs4/lxml-2.2.6/build/tmp/libxml2/lib/libxslt.a: could not read symbols: Bad value</p>
+
+<p>I guess that something is missing.  I installed Python-dev on my main system, created the virtual environment with &#8211;no-site-packages.  If I need to install Python-dev in my virtual environment, I don&#8217;t know how to do it (apt-get tries to put it in the main installation, complains that I am not root). If I need something else, I would appreciate instructions on how to put it into my virtualenv.</p>
+
+<p>By the way, what I am looking to do right now is to translate a dictionary object into xml.  I currently translate it into JSON without a hitch, but I need to be able to support also translating it into xml.  The structure consists of a key:value, the value consists of a list of a list of key-value pairs.  Any thoughts on converting a dictionary to xml would also be welcome.  That&#8217;s how I came to lxml.</p>
+
+<p>Thanks so much.</p>
+
+<p>Herb</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-165829">
+				<div id="div-comment-165829" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/0e01c17f7d22147b4a94b9d4e3ae283d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">manju</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-165829">
+			June 24, 2010 at 6:11 am</a>		</div>
+
+		<p>Hi all!
+i have installed lxml2.2.2 on windows platform(i m using python version 2.6.5).ive tried the code you have mentioned :
+&#8220;from lxml.html import parse
+p= parse(&#8216;http://www.google.com&#8217;).getroot()&#8221;</p>
+
+<p>but i am getting the following error:</p>
+
+<p>Traceback (most recent call last):
+  File &#8220;&#8221;, line 1, in 
+    p=parse(&#8216;http://www.google.com&#8217;).getroot()
+  File &#8220;C:\Python26\lib\site-packages\lxml-2.2.2-py2.6-win32.egg\lxml\html&#95;<em>init</em>_.py&#8221;, line 661, in parse
+    return etree.parse(filename<em>or</em>url, parser, base<em>url=base</em>url, **kw)
+  File &#8220;lxml.etree.pyx&#8221;, line 2698, in lxml.etree.parse (src/lxml/lxml.etree.c:49590)
+  File &#8220;parser.pxi&#8221;, line 1491, in lxml.etree.<em>parseDocument (src/lxml/lxml.etree.c:71205)
+  File &#8220;parser.pxi&#8221;, line 1520, in lxml.etree.</em>parseDocumentFromURL (src/lxml/lxml.etree.c:71488)
+  File &#8220;parser.pxi&#8221;, line 1420, in lxml.etree.<em>parseDocFromFile (src/lxml/lxml.etree.c:70583)
+  File &#8220;parser.pxi&#8221;, line 975, in lxml.etree.</em>BaseParser.<em>parseDocFromFile (src/lxml/lxml.etree.c:67736)
+  File &#8220;parser.pxi&#8221;, line 539, in lxml.etree.</em>ParserContext.<em>handleParseResultDoc (src/lxml/lxml.etree.c:63820)
+  File &#8220;parser.pxi&#8221;, line 625, in lxml.etree.</em>handleParseResult (src/lxml/lxml.etree.c:64741)
+  File &#8220;parser.pxi&#8221;, line 563, in lxml.etree._raiseParseError (src/lxml/lxml.etree.c:64056)
+IOError: Error reading file &#8216;http://www.google.com&#8217;: failed to load external entity &#8220;http://www.google.com&#8221;</p>
+
+<p>i am clueless as to what to do next as i am a newbie to python.
+please guide me to solve this error.
+thanks in advance!! :)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-even depth-1" id="comment-165889">
+				<div id="div-comment-165889" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/0e01c17f7d22147b4a94b9d4e3ae283d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">manju</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-165889">
+			June 25, 2010 at 4:31 am</a>		</div>
+
+		<p>Hi Ian,
+in the first lxml example that you have given,I think instead of
+doc = parse(&#8216;http://java.sun.com&#8217;).getroot()
+it should be </p>
+
+<p>from urllib2 import urlopen
+doc=parse(urlopen(&#8216;http://java.sun.com&#8217;)).getroot()</p>
+
+<p>as parse does not fetch the website.
+As i have said, the first one is giving an error but the second one is working fine for me.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-odd thread-alt depth-1" id="comment-176786">
+				<div id="div-comment-176786" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/02064ec58ce67d9bc464a9bb26559395?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">ddavout</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/comment-page-1/#comment-176786">
+			October 10, 2010 at 5:49 am</a>		</div>
+
+		<p>Thanks a lot to help me to overcome my &#8220;fear&#8217; in front of lxml. As a beginner I am quite happy to have managed to take all the data I needed that were sparsed on more than 400 web pages.(with the help of xmlstarlet to clean up manually some pages)
+No problem whatsoever to install with the debian packages.
+Thanks a lot</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+
+<div class="navigation">
+<div class="alignleft"></div>
+<div class="alignright"></div>
+</div>
+
+
+
+
+</div>
+
+		<div class="navigation">
+			<div class="nav-left">&laquo; <a href="../../03/the-magic-sentinel/index.html" rel="prev">The Magic Sentinel</a></div>
+			<div class="nav-right"><a href="../../14/a-few-corrections-to-on-packaging/index.html" rel="next">A Few Corrections To &#8220;On Packaging&#8221;</a> &raquo;</div>
+		</div><!-- END NAVIGATION -->
+
+
+	</div><!-- END CONTENT -->
+</div><!-- END CONTAINER  -->
+
+<div id="sidebar">
+	<ul>
+		<li id="home-link">
+			<h2><a href="../../../../index.html" title="Ian Bicking: a blog">Home</a></h2>
+		</li>
+<li id="text-315934862" class="widget widget_text"><h2 class="widgettitle">About</h2>
+			<div class="textwidget">Ian is a developer with Mozilla, <a href="http://ianbicking.appspot.com/projects">Python open source developer</a>, actually uses <a href="https://plus.google.com/u/0/104537541227697934010/posts">Google+</a> more than <a href="http://twitter.com/ianbicking">twitter</a> and lives in Minneapolis.<br>
+<span class="gittip-0001" gittip-username="ianbicking"></span>
+<script id="gittip-0001"
+  src="https://www.gittip.com/assets/widgets/0001.js"></script>
+</div>
+		</li>
+<li id="text-315934863" class="widget widget_text">			<div class="textwidget"><!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> --></div>
+		</li>
+<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
+		<ul>
+			<li><a href='../../../../2012/10/index.html' title='October 2012'>October 2012</a></li>
+	<li><a href='../../../../2012/02/index.html' title='February 2012'>February 2012</a></li>
+	<li><a href='../../../../2011/04/index.html' title='April 2011'>April 2011</a></li>
+	<li><a href='../../../../2011/03/index.html' title='March 2011'>March 2011</a></li>
+	<li><a href='../../../../2010/09/index.html' title='September 2010'>September 2010</a></li>
+	<li><a href='../../../../2010/08/index.html' title='August 2010'>August 2010</a></li>
+	<li><a href='../../../../2010/05/index.html' title='May 2010'>May 2010</a></li>
+	<li><a href='../../../../2010/04/index.html' title='April 2010'>April 2010</a></li>
+	<li><a href='../../../../2010/03/index.html' title='March 2010'>March 2010</a></li>
+	<li><a href='../../../../2010/02/index.html' title='February 2010'>February 2010</a></li>
+	<li><a href='../../../../2010/01/index.html' title='January 2010'>January 2010</a></li>
+	<li><a href='../../../../2009/09/index.html' title='September 2009'>September 2009</a></li>
+	<li><a href='../../../../2009/05/index.html' title='May 2009'>May 2009</a></li>
+	<li><a href='../../../../2009/04/index.html' title='April 2009'>April 2009</a></li>
+	<li><a href='../../../../2009/01/index.html' title='January 2009'>January 2009</a></li>
+	<li><a href='../../index.html' title='December 2008'>December 2008</a></li>
+	<li><a href='../../../11/index.html' title='November 2008'>November 2008</a></li>
+	<li><a href='../../../10/index.html' title='October 2008'>October 2008</a></li>
+	<li><a href='../../../09/index.html' title='September 2008'>September 2008</a></li>
+	<li><a href='../../../08/index.html' title='August 2008'>August 2008</a></li>
+	<li><a href='../../../07/index.html' title='July 2008'>July 2008</a></li>
+	<li><a href='../../../06/index.html' title='June 2008'>June 2008</a></li>
+	<li><a href='../../../05/index.html' title='May 2008'>May 2008</a></li>
+	<li><a href='../../../04/index.html' title='April 2008'>April 2008</a></li>
+	<li><a href='../../../03/index.html' title='March 2008'>March 2008</a></li>
+	<li><a href='../../../02/index.html' title='February 2008'>February 2008</a></li>
+	<li><a href='../../../01/index.html' title='January 2008'>January 2008</a></li>
+	<li><a href='../../../../2007/11/index.html' title='November 2007'>November 2007</a></li>
+	<li><a href='../../../../2007/10/index.html' title='October 2007'>October 2007</a></li>
+	<li><a href='../../../../2007/09/index.html' title='September 2007'>September 2007</a></li>
+	<li><a href='../../../../2007/08/index.html' title='August 2007'>August 2007</a></li>
+	<li><a href='../../../../2007/07/index.html' title='July 2007'>July 2007</a></li>
+		</ul>
+</li>
+<li id="text-315934861" class="widget widget_text">			<div class="textwidget"><a href="../../../../archive/index.html">The Older Archives</a></div>
+		</li>
+<li id="categories-1" class="widget widget_categories"><h2 class="widgettitle">Categories</h2>
+		<ul>
+	<li class="cat-item cat-item-12"><a href="../../../../category/erlang/index.html" title="View all posts filed under Erlang">Erlang</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="../../../../category/html/index.html" title="View all posts filed under HTML">HTML</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="../../../../category/javascript/index.html" title="View all posts filed under Javascript">Javascript</a>
+</li>
+	<li class="cat-item cat-item-15"><a href="../../../../category/licensing/index.html" title="View all posts filed under Licensing">Licensing</a>
+</li>
+	<li class="cat-item cat-item-18"><a href="../../../../category/mozilla/index.html" title="View all posts filed under Mozilla">Mozilla</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="../../../../category/notech/index.html" title="View all posts filed under Non-technical">Non-technical</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="../../../../category/olpc/index.html" title="View all posts filed under OLPC">OLPC</a>
+</li>
+	<li class="cat-item cat-item-14"><a href="../../../../category/packaging/index.html" title="View all posts filed under Packaging">Packaging</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="../../../../category/politics/index.html" title="View all posts filed under Politics">Politics</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="../../../../category/programming/index.html" title="View all posts filed under Programming">Programming</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="../../../../category/python/index.html" title="View all posts filed under Python">Python</a>
+</li>
+	<li class="cat-item cat-item-10"><a href="../../../../category/ruby/index.html" title="View all posts filed under Ruby">Ruby</a>
+</li>
+	<li class="cat-item cat-item-19"><a href="../../../../category/security/index.html" title="View all posts filed under Security">Security</a>
+</li>
+	<li class="cat-item cat-item-16"><a href="../../../../category/silverlining.1" title="View all posts filed under Silver Lining">Silver Lining</a>
+</li>
+	<li class="cat-item cat-item-20"><a href="../../../../category/programming/testing/index.html" title="View all posts filed under Testing">Testing</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="../../../../category/web/index.html" title="View all posts filed under Web">Web</a>
+</li>
+	<li class="cat-item cat-item-13"><a href="../../../../category/zopeplone/index.html" title="View all posts filed under Zope/Plone">Zope/Plone</a>
+</li>
+		</ul>
+</li>
+<li id="search-2" class="widget widget_search"><form id="searchform" method="get" action="../../../../index.html">
+	<div>
+		<input id="s" name="s" type="text" value="" tabindex="1" size="10" />
+		<input id="searchsubmit" name="searchsubmit" type="submit" value="Find" tabindex="2" />
+	</div>
+</form> </li>
+		<li id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widgettitle">Recent Posts</h2>
+		<ul>
+				<li><a href="../../../../index.html?p=291" title="Why doctest.js is better than Python&#8217;s doctest">Why doctest.js is better than Python&#8217;s doctest</a></li>
+				<li><a href="../../../../index.html?p=283" title="Python Application Package">Python Application Package</a></li>
+				<li><a href="../../../../index.html?p=277" title="Git-as-sync, not source-control-as-deployment">Git-as-sync, not source-control-as-deployment</a></li>
+				<li><a href="../../../../index.html?p=253" title="My Unsolicited Advice For PyPy">My Unsolicited Advice For PyPy</a></li>
+				<li><a href="../../../../index.html?p=250" title="A Python Web Application Package and Format (we should make one)">A Python Web Application Package and Format (we should make one)</a></li>
+				</ul>
+		</li>
+<li id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widgettitle">Recent Comments</h2>
+<ul id="recentcomments"><li class="recentcomments"><a href='http://www.mirsa.com.tr' rel='external nofollow' class='url'>havalandırma</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://redealmeidense.com.br/portalx/modules/' rel='external nofollow' class='url'>this website</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Eric Pierce on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Paul Brian on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://benjiyork.com' rel='external nofollow' class='url'>Benji York</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320">Why doctest.js is better than Python&#8217;s doctest</a></li></ul></li>
+	</ul>
+</div>
+
+	<div id="footer">
+		<p>
+			&copy; 2013 Ian Bicking<!--
+Does this commenting make me evil?
+			|
+			Thanks, <a href="http://wordpress.org/" title="WordPress">WordPress</a>
+			|
+			<a href="http://www.plaintxt.org/themes/barthelme/" title="Barthelme for WordPress" rel="follow">Barthelme</a> theme by <a href="http://scottwallick.com/" title="scottwallick.com" rel="follow">Scott</a>
+			| <!-- The following is a link to the theme author's sponsor. Please consider its smallness and that Scott was nice enough to make this theme publically available. -->
+			Sponsor: <a href="http://www.active-sandals.com/womreefsan.html" title="Support: Reef Sandals">Reef Sandals</a>
+			|
+			Valid <a href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1" title="Valid XHTML 1.0 Strict" rel="nofollow">XHTML</a> &amp; <a href="http://jigsaw.w3.org/css-validator/validator?uri=http://blog.ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no" title="Valid CSS" rel="nofollow">CSS</a>
+			|
+			-->
+			RSS: <a href="../../../../feed/rss/index.html" title="Ian Bicking: a blog RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Posts</a> &amp; <a href="../../../../comments/feed/index.html" title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Comments</a>
+		</p>
+	</div>
+
+</div><!-- END WRAPPER -->
+
+	<!-- Somehow 44 queries occured in 2.057 seconds. Magic! -->
+	<!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
+	<script type='text/javascript' src='../../../../wp-includes/js/comment-reply.js?ver=3.4.2'></script>
+
+<!-- Google Analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script>
+
+</body>
+</html>

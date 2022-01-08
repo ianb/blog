@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Frameworks, Libraries, Conceptual Scalability</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Frameworks, Libraries, Conceptual Scalability</h1>
+ 
+<div class="document">
+<p>Andrew Kuchling has a recent entry about <a class="reference" href="http://www.amk.ca/diary/2004/03/11#2004-03-11-1">Framelets</a> (from <a class="reference" href="http://www.softwareresearch.net/site/publications/J013.pdf">this
+paper</a>).</p>
+<p>Framelets are small frameworks that can be used together.  A framelet
+is (to quote):</p>
+<blockquote>
+<ul class="simple">
+<li>is small in size ( &lt; 10 classes);</li>
+<li>does not assume main control of an application; and</li>
+<li>has a clearly defined simple interface.</li>
+</ul>
+</blockquote>
+<p>I don't like the term, but the concept is important.  In the past I've
+talked about the distinction between a framework and a library, and
+this is the kind of thing I'm talking about, though I consider a
+library to be simpler than a mini-framework (I can't make myself use
+the term <em>framelet</em>, I just can't).</p>
+<p>The Python standard library is mostly made up of &quot;libraries&quot; as
+opposed to frameworks (though not entirely).  I think of a library as:</p>
+<blockquote>
+<ul class="simple">
+<li>Imperative; it does things.</li>
+<li>Public interface made up of functions and <em>maybe</em> a small number
+of classes (maybe one or two).  Internally it may use more.</li>
+<li>Users do not subclass anything.</li>
+</ul>
+</blockquote>
+<p>Examples are things like <a class="reference" href="http://python.org/doc/current/lib/module-pickle.html">pickle</a>, <a class="reference" href="http://python.org/doc/current/lib/module-shelve.html">shelve</a>, <a class="reference" href="http://python.org/doc/current/lib/module-urllib.html">urllib</a>, <span class="nowiki">csv<a class="wiki reference" href="http://blog.ianbicking.org/csv.html">?</a></span>, etc.  Even
+<a class="reference" href="http://python.org/doc/current/lib/module-logging.html">logging</a> is more a library than a framework, despite its complexity.</p>
+<p>It also has some more mini-framework modules, like <a class="reference" href="http://python.org/doc/current/lib/module-HTMLParser.html">HTMLParser</a>,
+<a class="reference" href="http://python.org/doc/current/lib/module-threading.html">threading</a>, <a class="reference" href="http://python.org/doc/current/lib/module-urllib2.html">urllib2</a>, and <a class="reference" href="http://python.org/doc/current/lib/module-asyncore.html">asyncore</a>.</p>
+<p>Generally when I work with these mini-frameworks I have to look up the
+documentation each time.  I still can't remember quite how to spawn
+threads, even though I've written code to do so many times -- the
+actual subset of the interface I use is simple enough, but I'm always
+distracted.  And urllib2 has annoyed me many times in the past,
+because things that should be simple are not -- the excuse is that you
+<em>can</em> do anything with urllib2 by subclassing various pieces, but I
+think it's wrong that you should subclass anything that could be
+easily expected (like HTTP authentication).  [John Lee has been making
+good progress on some <a class="reference" href="http://wwwsearch.sourceforge.net/">improved interfaces</a> for client web usage,
+though.]</p>
+<p>Still, the mini-frameworks in the standard library are generally
+easier to deal with than larger frameworks -- they are relatively
+generic and can usually be distilled into a application-specific
+library-like interface.  For instance, if I use HTMLParser I
+immediately make a function-based interface to do the specific parsing
+or transformation I need for my application.</p>
+<p>It's still a challenge -- how do you make something that is easy to
+start with, but complete and generic enough to grow with your
+application?  The old <em>make easy problems easy, and hard problems
+possible</em>.</p>
+<p>I've decided to make this the more general topic of my talk on
+<a class="reference" href="http://formencode.org">FormEncode</a> at <a class="reference" href="http://pycon.org/dc2004/talks/index_html#formencode">PyCon</a>, describing some of the design decisions I've
+made in FormEncode to try to make that particular framework both easy
+to use and complete.</p>
+</div>
+ <div class="dates" align="right">
+Created 13 Mar '04<br>
+Modified 14 Dec '04</div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

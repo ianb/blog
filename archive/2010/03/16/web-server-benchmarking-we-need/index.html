@@ -1,0 +1,728 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
+<script type="text/javascript">/*<![CDATA[*/(function(a){function b(a,b){if(+a)return~a||(d.cookie=h+"=; path=/");j=d.createElement(e),k=d.getElementsByTagName(e)[0],j.src=a,b&&(j.onload=j.onerror=b),k.parentNode.insertBefore(j,k)}function c(){n.api||b(l.shift()||-1,c)}if(this.Mobify)return;var d=document,e="script",f="mobify",g="."+f+".com/",h=f+"-path",i=g+"un"+f+".js",j,k,l=[!1,1],m,n=this.Mobify={points:[+(new Date)],tagVersion:[6,0]},o=/(; |#|&|^)mobify-path=([^&;]*)/g.exec(location.hash+"; "+d.cookie);o?(m=o[2])&&!+(m=sessionStorage[h]||m)&&(l=[!0,"//preview"+g+escape(m)]):(l=a()||l,l[0]&&l.push("//cdn"+i,"//files01"+i)),l.shift()?(d.write('<plaintext style="display:none;">'),setTimeout(c)):b(l[0])})(function(){if(/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)){return[1,"//cdn.mobify.com/sites/ians-blog/production/mobify.js"]}})/*]]>*/</script>
+<!-- END MOBIFY -->
+	<title>Ian Bicking: a blog   ::  The Web Server Benchmarking We Need</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta name="generator" content="WordPress 3.4.2" /><!-- LEAVE FOR STATS -->
+	<meta name="description" content="" />
+	<link rel="stylesheet" title="plaintxtSimpler" href="../../../../wp-content/themes/Barthelme-ianb/style.css" type="text/css" media="all" />
+	<link rel="start" href="../../../../index.html" title="Ian Bicking: a blog" />
+	<link rel="alternate" type="application/atom+xml" title="Ian Bicking: a blog Atom Feed" href="../../../../feed/atom/index.html" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog RSS 2.0 Feed" href="../../../../feed/rss/index.html" />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog Comments RSS 2.0 Feed" href="../../../../comments/feed/index.html" />
+	<link rel="alternate" type="application/rdf+xml" title="Ian Bicking: a blog RSS 1.0" href="../../../../feed/rdf/index.html" />
+	<link rel="alternate" type="text/xml" title="Ian Bicking: a blog RSS 0.92 Feed" href="../../../../feed/rss/index.html" />
+	<link rel="pingback" href="../../../../xmlrpc.php" />
+	<link rel="openid.server" href="http://www.myopenid.com/server" />
+	<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <link rel="me" type="text/html" href="http://www.google.com/profiles/ianbicking"/>
+		<link rel='archives' title='October 2012' href='../../../../2012/10/index.html' />
+	<link rel='archives' title='February 2012' href='../../../../2012/02/index.html' />
+	<link rel='archives' title='April 2011' href='../../../../2011/04/index.html' />
+	<link rel='archives' title='March 2011' href='../../../../2011/03/index.html' />
+	<link rel='archives' title='September 2010' href='../../../09/index.html' />
+	<link rel='archives' title='August 2010' href='../../../08/index.html' />
+	<link rel='archives' title='May 2010' href='../../../05/index.html' />
+	<link rel='archives' title='April 2010' href='../../../04/index.html' />
+	<link rel='archives' title='March 2010' href='../../index.html' />
+	<link rel='archives' title='February 2010' href='../../../02/index.html' />
+	<link rel='archives' title='January 2010' href='../../../01/index.html' />
+	<link rel='archives' title='September 2009' href='../../../../2009/09/index.html' />
+	<link rel='archives' title='May 2009' href='../../../../2009/05/index.html' />
+	<link rel='archives' title='April 2009' href='../../../../2009/04/index.html' />
+	<link rel='archives' title='January 2009' href='../../../../2009/01/index.html' />
+	<link rel='archives' title='December 2008' href='../../../../2008/12/index.html' />
+	<link rel='archives' title='November 2008' href='../../../../2008/11/index.html' />
+	<link rel='archives' title='October 2008' href='../../../../2008/10/index.html' />
+	<link rel='archives' title='September 2008' href='../../../../2008/09/index.html' />
+	<link rel='archives' title='August 2008' href='../../../../2008/08/index.html' />
+	<link rel='archives' title='July 2008' href='../../../../2008/07/index.html' />
+	<link rel='archives' title='June 2008' href='../../../../2008/06/index.html' />
+	<link rel='archives' title='May 2008' href='../../../../2008/05/index.html' />
+	<link rel='archives' title='April 2008' href='../../../../2008/04/index.html' />
+	<link rel='archives' title='March 2008' href='../../../../2008/03/index.html' />
+	<link rel='archives' title='February 2008' href='../../../../2008/02/index.html' />
+	<link rel='archives' title='January 2008' href='../../../../2008/01/index.html' />
+	<link rel='archives' title='November 2007' href='../../../../2007/11/index.html' />
+	<link rel='archives' title='October 2007' href='../../../../2007/10/index.html' />
+	<link rel='archives' title='September 2007' href='../../../../2007/09/index.html' />
+	<link rel='archives' title='August 2007' href='../../../../2007/08/index.html' />
+	<link rel='archives' title='July 2007' href='../../../../2007/07/index.html' />
+	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog &raquo; The Web Server Benchmarking We Need Comments Feed" href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/feed/" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="../../../../xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="../../../../wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='What Does A WebOb App Look Like?' href='../../12/a-webob-app-example/index.html' />
+<link rel='next' title='More Sentinels' href='../../../04/02/more-sentinels/index.html' />
+<meta name="generator" content="WordPress 3.4.2" />
+<link rel='canonical' href='index.html' />
+<link rel='shortlink' href='http://blog.ianbicking.org/?p=198' />
+<link rel="stylesheet" href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"  type="text/css" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+        <style type="text/css" media="all">
+/*<![CDATA[*/
+body { font-size: 100%; }
+body { font-family: tahoma, geneva, sans-serif; }
+div.post-header, h2.post-title, p.post-date-single, h2.post-title-single, div.post-entry h1, div.post-entry h2, div.post-entry h3, div.post-entry h4, div.post-entry h5, div.post-entry h6, div.post-entry blockquote, div.post-footer, h3#comment-count, h4#comment-header, div#comments ol li p.comment-metadata, h4#respond { font-family: verdana, geneva, sans-serif; }
+div.post-entry p { text-align: left; }
+div#wrapper { width: 100%; }
+
+/*]]>*/
+</style>
+</head>
+<body>
+
+<div id="wrapper">
+
+	<div id="header" onclick="location.href='http://blog.ianbicking.org/';" style="cursor:pointer;">
+		<h1 id="title"><a href="../../../../index.html" title="Ian Bicking: a blog">Ian Bicking: a blog</a></h1>
+		<p id="description"></p>
+	</div>
+<!-- WP Theme Credits -->
+<div style="display: none;">We can answer on question <a href="http://www.olnevhost.net/vps-hosting.html">what is VPS</a>? and
+what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap dedicated servers</strong></a>?</div>
+<!-- END HEADER -->
+<div id="container">
+	<div id="content" class="widecolumn">
+
+
+		<div id="post-198" class="post single-post">
+			<p class="post-date-single">{ 2010 03 16 }</p>
+			<h2 class="post-title-single">The Web Server Benchmarking We Need</h2>
+			<div class="post-entry">
+				<div class="document">
+<p>Another <a class="reference external" href="http://nichol.as/benchmark-of-python-web-servers">WSGI web server benchmark</a> was published.  It&#8217;s a decent benchmark, despite some criticisms.  But it benchmarks what everyone benchmarks: serving up a trivial app really really quickly.  This is not very useful to me.  Also, performance is not to me the most important differentiation of servers.</p>
+<p>In <a class="reference external" href="http://cloudsilverlining.org">Silver Lining</a> we&#8217;re using <a class="reference external" href="http://code.google.com/p/modwsgi/">mod_wsgi</a>.  Silver Lining isn&#8217;t tied to mod_wsgi (applications can&#8217;t really tell), and we may revisit that decision (mostly because of memory concerns), but it is a deliberate choice.  mod_wsgi is one of the few multiprocess WSGI servers, and it manages its children (the same way Apache manages all its children).  So if a child stops responding, it gets taken out of the pool and killed (brutal efficiency!  Or at least brutal terminology).  Child processes are also recycled, guarding against memory leaks or other peculiarities.  Sometimes these kinds of things are dismissed for covering up bugs, but (a) production is a lousy time to learn about bugs, (b) it&#8217;s like a third tier of garbage collection, and (c) the bugs you are avoiding are often bugs you can&#8217;t fix anyway (for instance, if your mysql driver leaks memory, is that the application developer&#8217;s fault?)</p>
+<p>I wish there was competition among servers not to see who can tweak their performance for entirely unrealistic situations, but to see who can implement the most fail-safe server.  We&#8217;re missing good benchmarks.  Unfortunately benchmarks are a pain in the butt to write and manage.</p>
+<p>But I hope someone writes a benchmark like that.  Here&#8217;s some things I&#8217;d like to see benchmarked:</p>
+<ul class="simple">
+<li>A &quot;realistic&quot; CPU-bound application.  <tt class="docutils literal"><span class="pre">for</span> <span class="pre">i</span> <span class="pre">in</span> <span class="pre">xrange(10000000):</span> <span class="pre">pass</span></tt> is a reasonable start.</li>
+<li>An application that generates big responses, e.g., <tt class="docutils literal"><span class="pre">&quot;x&quot;*100000</span></tt>.</li>
+<li>An I/O bound application.  E.g., one that reads a big file.</li>
+<li>A simply slow application (<tt class="docutils literal"><span class="pre">time.sleep(1)</span></tt>).</li>
+<li>Applications that wedge.  <tt class="docutils literal"><span class="pre">while</span> <span class="pre">1:</span> <span class="pre">pass</span></tt> perhaps?  Or <tt class="docutils literal"><span class="pre">lock</span> <span class="pre">=</span> <span class="pre">threading.Lock();</span> <span class="pre">lock.acquire();</span> <span class="pre">lock.acquire()</span></tt>.  Wedging in C and wedging in Python are different, so a bunch of different kinds of wedging.</li>
+<li>Applications that segfault.  ctypes is specially designed for this.</li>
+<li>Applications that leak memory like a sieve, e.g., <tt class="docutils literal"><span class="pre">global_var.extend(['x']*10000)</span></tt>.</li>
+<li>Large uploads.</li>
+<li>Slow uploads, like a client that takes 30 seconds to upload 1Mb.</li>
+<li>Also slow downloads.</li>
+<li>In each case it is interesting what happens when something bad happens to just a portion of requests.  E.g., if 1% of requests wedge hard.  A good container will serve the other 99% of requests properly.  A bad container will have its worker pool exhausted and completely stop.</li>
+<li>Mixing and matching these could be interesting.  For instance Dave Beazley <a class="reference external" href="http://www.dabeaz.com/blog/2010/02/revisiting-thread-priorities-and-new.html">found some bad GIL results mixing I/O and CPU-bound code</a>.</li>
+<li>Add ideas in the comments and I&#8217;ll copy them into this list.</li>
+</ul>
+<p>The hardest part of writing this is not the applications (they are simple).  One annoyance is wiring up the applications, but handily Nicholas covers that well in <a class="reference external" href="http://nichol.as/benchmark-of-python-web-servers">his benchmark</a>.  You also have to make sure to clean up, as many servers will not exit cleanly from some of the tests.  Another nuisance is that some of these require funny clients.  These aren&#8217;t too hard to write, but you can&#8217;t just use <tt class="docutils literal"><span class="pre">ab</span></tt>.  Then you have to report.</p>
+<p>Anyway: I would <strong>love it</strong> if someone did this, and packaged it as repeatable/runnable code/scripts.  I&#8217;ll help some, but I can&#8217;t lead.  I&#8217;d both really like to see the results, and in my ideal world people writing servers would start using these benchmarks to make their servers more robust.</p>
+</div>
+<p>Automatically generated list of related posts:</p><ol>
+<li><a href='../../../../index.html?p=245' rel='bookmark' title='Javascript on the server AND the client is not a big deal'>Javascript on the server AND the client is not a big deal</a> <small>All the cool kids love Node.js. I&#8217;ve used it a...</small></li>
+<li><a href='../../../01/29/new-way-to-deploy-web-apps/index.html' rel='bookmark' title='A new way to deploy web applications'>A new way to deploy web applications</a> <small>Deployment is one of the things I like least about...</small></li>
+<li><a href='../../../../index.html?p=250' rel='bookmark' title='A Python Web Application Package and Format (we should make one)'>A Python Web Application Package and Format (we should make one)</a> <small>At PyCon there was an open space about deployment, and...</small></li>
+<li><a href='../../../../2007/08/21/the-shrinking-python-web-framework-world/index.html' rel='bookmark' title='The Shrinking Python Web Framework World'>The Shrinking Python Web Framework World</a> <small>When I was writing the summary of differences between WebOb...</small></li>
+<li><a href='../../../../2007/08/14/of-microformats-and-the-semantic-web/index.html' rel='bookmark' title='Of Microformats and the Semantic Web'>Of Microformats and the Semantic Web</a> <small>I was talking a little with Daniel Krech (author of...</small></li>
+</ol>											</div><!-- END POST-ENTRY  -->
+			<!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			xmlns:dc="http://purl.org/dc/elements/1.1/"
+			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+		<rdf:Description rdf:about="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/"
+    dc:identifier="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/"
+    dc:title="The Web Server Benchmarking We Need"
+    trackback:ping="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/trackback/" />
+</rdf:RDF> -->
+			<div class="post-footer">
+				<p>Posted by Ian Bicking on Tuesday, March 16th, 2010, at 5:23 pm, and filed under <a href="../../../../category/programming/index.html" title="View all posts in Programming" rel="category tag">Programming</a>, <a href="../../../../category/python/index.html" title="View all posts in Python" rel="category tag">Python</a>, <a href="../../../../category/silverlining.1" title="View all posts in Silver Lining" rel="category tag">Silver Lining</a>, <a href="../../../../category/web/index.html" title="View all posts in Web" rel="category tag">Web</a>.</p>
+				<p>
+				Comments have a <a href='http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/feed/'>feed</a>.</p>
+			</div><!-- END POST-FOOTER -->
+		</div><!-- END POST -->
+
+<div id="comments">
+
+
+
+
+<h4 id="comments">23 Comments</h4>
+ <ul class="commentlist">
+		<li class="comment even thread-even depth-1 parent" id="comment-156353">
+				<div id="div-comment-156353" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/70dfb4afd84b106d0855184bf0ae4675?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://blog.dscpl.com.au' rel='external nofollow' class='url'>Graham Dumpleton</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156353">
+			March 16, 2010 at 5:32 pm</a>		</div>
+
+		<p>A couple of other things to add that I can think of right now.</p>
+
+<ol>
+<li><p>For slow clients, also evaluate benefits for using nginx as a front end, especially where hosting web application via Apache and where keep alive can cause Apache to suffer.</p></li>
+<li><p>Performance of wsgi.file_wrapper extension. Yes I know that it is flawed and some common paradigms defeat it and cause any performance optimisation it supports not to be used, but interesting all the same.</p></li>
+</ol>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment odd alt depth-2 parent" id="comment-156396">
+				<div id="div-comment-156396" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/49b31b7264aa9367f83872a4112312d6?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://jehiah.cz/' rel='external nofollow' class='url'>Jehiah</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156396">
+			March 16, 2010 at 10:01 pm</a>		</div>
+
+		<p>using nginx is a good solution to a large part of the mixed fast/slow client problem, but when you have multiple requests from nginx to your app server you still need to know how it handles those scenarios, they just happen much much more seldom</p>
+
+<p>(i&#8217;ll go so far to say that it should be assumed that app servers are run behind nginx now)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-3 parent" id="comment-156401">
+				<div id="div-comment-156401" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/70dfb4afd84b106d0855184bf0ae4675?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://blog.dscpl.com.au' rel='external nofollow' class='url'>Graham Dumpleton</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156401">
+			March 16, 2010 at 10:52 pm</a>		</div>
+
+		<p>Why would concurrent multiple requests be less inclined to happen if nginx is used as front end. The nginx server as I understand it only uses HTTP/1.0 for proxy requests so it cant even handle pipelining of requests, nor does it use keep alives for proxy connections. Thus all requests between nginx and backend when proxying require a separate socket connection. It would still be quite easy to have concurrent requests between nginx and backend because although it may help isolate the backend from slow clients, it isn&#8217;t going to help with the fact that processing time for a request by the backend is still going to take time, during which other requests can/will arrive.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment odd alt depth-4 parent" id="comment-156417">
+				<div id="div-comment-156417" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/dd1a815ca3634ab75bd9c92a719005d5?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://self.maluke.com/' rel='external nofollow' class='url'>Sergey Schetinin</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156417">
+			March 17, 2010 at 12:28 am</a>		</div>
+
+		<p>For some reason this is true. I&#8217;ve been testing an app by running <code>ab</code> directly against it and against the same but nginx-proxied. The app manages to serve about 50 reqs per second and is served by a server spawning a thread per connection (no threadpool). I was monitoring how many threads it uses by running htop in a different console. When running &#8216;ab -n 1000 -c 10&#8242; directly against it, it consumes a number of threads all the time. The same test against nginx and the server spawns about five threads initially and after a second settles on just one thread. The resulting performance is very close. So indeed, when proxied by nginx the appserver sees much lower concurrency.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment byuser comment-author-ianb bypostauthor even depth-5" id="comment-156419">
+				<div id="div-comment-156419" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156419">
+			March 17, 2010 at 12:38 am</a>		</div>
+
+		<p>This seems plausible to me &#8212; Nginx can accept the connection and just hold onto it and proxy it at its discretion.  Realistically it seldom makes sense to try to handle more than a small number of requests in parallel, so if Nginx is smart (which it seems to be) then it would queue those incoming requests and forward them serially.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt depth-5" id="comment-156431">
+				<div id="div-comment-156431" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/70dfb4afd84b106d0855184bf0ae4675?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://blog.dscpl.com.au' rel='external nofollow' class='url'>Graham Dumpleton</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156431">
+			March 17, 2010 at 2:12 am</a>		</div>
+
+		<p>If you are using hello world which responds quickly then will accept it may be the case, but if request handlers are taking in the order of 100ms or more as opposed to 10ms, you logically would have to start seeing overlapping of requests to get any sort of decent throughput if talking through to a single process. This highlights again the need for not relying on hello world code for testing and look at a greater range of response times for requests within an application to understand the way things interact.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even depth-5" id="comment-156433">
+				<div id="div-comment-156433" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/dd1a815ca3634ab75bd9c92a719005d5?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://self.maluke.com/' rel='external nofollow' class='url'>Sergey Schetinin</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156433">
+			March 17, 2010 at 2:24 am</a>		</div>
+
+		<p>It&#8217;s an application that queries a database, converts the data from a wiki markup to html, parses it with lxml, does a couple passes on it (merging with a template, automatic typography, syntax highlighting, links fixup etc) and then serializes it. It&#8217;s not a hello-world app.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1 parent" id="comment-156358">
+				<div id="div-comment-156358" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/70dfb4afd84b106d0855184bf0ae4675?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://blog.dscpl.com.au' rel='external nofollow' class='url'>Graham Dumpleton</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156358">
+			March 16, 2010 at 6:02 pm</a>		</div>
+
+		<p>Oh, one more thing. Any analysis should also endeavour to actually show how the results are in any way meaningful. Sites aren&#8217;t run such that they are at their maximum capacity all the time. There is absolutely no point trying to chase down what may be the best performing solution if your site is never ever going to do anything but idle along most of the time anyway. Yes the results may help in showing how much theoretical headroom you have for doing vertical scaling for a specific solution, but in reality, serious sites are going to be looking at horizontal scaling as well which brings its own class of problems to be solved. All of this also does nothing in relation to the fact that the real performance bottlenecks are going to be in the application and database. Generally the only real concern that is going to come from the WSGI server itself is what additional memory overhead it imposes due to how it is implemented and configured/misconfigured.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment byuser comment-author-ianb bypostauthor even depth-2" id="comment-156366">
+				<div id="div-comment-156366" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156366">
+			March 16, 2010 at 6:40 pm</a>		</div>
+
+		<p>I&#8217;d simply ask that it be repeatable.  If there&#8217;s a setup and it&#8217;s not too hard to run, then if you don&#8217;t like it you can take it (fork it) and try to adjust it for your needs.  Probably the least satisfying aspect of benchmarking is how political it gets.  Asking that the results be &#8220;meaningful&#8221; is inviting too much politics.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+		<li class="comment odd alt thread-even depth-1 parent" id="comment-156378">
+				<div id="div-comment-156378" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/8b588344181b6098f508e9741ac36e0e?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Kurt</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156378">
+			March 16, 2010 at 8:05 pm</a>		</div>
+
+		<p>Stalled downloads. I&#8217;ve encountered this (i.e. PDF file downloads 2 megs&#8230; waits 30 seconds, then gives me the last meg). This really screws up some browsers and I&#8217;m guessing it&#8217;s not so good for the server (something bad is happening to cause this I assume).</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-2" id="comment-156383">
+				<div id="div-comment-156383" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/ef7fa822521407c0afb50fcf56094260?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Eric</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156383">
+			March 16, 2010 at 8:36 pm</a>		</div>
+
+		<p>If you&#8217;re getting stalled downloads a lot with PDF, particularly dynamically generated ones, you may run up against bugs using Acrobat Reader and the HTTP header Accept-Ranges. There are a whole suite of unique issues with Acrobat Reader and streaming PDFs. We&#8217;ve even seen very old versions (with browser embed plugins) firing off many dozens of individual requests (with full tcp/SSL handshakes for each connect) for a single dynamic PDF file. (We only noticed it due to massive load spikes of our service having to suddenly generate the same heavy-weight PDF dozens of times per second.)</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1 parent" id="comment-156436">
+				<div id="div-comment-156436" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/53c2c5f6e446e221e0cd1051e5b8856f?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://nichol.as' rel='external nofollow' class='url'>Nicholas Piël</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156436">
+			March 17, 2010 at 2:54 am</a>		</div>
+
+		<p>Hi Ian,</p>
+
+<p>I agree with your points, that benchmarking is hard and that performance is not the most important factor and also that spawning, upgrading and reaping of workers is probably one of the most interesting aspect of the different servers. </p>
+
+<p>Concerning the benchmark, with an increasing number of servers things get exponentially complex. In my benchmark I have been looking at 14 servers, if I excluded some of them I would have surely gotten comments that it is not complete and that I really ought to check out this or that server as well. </p>
+
+<p>At first I tried to present a more complex web application which more lies in the line of my current project and plans. However, this would quickly rule out all threaded web servers. The following might indicate how things can easily get difficult. I have been thinking about time.sleep(n), but would it be fair to compare an async server such as Gevent or Eventlet with a threaded web server? These async server have implemented such a sleeping function in Greentlet style while for example ModWSGI blocks a complete thread. This would effectively limit the RPS rate on a threaded server to threadpool/n or you would corrupt the async server by using a blocking call.</p>
+
+<p>I can imagine that when looking at different settings, such as for example the size of the response there might be lots of buffer tuning options in uWSGI to specifically tune for that setting (not sure if thats the case but uWSGI sure has lots of things to tune). The problem you quickly run into is that you will be tuning your server around a specific problem, how far will you allow this to go and still call it a comparative benchmark? </p>
+
+<p>Another thing to keep in mind is that when publishing your benchmark results it might give some people the idea that you are judging their lifework, which really isn&#8217;t the case. The benchmark if anything is an objective comparison on a very limited domain which might benefit the performance of some servers. I tried to keep the application simple in the hope to keep it as unbiassed as possible but even that can already stir up some commotion. </p>
+
+<p>And yes, the hardest part is not setting up the applications but the specifics on how to tune the application server for the specific application on certain hardware with a certain proxy server. It is difficult to control all these variables and might probably be best suited by something like the computer language shootout, where some of these variables can be pinned down.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment even depth-2 parent" id="comment-156456">
+				<div id="div-comment-156456" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/70dfb4afd84b106d0855184bf0ae4675?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://blog.dscpl.com.au' rel='external nofollow' class='url'>Graham Dumpleton</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156456">
+			March 17, 2010 at 5:16 am</a>		</div>
+
+		<p>Using time.sleep(n) would block the thread for any WSGI server, not just mod&#95;wsgi. As such, would also block uWSGI process threads, CherryPy process threads etc etc. That is how WSGI is but it wouldn&#8217;t matter as the whole point with such WSGI servers is that there are other threads and/or processes to handle concurrent requests.</p>
+
+<p>This is why in part you can only really compare synchronous WSGI servers against other synchronous WSGI servers. Similarly you should only compare asynchronous servers against other asynchronous based servers. To try and compare them against each other just doesn&#8217;t make a great deal of sense because the programming model is different and one application isn&#8217;t necessarily appropriate for the other model or going to be directly portable between them such that a fair comparison can be drawn.</p>
+
+<p>This is why the original Tornado results were arguably flawed, although that didn&#8217;t stop a lot of people flocking to it as the latest and greatest thing. The Tornado folks made it even more misleading by comparing a heavy weight Django application against what was for its asynchronous server not much more than a hello world. If one compares Tornado to a hello world application running on a WSGI server like you did, there isn&#8217;t much difference and not the huge difference Tornado folks claimed.</p>
+
+<p>One has to realise that the synchronous and asynchronous models are suited for different tasks. To turn Tornado into a server suitable for properly supporting WSGI applications with concurrent request processing, you need to stick a thread pool on top of it and bridge between the asynchronous and synchronous worlds. This is the only real way to avoid the problem of time.sleep(n) blocking the whole server with a true asynchronous server. Once you stick such a thread pool on top you loose various of the features that make asynchronous systems useful for certain tasks, such as being able to handle high number of concurrent requests with low resource usage. If you are going to loose features like that, what is the point, you may as well stick with a normal synchronous server.</p>
+
+<p>We get back to what I originally said to Ian, if one is going to develop a rang of benchmarks, there is no point just saying, here is a bunch of benchmarks and some pretty graphs, if one cant also explain how that is meaningful and actually applicable to what people are doing or need for there specific application so they can make a reasoned judgement as to what is best for them. All these graphs tend to do at the moment is cause the sheep who are easily impressed to move to whatever system the results give the impression of being better than anything else for that specific test.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment odd alt depth-3 parent" id="comment-156460">
+				<div id="div-comment-156460" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/e04ba8565a82423fc6b401d092bc5a39?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.defuze.org' rel='external nofollow' class='url'>Sylvain Hellegouarch</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156460">
+			March 17, 2010 at 7:40 am</a>		</div>
+
+		<p>Well testing a server should always go with a context and a rationale behind said test. A benchmark isn&#8217;t a test per se, it&#8217;s just one aspect of a server that is pushed to the limit. So to me what Nicholas has done is fine since he explained the goal right in the premise of the article:</p>
+
+<p>&gt; That benchmark looked specifically at the raw socket performance of various frameworks.</p>
+
+<p>What Ian expects is much more of course but I&#8217;d say that if by 2010 no one has come with a generic load/performance/etc testing of a web server, maybe it&#8217;s because it&#8217;s not actually doable in any meaningful way. Testing always depends on the context it takes place.</p>
+
+<p>Probably the only realistic test that can be performed across various servers is to test for static serving performances. Once you hit the application server, it becomes way harder. Personally I&#8217;m not finding what Ian proposes to test to be actually helpful. This is just a fancier benchmark, not a real test.</p>
+
+<p>For instance, when testing an intranet application, I would be interested in seeing how an operation that I consider sensitive perform under certain conditions. For example, I would like to know how login in performs on a Monday morning by simulating 500 virtual users. How many of those can log at once? How long does it take? Do I have failures? How long does it take for the servers to cool down? Most likely, the HTTP server performances won&#8217;t impact any of those.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment byuser comment-author-ianb bypostauthor even depth-4 parent" id="comment-156495">
+				<div id="div-comment-156495" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156495">
+			March 17, 2010 at 3:58 pm</a>		</div>
+
+		<blockquote>
+  <p>What Ian expects is much more of course but I’d say that if by 2010 no one has come with a generic load/performance/etc testing of a web server, maybe it’s because it’s not actually doable in any meaningful way. Testing always depends on the context it takes place.</p>
+</blockquote>
+
+<p>Do you know what your web server does when 1% of requests go into an infinite loop?  That&#8217;s not hard to test, and it&#8217;s both a reasonable and easy to test.  But how many people know what the result is?  This represents exactly the kind of situation you can&#8217;t test in context, because developers don&#8217;t develop expecting to have that problem (it is after all a bug).  But we all know these things happen.</p>
+
+<p>Right now I see primarily microbenchmarks (that benchmark one small isolated aspect of a system) and people who claim no general benchmarking is valid.  There is a middle ground.  It does not seem that difficult to me to just start to benchmark somewhat more interesting things.  Server developers aren&#8217;t going to tweak their servers for your one particular application; we need some common understanding of performance because server and application are two separate lines of development.  Outside of the process model decision (async/greenlets, threaded, multiprocess), I don&#8217;t see anything interesting happening in terms of performance, nor do I expect any server to accomplish anything by using the results of this kind of microbenchmark except perhaps outliers that want to get in line with the rest of the pack.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		<ul class='children'>
+		<li class="comment odd alt depth-5" id="comment-156499">
+				<div id="div-comment-156499" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/e04ba8565a82423fc6b401d092bc5a39?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.defuze.org' rel='external nofollow' class='url'>Sylvain Hellegouarch</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156499">
+			March 17, 2010 at 4:25 pm</a>		</div>
+
+		<p>&gt; Do you know what your web server does when 1% of requests go into an infinite loop?</p>
+
+<p>Where do you get that 1% from? What value that random percentage has? If a request goes into an infinite loop most likely the request will timeout one one end or the other. </p>
+
+<p>&gt; But we all know these things happen.</p>
+
+<p>If it&#8217;s a bug, it should be unit tested, not performance tested. </p>
+
+<p>&gt; This represents exactly the kind of situation you can’t test in context (..)</p>
+
+<p>If it can be shown under a certain load only, then there is a context.</p>
+
+<p>&gt; we need some common understanding of performance</p>
+
+<p>True but this should not be translated into code. Merely asking people who have a good experience in those areas what should be taken into account when discussing about server performances. Why the compulsory requirement for some code?</p>
+
+<p>&gt; Server developers aren’t going to tweak their servers for your one particular application</p>
+
+<p>I don&#8217;t expect them to but they can&#8217;t expect their servers to be used without an application context either (apart from static serving). So they must be aware of the context in which their server will be used.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+</ul>
+</li>
+		<li class="comment even depth-3" id="comment-156461">
+				<div id="div-comment-156461" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/a709fd00fc849280c23233ef0a01c5dc?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://plope.com' rel='external nofollow' class='url'>Chris McDonough</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156461">
+			March 17, 2010 at 9:41 am</a>		</div>
+
+		<p>&#8220;All these graphs tend to do at the moment is cause the sheep who are easily impressed to move to whatever system the results give the impression of being better than anything else for that specific test.&#8221;</p>
+
+<p>When you see people say &#8220;wow, awesome, I&#8217;ll really need to try CoolNewWSGIServerX!&#8221; in a reddit comment against a set of benchmarks, you might remember:</p>
+
+<ul>
+<li><p>They aren&#8217;t going to try it.  They would have just tried it instead of leaving a comment saying they&#8217;re going to try it.</p></li>
+<li><p>Even if they do try it, they probably don&#8217;t have a production application anyway. If they had a production application, they&#8217;d be more concerned about stability and maintainability than raw speed, because except for a very few cases, the server isn&#8217;t their bottleneck; their app is always their bottleneck.</p></li>
+</ul>
+
+<p>As a result,  although it&#8217;s good to stay involved and try to correct misstatements and benchmarking misconfigurations, I wouldn&#8217;t worry about sheep or flocking or whatever.  At the end of the day, people are lazy, and they&#8217;re likely to choose the system that has the best production feature-set and the best documentation.  Marketing also helps, of course, and positive benchmark results can be seen as a form of marketing.  But if a server doesn&#8217;t have good docs and a good production feature set, it&#8217;s not going to see a lot of use, even if it goes at plaid speed.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+		<li class="comment byuser comment-author-ianb bypostauthor odd alt depth-2" id="comment-156494">
+				<div id="div-comment-156494" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-156494">
+			March 17, 2010 at 3:46 pm</a>		</div>
+
+		<p>Even making the example application a little more complicated would make the results more reasonable, I think.  For instance, return a large string, or the first 100 Fibonacci numbers, or something like that.  If that hurts threaded servers, so be it (I&#8217;m not sure it would be that bad though).  Certainly <code>time.sleep()</code> has a particular problem that async servers have monkeypatched that specific function call, though arguably it might not be a bad representation of how a database call could work (if you have a genuine async database driver, or a pure-Python driver based on socket).</p>
+
+<p>As for combinations, there certainly are many; adding Nginx to the mix doubles the combinations, for example.  And uWSGI can be embedded in a bunch of environments.  And there are at least several distinct ways to configure mod_wsgi, and I don&#8217;t particularly know which one is best.  Because of this I think getting a testing rig that other people can use and extend is more useful than one presentation of benchmark results.  Actually putting together the results would be handy every so often, it also gives people a baseline to compare against (so they can test their new server setup against some other setup that seems good, instead of testing it against all other setups).</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+</li>
+		<li class="comment even thread-even depth-1" id="comment-157405">
+				<div id="div-comment-157405" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/9e42ce18ec8a40b6334a6b0283d72528?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://tech.blog.aknin.name' rel='external nofollow' class='url'>Yaniv Aknin</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-157405">
+			March 28, 2010 at 5:05 am</a>		</div>
+
+		<p>I wholeheartedly agree with your approach, and as I wrote you in a separate email, made a feeble attempt at sketching the kind of benchmark you&#8217;re talking about (see my site for a short writeup of what I coded or the &#8220;Labour&#8221; repository in my github for the actual code). Cheers.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-169406">
+				<div id="div-comment-169406" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/5ff6d9d852f644c5ed03c216dcf1d2fc?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://ResourcePoint.net' rel='external nofollow' class='url'>Guy Siverson</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-169406">
+			August 3, 2010 at 8:39 am</a>		</div>
+
+		<p>&#8220;I wish there was competition among servers not to see who can tweak their performance for entirely unrealistic situations, but to see who can implement the most fail-safe server. We’re missing good benchmarks.&#8221;</p>
+
+<p>What benchmarks would you like to see that are currently being missed?</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-170400">
+				<div id="div-comment-170400" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/35b83b4f81857588b21e0df554ed2eac?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Vince</cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-170400">
+			August 14, 2010 at 2:05 am</a>		</div>
+
+		<p>Well, it seems that someone is talking less about theory and more about practice: those guys at TrustLeap not only disclosed the source code of their benchmark template but they also applied it to the market leaders.</p>
+
+<p>Maybe that&#8217;s because their own Web Application server, G-WAN, is smoking everybody else &#8211; whether this is in the kernel or in user-mode.</p>
+
+<p>Things can be simple, after all, when one does not fear comparisons.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-183058">
+				<div id="div-comment-183058" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://1.gravatar.com/avatar/70981657c09decb1afc4403ef9508b9c?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.henshawconsulting.com.au' rel='external nofollow' class='url'>Dr Sophie Henshaw</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-183058">
+			November 25, 2010 at 10:12 pm</a>		</div>
+
+		<p>I wish there was more competition among servers as well. Nicholas&#8217;s benchmark is a start, and benchmarks can only progress from here. We need to keep that in mind.</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+		<li class="comment even thread-even depth-1" id="comment-187957">
+				<div id="div-comment-187957" class="comment-body">
+				<div class="comment-author vcard">
+		<img alt='' src='http://0.gravatar.com/avatar/264ff4b4cf8538a36c6b4e5a45ce7acc?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.acoholabuse.net' rel='external nofollow' class='url'>Edmundo Gave</a></cite> <span class="says">says:</span>		</div>
+
+		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2010/03/16/web-server-benchmarking-we-need/comment-page-1/#comment-187957">
+			December 30, 2010 at 6:19 pm</a>		</div>
+
+		<p>Hey I just wanted to let you know, I really like the written material on your website. But I am employing Firefox on a machine running version 8.x of Ubuntu and the design doesn&#8217;t seem quite as intended. Not a serious issue, I can still essentially read the articles and research for info, but just wanted to inform you about that. The navigation bar is kind of tough to use with the config I&#8217;m running. Keep up the great work!</p>
+
+		<div class="reply">
+				</div>
+				</div>
+		</li>
+</ul>
+
+<div class="navigation">
+<div class="alignleft"></div>
+<div class="alignright"></div>
+</div>
+
+
+
+
+</div>
+
+		<div class="navigation">
+			<div class="nav-left">&laquo; <a href="../../12/a-webob-app-example/index.html" rel="prev">What Does A WebOb App Look Like?</a></div>
+			<div class="nav-right"><a href="../../../04/02/more-sentinels/index.html" rel="next">More Sentinels</a> &raquo;</div>
+		</div><!-- END NAVIGATION -->
+
+
+	</div><!-- END CONTENT -->
+</div><!-- END CONTAINER  -->
+
+<div id="sidebar">
+	<ul>
+		<li id="home-link">
+			<h2><a href="../../../../index.html" title="Ian Bicking: a blog">Home</a></h2>
+		</li>
+<li id="text-315934862" class="widget widget_text"><h2 class="widgettitle">About</h2>
+			<div class="textwidget">Ian is a developer with Mozilla, <a href="http://ianbicking.appspot.com/projects">Python open source developer</a>, actually uses <a href="https://plus.google.com/u/0/104537541227697934010/posts">Google+</a> more than <a href="http://twitter.com/ianbicking">twitter</a> and lives in Minneapolis.<br>
+<span class="gittip-0001" gittip-username="ianbicking"></span>
+<script id="gittip-0001"
+  src="https://www.gittip.com/assets/widgets/0001.js"></script>
+</div>
+		</li>
+<li id="text-315934863" class="widget widget_text">			<div class="textwidget"><!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> --></div>
+		</li>
+<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
+		<ul>
+			<li><a href='../../../../2012/10/index.html' title='October 2012'>October 2012</a></li>
+	<li><a href='../../../../2012/02/index.html' title='February 2012'>February 2012</a></li>
+	<li><a href='../../../../2011/04/index.html' title='April 2011'>April 2011</a></li>
+	<li><a href='../../../../2011/03/index.html' title='March 2011'>March 2011</a></li>
+	<li><a href='../../../09/index.html' title='September 2010'>September 2010</a></li>
+	<li><a href='../../../08/index.html' title='August 2010'>August 2010</a></li>
+	<li><a href='../../../05/index.html' title='May 2010'>May 2010</a></li>
+	<li><a href='../../../04/index.html' title='April 2010'>April 2010</a></li>
+	<li><a href='../../index.html' title='March 2010'>March 2010</a></li>
+	<li><a href='../../../02/index.html' title='February 2010'>February 2010</a></li>
+	<li><a href='../../../01/index.html' title='January 2010'>January 2010</a></li>
+	<li><a href='../../../../2009/09/index.html' title='September 2009'>September 2009</a></li>
+	<li><a href='../../../../2009/05/index.html' title='May 2009'>May 2009</a></li>
+	<li><a href='../../../../2009/04/index.html' title='April 2009'>April 2009</a></li>
+	<li><a href='../../../../2009/01/index.html' title='January 2009'>January 2009</a></li>
+	<li><a href='../../../../2008/12/index.html' title='December 2008'>December 2008</a></li>
+	<li><a href='../../../../2008/11/index.html' title='November 2008'>November 2008</a></li>
+	<li><a href='../../../../2008/10/index.html' title='October 2008'>October 2008</a></li>
+	<li><a href='../../../../2008/09/index.html' title='September 2008'>September 2008</a></li>
+	<li><a href='../../../../2008/08/index.html' title='August 2008'>August 2008</a></li>
+	<li><a href='../../../../2008/07/index.html' title='July 2008'>July 2008</a></li>
+	<li><a href='../../../../2008/06/index.html' title='June 2008'>June 2008</a></li>
+	<li><a href='../../../../2008/05/index.html' title='May 2008'>May 2008</a></li>
+	<li><a href='../../../../2008/04/index.html' title='April 2008'>April 2008</a></li>
+	<li><a href='../../../../2008/03/index.html' title='March 2008'>March 2008</a></li>
+	<li><a href='../../../../2008/02/index.html' title='February 2008'>February 2008</a></li>
+	<li><a href='../../../../2008/01/index.html' title='January 2008'>January 2008</a></li>
+	<li><a href='../../../../2007/11/index.html' title='November 2007'>November 2007</a></li>
+	<li><a href='../../../../2007/10/index.html' title='October 2007'>October 2007</a></li>
+	<li><a href='../../../../2007/09/index.html' title='September 2007'>September 2007</a></li>
+	<li><a href='../../../../2007/08/index.html' title='August 2007'>August 2007</a></li>
+	<li><a href='../../../../2007/07/index.html' title='July 2007'>July 2007</a></li>
+		</ul>
+</li>
+<li id="text-315934861" class="widget widget_text">			<div class="textwidget"><a href="../../../../archive/index.html">The Older Archives</a></div>
+		</li>
+<li id="categories-1" class="widget widget_categories"><h2 class="widgettitle">Categories</h2>
+		<ul>
+	<li class="cat-item cat-item-12"><a href="../../../../category/erlang/index.html" title="View all posts filed under Erlang">Erlang</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="../../../../category/html/index.html" title="View all posts filed under HTML">HTML</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="../../../../category/javascript/index.html" title="View all posts filed under Javascript">Javascript</a>
+</li>
+	<li class="cat-item cat-item-15"><a href="../../../../category/licensing/index.html" title="View all posts filed under Licensing">Licensing</a>
+</li>
+	<li class="cat-item cat-item-18"><a href="../../../../category/mozilla/index.html" title="View all posts filed under Mozilla">Mozilla</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="../../../../category/notech/index.html" title="View all posts filed under Non-technical">Non-technical</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="../../../../category/olpc/index.html" title="View all posts filed under OLPC">OLPC</a>
+</li>
+	<li class="cat-item cat-item-14"><a href="../../../../category/packaging/index.html" title="View all posts filed under Packaging">Packaging</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="../../../../category/politics/index.html" title="View all posts filed under Politics">Politics</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="../../../../category/programming/index.html" title="View all posts filed under Programming">Programming</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="../../../../category/python/index.html" title="View all posts filed under Python">Python</a>
+</li>
+	<li class="cat-item cat-item-10"><a href="../../../../category/ruby/index.html" title="View all posts filed under Ruby">Ruby</a>
+</li>
+	<li class="cat-item cat-item-19"><a href="../../../../category/security/index.html" title="View all posts filed under Security">Security</a>
+</li>
+	<li class="cat-item cat-item-16"><a href="../../../../category/silverlining.1" title="View all posts filed under Silver Lining">Silver Lining</a>
+</li>
+	<li class="cat-item cat-item-20"><a href="../../../../category/programming/testing/index.html" title="View all posts filed under Testing">Testing</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="../../../../category/web/index.html" title="View all posts filed under Web">Web</a>
+</li>
+	<li class="cat-item cat-item-13"><a href="../../../../category/zopeplone/index.html" title="View all posts filed under Zope/Plone">Zope/Plone</a>
+</li>
+		</ul>
+</li>
+<li id="search-2" class="widget widget_search"><form id="searchform" method="get" action="../../../../index.html">
+	<div>
+		<input id="s" name="s" type="text" value="" tabindex="1" size="10" />
+		<input id="searchsubmit" name="searchsubmit" type="submit" value="Find" tabindex="2" />
+	</div>
+</form> </li>
+		<li id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widgettitle">Recent Posts</h2>
+		<ul>
+				<li><a href="../../../../index.html?p=291" title="Why doctest.js is better than Python&#8217;s doctest">Why doctest.js is better than Python&#8217;s doctest</a></li>
+				<li><a href="../../../../index.html?p=283" title="Python Application Package">Python Application Package</a></li>
+				<li><a href="../../../../index.html?p=277" title="Git-as-sync, not source-control-as-deployment">Git-as-sync, not source-control-as-deployment</a></li>
+				<li><a href="../../../../index.html?p=253" title="My Unsolicited Advice For PyPy">My Unsolicited Advice For PyPy</a></li>
+				<li><a href="../../../../index.html?p=250" title="A Python Web Application Package and Format (we should make one)">A Python Web Application Package and Format (we should make one)</a></li>
+				</ul>
+		</li>
+<li id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widgettitle">Recent Comments</h2>
+<ul id="recentcomments"><li class="recentcomments"><a href='http://www.mirsa.com.tr' rel='external nofollow' class='url'>havalandırma</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://redealmeidense.com.br/portalx/modules/' rel='external nofollow' class='url'>this website</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Eric Pierce on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Paul Brian on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://benjiyork.com' rel='external nofollow' class='url'>Benji York</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320">Why doctest.js is better than Python&#8217;s doctest</a></li></ul></li>
+	</ul>
+</div>
+
+	<div id="footer">
+		<p>
+			&copy; 2013 Ian Bicking<!--
+Does this commenting make me evil?
+			|
+			Thanks, <a href="http://wordpress.org/" title="WordPress">WordPress</a>
+			|
+			<a href="http://www.plaintxt.org/themes/barthelme/" title="Barthelme for WordPress" rel="follow">Barthelme</a> theme by <a href="http://scottwallick.com/" title="scottwallick.com" rel="follow">Scott</a>
+			| <!-- The following is a link to the theme author's sponsor. Please consider its smallness and that Scott was nice enough to make this theme publically available. -->
+			Sponsor: <a href="http://www.active-sandals.com/womreefsan.html" title="Support: Reef Sandals">Reef Sandals</a>
+			|
+			Valid <a href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1" title="Valid XHTML 1.0 Strict" rel="nofollow">XHTML</a> &amp; <a href="http://jigsaw.w3.org/css-validator/validator?uri=http://blog.ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no" title="Valid CSS" rel="nofollow">CSS</a>
+			|
+			-->
+			RSS: <a href="../../../../feed/rss/index.html" title="Ian Bicking: a blog RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Posts</a> &amp; <a href="../../../../comments/feed/index.html" title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Comments</a>
+		</p>
+	</div>
+
+</div><!-- END WRAPPER -->
+
+	<!-- Somehow 44 queries occured in 1.315 seconds. Magic! -->
+	<!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
+	<script type='text/javascript' src='../../../../wp-includes/js/comment-reply.js?ver=3.4.2'></script>
+
+<!-- Google Analytics -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script>
+
+</body>
+</html>

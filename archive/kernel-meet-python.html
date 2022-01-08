@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Kernel, meet Python</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Kernel, meet Python</h1>
+ <p>
+
+I just started reading about <a href="http://www.freenet.org.nz/python/lufs-python/">LUFS-Python</a>
+via <a href="http://www.larsen-b.com/archives/000064.html">Jkx@Home</a>, and
+now in another entry by <a href="http://simon.incutio.com/archive/2003/12/10/pythonFilesystems">Simon
+Willison</a>.
+
+<p>
+
+<a href="http://lufs.sf.net">LUFS</a> is Linux Usermode File System; a
+virtual file system implemented by a normal process (as opposed to
+being compiled into the kernel).  It's a neat idea, and one which
+should have come about a long time ago.  This kind of feature was one
+of the selling points of <a href="http://www.gnu.org/software/hurd/hurd.html">GNU Hurd</a> (but
+that shouldn't scare you away from it ;).
+
+<p>
+
+Simon comes up with a couple ideas I hadn't thought of -- it wouldn't
+have occurred to me to use LUFS to underly other protocols, like FTP
+or SMB, or even DAV.  But once you have files, these servers already
+exist.
+
+<p>
+
+I'd definitely like to experiment with this, but at the same time
+there were significant problems the last time I used LUFS.  At the
+time I was looking for a WebDAV filesystem for Linux, and I didn't
+want to install Code and a bunch of other things that <a href="http://dav.sourceforge.net/">davfs2</a> required (though I may
+yet try that again).  LUFS also seemed like the Right Way.  Now the
+DAV option seems to have disappeared, or maybe I was imagining it and
+I was only using sshfs; either way, I did manage to get it working.
+Besides having bugs (which happens), the things was <i>really</i>
+slow.  Not just network-filesystem slow, but I-can't-use-this slow.
+My perception was that things that seemed trivial to me (like tab
+completion) resulted in expensive calls.  The performance
+characteristics of these filesystems just didn't map to my
+expectation, or the expectation of the tools I use.  I doubt grep or
+find would be a very effective.  If you take a different track,
+something like <a href="http://savannah.gnu.org/projects/tramp/">Tramp</a> for Emacs
+(which I find absolutely indispensable) works at a higher
+(application) level, and has the opportunity to use that to its
+advantage [ouch, Savannah is down, but you can read some <a href="http://www.xemacs.org/Documentation/packages/html/tramp.html#SEC_Top">here</a>
+for now].  This is also the advantage of similar systems like KDE's <a href="http://developer.kde.org/documentation/design/kde/ioslaves/framework.html">ioslaves</a>,
+and <a href="http://developer.gnome.org/doc/API/gnome-vfs/">Gnome
+VFS</a>.
+
+<p>
+
+Some of this can probably be cleverly fixed, through judicious use of
+caching and prediction.  This is why Python could make this a lot more
+interesting, because Python is such an accessible language that you
+can build all these features without going mad.  For most of these
+filesystems, the bottlenecks (I predict) are at a level where Python
+is Fast Enough, and a well optimized Python program could beat a
+poorly optimized C program.
+
+<p>
+
+The other big issue I see is that filesystem semantics aren't correct
+for some of these virtual filesystems.  We see this in Windows Web
+Folders, where applications require special modification (even if
+minor) to use these files correctly.  Ioslaves and VFS try to do the
+same thing.  But if you work in an entirely application-neutral
+manner, like LUFS, how do you deal with varying semantics?  These are
+things like WebDAV locking or versioning, or RDBMS transactions, and
+it continues for almost all things that seem at first blush to be
+filesystem-like.
+
+<p>
+
+I have too much stuff to work on, but this still has me quite
+excited, I'll definitely have to play with it.
+ <div class="dates" align="right">
+Created 10 Dec '03<br>
+Modified 14 Dec '04</div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

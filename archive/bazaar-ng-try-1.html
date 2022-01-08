@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Bazaar-NG, try 1</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Bazaar-NG, try 1</h1>
+ 
+<div class="document">
+<p>Some thoughts on <a class="reference" href="http://bazaar-vcs.org/">bzr</a>, aka Bazaar-NG (a distributed version
+control system, like Subversion, BitKeeper, Arch, etc)</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">b</span></tt> <tt class="docutils literal"><span class="pre">z</span></tt> <tt class="docutils literal"><span class="pre">r</span></tt> is really hard to type.  <tt class="docutils literal"><span class="pre">b</span></tt> <tt class="docutils literal"><span class="pre">a</span></tt> <tt class="docutils literal"><span class="pre">z</span></tt> (bzr's
+predecessor) is probably even harder.</li>
+<li>There sure are a lot of commands that show status-related things.
+<tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">status</span></tt> (maybe with options) seems sufficient to me.</li>
+<li>It looks a lot like <tt class="docutils literal"><span class="pre">svn</span></tt>, which is good.  Doesn't help keep me
+from typing <tt class="docutils literal"><span class="pre">s</span></tt> <tt class="docutils literal"><span class="pre">v</span></tt> <tt class="docutils literal"><span class="pre">n</span></tt> all the time, though.</li>
+<li>It is rooted, unlike Subversion, where every directory is kind of
+self-contained.  So commands act at the root, not on your current
+directory.  I kind of like the independence of Subversion checkout
+directories.  So <tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">status</span></tt> shows the status of the entire
+checkout (which I sometimes like, and sometimes don't), and <tt class="docutils literal"><span class="pre">bzr</span>
+<span class="pre">ignore</span></tt> uses patterns rooted at the base path (which is generally
+better than Subversion).</li>
+<li>There's no way to publish &quot;out of the box&quot;.  (With <tt class="docutils literal"><span class="pre">bzrtools</span></tt>
+installed -- a set of plugins -- there's a <tt class="docutils literal"><span class="pre">push</span></tt> command that
+uses rsync or scp.)  There's no command to email that I can see.</li>
+<li>Generally I'm having a very hard time uploading and downloading
+repositories.</li>
+<li>As always with these new VC systems, branching is similar in motivation but totally different.
+Subversion is the same way with respect to CVS of course.  I don't
+know what to think of it, I could only really tell by using it.</li>
+<li>One of the <em>absolute most important features</em> to me with Subversion
+is the ability to track changes among different checkouts, update,
+sync, merge, etc.  I use this way more than history, for instance.
+Since every checkout is a branch in Bazaar... well, I don't know
+what I'll do.  I guess I just write <tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">pull</span></tt> instead of <tt class="docutils literal"><span class="pre">svn</span>
+<span class="pre">up</span></tt>...?  There's some <tt class="docutils literal"><span class="pre">bind</span></tt> thing which I think is similar in
+concept, but maybe more closely bound than svn checkouts.  This
+might be nice for deployment, where I like the metadata of a
+checkout, but dislike the possible side effects of <tt class="docutils literal"><span class="pre">svn</span> <span class="pre">up</span></tt>.  But
+I don't really understand the feature.</li>
+<li>What's the difference between <tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">branch</span></tt> and <tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">checkout</span></tt>?
+Isn't every checkout a branch?  Maybe <tt class="docutils literal"><span class="pre">checkout</span></tt> means <em>take that
+and branch it here</em>, where <tt class="docutils literal"><span class="pre">branch</span></tt> means <em>take this and branch it
+there</em>?  If that's all, it's not worth the ambiguity IMHO.</li>
+<li>Initial commit and checkout are a bit slow, because you are
+getting/putting a complete history.  I tried a bunch of different
+ways of publishing, and some were much faster than others.  Can't
+remember which, though.</li>
+<li>Several commands swallow exceptions (though <a class="reference" href="https://launchpad.net/products/bzr/+bug/35941">I learned</a> setting the
+environmental variable <tt class="docutils literal"><span class="pre">BZR_PDB=1</span></tt> throws you into pdb where you
+can figure out where the exception came from).  Generally the error
+messages need to be a lot more verbose and offer more clues about
+the problem.  I'm using 0.8pre (I guess that's what's packaged for
+Ubuntu Dapper), and some of these problems I'm encountering are just
+bugs... but some are just, say, not giving the right file path.  In
+either case, the error message needs to be good.</li>
+</ul>
+<p>So... I'm not sure what the next step is for me.  I don't have a
+project I'm looking to make distributed at the moment, and I can't
+really consider moving an existing project until I understand how this
+stuff is supposed to work.  There's a <a class="reference" href="http://bazaar-vcs.org/BzrForCVSUsers">document for CVS users</a> (CVS?), but it kind of drifts
+off just at the point it would get interesting.</p>
+</div>
+ <div class="dates" align="right">
+Created 28 Mar '06</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>Check out darcs.</p>
+<p>--titus</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-1.html" rel="nofollow">#</a> <a href="http://www.idyll.org/~t/www-toosl/twill.html">Titus Brown</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I concur. I'm a big big fan of darcs. Took me a little while to figure out the <em>right way</em> to do some things, but now it seems like such a natural way to do source control. Haven't tried it in a team though.</p>
+<p>Jay P.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-2.html" rel="nofollow">#</a> <a href="http://">Jay P.</a></div><hr noshade>
+ 
+<div class="document">
+<p>I tried Darcs quite some time ago, but like Bazaar I didn't have anything I wanted to use it on at the time.  I like Darcs' relatively small command set, and it didn't take me long to be able to use it.  But I never <em>really</em> used it, and it's the workflow that most concerns me.  I notice they do have a <a class="reference" href="http://abridgegame.org/darcs/manual/node6.html">best practices</a> document, which is nice.</p>
+<p>Other than that, I don't really know why to choose one over the other.  My interest in Bazaar is in part the implementation language, and that it is backed by a real institution.  But, I must admit I am also impressed by Darcs' implementation language; it really seemed to set off a lot of true productive Haskell programming.  <a class="reference" href="http://bazaar-vcs.org/RcsComparisons">This comparison</a> doesn't find Bazaar better in many ways, though many Darcs items are blank (someone should fill them in).</p>
+<p>I think Bazaar probably has the most potential of success if it can act just like Subversion, except with nice merging.  Then people can use other features incrementally, but Subversion (or the CVS model more generally) is the proper starting point (at least from a marketing point of view).  Which leads one to <a class="reference" href="http://svk.elixus.org/">svk</a>.  Which is also easy to type than <tt class="docutils literal"><span class="pre">bzr</span></tt> or <tt class="docutils literal"><span class="pre">darcs</span></tt>.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-3.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>OK -- use svn, and then use tailor to export it as a distributed project ;).</p>
+<p>The only real solution, I think, is to actually <em>use</em> one or the other.  Try contributing to twill, why not? ;)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-4.html" rel="nofollow">#</a> <a href="http://www.idyll.org/~t/www-tools/twill.html">Titus Brown</a></div><hr noshade>
+ 
+<div class="document">
+<p>My brief experiences with svk were:</p>
+<ol class="arabic simple">
+<li>It was very, very slow.</li>
+<li>It fell over with odd errors.</li>
+<li>It had even worse documentation than most other [RV]CSs I've encountered.</li>
+</ol>
+<p>Having worked mostly with Bazaar and CVS, the one thing about CVS I miss with Bazaar is the documentation, particularly examples. Being told over and over again that some special name or token I'm using is invalid, without any documentation about what <em>is</em> actually valid, really annoys. Having to trawl various blogs, some being out-of-date, just to find stuff out also really annoys.</p>
+<p>It's a shame because someone has clearly made an effort to write nice help texts for the baz commands. If only they'd realised that examples would mostly complete the job and reduce developer stress by 95%. I hope they've figured that out with bzr...</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-5.html" rel="nofollow">#</a> <a href="http://">Paul Boddie</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>First I have to say &quot;What about Mercurial?&quot;  At the very least &quot;hg&quot; is easier to type than &quot;bzr&quot; ;) .  It's also written in python, it's much, much faster than bzr when downloading/uploading stuff and is much more space efficient. <a class="reference" href="http://www.selenic.com/mercurial/">http://www.selenic.com/mercurial/</a></p>
+<p>About bzr...  You can get the status/diff/... of everything starting with the current directory with something like &quot;bzr status .&quot; .  I think a checkout is just a branch without the history (but then again I'm a bit confused with bzr's branches/checkouts/repositories...)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-6.html" rel="nofollow">#</a> anonymous</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I'd suggest trying Mercurial too. It's somewhat more minimalistic than bazaar-ng but very easy to use and powerful. It deserves a try... and even a blog entry of its own ;). Hope this helps you find a nice DVCS that suits your needs.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-7.html" rel="nofollow">#</a> <a href="http://www.mmn-arquitectos.com">pachi</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>It might be hard to find one that meets my needs, since if you'll remember I have no real needs ;)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-8.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>In regards to &quot;track changes in different checkouts&quot; look into bzr missing
+<tt class="docutils literal"><span class="pre">bzr</span> <span class="pre">missing</span> <span class="pre">http://blah.com/other/branch</span></tt>
+ran from the root of your branch will spit out the revid logs for what differs.</p>
+<p>Finally... for checkout vs branch, _my_ understanding is the same, checkout will be used for creating bound branches, eg think cvs co where you get just the working files instead of full history- history related operations will have to access the actual repository.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-9.html" rel="nofollow">#</a> anonymous_coward</div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>I've tried out hg (mercurial) some time ago. Looks really promising.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-10.html" rel="nofollow">#</a> <a href="http://www.active-4.com/">Armin Ronacher</a></div><hr noshade>
+ 
+<div class="document">
+<p>If it starts to bug you you can always copy bzr.bat to a different file name.  :)</p>
+<p>Seriously, I've also been trying out bzr and have had some of the same problems that you have.  bzr is still in development phase so I feel somewhat forgiving that it is still rough and missing some features. It is a distributed system so it probably will never be a perfect replacement for svn.  The model of bzr is based on the idea that every programmer has their own copy (branch) of the entire code history.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-11.html" rel="nofollow">#</a> James</div><hr noshade>
+ 
+<div class="document">
+<p>Hi Ian,</p>
+<p>Bazaar does support push without bzrtools.  For remote push, you can use ftp out of the box, or install the Paramiko ssh library to use it with almost any ssh account.  (e.g. bzr push sftp://myshellhost/home/ian/branch)</p>
+<p>The difference between checkout and branch is that checkout does not create an independent branch-- all of your changes will go into the original branch when you commit.  It's very much like svn co, and sharing a branch using svn.  If you're out of date, you must update before you can commit.  branch, on the other hand, creates a new independent line of development that will not affect the original, until you deliberately merge it in.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-12.html" rel="nofollow">#</a> <a href="http://code.aaronbentley.com">Aaron Bentley</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Re: push -- I guess it was that I couldn't tell the difference between didn't-work and shouldn't-work.  It <em>didn't</em> work for me, but I couldn't tell that if it should or shouldn't.  Which I guess comes back to the error message thing.  Or maybe it was something related to the versions I used -- I upgraded from 0.7 to 0.8pre at some point in my testing, and also installed bzrtools, and something eventually started working that didn't before.</p>
+<p>The checkout thing makes sense then, and makes it more interesting.  If that works fairly easily with remote repositories, then that will be a very nice bridge from traditional svn usage.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/bazaar-ng-try-1-comment-13.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

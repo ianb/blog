@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>My first bit of ElementTree</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>My first bit of ElementTree</h1>
+ 
+<div class="document">
+<p>There was a discussion about <a class="reference" href="2005-01-htmlfill.html">htmlfill</a> and <a class="reference" href="http://formencode.org">FormEncode</a> on the <a class="reference" href="http://subway.python-hosting.com/">Subway</a>
+list <a class="reference" href="http://groups-beta.google.com/group/subway-devel/browse_frm/thread/95f5d13eef4387b1/16c353b46f2f09e3#16c353b46f2f09e3">a while ago</a>.  One of the things that occurred to me during the
+discussion is that htmlfill would be a lot simpler and more reliable
+if it didn't use <a class="reference" href="http://python.org/doc/current/lib/module-HTMLParser.html">HTMLParser</a>, and just worked with a nice DOM-ish
+tree.</p>
+<p>And then I thought, well, if you are going to generate a form and then
+pass it to htmlfill (one of a couple options), wouldn't it be nice if
+you passed in the already-parsed tree, instead of reparsing?  Saves a
+few cycles at least.</p>
+<p>In FormEncode I made a little module <a class="reference" href="http://svn.colorstudy.com/trunk/FormEncode/src/simplehtmlgen.py">simplehtmlgen</a> to generate the
+HTML -- it's kind of like <a class="reference" href="http://starship.python.net/crew/friedrich/HTMLgen/html/main.html">HTMLGen</a>, but a little more isomorphic to
+HTML/XML.  More like <a class="reference" href="http://www.divmod.org/Home/Projects/Nevow/#stan">stan</a>, really.  Well, I could use stan (which
+also produces a DOM-like object), but I decided to try <a class="reference" href="http://effbot.org/zone/element-index.htm">ElementTree</a>
+instead, since I feel vaguely like it's growing standard for Pythonic
+XML.  It's not perfect for my purposes -- it might be too XML, where I
+would prefer a more lax perspective that would better accommodate
+HTML.</p>
+<p>Anyway, I wrote a module for ElementTree, <a class="reference" href="http://svn.colorstudy.com/trunk/Validator/validator/htmlgen.py">htmlgen</a>.  You use it like:</p>
+<pre class="literal-block">
+html.textarea(name='entry', class_='big_field')(text_content)
+</pre>
+<p>And you get back subclasses of ElementTree's Elements (which you can
+continue to call to add more attributes or content to).  The subclass
+also adds a <tt class="literal"><span class="pre">__str__</span></tt> method which serializes the XML (using a
+default encoding -- I'm not 100% comfortable with a default encoding,
+but it <em>seems</em> like a good idea to my naive unicode mind).  Anyway,
+about ElementTree...</p>
+<p>One of the odd parts of ElementTree is how it deals with text.  Tags
+have a <tt class="literal"><span class="pre">text</span></tt> attribute, which is the text immediately contained in
+the tag, and a <tt class="literal"><span class="pre">tail</span></tt> attribute which contains the text immediately
+after the tag ends.  There's no text node or text structure that is a
+child of another tag.  There's also no object to represent a set of
+nodes (except a normal list) so I had to be careful to flatten lists
+(since I do want to handle sets of tags that aren't a valid XML tree).
+Anyway, I think this library simplifies some of that, things you'd
+mostly notice if you are building trees with ElementTree instead of
+parsing XML documents.</p>
+<p>Another odd thing is that there's no way to serialize nodes to unicode
+-- to do that I had to serialize them to bytes and then decode to
+unicode.  Seemed like a weird omission.  And you can't put in any kind
+of unparsed literal into the tree, you can only put real nodes in, so
+there's no way to make a <tt class="literal"><span class="pre">literal</span></tt> class/function/builder.  This
+makes sense from a parsing point of view (since you couldn't reparse
+the serialized output if it wasn't valid), but is a common feature of
+HTML builders.  Instead I guess you just have to parse XML strings
+before inserting them, which is easy enough.</p>
+<p>One positive point (which from another perspective might be a
+negative) ElementTree doesn't seem very namespace-aware, so I can
+create tags and attributes with <tt class="literal"><span class="pre">:</span></tt> in them (which means I can
+generate <a class="reference" href="http://www.zope.org/DevHome/Wikis/DevSite/Projects/ZPT/FrontPage">ZPT</a>).</p>
+<p>I feel a little badly about subclassing <tt class="literal"><span class="pre">Element</span></tt> (technically
+<tt class="literal"><span class="pre">_ElementInterface</span></tt>), because it means there's a more-featureful
+class of nodes that can easily be mixed in with a less-featureful
+class (or vice versa).  The builder syntax isn't a big deal -- there's
+no real reason to use that in lieu of the normal methods when
+manipulating a tree that is already created.  But things like
+<tt class="literal"><span class="pre">__str__</span></tt> are likely to be useful, but at the same time limiting if
+you depend on them.</p>
+</div>
+ <div class="dates" align="right">
+Created 24 Feb '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>&quot;Another odd thing is that there's no way to serialize nodes to unicode --&quot;..</p>
+<p>this could help..</p>
+<p>from cElementTree import Element, tostring</p>
+<p>html = Element('html')</p>
+<p>tostring(html, encoding='utf-8') # -&gt; returns html node serialized into a string using specified encoding</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-bit-of-elementtree-comment-1.html" rel="nofollow">#</a> daf</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Right, which is why I implemented a <tt class="literal"><span class="pre">__unicode__</span></tt> method like:</p>
+<pre class="literal-block">
+def __unicode__(self):
+    return tostring(self, 'utf-8').decode('utf-8')
+</pre>
+<p>Doesn't that seem really weird, though?</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-bit-of-elementtree-comment-3.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>Unfortunately, htmlgen is already taken in the Python HTML generator namespaces.  It's a really old (but still fairly widely used) module available <a class="reference" href="http://starship.python.net/crew/friedrich/HTMLgen/html/main.html">on the starship</a>.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-bit-of-elementtree-comment-2.html" rel="nofollow">#</a> <a href="http://ascher.ca/blog">David Ascher</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+Yes, but it's <tt class="literal"><span class="pre">HTMLgen</span></tt> not <tt class="literal"><span class="pre">htmlgen</span></tt>... ;)  Probably mine should be called <tt class="literal"><span class="pre">etgen</span></tt> or something.  Anyway, for now it's part of a package, so there's no real name conflict.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-bit-of-elementtree-comment-4.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
+</blockquote>
+ 
+<div class="document">
+<p>&quot;htmlfill would be a lot simpler and more reliable if it didn't use HTMLParser&quot;</p>
+<p>Guess it's probably obvious to those that have already realised it but only recently occurred to me that parsing HTML could be alot easier (particularily when it comes to perserving things like whitespace) with a specific parser that gets only what you need while regarding the rest of the document as &quot;just text&quot;, vs. a generic HTML parser which is aware of the complete vocabulary.</p>
+<p>In PHP there's an excellent lexing tool in SimpleTest which uses &quot;parallel regular expressions&quot; - <a class="reference" href="http://cvs.sourceforge.net/viewcvs.py/simpletest/simpletest/parser.php?view=markup">http://cvs.sourceforge.net/viewcvs.py/simpletest/simpletest/parser.php?view=markup</a> which would suit the job. Don't know what's available for lexing in Python so well but seems like SimpleParse might do the job.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-bit-of-elementtree-comment-5.html" rel="nofollow">#</a> <a href="http://www.phppatterns.com">Harry Fuecks</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+That's kind of what htmlfill does -- it lets HTMLParser parse the tags, but it just echos out all the parts inbetween the elements it cares about.  There's a problem with it eating newlines, but otherwise it seems to work fine.  BeautifulSoup is another HTML parser that on a fairly low level.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-bit-of-elementtree-comment-6.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Sorry - explained myself badly.</p>
+<p>Was referring to the process of lexing the raw text in the first place. Rather than using characters like &gt; and &lt; to find tokens, as is common in most HTML parsers (HTMLParser and sgmllib seem to do this), look for specific tags by name while treating all else as unintesting plain text, although it may contain HTML tags we're no interested in. In this case it might amount to some fairly simple regular expressions.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-bit-of-elementtree-comment-7.html" rel="nofollow">#</a> <a href="http://www.phppatterns.com">Harry Fuecks</a></div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+I thought the 'text' attribute thing with ElementTree was a little odd at first as well. However, beyound this, I think ElementTree is Pythonic and quite handy. I have written dozens of parsers and generators with ElementTree and can no complain. Also, I do use <a class="reference" href="http://dustman.net/andy/python/HyperText">http://dustman.net/andy/python/HyperText</a> which reminds me a bit of what your doing here.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/my-first-bit-of-elementtree-comment-8.html" rel="nofollow">#</a> <a href="http://brianray.chipy.org">Brian Ray</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

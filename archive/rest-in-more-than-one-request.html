@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>REST in more than one request</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>REST in more than one request</h1>
+ 
+<div class="document">
+<p>Thinking more about <a class="reference" href="constraints-and-continuations.html">post</a> on
+continuation-based frameworks, and reading through <a class="reference" href="http://common-lisp.net/project/ucw/docs/html/rest/rest.html">this interesting
+conversation</a>, it
+occurs to me that RESTful encapsulation is being limited to one
+request, stateless, and pushing a lot of data into one HTTP call.  I think this
+is too limiting.  Encapsulation is nice, but if you
+are willing to give up synchronous completion of the encapsulated
+activity, then multiple requests aren't so bad.</p>
+<p>The example that came up in that conversation is an ecommerce site.
+In that model, the product pages can and probably should be RESTish.
+But the ordering process isn't so much.  There's multiple steps.  A
+variable number of steps probably, and sometimes you have to go back a
+step (e.g., invalid credit card).  It's interactive, and highly
+stateful.  Not very REST, maybe good for continuations.</p>
+<p>Well, lets pick that apart some more.  The items you purchase are all RESTy.
+Everyone sees the same items.</p>
+<p>The shopping cart is pretty easy to imagine in a REST form.  You pop
+things in, you pop things out.</p>
+<p>OK, so the user hits &quot;checkout&quot;, and you grab the cart contents from
+the REST cart.  And you grab the HTML representation of the contents
+from the cart.  And then you have an &quot;app&quot; that lets you see the
+total, remove things, etc.  Is that app REST?  No... I don't even know
+exactly what that would mean if it was REST.  This is where I think
+people can go down the cargo cult path, because they are looking at
+how to make that RESTy, and so they worry about what the URI for the
+delete action looks like.</p>
+<p>But if you step back just a bit, that app can look RESTish too.  You
+tell the app where the cart is.  You tell the app what to do when you
+are finished.  Then the app is a service; when you
+send the user's browser over to the app, you are calling that service,
+and you'll get your response when the app directs the user's browser to
+the next step in the process.</p>
+<p>Unlike what is typically described as a service, attaining the result -- an actual
+checkout -- takes many requests, not one.  And it involved the user's
+browser.  But it <em>can</em> be encapsulated.  So can the payment, and other
+pieces.  Is the result going to be as tweaked out as Amazon's checkout
+form?  Probably not; the application boundaries might be quite
+noticeable to users (though there is progress to be made there, and Ajax
+techniques can help a great deal).
+The user might not be able to edit all the pieces at
+once.  There's probably a bunch of glue; glue is overhead, RESTful or
+not.</p>
+<p>And that form/app for actually managing your shopping cart contents?  Yeah, that
+can be continuation based.  But <em>why</em>?  It's not a complex application, you don't need
+a clever framework.  Once you have a clever framework you're going to
+mix these problems together and solve them all at once, because you have to
+justify the framework, and there's no way in hell you can do that for some silly
+little form that lets you change what's in your cart.</p>
+<p>Maybe there needs to be some language for non-service-oriented REST;
+REST where the browser is a peer, not just a viewer into the consolidation
+of services on the server side.  Or another term, maybe &quot;REST&quot; shouldn't be
+overloaded so much.  But something... browser-based web
+services?</p>
+</div>
+ <div class="dates" align="right">
+Created 13 Apr '06</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>Good stuff:</p>
+<blockquote>
+... it occurs to me that RESTful encapsulation is being 
+limited to one request, stateless, and pushing a lot 
+of data into one HTTP call</blockquote>
+<p>I got that feeling too. I think the original concept was that state should either be stored on the client or on the server <em>as a resource</em>. There's no rule that says you can't have state on the server, just that it should be behind a distinct resource / URL.</p>
+<blockquote>
+But the ordering process isn't so much. There's multiple 
+steps. A variable number of steps probably, and sometimes 
+you have to go back a step (e.g., invalid credit card). It's 
+interactive, and highly stateful. Not very REST, maybe good 
+for continuations.</blockquote>
+<p>I'd argue that processes like this illustrate RESTs strengths quite well since they use <em>hypermedia as the engine of application state</em>. The next/previous links driving the process either way illustrate this fundamental aspect of RESTful interaction. I believe your point was that most continuation based frameworks break a few rules when they keep state on the server in the form of stack frames as opposed to moving everything back to the client but that's just one aspect of REST.</p>
+<p>You can build stateful processes using REST, you just have to put state behind URIs if you're storing it on the server, which as you've pointed out is often the better solution.</p>
+<blockquote>
+And then you have an &quot;app&quot; that lets you see the total, remove 
+things, etc. Is that app REST? No... I don't even know exactly what 
+that would mean if it was REST. This is where I think people can go 
+down the cargo cult path, because they are looking at how to make 
+that RESTy,</blockquote>
+<p>I don't see how that's not RESTy? If a user's cart has a distinct resource on the server and the items in the cart also have distinct resources and manipulating the items in the cart use basic RESTful interaction what's not RESTy? REST doesn't mean a set / constant / global resource space that can never be modified. It just means that everything important should have a distinct URL. The URL can be ugly:</p>
+<pre class="literal-block">
+http://shopping.com/cart.php?user=ianb
+</pre>
+<p>That's completely RESTful. Here's what's not:</p>
+<pre class="literal-block">
+http://shopping.com/cart.php
+</pre>
+<p>... and then relying on session state or cookies to determine whose cart it is.</p>
+<blockquote>
+and so they worry about what the URI for the delete action 
+looks like.</blockquote>
+<p>The delete action doesn't have a URL - the item has a URL. The delete action is an interaction and it looks like this with AJAX/other capable HTTP client libraries:</p>
+<pre class="literal-block">
+DELETE http://shopping.com/cart.php?user=ianb&amp;item=3452 HTTP/1.1
+</pre>
+<p>It looks like this with forms:</p>
+<pre class="literal-block">
+POST http://shopping.com/cart.php?user=ianb&amp;item=3452 HTTP/1.1
+...
+
+action=delete
+</pre>
+<p>I think the key thing to take away from all this is that state on the server is fine as long as you're putting it behind a URI and then allowing the client to modify it using the universal interface.</p>
+<blockquote>
+And that form/app for actually managing your shopping cart contents? Yeah, 
+that can be continuation based. But why? It's not a complex application, 
+you don't need a clever framework. Once you have a clever framework you're 
+going to mix these problems together and solve them all at once, because you 
+have to justify the framework, and there's no way in hell you can do that for 
+some silly little form that lets you change what's in your cart.</blockquote>
+<p>Amen.</p>
+<blockquote>
+Maybe there needs to be some language for non-service-oriented REST; REST where 
+the browser is a peer, not just a viewer into the consolidation of services on 
+the server side. Or another term, maybe &quot;REST&quot; shouldn't be overloaded so much. 
+But something... browser-based web services?</blockquote>
+<p>See, this is where I'm getting the feeling that you've been reading the wrong material on REST. If you're reading stuff that says REST is about &quot;invoking services&quot; using name/value pairs instead of posting XML (WS), then that shit is just wrong. I don't understand where the insinuation that the client is just a &quot;viewer&quot; or that the server is exposing &quot;services&quot; is coming from. None of this is based in REST. REST is all about simple resource representations, identified by unique identifiers (URLs), interlinked using references to each other, and manipulated using a small and universal set of basic verbs. REST is &quot;resource oriented&quot;, not &quot;service oriented&quot;. There's no concept of a &quot;service&quot;, it's resources all the way down.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/rest-in-more-than-one-request-comment-1.html" rel="nofollow">#</a> <a href="http://naeblis.cx/rtomayko/">Ryan Tomayko</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<blockquote>
+<p><em>and so they worry about what the URI for the delete action looks like.</em></p>
+<p>The delete action doesn't have a URL - the item has a URL. The delete action is an interaction and it looks like this with AJAX/other capable HTTP client libraries:</p>
+<pre class="literal-block">
+DELETE http://shopping.com/cart.php?user=ianb&amp;item=3452 HTTP/1.1
+</pre>
+<p>It looks like this with forms:</p>
+<pre class="literal-block">
+POST http://shopping.com/cart.php?user=ianb&amp;item=3452 HTTP/1.1
+...
+
+action=delete
+</pre>
+</blockquote>
+<p>Well, it probably looks more like:</p>
+<pre class="literal-block">
+POST http://shopping.com/cart.php?user=ianb HTTP/1.1
+...
+
+action=update&amp;item_3452_amount=0&amp;item_3841_amount=3&amp;item_3841_delete=Delete
+</pre>
+<p>Or whatever other details come from the way the HTML form is designed.  Oldschool HTML forms are okay, but they do often mean tight coupling between the form and the action.  So the RESTful, stable interface isn't the delete action (at least not the one the management app uses), it's some other interface.</p>
+<blockquote>
+See, this is where I'm getting the feeling that you've been reading the wrong material on REST. If you're reading stuff that says REST is about &quot;invoking services&quot; using name/value pairs instead of posting XML (WS), then that shit is just wrong. I don't understand where the insinuation that the client is just a &quot;viewer&quot; or that the server is exposing &quot;services&quot; is coming from. None of this is based in REST. REST is all about simple resource representations, identified by unique identifiers (URLs), interlinked using references to each other, and manipulated using a small and universal set of basic verbs. REST is &quot;resource oriented&quot;, not &quot;service oriented&quot;. There's no concept of a &quot;service&quot;, it's resources all the way down.</blockquote>
+<p>I don't think the cart management app will be RESTful, nor do I see any reason it needs to be.  It just doesn't matter.  It doesn't really matter what the HTML forms are that the cart management uses.  When you check out, you redirect the user to that app.  When they are finished managing, the management app redirects them to the next step.  What happens between those doesn't matter.  Nobody should care if the management app uses RESTful principles internally.</p>
+<p>Browser-based APIs are more concerned about where the browser <em>goes</em>, not what it sees.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/rest-in-more-than-one-request-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Well... maybe I didn't figure out quite what my point was there.  The point of a cart management app is that it speaks to the browser, it speaks POST and HTML.  It interacts.  It's not an atomic resource, it's really an interactive application that speaks to a browser.  There's no resource there.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/rest-in-more-than-one-request-comment-3.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ 
+<div class="document">
+<p>Now we're getting somewhere...</p>
+<blockquote>
+<p>Well, it probably looks more like:</p>
+<pre class="literal-block">
+action=update&amp;item_3452_amount=0&amp;item_3841_amount=3&amp;item_3841_delete=Delete
+</pre>
+</blockquote>
+<p>Indeed.</p>
+<blockquote>
+I don't think the cart management app will be RESTful, ...</blockquote>
+<p>I see what you're saying now. The example above is actually still RESTful in that you're not breaking any hard rules directly (so long as those name/value pairs are in a POST body and not on a GET/URL). I think we're 1.) tripping into the area of taste/style and 2.) trying to determine whether manipulating resources directly is preferable to manipulating resources using what the Atom Publishing Protocol calls &quot;collection resources&quot;. e.g. You can post to a &quot;collection resource&quot; and manipulate multiple other resources as a result. There's nothing in REST that disallows or even discourages this that I'm aware of. As you've shown, this is an extremely common practice on the web circa 2006.</p>
+<p>I think I'm getting a better idea of the behavior you're labeling cargo cultish though. I don't think it's REST, I think it's more like &quot;individual resource orientedness&quot; or something; the idea that every interaction must be performed through specific individual resources, that interactions on collection resources are &quot;bad style,&quot; and that URLs that look like &quot;shopping.com/ianb/cart&quot; offer substantial benefits over URLs that look like &quot;shopping.com/cart.php?user=ianb&quot;. I think it's fairly safe to call these principals misguided if not harmful.</p>
+<blockquote>
+... nor do I see any reason it needs to be. It just doesn't matter.</blockquote>
+<p>It matters if there's value in interacting with the cart items outside of the one simple cart interface page. For example, if the cart had an &quot;API&quot; or if you wanted a cart that contained items from 5 different shopping sites, or if you just wanted to remove or view cart items on an item-by-item basis, etc. But all of these scenarios require some additional requirement beyond the basic shopping cart page so one could argue that building out a full resource hierarchy is a form of pre-mature optimization and breaks basic principals like <a class="reference" href="http://blog.ianbicking.org/unnessary-until-proven-required">Unnessary Until Proven Required</a>.</p>
+<p>Overall I think I understand where you're coming from a bit better and I'd agree that the resource based approach should be used because it's valuable, not because it's cool.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/rest-in-more-than-one-request-comment-4.html" rel="nofollow">#</a> <a href="http://naeblis.cx/rtomayko/">Ryan Tomayko</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

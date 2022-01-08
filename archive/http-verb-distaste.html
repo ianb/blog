@@ -1,0 +1,228 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>HTTP verb distaste</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>HTTP verb distaste</h1>
+ 
+<div class="document">
+<p>I was looking <a class="reference" href="http://www.sitepoint.com/blogs/2005/11/22/who-gets-rest/">this</a>
+unassuming post from a while back, and thinking about callbacks from
+<a class="reference" href="http://blog.ianbicking.org/httpish-all-the-way-down-comment-3.html">this comment</a>,
+and I started getting that annoyed feeling about REST and HTTP verbs,
+but I wasn't sure why.  Now I think I know why: the way HTTP verbs are
+being suggested they are a poor substitute for callbacks, and
+callbacks are easily attainable right now if we just pay attention to
+them.</p>
+<p>To summarize the verb argument (as I understand it): using different
+verbs on the same resource allows you to make a cohesive set of
+actions that work on a well-defined entity, and the entity is
+represented by the resource URL.  Because the HTTP verb is orthogonal
+to the resource URL, you keep object and verb very separate.</p>
+<p>What do the verbs mean?  This is communicated via some other channel,
+probably documentation.  It is not always self-evident.  DELETE means
+delete?  Only if you have a dumb container.  If you don't have a dumb
+container, DELETE probably means more than just delete -- it has side
+effects outside of the resource in isolation.</p>
+<p>I was reminded of this again with Mark Nottingham's <a class="reference" href="http://www.mnot.net/blog/2006/06/22/link">post about links</a>, which is this idea of
+callbacks again, about defining explicit relationships instead of
+implying.  He extends it with link templates, like
+<tt class="docutils literal"><span class="pre">http://www.example.com/home/{userid}</span></tt>, which can represent some
+more complex relationships.  One of the nice parts about something
+like this is that
+<tt class="docutils literal"><span class="pre">http://www.example.com/userhome.php?userid={userid}</span></tt> works just as
+well in this scheme.  That is, it works for the systems we have now,
+not just the systems we want to create in the future.</p>
+<p>The problem with depending on &quot;RESTful&quot; URLs, verbs, and other
+contracts is that it isn't <em>the web we have now</em>.  And it's
+<em>definitely</em> not a simpler web, because the web we have now isn't
+going away.  There are complaints such that
+<tt class="docutils literal"><span class="pre">userhome.php?userid={userid}</span></tt> isn't likely to be a stable URL.
+Well, creating a <em>new</em> URL scheme for the site certainly isn't the way
+to solve that!</p>
+<p>Good designs have to deal with what we have, not just with what we
+wish we had.  You have to embrace the problems, recognizing them as
+part of the success.  The W3C's pursuit of XHTML over enhancing HTML
+is one such example, and we've all spent a whole lot of time
+accomplishing nothing as a result.  Much of REST is great <em>because</em> it
+embraces what we already have, because it <em>describes</em> the systems that
+already work well.  But some of what goes under the REST flag does not
+fit this.  The systems we have now do GET and POST really well;
+everything else is spotty.  If we need more than GET and POST, then
+that has to be resolved.  But I don't see why we would need more;
+those two verbs describe just about everything we need, and they do it
+with a proper amount of vagueness, not describing much more than what
+they can deliver.</p>
+<p>Something like Link Template headers (or even more conservatively
+<tt class="docutils literal"><span class="pre">&lt;link&gt;</span></tt>) provide a much greater vocabulary, and they are so
+wonderfully <em>composeable</em> compared to HTTP verbs.  I think that's a
+much more interesting direction.</p>
+</div>
+ <div class="dates" align="right">
+Created 23 Jun '06</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>Ian,</p>
+<p>Could you please define &quot;the web we have now&quot;? I fail to understand your point as I am not certain of what you mean by this assertion.</p>
+<p>Thanks</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/http-verb-distaste-comment-2.html" rel="nofollow">#</a> <a href="http://www.defuze.org">Sylvain Hellegouarch</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I mean web applications people have been building in the field, implemented for the current batch of browsers.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/http-verb-distaste-comment-4.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Well then I'm sorry but I do not understand your point at all. REST is not effective today because it is still widely misunderstood IMO (I'm not saying I understand it cmprehensively). Too many people think RESTful URLs equal REST application. It is so wrong. RESTful URLs are a mean. REST is a set of principle.</p>
+<p>I really miss your point here Ian.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/http-verb-distaste-comment-5.html" rel="nofollow">#</a> <a href="http://www.defuze.org">Sylvain Hellegouarch</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I perhaps state my anti RESTful URLness too strongly.  There's obviously nothing <em>wrong</em> with such URLs.  There's just not much particularly right about them either.  They are just strings either way.  How they are read by humans isn't very important.  The verbs are more important, and using more verbs presents real problems with existing applications and clients.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/http-verb-distaste-comment-6.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>I don't think you can really think about a purely RESTful approach when you're using a browser since usually you can only GET or POST from the browser.</p>
+<p>The RESTful approach is quite powerful when applied to web services (REST+Atom, look at GData for a real use case) that are meant to be used by a machine and not a human.</p>
+<p>Other than that I personally think that:</p>
+<p><a class="reference" href="http://www.example.com/user">http://www.example.com/user</a>/{userid}</p>
+<p>is quite more pleasant to work with than:</p>
+<p><a class="reference" href="http://www.example.com/userhome.php">http://www.example.com/userhome.php</a>?userid={userid}</p>
+<p>for two main reasons:</p>
+<ol class="arabic simple">
+<li>Easier to remember for humans</li>
+<li>Not bounded to implementation details of any sort</li>
+</ol>
+<p>Regarding point n°2, the example you're providing is exposing two <em>major</em> implementation details:</p>
+<ul class="simple">
+<li>The system is (or originally was) PHP based</li>
+<li>The userhome.php script expects an userid parameter inside the query string</li>
+</ul>
+<p>this can provide useful information to someone who is trying to attack your site/application but even more important will force you (the developer) to keep the same scheme even if you're going to rewrite your app in another language.</p>
+<p>Other than that I agree with Sylvain that your points regarding &quot;the web we have now&quot; are somewhat vague IMHO. ;-)</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/http-verb-distaste-comment-3.html" rel="nofollow">#</a> michele</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I'm gonna add something about <a class="reference" href="http://www.example.com/user">http://www.example.com/user</a>/{userid}</p>
+<p>I'm changing servers as well as backend languages as we speak. It's a lot easier if the url is not bound to a particular programming language.</p>
+<p>example:</p>
+<p><a class="reference" href="http://www.example.com/userhome.asp">http://www.example.com/userhome.asp</a>?userid={userid}</p>
+<p>becomes</p>
+<p><a class="reference" href="http://www.example.com/userhome.jsp">http://www.example.com/userhome.jsp</a>?userid={userid}</p>
+<p>becomes</p>
+<p><a class="reference" href="http://www.example.com/userhome.php">http://www.example.com/userhome.php</a>?userid={userid}</p>
+<p>becomes</p>
+<p><a class="reference" href="http://www.example.com/userhome.aspx">http://www.example.com/userhome.aspx</a>?userid={userid}</p>
+<p>becomes</p>
+<p><a class="reference" href="http://www.example.com/userhome.py">http://www.example.com/userhome.py</a>?userid={userid}</p>
+<p>and eventually:</p>
+<p><a class="reference" href="http://www.example.com/user">http://www.example.com/user</a>/{userid}</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/http-verb-distaste-comment-7.html" rel="nofollow">#</a> <a href="http://www.christophermahan.com/">Christopher Mahan</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>But</p>
+<p><a class="reference" href="http://www.example.com/userhome">http://www.example.com/userhome</a>?userid={userid}</p>
+<p>is easily rewritten by Apache to fit any of those others.  I think you're conflating two separate issues.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/http-verb-distaste-comment-8.html" rel="nofollow">#</a> Randall Randall</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>That's exactly right. One additional note on the following two URLs:</p>
+<pre class="literal-block">
+http://www.example.com/user/{userid}
+http://www.example.com/userhome?userid={userid}
+</pre>
+<p>I'm not sure why the examples given so far have used two different forms of the URL (i.e. /user/... and /userhome...). To really compare apples to oranges I will use these:</p>
+<pre class="literal-block">
+http://www.example.com/user/{userid}
+http://www.example.com/user?userid={userid}
+</pre>
+<p>These two URLs exhibit the difference between positional and keyword arguments in Python. The python equivalent would be:</p>
+<pre class="literal-block">
+from www.example.com import user
+user(1)
+user(userid=1)
+</pre>
+<p>Given that distinction, they really are not the same at all (although both forms <em>may</em> work in Python if the first parameter of the user() function happens to be named &quot;userid&quot;). While some may argue that the first form is more &quot;REST-ful&quot;, I would say simply that they are not the same and cannot be compared that way. The first form derives the meaning of the parameter from its position within the URL. In contrast, the second derives the meaning of the parameter from its explicit name.</p>
+<p>There is one gotcha here though: conventionally &quot;keyword arguments&quot; are ignored by web servers if they are not &quot;needed&quot; by the server/script. This has the implication of making a set of textually unique URLs resolve to a single resource. For example:</p>
+<pre class="literal-block">
+http://www.example.com/user?userid=1
+http://www.example.com/user?userid=1&amp;count=10
+</pre>
+<p>Depending on the implementation of the &quot;user&quot; page/script, these two URLs may or may not refer to the same resource. This may be viewed as either a benefit or a disadvantage in the implementation of HTTP servers. Of course the same thing could happen with &quot;positional&quot; arguments in HTTP. Given a sufficiently flexible (or ill-configured) server, the following two URLs may refer to the same resource as well (although it would violate convention):</p>
+<pre class="literal-block">
+http://www.example.com/user/1
+http://www.example.com/user/1/10
+</pre>
+<p>I would argue that the thing that needs to change is the ability of web servers to easily map arbitrary URLs to arbitrary resources. The structure of directories and files on a server is an outdated and constrained model. Even more outdated and outrageous is the use of file extensions to determine resource types. ModRewrite is a poor solution because it is far too complicated to configure for novice users. It's like trying to use a jackhammer to pound a finish nail--its nearly impossible to determine what it will hit unless you're well exercised in the art of regular expressions and other various criptic configuration giberish.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/http-verb-distaste-comment-9.html" rel="nofollow">#</a> <a href="http://www.openpolitics.com/pieces/">Daniel</a></div><hr noshade>
+</blockquote>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>I always seem to find interesting blog posts by you long after you wrote them ;)</p>
+<p>Some time I'm going to take another shot at nailing this whole MVC &quot;vs.&quot; REST thing (which is to me far more interesting than REST vs. SOAP) - tried and failed once already here: <a class="reference" href="http://www.sitepoint.com/blogs/2005/12/22/mvc-and-web-apps-oil-and-water/">http://www.sitepoint.com/blogs/2005/12/22/mvc-and-web-apps-oil-and-water/</a></p>
+<p>What I was grasping for in &quot;Who GETs REST?&quot; (<a class="reference" href="http://www.sitepoint.com/blogs/2005/11/22/who-gets-rest/">http://www.sitepoint.com/blogs/2005/11/22/who-gets-rest/</a>) is a single rule / guideline people could use, from which a whole bunch of other consequences naturally fall out, without having to be able to grasp the whole of REST. But think that failed.</p>
+<p>The real point is I think that 99% of today's web frameworks put you through loops as a developer are either just horrible or dangerous. By contrast, if we had an API which relates directly the REST, my guess is the whole web dev thing gets alot easier for real people to grasp - it would be natural even if you don't know much about HTTP.</p>
+<p>Looking at what we've got today...</p>
+<p>Considering struts - it's amazing that people are willing to accept that kind of API. The concepts struts pushes you to think in terms of (Actions, ActionMappers blah blah) have _zero_ relationship to the medium - HTTP. Struts becomes some kind of Zen excercise of thinking in 13 dimensions. There's only an artificial correspondance between URLs and code you're writing. And somehow the idea that a framework constrains how you use URLs is deeply wrong.</p>
+<p>Meanwhile the Rails / Catalyst / Django / Turbogears approach - URLs to class methods has inverted the problem - it's almost too easy. Relateing URLs to class methods means people are &quot;tunneling&quot; all kinds of verbs through HTTP GET (delete/list/index/show/find/findByName etc. etc.) - and from there we have the whole &quot;Goodnight Moon&quot; factor (Mark Pilgrim, as a new father, being very dry - <a class="reference" href="http://www.intertwingly.net/blog/2005/05/06/This-Stuff-Matters#c1115432785">http://www.intertwingly.net/blog/2005/05/06/This-Stuff-Matters#c1115432785</a>)</p>
+<p>Perhaps the acid test is &quot;how easy is it to implement conditional HTTP GET's&quot;? This point doesn't travel so well, which is a shame - it's another &quot;rule to illustrate the point&quot; rather than a mere feature request. In both the above two MVC framework styles, doing any kind of HTTP caching is code you're going to have to tack on as a (very) painful after-thought.</p>
+<p>To me the obvious &quot;right path&quot; is mapping URLs / resources to classes, which have methods corresponding to HTTP methods - then you get to have a property &quot;last_modified&quot; and your framework can handle the HTTP caching for you automatically.</p>
+<p>Of the REST frameworks out there, web.py has the API right but is still being too light weight to provide &quot;off the shelf&quot; resources, which would help. There's also tonic (PHP) <a class="reference" href="http://tonic.sourceforge.net/">http://tonic.sourceforge.net/</a> which seems to be getting some of the fundamental ideas right, but needs to be more than a one-developer code base. Then there's RESTLET (<a class="reference" href="http://www.restlet.org/">http://www.restlet.org/</a>) which looks promising but, in usual Java style, it's embraced choice (e.g. server container support) as a path to wasting my time. Also Rails finally seems to be heading this way (<a class="reference" href="http://jimonwebgames.com/articles/2006/06/26/dont-say-crud-say-fucd">http://jimonwebgames.com/articles/2006/06/26/dont-say-crud-say-fucd</a>) without complete submission though on the new method names. But no one seems to be _really_ there yet.</p>
+<p>And in fact it's not really MVC vs. REST. The value of MVC-style seperation or concerns goes without saying but the problem is people tend to consider MVC as open season to inventing a ton of verbs for their application, but with HTTP the verbs are already fixed (and emphasize coarse grained APIs) - the nouns are where you get to have a choice - not a natural consequence of MVC.</p>
+<p>At a fundamental level, the whole thing is kind of bizarre - it's taken this long for people to figure out how to write code to such a simple and widely used protocol (even if it is only half-implemented). It's like on the one hand we've got the &quot;who gives a sh*t&quot; crowd, hacking away with stuff like PHP, oblivious until someone tells them something else is cool while on the other we've got the &quot;I love complexity&quot; crowd, happy to buy obscure (typically Java) abstractions to flagellate themselves with, never questioning whether it's a good idea or not.</p>
+<p>Anyway.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/http-verb-distaste-comment-10.html" rel="nofollow">#</a> <a href="http://harryf.wordpress.com">Harry Fuecks</a></div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

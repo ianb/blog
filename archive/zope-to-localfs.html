@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Zope to LocalFS</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Zope to LocalFS</h1>
+ 
+<div class="document">
+<p>So at <a class="reference" href="http://imagescape.com">my work</a> we're in this kind of weird limbo, where a lot (but
+not all) of our newer projects are in <a class="reference" href="http://webwareforpython.org">Webware</a>, and we have a lot of
+stuff left in Zope.  And while some of it could really use a rewrite
+anyway -- especially the stuff from the Bad Old Days of pure DTML
+applications -- rewriting that stuff doesn't really <em>accomplish</em>
+anything.  If it ain't broke...</p>
+<p>Anyway, some new little app came up, and I figured I'd stick to Zope
+because it was just too small to do in Webware, and we haven't
+completely figured out how we're doing Webware deployment -- the time
+invested is worth it for large projects, but this wasn't a large
+project.  Making small projects in Webware more feasible is definitely
+important to me, but this project was starting to get overdue, so I
+couldn't figure out too much.</p>
+<p>But even then, I decided I'd do a little experimentation in Zope, and
+see if I could put the whole application into <a class="reference" href="http://www.easyleading.org/Downloads/">LocalFS</a> -- which means
+all the files would be on the disk.  I could have written it as a Zope
+Product, but I don't see Zope as our future and I didn't feel like
+investing the effort.  But these legacy applications -- written in
+DTML, ZPT, ZSQL, and Python Scripts, stored in the ZODB, edited
+through the web -- are going to be around for a while.  And I <em>really</em>
+want them under source control for all sorts of reasons -- not just
+history, but ease of deployment, centralized indexing of our
+applications, synchronizing development in branches, and deploying
+applications.</p>
+<p>LocalFS, however, doesn't support ZSQL or Python Scripts.  So I
+thought I'd try to fix that.  In the end it wasn't as hard as I
+expected; it really is just Python code.  The inheritance is out of
+control (with many base classes), and it has some funny idioms, and
+LocalFS is probably always going to be a little wonky in Zope (e.g.,
+it doesn't participate in transactions), but to accomplish what we
+needed wasn't too hard.  The code is accessible to humans.  The only
+real catch was debugging in the presence of <a class="reference" href="http://www.plope.com/Books/2_7Edition/Acquisition.stx">Acquisition</a> (for a longer
+description of acquisition see <a class="reference" href="http://udell.roninhouse.com/bytecols/2001-06-13.html">this</a>).  I am convinced that Zope would have been way, way, way better
+if they'd never used Acquisition -- it's a clever hack that <em>ruins</em>
+the entire system.  Thankfully <a class="reference" href="http://dev.zope.org/Zope3">Zope 3</a> has gotten rid of
+Acquisition.  The inheritance situation in Zope 2 is difficult, but ultimately
+it's something you can get your head around if you read enough code
+(and probably you can avoid for small changes).  But Acquisition
+simply ruins everything and makes the entire system unpredictable.</p>
+<p>I had thought about using <a class="reference" href="http://zope.org/Members/tseaver/FSDump/view">FSDump</a>, which dumps part of the ZODB out to
+disk, specifically for use with version control.  But it's one-way,
+just for writing out.  And our use of the ZODB is actually really
+conservative, with all our valuable code really in those four types,
+plus some configuration in Properties and database connections, so
+LocalFS allows us to keep the canonical version in the filesystem and
+avoid both the ZODB and ZMI entirely.  And since all our volatile data
+is in a database, I think LocalFS is safe enough (I might be worried
+otherwise).</p>
+<p>I'll try to separate out the changes to LocalFS into a couple patches sometime soon, but
+for now I just thought I'd note the experience.</p>
+</div>
+ <div class="dates" align="right">
+Created 21 Feb '05</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p><a class="reference" href="http://www.infrae.com/download/FileSystemSite">http://www.infrae.com/download/FileSystemSite</a> might be what you are searching for</p>
+<pre class="literal-block">
+This is a repackaging of the CMF's FileSystem Directory Views such 
+that it is independent of the CMF.
+
+The major use of this is to develop view code on the file system 
+such that it can be edited with normal development utilties and 
+checked into a source control management system.
+</pre>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/zope-to-localfs-comment-1.html" rel="nofollow">#</a> <a href="http://planetzope.org">d2m</a></div><hr noshade>
+ 
+<div class="document">
+You might want to look at <a class="reference" href="http://hathawaymix.org/Software/Ape">Ape</a> which is a really cool abstract storage layer for the ZODB (actually, it's meant to be / trying to be a standalone abstract persistence system). It has file system representation with knowledge of Z SQL Methods, Python Scripts, Page Templates, etc. I've used it before to move items to and from disk with a Zope copy/paste operation.</div>
+ <div align="right"><a href="http://blog.ianbicking.org/zope-to-localfs-comment-2.html" rel="nofollow">#</a> <a href="http://toulouse.amber.org/">Jeff Shell</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>Also - Ape does a really good job of preserving Properties in an easy to read and edit format. It's file system representation is really really good - and it was a few revisions ago that I used it.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/zope-to-localfs-comment-3.html" rel="nofollow">#</a> <a href="http://toulouse.amber.org/">Jeff Shell</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>No Ape is not a good product, it breaks zexp export and undo fonctions. It also stores metadatas in a .properties file but with binary in it.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/zope-to-localfs-comment-6.html" rel="nofollow">#</a> Alexdb</div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>Another option is ZFolder2Product, located at <a class="reference" href="http://sourceforge.net/projects/zfolder2product">http://sourceforge.net/projects/zfolder2product</a></p>
+<p>ZFolder2Product takes the contents of an existing Zope2 folder and creates a custom Zope Product, which re-creates the entire folder contents when installed. The Product and folder contents are saved in external files usable within a version control system like CVS.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/zope-to-localfs-comment-4.html" rel="nofollow">#</a> <a href="http://blog.ianbicking.org/www.accountis.com">rhys</a></div><hr noshade>
+ 
+<div class="document">
+<p>Hi,
+I am trying to tweak localfs to support Python script and zsql methods.
+Where can I find the fixes that you have made, so that i can avoid reinventing the wheel.
+Can you please provide the patched version.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/zope-to-localfs-comment-5.html" rel="nofollow">#</a> Ratish</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>

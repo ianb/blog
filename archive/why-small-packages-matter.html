@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Why Small Packages Matter</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+
+<link rel="openid.server" href="http://www.myopenid.com/server" />
+<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+ <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div><h1>Why Small Packages Matter</h1>
+ 
+<div class="document">
+<p>With Eggs and simpler installation and dependencies there's more
+opportunities to distribute smaller packages and split large packages
+up into pieces.</p>
+<p>I was reading <a class="reference" href="http://www.z3lab.org/sections/blogs/philipp-weitershausen/2006_08_13_jeff-shell-on-zope-3-how">this post on Zope</a>:</p>
+<blockquote>
+I think this [splitting up of packages] is a big deal and too hope
+that we can &quot;explode&quot; Zope 3 into many eggs soon. Jim wants to do
+it for Zope 3.4, yay!  Having smaller, more easily distributable
+Zope packages will also reduce the buy-in into Zope as a
+platform. For example, you won't have to ship with the ZMI anymore
+if you not only think it sucks but also find it disturbing to
+develop with.</blockquote>
+<p>Of course, I like this direction.  But not because of small distributions;
+there's a small number of places where that matters (e.g., mobile
+phones), but for most of us the download time and disk space isn't a
+big deal.  And after all, just because one app doesn't require the ZMI
+doesn't mean you don't have it installed -- if it is already there you
+aren't saving any disk space.</p>
+<p>The advantage I see in breaking up pieces is discipline,
+extensibility, and creating a hierarchy to the concepts in your
+library or framework.</p>
+<p><strong>Discipline:</strong></p>
+<blockquote>
+<p>Given a big package, developers will sometimes say that the package is
+loosely coupled on the inside, and if you want to use <tt class="docutils literal"><span class="pre">foo.x</span></tt>
+but not <tt class="docutils literal"><span class="pre">foo.y</span></tt> that's fine, because they don't depend on each
+other.</p>
+<p>How do you know they don't depend on each other?  How do you know
+they won't depend on each other in the future?  How do you know
+someone won't read about <a class="reference" href="http://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY</a> and
+factor out pieces that are shared between the two modules?  How do
+you know someone won't &quot;fix&quot; a bug in <tt class="docutils literal"><span class="pre">foo.z</span></tt> that both modules
+use, breaking something you depended on in some interface?</p>
+<p>If you use two different distributions for these two modules, you
+actually have lots of ways of detecting these problems and truly
+keeping the modules decoupled.  It's not automatic -- there's
+always opportunities to break things.  But the discipline of
+distribution boundaries (and other separations like separate
+release schedules) will tend to keep you honest about coupling.</p>
+</blockquote>
+<p><strong>Extensibility:</strong></p>
+<blockquote>
+<p>One argument for keeping things packaged together is that it
+allows for <em>optional integration</em>, so that people who want to use
+<em>all</em> the features get a more convenient tool.</p>
+<p>This means that, for instance, an object may have a method that
+binds it to another module in the package.  But it's <em>optional</em>,
+because you don't have to call the method.  The programmer asked
+to trust that this &quot;optional&quot; feature is truly optional may consider
+all the questions raised under Discipline, but imagine that these issues
+are addressed.  So what's the problem?</p>
+<p>In this case, the optional integration has a privileged position.
+The original author's libraries get special hooks, but the developer using
+those libraries doesn't get the same access.  You could <a class="reference" href="http://en.wikipedia.org/wiki/Monkey_patch">monkey
+patch</a> your own
+extension, but you'll only have created a horrible coupled mess.
+You could avoid the extension entirely, of course, but if the
+original author thought it was sufficiently useful to create the
+extension it is likely that another user of the library will feel
+the same.</p>
+</blockquote>
+<p><strong>Hierarchy of Concepts:</strong></p>
+<blockquote>
+<p>Ideally a system will be layed out with a nice hierarchy of
+concepts:</p>
+<pre class="literal-block">
+Library-A      Library-B
+  |    \        /
+  |     \      /
+  |      \    /
+Library-C \  /
+           \/
+        Library-D
+           |
+           |
+        Library-E
+</pre>
+<p>To understand Library A you have to understand all of Library C,
+D, and E.  To understand Library D you only need understand
+Library E.</p>
+<p>Given a hierarchy like this, there's actually an advantage to not
+using the entire framework/system.  You don't need to understand
+nearly as much, and learning a library is probably the biggest
+overhead to using a library.</p>
+<p>It can be argued that if you want to use Library A, you only need
+to read about Library A.  If the documentation is very good, this
+is <em>somewhat</em> true.  It is true if you use it perfectly and write
+no buggy code and the libraries themselves have no bugs and you
+don't need to do anything that goes outside the bounds of what
+Library A provides.  This isn't my experience programming, and
+isn't typical when using <a class="reference" href="http://en.wikipedia.org/wiki/FOSS">F/OSS</a>.</p>
+<p>There is also a hierarchy of stability.  If Library E is a moving
+target then you are just plain hosed.  If someone keeps making API
+changes in Library D you are also hosed.  If stability does not
+increase as you move down your stack then the stack is a big
+ball of mud, even if at one isolated moment it might seem like an elegant
+and stable system.</p>
+</blockquote>
+<p>For all these reasons when someone claims their framework is all
+spiffy and decoupled, but they just don't care to package it as
+separate pieces... I become quite suspicious.  Packaging doesn't fix
+everything.  And it can introduce real problems if you split your
+packages the wrong way.  But doing it right is a real sign of a
+framework that wants to become a library, and that's a sign of
+Something I'd Like To Use.</p>
+</div>
+ <div class="dates" align="right">
+Created 16 Aug '06</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ 
+<div class="document">
+<p>I think you've formulated the concerns quite well. Zope (2.x at least) seems similar in some ways to various Java frameworks where one is presented with a huge number of .jar files, a big configuration file with lots of sections, and documentation which glosses over the dependencies within the system. Consequently, as a developer, one has no confidence in being able to remove stuff which is either blatantly superfluous or worrying from a security perspective. Zope's &quot;through the Web&quot; management is nice, but I imagine that many people have wondered whether it could be detached and omitted from certain kinds of production systems.</p>
+<p>Of course, one of the Python community's favourite megaframeworks, Twisted, went through its own process of decoupling a while back, and that may have made some of the components more popular. The prospect of having to adopt a huge blob which dwarfs one's own project is often something which invigorates the reinventive tendencies of many Python developers. Depending on or bundling some part of Twisted is better than having to monitor the effects of a complicated dependency on the whole thing.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-small-packages-matter-comment-1.html" rel="nofollow">#</a> Paul Boddie</div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>From what I've seen, Twisted's refactoring is largely a failure. It's not compatible with eggs, and approximately zero people use the components separately -- everyone seems to still use the sumo distribution.</p>
+<p>I think the only thing it solved is the complaint that it's not split up, I haven't seen that thread in a long time. It may have also helped a bit with the release management, but that matters to very few people. Supporting eggs would be a huge benefit to application and library developers, but they don't seem particularly interested in doing it.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-small-packages-matter-comment-2.html" rel="nofollow">#</a> <a href="http://bob.pythonmac.org">Bob Ippolito</a></div><hr noshade>
+<blockquote>
+ 
+<div class="document">
+<p>I think Twisted's refactoring was kind of like Zope 3's refactoring, which happened in theory previously but no one used it.  Actually getting usable isolated packages out of Zope 3 was hard, just for technical reasons, but also because the people doing the work didn't have much incentive to deal with the issues like getting the tarballs pushed somewhere and whatnot.  Now they are taking a different tack with Eggs, and I think the result is potentially useful where the previous one wasn't.  I think entry points are also really important here, because it's an actual novel feature which makes packaging matter as more than just a way to deflect criticism.</p>
+<p>I also think people will really use the new Zope refactoring, if it is done well -- especially extracting small things (like, say, the transaction manager) instead of trying to extract &quot;optional&quot; things like the ZMI.  The transaction manager is useful on its own, the ZMI is not.  Similarly, the things Twisted should extract are things like the Deferred stuff, not the optional pieces like the protocol handlers.  Right now I think the lack of a solid idiom for async programming (barring the use of the entire Twisted stack, or ad hoc callbacks) really keeps people from using that kind of programming in places where it might make sense.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-small-packages-matter-comment-3.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+</blockquote>
+</blockquote>
+ 
+<div class="document">
+<p>I'm in the midst of a project using turbogears. I do distribute my application as several separate eggs, split on the major fault-lines in the concepts. i.e. a datalayer, management, shop, plugins, migration etc. It has been hugely beneficial to do this because of the aforementioned decoupling. Also because it enables decoupled updates to components with reduced risk to the whole.</p>
+</div>
+ <div align="right"><a href="http://blog.ianbicking.org/why-small-packages-matter-comment-4.html" rel="nofollow">#</a> Florian</div><hr noshade>
+</blockquote>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2442258-1";
+urchinTracker();
+</script></body>
+</html>
