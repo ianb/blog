@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Python Application Package</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2012-02-29T18:12:00-06:00">
+                Wednesday, February 29th, 2012
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2012/02/python-application-package.html"
+                    rel="bookmark"
+                    title="Permalink to Python Application Package"
+                    >Python Application&nbsp;Package</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I&#8217;ve been thinking some more about deployment of Python web applications, and deployment in general (in part leading up to the <a class="reference external" href="https://us.pycon.org/2012/community/WebDevSummit/">Web Summit</a>). And I&#8217;ve got an&nbsp;idea.</p>
+<p>I <a class="reference external" href="http://blog.ianbicking.org/2011/03/31/python-webapp-package/">wrote about this about a year ago</a> and <a class="reference external" href="https://github.com/ianb/pywebapp/blob/master/docs/spec.txt">recently revised some notes on a proposal</a> but I&#8217;ve been thinking about something a bit more basic: a way to simply ship server applications, bundles of code.  Web applications are just one use case for&nbsp;this.</p>
+<p>For now lets call this a &#8220;Python application package&#8221;.  It has these&nbsp;features:</p>
+<ol class="arabic simple">
+<li>There is an <em>application description</em>: this tells the <em>environment</em> about the application.  (This is sometimes called &#8220;configuration&#8221; but that term is very confusing and overloaded; I think &#8220;description&#8221; is much&nbsp;clearer.)</li>
+<li>Given the description, you can create an execution environment to run code from the application and acquire objects from the application.  So there would be a specific way to setup <tt class="docutils literal">sys.path</tt>, and a way to indicate any libraries that are required but not bundled directly with the&nbsp;application.</li>
+<li>The environment can inject information into the application.  (Also this sort of thing is sometimes called &#8220;configuration&#8221;, but let&#8217;s not do that either.)  This is where the environment could indicate, for instance, what database the application should connect to (host, username,&nbsp;etc).</li>
+<li>There would be a way to run commands and get objects from the application.  The environment would look in the application description to get the names of commands or objects, and use them in some specific manner depending on the purpose of the application.  For instance, <span class="caps">WSGI</span> web applications would point the environment to an application object.  A Tornado application might simply have a command to start itself (with the environment indicating what port to use through its&nbsp;injection).</li>
+</ol>
+<p>There&#8217;s a lot of things you can build from these pieces, and in a sophisticated application you might use a bunch of them at once.  You might have some <span class="caps">WSGI</span>, maybe a seperate non-<span class="caps">WSGI</span> server to handle Web Sockets, something for a Celery queue, a way to accept incoming email, etc.  In pretty much all cases I think basic application lifecycle is needed: commands to run when an application is first installed, something to verify the environment is acceptable, when you want to back up its data, when you want to uninstall&nbsp;it.</p>
+<p>There&#8217;s also some things that all environments should setup the same or inject into the application.  E.g., <tt class="docutils literal">$<span class="caps">TMPDIR</span></tt> should point to a place where the application can keep its temporary files.  Or, every application should have a directory (perhaps specified in another environmental variable) where it can write log&nbsp;files.</p>
+<div class="section" id="details">
+<h2>Details?</h2>
+<p>To get more concrete, here&#8217;s what I can imagine from a small application description; probably <span class="caps">YAML</span> would be a good&nbsp;format:</p>
+<pre class="literal-block">
+platform: python, wsgi
+require:
+  os: posix
+  python: &lt;3
+  rpm: m2crypto
+  deb: python-m2crypto
+  pip: requirements.txt
+python:
+  paths: vendor/
+wsgi:
+  app: myapp.wsgiapp:application
+</pre>
+<p>I imagine <tt class="docutils literal">platform</tt> as kind of a series of mixins.  This system doesn&#8217;t really need to be Python-specific; when creating something similar for <a class="reference external" href="http://cloudsilverlining.org">Silver Lining</a> I found <span class="caps">PHP</span> support relatively easy to add (handling languages that aren&#8217;t naturally portable, like Go, might be more of a stretch).  So <tt class="docutils literal">python</tt> is one of the features this application uses.  You can imagine lots of modularization for other features, but it would be easy and unproductive to get distracted by&nbsp;that.</p>
+<p>The application has certain requirements of its environment, like the version of Python and the general <span class="caps">OS</span> type.  The application might also require libraries, ideally one libraries that are not portable (M2Crypto being an example).  Modern package management works pretty nicely for this stuff, so relying on system packages as a first try I believe is best (I&#8217;d offer <tt class="docutils literal">requirements.txt</tt> as a fallback, not as the primary way to handle&nbsp;dependencies).</p>
+<p>I think it&#8217;s much more reliable if applications primarily rely on bundling their dependencies directly (i.e., using a vendor directory). The tool support for this is a bit spotty, but I believe this package format could clarify the problems and solutions.  <a class="reference external" href="https://gist.github.com/1368649">Here is an example</a> of how you might set up a virtualenv environment for <em>managing</em> vendor libraries (you then do not need virtualenv to <em>use</em> those same libraries), and do so in a way where you can check the results into source control.  It&#8217;s kind of complicated, but works (well, almost works - <tt class="docutils literal">bin/</tt> files need fixing up).  It&#8217;s a start at&nbsp;least.</p>
+</div>
+<div class="section" id="support-library">
+<h2>Support&nbsp;Library</h2>
+<p>On the environment side we need a good support library.  <a class="reference external" href="https://github.com/ianb/pywebapp/">pywebapp</a> has some of the basic features, though it is quite incomplete. I imagine a library looking something like&nbsp;this:</p>
+<pre class="literal-block">
+from apppackage import AppPackage
+app = AppPackage('/var/apps/app1.2012.02.11')
+# Maybe a little Debian support directly:
+subprocess.call(['apt-get', 'install'] +
+                app.config['require']['deb'])
+# Or fall back of virtualenv/pip
+app.create_virtualenv('/var/app/venvs/app1.2012.02.11')
+app.install_pip_requirements()
+wsgi_app = app.load_object(app.config['wsgi']['app'])
+</pre>
+<p>You can imagine building hosting services on this sort of thing, or setting up continuous integration servers (<tt class="docutils literal"><span class="pre">app.run_command(app.config['unit_test'])</span></tt>), and so&nbsp;forth.</p>
+</div>
+<div class="section" id="local-development">
+<h2>Local&nbsp;Development</h2>
+<p>If designed properly, I think this format is as usable for local development as it is for deployment.  It should be able to run directly from a checkout, with the &#8220;development environment&#8221; being an environment just like any&nbsp;other.</p>
+<p>This rules out, or at least makes less exciting, the use of zip files or tarballs as a package format.  The only justification I see for using such archives is that they are easy to move around; but we live in the <span class="caps">FUTURE</span> and there are many ways to move directories around and we don&#8217;t need to cater to silly old fashions.  If that means a script that creates a tarball, FTPs it to another computer, and there it is unzipped, then fine - this format <em>should not</em> specify anything about how you actually deliver the files.  But let&#8217;s not worry about copying <a class="reference external" href="http://en.wikipedia.org/wiki/WAR_file_format_%28Sun%29">WARs</a>.</p>
+</div>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

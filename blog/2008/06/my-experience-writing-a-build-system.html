@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>My Experience Writing a Build System</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2008-06-19T22:41:00-05:00">
+                Thursday, June 19th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/06/my-experience-writing-a-build-system.html"
+                    rel="bookmark"
+                    title="Permalink to My Experience Writing a Build System"
+                    >My Experience Writing a Build&nbsp;System</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>Lately there&#8217;s been some interest in build processes among various people &#8212; <a class="reference external" href="http://www.zedshaw.com/projects/vellum/">Vellum</a> was announced a while back, <a class="reference external" href="http://groovie.org/2008/04/09/wheres-the-capistrano-knock-off-for-us-python-web-devs">Ben has been looking for a tool</a> and looking at <a class="reference external" href="https://savannah.nongnu.org/projects/fab/">Fabric</a>, and <a class="reference external" href="http://www.blueskyonmars.com/projects/paver/">Kevin announced Paver</a>.  At the same time <a class="reference external" href="http://pypi.python.org/pypi/zc.buildout">zc.buildout</a> is starting to gain some users outside of the Zope world, and I noticed <a class="reference external" href="http://www.minitage.org/doc/rst/">Minitage</a> as an abstraction on top of&nbsp;zc.buildout.</p>
+<p>A while ago I started working on a build project for <a class="reference external" href="http://topp.openplans.org">Open Plans</a> called <a class="reference external" href="https://svn.openplans.org/svn/fassembler/trunk">fassembler</a>.  I think the result has been fairly successful and maintainable, and I thought I&#8217;d share some of my own reflections on that&nbsp;tool.</p>
+<div class="section" id="update-what-we-were-trying-to-accomplish">
+<h2><strong>Update:</strong> what we were trying to&nbsp;accomplish</h2>
+<p>I didn&#8217;t make it clear in the post just what we were trying to do, and what this build system would&nbsp;accomplish.</p>
+<p>Our site (<a class="reference external" href="http://openplans.org">openplans.org</a>) is made up of several separate servers with an <span class="caps">HTML</span>-rewriting proxy on the front end.  We have a Zope server running a custom application, Apache running WordPress <span class="caps">MU</span>, and some servers running Pylons or other Python web applications for portions of our site.  We needed a way to consistently reproduce this entire stack, all the pieces, plugged together so that the site would actually work.  Two equally important places where we had to reproduce the stack are for developer rigs and the production&nbsp;site.</p>
+<p>Our code is primarily Python and we use a <em>lot</em> of libraries, developed both internally and externally.  Setting up the site is primarily a matter of installing the right libraries and configuration and setting up any databases (both a <a class="reference external" href="http://www.zope.org/Products/StandaloneZODB"><span class="caps">ZODB</span></a> databases and several MySQL databases).  We use a few libraries written in C, but <a class="reference external" href="http://python.org/doc/current/lib/module-distutils.html">distutils</a> handles the compilation of those pretty&nbsp;transparently.</p>
+<p>For this case we really don&#8217;t care about build tools that focus on compilation.  We don&#8217;t care about careful dependency tracking because we are compiling very little&nbsp;software.</p>
+</div>
+<div class="section" id="make-doesn-t-make-sense">
+<h2>make doesn&#8217;t make&nbsp;sense</h2>
+<p><strong>Update 2</strong>: If you think the make model makes lots of sense, read the preceding section &#8212; it makes sense for a different problem set than what we&#8217;re&nbsp;doing.</p>
+<p>We initially had a system based on <a class="reference external" href="http://agendaless.com/Members/chrism/software/buildit">BuildIt</a>, which is kind of like <a class="reference external" href="http://en.wikipedia.org/wiki/Make_(software)">make</a> with Python as the control code.  It wasn&#8217;t really a good basis for our build tool, and I think it added a lot of confusion, compounded by the fact that we weren&#8217;t quite sure what we wanted our build to do.  Ultimately I think the make model of building doesn&#8217;t make&nbsp;sense.</p>
+<p>The make model is based on the idea that you <strong>really</strong> want to save work.  So you detect changes and remake things only as necessary.  For compilation this might make sense, because you edit code and recompile a lot and it&#8217;s tedious to wait.  But we are building a website, and installing software, and none of that style of efficiency matters.  make-style detection of work to be done doesn&#8217;t even save any time.  But it does make the build more fragile (e.g., if you define a dependency incorrectly) and much harder to understand, and you constantly find yourself wiping the build and starting from scratch because you don&#8217;t trust the&nbsp;system.</p>
+<p>The metaphor for the new build system was much simpler: do a list of things, top to bottom.  There&#8217;s no effort into detecting changes in the build, or changes in the settings, or anything&nbsp;else.</p>
+</div>
+<div class="section" id="do-things-carefully">
+<h2>Do things&nbsp;carefully</h2>
+<p>In the build system almost all actions go through the <a class="reference external" href="https://svn.openplans.org/svn/fassembler/trunk/fassembler/filemaker.py">filemaker</a> module.  This is <em>kind of</em> a file abstraction library.  But the goals are entirely different than convenience: the goal is transparency and safety.  In contrast Paver uses <a class="reference external" href="http://www.jorendorff.com/articles/python/path/">path.py</a> for convenience, but I&#8217;m not sure what the win would be if we used a model like&nbsp;that.</p>
+<p><tt class="docutils literal">filemaker</tt> itself is heavily tied to the framework that it&#8217;s written for, specifically user interaction and logging.  Most tasks just <em>do</em> things, and rely on filemaker to detect problems and ask the user questions.  For example, every time a file is written, it checks if the file exists, and if it has the same content.  If it exists with other content, it asks the user about what to do.  It doesn&#8217;t overwrites files without asking (at least by default).  I think this makes the tool more humane as the default behavior for a build is to be careful and transparent.  The build author has to go out of their way to make things&nbsp;difficult.</p>
+<p>Many zc.buildout recipes will blithely overwrite all sorts of files which always made me very uncomfortable with the product.  It&#8217;s the <em>recipes</em> in zc.buildout which do this, not the buildout framework itself, but because buildout made overwriting the easy thing to do, and didn&#8217;t start with humane conventions or tools, this behavior is the&nbsp;norm.</p>
+<p>What I think filemaker most accomplished was the ability to do file operations while also asserting the expected state of the system, and so makes build bugs noticeable earlier instead of getting a build process that finishes successfully but creates a buggy build, or having an exception show up far from where the error was originally&nbsp;introduced.</p>
+<p>Also, because it won&#8217;t overwrite your work in progress this has saved the build from engendering deep feelings of hatred in cases when it might overwrite your work in progress.  It&#8217;s hard to detect this absence of hatred, but I know that I&#8217;ve felt it with other&nbsp;systems.</p>
+</div>
+<div class="section" id="update-a-corollary-ignore-no-errors">
+<h2><strong>Update:</strong> a corollary: ignore no&nbsp;errors</h2>
+<p>One question you might wonder about: why not a shell script?  We did prototype some things as shell scripts, but we&#8217;ve consistently moved to Python at some point, even things that seemed really trivial.  The problem with shell scripts is they have horribly bad behavior with respect to errors.  Ignoring errors is really really easy, noticing errors is really&nbsp;hard.</p>
+<p>This is absolutely unacceptable for builds.  Builds must not ignore errors.  The build may mostly work despite an error.  It might be totally broken, but the error message is lost in all sorts of useless output.  The error message probably makes no sense.  The context is lost.  No suggestion is given to the&nbsp;user.</p>
+<p>When builds work, that&#8217;s great.  Build <em>do not</em> always work.  They always fail sometimes, and some poor sucker (usually in some hot potato-like arrangement) has to figure out what went wrong.  You have to plan for these&nbsp;problems.</p>
+<p>Everything in the build tries to be careful about errors.  All places where it is not, it is a bug.  The resolution isn&#8217;t to see something appear to work, but create a broken build, and say &#8220;oh, you forgot to set X&#8221;.  The resolution is to make sure when you forget to set X it gives you an error that tells you to set&nbsp;X.</p>
+<p>This is one of the more important and more often ignored principles of a good build/deployment system.  Maybe it&#8217;s gotten better, but when I first used zc.buildout (<em>very</em> early in its development) the poor handling of errors was by far the biggest problem and it left me with a bad taste in my mouth.  easy_install and setuptools in general is also very flawed in this&nbsp;respect.</p>
+</div>
+<div class="section" id="log-interesting-things">
+<h2>Log interesting&nbsp;things</h2>
+<p>I tried to make a compromise between logging very verbosely, and being too quiet.  As a user, I want to see everything <em>interesting</em> and leave out everything <em>boring</em>.  Determining interesting and boring can be a bit difficult, but really just require some attention and&nbsp;tweaking.</p>
+<p>To make it possible to visually parse the output of the tool I found both indentation and color to be very useful.  Indentation is used to represent subtasks, and color to make sections and warnings stand&nbsp;out.</p>
+<p>The default verbosity setting is not to be completely quiet.  Silence is a Unix convention that just doesn&#8217;t work for build tools.  Silence gets you interactions like&nbsp;this:</p>
+<pre class="literal-block">
+$ build-something target-directory/
+(much time passes)
+Error: cannot write /home/ianb/builds/20080426/target-directory/products/AuxInput/auxinput/config/configuration.xml
+</pre>
+<p>Why did it want to write that file?  Why can&#8217;t it write that file?  Is the build buggy?  Did I misconfigure it?  Does the directory&nbsp;exist?</p>
+<p>The typical way of handling this is either to run the build again with logging setup or otherwise make it more verbose, or to get in the habit of always running it&nbsp;verbose.</p>
+</div>
+<div class="section" id="mixing-code-and-configuration">
+<h2>Mixing code and&nbsp;configuration</h2>
+<p>BuildIt, which we were using before, had the ability to put variables in settings, and you could read an option from another section with something like <tt class="docutils literal">${section/option}</tt>.  It was limited to simple (but recursive) variable substitution, and had some clever but very confusing rules that created a kind of&nbsp;inheritance.</p>
+<p>I liked the ability to do substitution, but wasn&#8217;t happy with the compromise BuildIt made.  I wasted a <em>lot</em> of time trying to figure out the context of substitutions.  So, I saw two directions.  One was to remove the cleverness and just do simple substitution.  This is the choice zc.buildout made.  The other was to go whole-hog.  With a bit of trepidation I decided to to go for it, and I made the choice to treat all configuration settings as <a class="reference external" href="http://pythonpaste.org/tempita/">Tempita</a> templates.  All configuration is generally accessed via <tt class="docutils literal">config.setting_name</tt>, and that lazily interpolates the setting (it took me quite a while to figure out how to avoid infinite loops of substitution).  Because evaluation is done lazily settings can depend on each other and be overridden and have lots of code in defaults (e.g., a default that is calculated based on the value of another setting), and it works out okay.  Most settings just ended up having a smart default, and as a result very little tweaking of the configuration is&nbsp;necessary.</p>
+<p>Somewhat ironically the result was a kind of atrophying of the settings, because no one actually <em>set</em> them, instead we just tweaked the defaults to get it right.  Now I&#8217;m not entirely sure what exactly the &#8220;settings&#8221; are setting, or who they should really belong to.  To the build?  To the tasks?  While this is conceptually confusing, in practice it isn&#8217;t so bad.  This mixing of code and configuration has been distinctly useful, and not <em>nearly</em> as problematic to debug as I worried it would be.   In some ways it was a way of building <tt class="docutils literal">lambda</tt> into every string, and the lazy evaluation of those strings has been really important.  But it&#8217;s not clear if they are really&nbsp;settings.</p>
+<p>Would normal string interpolation have been enough (e.g., with <a class="reference external" href="http://python.org/doc/current/lib/node40.html">string.Template</a>)?  I&#8217;m pretty sure it wouldn&#8217;t have been.  The ability to do a little math or use functions that read things from the environment has been very&nbsp;important.</p>
+</div>
+<div class="section" id="managing-python-libraries">
+<h2>Managing Python&nbsp;libraries</h2>
+<p>fassembler uses <a class="reference external" href="http://pypi.python.org/pypi/virtualenv">virtualenv</a> for building each piece of the stack.  Generally it creates several environments and installs things into them &#8212; it doesn&#8217;t run inside the environments itself.  This works&nbsp;fine.</p>
+<p>zc.buildout in comparison does some fancy stuff to scripts where specific eggs are enabled when you run a script.  Each script has a list of <em>all</em> the eggs to enable.  You can&#8217;t install things or manage anything manually, even to test &#8212; you always have to go through buildout, and it will regenerate the scripts for you.  zc.buildout was implemented at the same time as workingenv (the predecessor to virtualenv), and I actually finished virtualenv with fassembler in mind, so I can&#8217;t blame zc.buildout for not using virtualenv.  That said, I don&#8217;t think the zc.buildout system makes any sense.  And it&#8217;s really complicated and has to access all sorts of not-really-public parts of easy_install to&nbsp;work.</p>
+<p>Isolation is only the start.  easy_install makes sure each library&#8217;s claimed dependencies are satisfied.  You might then think easy_install would do all the work to make the stack work.  It is nowhere close to making the stack work.  <tt class="docutils literal">setup.py</tt> files can/should contain the bare minimum that is known to be necessary to make a package work.  But they can&#8217;t predict future incompatibilities, and they can&#8217;t predict interactions.  And you don&#8217;t want all your packages changing versions arbitrarily.  If you work with a lot of libraries you <em>need</em> those libraries to be pinned, and only update them when you <em>want</em> to update them, not just because an update has been&nbsp;released.</p>
+<p>So for each piece of the stack we have a set of &#8220;requirements&#8221;.  This is a flat files that indicates all the packages to install.  They can have explicit versions, far more restrictive than anything you should put in <tt class="docutils literal">setup.py</tt>.  It also can check out from svn, including pinning to revisions.  This installation plan can go in svn, you can do diffs on it, you can branch and copy and do whatever.  Maybe at some point we could use it to keep cached copies of the libraries.  For now it mostly uses <tt class="docutils literal">easy_install</tt> (and <tt class="docutils literal">python setup.py develop</tt> for&nbsp;checkouts).</p>
+<p>In parallel we have a command-line program for just installing packages using files like this, called <a class="reference external" href="https://svn.openplans.org/svn/PoachEggs/trunk">PoachEggs</a>.  I want to make this better, and have fassembler use it, but I mostly note it because it implements a feature that can &#8220;freeze&#8221; all your packages to a requirements file.  You take a working build and freeze its requirements, giving explicit (<tt class="docutils literal">==</tt>) versions for packages, and pin all the svn checkouts to a revision, so that the frozen requirements file will install exactly the packages you know&nbsp;work.</p>
+<p>An alternative to this is what the <a class="reference external" href="http://repoze.org/">Repoze</a> guys are doing, which is to create a custom index that only includes the versions of libraries that you want.  You then tell easy_install to use this instead of <a class="reference external" href="http://pypi.python.org/pypi">PyPI</a>.  It works with zc.buildout (and anything that uses easy_install), but I can&#8217;t get excited about it compared to a simple text file.  I also want svn checkouts instead of create tarballs of the checkout &#8212; I like an editable environment, because the build is just as much to support developers as to support&nbsp;deployment.</p>
+</div>
+<div class="section" id="the-structure">
+<h2>The&nbsp;structure</h2>
+<p>A big part of the development of fassembler was nailing down the structure of our site, and moving to use tools like <a class="reference external" href="http://supervisord.org/">supervisor</a> to manage our processes.  A lot of these expectations are built into the builds and fassembler itself.  This is part of what makes the build Work &#8212; the pieces all conform to a common structure with some basic standards.  But this isn&#8217;t the build tool itself, it&#8217;s just a set of&nbsp;conventions.</p>
+<p>I don&#8217;t know quite what to make of this.  Extracting the conventions from the builds leads to a situation where you can more easily misconfigure things, and the installation process ends up being more documentation-based instead of code-based.  We do <em>not</em> want to rely on documentation, because documentation is generally because of a flaw in the build process that needs explaining.  It&#8217;s faster for everyone if the code is just right.  Maybe these conventions could be put into code, separate from the build.  The abstraction worries me, though &#8212; too much to keep track&nbsp;of?</p>
+</div>
+<div class="section" id="what-we-don-t-get-right">
+<h2>What we don&#8217;t get&nbsp;right</h2>
+<p>The biggest problem is that fassembler is our own system and no one else uses it.  If someone wants to use just a piece of our stack they either have to build it manually or they have to use our system which is meant to build all our pieces together with our conventions.  There&#8217;s some pressure to use zc.buildout to make pieces more accessible to other Zope users.  We&#8217;ve also found things that build with zc.buildout that we&#8217;d like to use (e.g., setups for <a class="reference external" href="http://varnish.projects.linpro.no/">varnish</a>).</p>
+<p>We haven&#8217;t figured out how to separate the code for building <em>our</em> stuff from the build software itself.  There&#8217;s a bootstrapping problem: you need to get the build code to build a project, and so it can&#8217;t be part of the project you are building.  zc.buildout uses configuration files (that aren&#8217;t code, so they lack the bootstrap problem) and it uses <a class="reference external" href="http://pypi.python.org/pypi/zc.buildout#id1">recipes</a> (a kind of plugin) and has gone to quite a bit of effort to bootstrap everything.  virtualenv also supports a kind of <a class="reference external" href="http://pypi.python.org/pypi/virtualenv#bootstrap-example">bootstrap</a> which we use to do the initial setup of the environment, but it doesn&#8217;t support code organization in the style of&nbsp;zc.buildout.</p>
+<p>Builds are also fairly tedious to write.  They aren&#8217;t horrible, but they feel much longer than they should be.  Part of their length, though, is that over time we put in more code to guard against environment differences or build errors, and more code to detect the environment.  But compared to zc.buildout&#8217;s configuration files, it doesn&#8217;t feel quite as nice, and if it&#8217;s not as nice sometimes people are lazy and do ad hoc&nbsp;setups.</p>
+</div>
+<div class="section" id="the-future">
+<h2>The&nbsp;future</h2>
+<p>We haven&#8217;t really decided, but as you might have noticed zc.buildout gets a lot of attention here.  There&#8217;s quite a few things I don&#8217;t like about it, but a lot of these have to do with the recipes available.  We don&#8217;t <em>have</em> to use the standard zc.buildout egg installation recipe.  In fact that would be first on the chopping block, replaced with something much simpler that assumes you are running inside a virtualenv environment, and probably something that uses requirement&nbsp;files.</p>
+<p>Also, we could extract filemaker into a library and recipes could use that.  Possibly logging could be handled the same way (the <a class="reference external" href="http://python.org/doc/current/lib/module-logging.html">logging</a> module just isn&#8217;t designed for an interactive experience like a build tool).  Then if we used other people&#8217;s recipes we might feel grumpy, since they&#8217;d use neither filemaker or our logging, but it would still work.  And our recipes would be full of awesome.  The one thing I don&#8217;t think we could do is introduce the template-based configuration.  Or, if we did, it would be&nbsp;hard.</p>
+<p>That said, there is a very different direction we could go, one inspired more by <a class="reference external" href="http://code.google.com/appengine/">App Engine</a>.  In that model we build files under a directory, and that directory is the build.  Wherever you build, you get the same files, period.  All paths would be relative.  All environmental detection would happen in code at runtime.  Things that aren&#8217;t &#8220;files&#8221; exactly would simply be standard scripts.  E.g., database setup would not be done by the build, but would be a script put in a standard&nbsp;location.</p>
+<p>This second file-based model of building is very much different than the principles behind zc.buildout.  zc.buildout requires rebuilding when anything changes, and does so without apology.  It requires rebuilding to move the directories, or to move to different machines.  Using a file-based model requires a lot of push-back into the products themselves.  Applications have to be patched to accept smart relative paths.  They have to manage themselves a lot more, detect their environment, handle any conflicts or ambiguities, being graceful about stuff like databases, because the files have to be universal.  In an extreme case I could imagine going so far as to only keep a template for a configuration file, and write the real configuration file to a temporary location before starting a server (if the server cannot be patched to accept runtime location&nbsp;information).</p>
+<p>So this is the choice ahead.  I&#8217;m not sure <em>when</em> we&#8217;ll make this choice (if ever!) &#8212; build systems are dull and somewhat annoying, but they are no more dull and annoying than dealing with a poor build system.  Actually, they are <em>definitely</em> less dull than working with a build system that isn&#8217;t good enough or powerful enough, or one that simply lacks the <span class="caps">TLC</span> necessary to keep builds working.  So no choice is a choice too, and maybe a bad&nbsp;choice.</p>
+</div>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

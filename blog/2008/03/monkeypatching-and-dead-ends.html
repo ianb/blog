@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Monkeypatching and dead ends</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,38 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2008-03-21T17:38:00-05:00">
+                Friday, March 21st, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/03/monkeypatching-and-dead-ends.html"
+                    rel="bookmark"
+                    title="Permalink to Monkeypatching and dead ends"
+                    >Monkeypatching and dead&nbsp;ends</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p><a class="reference external" href="http://www.dehora.net/journal/2008/03/21/rope/">Bill de hÓra</a> and then <a class="reference external" href="http://patricklogan.blogspot.com/2008/03/another-dynamic-tools-topic-are-you.html">Patrick Logan</a> picked up on an <a class="reference external" href="http://blog.ianbicking.org/theres-so-much-more-than-rails.html">old post of mine about monkeypatching</a>.</p>
+<p>Patrick&#8217;s&nbsp;reply:</p>
+<blockquote>
+<p>I know next to nothing about the specific problems the Ruby and Python folks are encountering with &#8220;monkeypatching&#8221;. However this capability is nothing new for dynamic languages. And it is a frequent desire for me when I program in C-like languages. If you become frustrated using static &#8220;utility&#8221; methods, for example in Java, that work with &#8220;closed&#8221; classes (say, String or Object), then you have at least some desire for these&nbsp;&#8220;monkeypatches&#8221;.</p>
+<p>See the thing is this capability <em>is</em> a cool feature in many Lisp and most Smalltalk systems. Sorry, dear readers who hate my Smug Lisp Weeniness. But it is true. Not only is it &#8220;cool,&#8221; moreover it is <em>pragmatic</em>.</p>
+<p>The truly good implementations of dynamic languages recognize the advantages of these kinds of extensions, and they&#8217;ve supported them with good tools for decades. Learn from it, don&#8217;t run from&nbsp;it.</p>
+</blockquote>
+<p>Sharp tools are good.  I would not want monkeypatching removed from Python.  Still, it&#8217;s best not to leave sharp tools lying around.  It&#8217;s best not to mix your butter knives with your steak knives.  I don&#8217;t resent the safety guards on circular&nbsp;saws.</p>
+<p>And sorry Lisp Weenies: your experiences are not so novel anymore.  The Python community isn&#8217;t new to this dynamic typing thing.  We&#8217;ve taken some hits and we&#8217;ve learned from them.  And frankly the problems with runtime patching of methods can&#8217;t be specific to Python or Ruby.  It only took the Ruby community a couple years to start <a class="reference external" href="http://avdi.org/devblog/2008/02/23/why-monkeypatching-is-destroying-ruby/">catching on</a>.  Are you telling me Lisp and Smalltalk programmers still haven&#8217;t figured this out?  Everything you value about modularity is at risk when you monkeypatch code.  That risk can be worth it, of course!  But do you really need me to explain the benefits of modularity?  What&#8217;s next, a recap of the problems with <span class="caps">GOTO</span>?</p>
+<p>One of the things that I think distinguishes Python among the popular dynamically typed languages of the day, is that it&#8217;s built &#8212; languages and libraries &#8212; on a great deal of concrete experience.  Experience <em>about developing with Python</em>.  There was a time when people tended to define Python as a delta from Java or Perl or C.  We don&#8217;t need to do that anymore.  Sure, closed classes in Java suck.  Python isn&#8217;t a reaction to Java&#8217;s suckiness.  That we can do something Java can&#8217;t doesn&#8217;t get me excited.  This feature of monkeypatching has to stand up on its own, and while sometimes its use is justified those cases are few and far between.  That&#8217;s what we&#8217;ve learned: monkeypatching was not dismissed out of hand, it was not dismissed because of anything in Java, it was dismissed because people <em>used</em> it without acknowledging it as a hack, and it <em>sucked</em>.</p>
+<p>Of course the use cases are still there.  Which is why people <a class="reference external" href="http://www.bud.ca/blog/the-great-python-component-swap-meet">are trying new things</a> to address these problems.  One benefit of experience is that you know some paths are dead ends.  We still haven&#8217;t figured out The One Right Path (and <a class="reference external" href="http://blog.ianbicking.org/because-unanswered-problems-are-always-hard.html">we never will</a>), and maybe we&#8217;ve only traced out the longest path in a very long dead end in this maze of ideas we are traversing.  Since I doubt the maze has any exit (nirvana?) it&#8217;s a valid debate about where we are trying to get at all.  That said, I suspect we&#8217;ve out-explored Lisp.  Lisp has been a worthy mentor, an intrepid explorer in his time, but he&#8217;s old and doesn&#8217;t get out much and only tells stories of where he&#8217;s been in the past.  There are still things to be learned there, wisdom to be dug out of that environment, but Lisp and Python are not&nbsp;peers.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +66,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

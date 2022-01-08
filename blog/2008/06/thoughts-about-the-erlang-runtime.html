@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Thoughts About the Erlang Runtime</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2008-06-09T18:03:00-05:00">
+                Monday, June 9th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/06/thoughts-about-the-erlang-runtime.html"
+                    rel="bookmark"
+                    title="Permalink to Thoughts About the Erlang Runtime"
+                    >Thoughts About the Erlang&nbsp;Runtime</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I should preface this entire post by noting that I haven&#8217;t used Erlang, just read about it, and I handle most concurrency using Python threads, a model for which I have no great affection (or hate).  But I was reading <a class="reference external" href="http://patricklogan.blogspot.com/2008/05/toward-finer-tuning-of-definitions-of.html">two</a> <a class="reference external" href="http://patricklogan.blogspot.com/2008/05/this-is-part-two-of-my-response-to-ted.html">posts</a> by Patrick Logan on Erlang and it got me thinking&nbsp;again.</p>
+<p>From my reading and what I&#8217;ve heard from other people, Erlang the language-and-syntax seems quite crufty.  Erlang is not the Complete Package, the language that will make you leave your wife, the language that will have you walking into telephone polls because it&#8217;s just so <em>hot</em> that you can&#8217;t take your eyes off it.  Erlang is not that language.  People seem to get excited about two things in Erlang: the concurrency model and pattern matching.  I&#8217;m not quite sure why people are excited about pattern matching.  <a class="reference external" href="http://svn.colorstudy.com/home/ianb/recipes/patmatch.py">Pattern matching isn&#8217;t particularly hard to implement</a>, though maybe it interacts with other aspects of the system in a way I don&#8217;t understand.  I remain skeptical that it&#8217;s anything&nbsp;special.</p>
+<p>Then there is the concurrency model (and its associated message passing), and this <em>does</em> strike me as special.  You can <a class="reference external" href="http://candygram.sourceforge.net/">kind of</a> implement that model in Python, but with none of the concrete&nbsp;benefits.</p>
+<p>These are the useful features I see in the concurrency&nbsp;model:</p>
+<ol class="arabic simple">
+<li>Erlang processes are&nbsp;share-nothing.</li>
+<li>The processes are light weight.  You can start lots of processes, and they start quickly and can die off quickly without any great overhead.  They aren&#8217;t <span class="caps">OS</span>-level processes.  These are sometimes called green processes or microprocesses.  There are many implementations of micro<em>threads</em> in Python, but you lose the benefits of&nbsp;share-nothing.</li>
+<li>The runtime makes light weight processes feasible as well.  The <span class="caps">OS</span> overhead of a Python process is actually just a small part of the total overhead when spawning a process.  Loading and initializing the runtime libraries of a Python program of even modest complexity is problematic.  I&#8217;m not sure exactly how Erlang does this, but I suspect it&#8217;s because libraries can be safely shared because Erlang is a functional language.  (<a class="reference external" href="http://blog.ianbicking.org/2008/01/12/what-php-deployment-gets-right/"><span class="caps">PHP</span> is also like this</a>, with most of the library written in a sharable C&nbsp;library.)</li>
+</ol>
+<p>1 and 2 can be handled with the right <span class="caps">VM</span>.  This isn&#8217;t a particularly <em>common</em> <span class="caps">VM</span> design, but it&#8217;s certainly doable.  3 is tricky, and effects the language&nbsp;design.</p>
+<p>I don&#8217;t think it effects the language design as greatly as to require a functional language.  It requires that sharable code itself be a functional (i.e., immutable) subset of the language.  What the code <em>does</em> doesn&#8217;t have to be functional, only what the code <em>is</em>.</p>
+<p>To explain this, functions in most languages are immutable.  Python functions aren&#8217;t actually immutable, but they are close enough that hardly anyone would notice if you made them immutable (right now you can overwrite their name, compiled code, and some other stuff &#8212; but almost no one actually does this).  The function may have side effects, but as long as the function <em>object</em> is immutable then it can be shared safely among&nbsp;processes.</p>
+<p>You can extend this to the module as a whole.  This means you couldn&#8217;t <a class="reference external" href="http://en.wikipedia.org/wiki/Monkey_patch">monkeypatch</a> objects in the module, and module-level assignments would effectively be constants.  Any module-level objects would have to be immutable.  Things like classes, which are also a kind of module-level object, would also have to be immutable &#8212; meaning things like class variables would be immutable.  It could still be possible to do module-level code if there was a way of freezing the module after its instantiation (this would be important for Python, as even decorators are a kind of code run at import time).  Adding a general concept of &#8220;freezing&#8221; to the language might be the most general and expedient way to make modules&nbsp;sharable.</p>
+<p>The other half of the concurrency model in Erlang is message passing.  Erlang processes send messages around like other systems send methods.  It would be possible to use exactly Erlang&#8217;s system, as it&#8217;s not Erlang-specific and has been ported to many languages.  Though I&#8217;d be somewhat more inclined to use <a class="reference external" href="http://en.wikipedia.org/wiki/Bencode">bencode</a> as it has some cleverness in its design.  Or perhaps <span class="caps">JSON</span>, just because.  Regardless of the format you are always passing around <em>data</em>, which I think is important.  Systems that pass around &#8220;objects&#8221; become complex, mostly because you just <strong>cannot</strong> pass objects around and so those systems are just complex facades built around data&nbsp;exchange.</p>
+<p>Lately I&#8217;ve become fond of thinking of objects as views over a more fundamental data structure (<a class="reference external" href="http://pythonpaste.org/webob/">WebOb</a> is strictly based on this pattern).  Methods are details of the implementation, but only the data can mean something to someone else.  At least this is the worldview you start to internalize when you think about <span class="caps">REST</span> a lot.  (My post <a class="reference external" href="http://blog.ianbicking.org/2008/01/15/documents-vs-objects/">Documents vs. Objects</a> is also about&nbsp;this.)</p>
+<p>Arguable a plain-data-with-views world is just the <a class="reference external" href="http://blog.ianbicking.org/because-unanswered-problems-are-always-hard.html">dynamic-weak-typed</a> anti-pattern.  That anti-pattern is one where you get all the disadvantages of dynamic typing, and all the disadvantages of static typing, all in one ugly bundle.  Erlang&#8217;s records remind me of this anti-pattern.  Instead of dictionaries everything is a tuple, and getting a record is just syntactic sugar mapping record names to indexes &#8212; all in the context of a dynamically typed language where you could mistype a value and get strange output as a&nbsp;result.</p>
+<p>The strong-static typing solution to the type problem involves complicated contracts, aka &#8220;service descriptions&#8221;, the stuff of <span class="caps">WS</span>-*, <span class="caps">CORBA</span> <span class="caps">IDL</span>, etc.  The strong-dynamic typing solution is that every object have an explicit type.  This is fine for things we all agree on: lists, dictionaries, bytes, numbers.  Sadly even a basic thing like unicode strings cause problems, as do dates, but at least those have straight-forward solutions (you add more basic types to the message format).  More complex types, like a domain object (e.g., a user record) are difficult.  Are they all just dictionaries?  Dictionaries plus special metadata?  <span class="caps">XML</span> namespaces address this problem in some ways, but are also the point at which <span class="caps">XML</span> starts to just piss people off and make them want to use <span class="caps">JSON</span>.  And for good reason, because <span class="caps">XML</span> namespaces force you to define entities and responsible parties very early on, possibly long before you know what you are actually trying to do.  Besides <span class="caps">XML</span>, are there other systems that aren&#8217;t just naive/unextendable (bencode, <span class="caps">JSON</span>) and are still basically dynamically&nbsp;typed?</p>
+<p>This is the kind of thing I would really love to see <a class="reference external" href="http://codespeak.net/pypy/">PyPy</a> experiment&nbsp;with.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

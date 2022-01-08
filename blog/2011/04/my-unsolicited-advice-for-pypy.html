@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>My Unsolicited Advice For PyPy</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2011-04-04T09:23:00-05:00">
+                Monday, April 4th, 2011
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2011/04/my-unsolicited-advice-for-pypy.html"
+                    rel="bookmark"
+                    title="Permalink to My Unsolicited Advice For PyPy"
+                    >My Unsolicited Advice For&nbsp;PyPy</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I think the most interesting work in programming languages right now is about the <em>runtime</em>, not syntax or even the languages themselves. Which places PyPy in an interesting position, as they have put a great deal of effort into abstracting out the concept of runtime from the language they are implementing&nbsp;(Python).</p>
+<p>There are of course other runtime environments available to Python. The main environment has and continues to be CPython &#8212; the runtime developed in parallel with the language, and with continuous incremental feedback and improvement by the Python developer community.  It is the runtime that informs and is informed by the language.  It&#8217;s also the runtime that is most easy-going about integrating with C libraries, and by extension it is part of the vague but important runtime environment of &#8220;Unix&#8221;.  There&#8217;s also Jython and IronPython.  I frankly find these completely uninteresting.  They are runtimes controlled by companies, not communities, and the Python implementations are neither natural parts of their runtime environments, nor do the runtimes include many concessions to make themselves natural for&nbsp;Python.</p>
+<p>PyPy is somewhere different.  It still has a tremendous challenge because Python was not developed <em>for</em> PyPy.  Even small changes to the language seem impossible &#8212; something as seemingly innocuous as making builtins static seems to be stuck in a conservative reluctance to change.  But unlike Jython and IronPython they aren&#8217;t stuck between a rock and a hard place; they just have to deal with the rock, not the hard&nbsp;place.</p>
+<p>So here is my unsolicited advice on what PyPy-the-runtime should consider.  Simple improvements to performance and the runtime are fine, but being incrementally better than CPython only goes so far, and I personally doubt it will ever make a big impact on Python that&nbsp;way.</p>
+<p>PyPy should push hard on <em>concurrency</em> and <em>reliability</em>.  If it is <em>fast enough</em> then that&#8217;s fine; that&#8217;s done as far as I&#8217;m concerned. I say this because I&#8217;m a web programmer, and speed is uninteresting to me.  Certainly opinions will differ.  But to me speed (as it&#8217;s normally defined) is really <em>really</em> uninteresting.  When or if I care about speed I&#8217;m probably more drawn to Cython.  I <em>do</em> care about latency, memory efficiency, scalability/concurrency, resource efficiency, and most of all <em>worst cases</em>.  I don&#8217;t think a <span class="caps">JIT</span> addresses any of these (and can even make things worse).  I don&#8217;t know of benchmarks that measure these parameters&nbsp;either.</p>
+<p>I want a runtime with new and novel features; something that isn&#8217;t just incrementally better than CPython.  This itself might seem controversial, as the only point to such novel features would be for people to implement at least some code intended for <em>only</em> PyPy.  But if the features are good enough then I&#8217;m okay with this &#8212; and if I&#8217;m not drawn to write something that will only work on PyPy, I probably won&#8217;t be drawn to use PyPy <em>at all</em>; natural conservatism and inertia will keep me (and most people) on CPython&nbsp;indefinitely.</p>
+<p>What do I&nbsp;want?</p>
+<ul class="simple">
+<li><strong>Microprocesses</strong>.  Stackless and greenlets have given us micro-threads, but it&#8217;s just not the same.  Which is not entirely a criticism &#8212; it shows that unportable features <em>are</em> interesting when they are good features.  But I want the next step, which is processes that don&#8217;t share state.  (And implicitly I don&#8217;t just want standard async techniques, which use explicit concurrency and shared&nbsp;state.)</li>
+<li><strong>Shared objects</strong> across processes with <strong>copy-on-write</strong>; then you can efficiently share objects (like modules!) across concurrent processes without the danger of shared state, but without the overhead of copying <em>everything</em> you want to share.  Lack of this is hurting <span class="caps">PHP</span>, as you can&#8217;t have a rich set of libraries and share-nothing without killing your&nbsp;performance.</li>
+<li>I&#8217;d rather see a break in compatibility for C extensions to support this new model, than to abandon what could be PyPy&#8217;s best feature to support CPython&#8217;s C extension ecosystem.  Being a web programmer I honestly don&#8217;t need many C modules, so maybe I&#8217;m biased.  But if the rest of the system is good enough then the C extensions will&nbsp;come.</li>
+<li>Make sure resource sharing that happens outside of the Python environment is really solid.  C libraries are often going to be unfriendly towards microprocesses; make sure what <em>is</em> exposed to the Python environment is solid.  That might even mean a dangerous process mode that can handle ctypes and <span class="caps">FFI</span> and where you carefully write Python code that has extra powers, so long as there&#8217;s a strong wall between that code and &#8220;general&#8221; code that makes use of those&nbsp;services.</li>
+<li><strong>Cython</strong> &#8212; it&#8217;s doing a lot of good stuff, and has a much more conservative but also more predictable path to performance (through things like type annotation).  I think it&#8217;s worth leaning on.  I also have something of a hunch that it could be a good way to do <span class="caps">FFI</span> in a safe manner, as Cython already supports multiple targets (Python 2 and 3) from the same codebase.  Could PyPy be another&nbsp;target?</li>
+<li><strong>Runtime introspection of the runtime</strong>.  We have great language introspection (probably much to the annoyance of PyPy developers who have to copy this) but currently runtime introspection is poor-to-nonexistant. What processes are running?  How much memory is each using?  Where? Are they holding on to resources?  Are they blocking on some non-Python library?  How much <span class="caps">CPU</span> have they been using?  Then I want to be able to kill processes, send them signals, adjust priorities,&nbsp;etc.</li>
+</ul>
+<p>And I guess it doesn&#8217;t have to be &#8220;PyPy&#8221;, but a new backend for PyPy to target; it doesn&#8217;t have to be the <em>only</em> path PyPy&nbsp;pursues.</p>
+<p>With a runtime like this PyPy could be an absolutely rocking platform for web development.  Python could be as reliable as, oh&#8230; <a class="reference external" href="http://blog.ianbicking.org/2008/01/12/what-php-deployment-gets-right/"><span class="caps">PHP</span></a>? Sorry, I probably won&#8217;t win arguments that way ;)  As good as Erlang! Maybe we could get the benefits of async without the pain of callbacks or Deferreds. And these are features people would <em>use</em>.  Right now I&#8217;m perceiving a problem where there&#8217;s lots of people standing on the sidelines cheering you on but not actually <em>using</em>&nbsp;PyPy.</p>
+<p>So: I wouldn&#8217;t tell anyone what to do, and if someone tries this out I&#8217;ll probably only be on the sidelines cheering you on&#8230; but I really think this could be&nbsp;awesome.</p>
+<p><strong>Update</strong>: there&#8217;s some <a class="reference external" href="http://news.ycombinator.com/item?id=2406920">interesting comments on Hacker News</a> as&nbsp;well.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

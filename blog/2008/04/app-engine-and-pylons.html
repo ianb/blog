@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>App Engine and Pylons</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2008-04-13T11:32:00-05:00">
+                Sunday, April 13rd, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/04/app-engine-and-pylons.html"
+                    rel="bookmark"
+                    title="Permalink to App Engine and Pylons"
+                    >App Engine and&nbsp;Pylons</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>So I promised some more technical discussion of App Engine than my <a class="reference external" href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/">last</a> <a class="reference external" href="http://blog.ianbicking.org/2008/04/09/app-engine-and-open-source/">two</a> posts.  Here it&nbsp;is:</p>
+<p>Google App Engine uses a somewhat <span class="caps">CGI</span>-like model.  That is, a script is run, and it uses stdin/stdout/environ to handle the requests.  To avoid the overhead of <span class="caps">CGI</span> a process can be reused by defining <tt class="docutils literal">__main__.main()</tt>.  But while a process <em>can</em> be reused, it might not be, and of course it might get run on an entirely separate server.  So in many ways it&#8217;s like the <span class="caps">CGI</span> model, with a small optimization so that, particularly under load, your requests can run with less&nbsp;latency.</p>
+<p>This part is all well and good.  I&#8217;ve already come to terms with servers going up and down without warning.  But the environment itself has a number of other restrictions.  It seems that App Engine is providing security in the language itself.  The interpreter has been modified so that code is sandboxed, with no ability to write to the disk, open sockets, import C extensions, and see quite a few things in its environment.  It&#8217;s these things that are a bit harder to come to terms&nbsp;with.</p>
+<p>While they claim it supports any Python framework, these restrictions don&#8217;t actually make it easy.  So for the last few days quite a few of us have been hacking various things to get stuff&nbsp;working.</p>
+<p>The first thing people noticed is that <a class="reference external" href="http://www.makotemplates.org/">Mako</a> and <a class="reference external" href="http://genshi.edgewall.org/">Genshi</a> didn&#8217;t work, because they use the <a class="reference external" href="http://docs.python.org/lib/module-compiler.ast.html">ast</a> (via the <a class="reference external" href="http://python.org/doc/current/lib/module-parser.html">parser module</a>) to handle the templating, and that module has been restricted.  Apparently arbitrary bytecode is not safe in this environment, and so anything that can produce bytecode is considered dangerous.  From what I understand Philip Jenvy has been working on Mako and the trunk is currently working.  He&#8217;d already been doing work to get Mako working on Jython, which had similar issues.  Genshi is <a class="reference external" href="http://genshi.edgewall.org/wiki/AppEngine">also in progress</a> and fairly close to working, though with some missing features.  Genshi has the harder task as Mako was primarily reading the ast, while Genshi was writing&nbsp;it.</p>
+<p>The first thing <em>I</em> noticed is that Setuptools doesn&#8217;t work.  I&#8217;m flattered that one of the only 3 libraries included with App Engine is <a class="reference external" href="http://pythonpaste.org/webob/">WebOb</a>, but of course I am more enamored of a rich set of reusable libraries.  Setuptools didn&#8217;t work because several modules and functions have been removed &#8212; this like <tt class="docutils literal">os.open</tt>, <tt class="docutils literal">os.uname</tt>, <tt class="docutils literal">imp.acquire_lock</tt>, etc.  Some of these are kind of reasonable, while others are not.  The removal of many functions from <a class="reference external" href="http://python.org/doc/current/lib/module-imp.html">imp</a> doesn&#8217;t really make sense, for instance (I think the motivation was the difficulty of auditing the <em>implementation</em> of those functions, not that the functionality itself is dangerous).  And while some functions can&#8217;t be used in the environment, the fact you can&#8217;t <em>import</em> those functions is more problematic.  For instance, The Setuptools&#8217; <tt class="docutils literal">pkg_resources</tt> module has support to unzip eggs when they are imported.  App Engine doesn&#8217;t support importing from zip files at all, and you certainly can&#8217;t unzip to a temporary location.  But withoutthe necessary modules and objects pkg_resources won&#8217;t even&nbsp;import.</p>
+<p>To work around this I started a new project: <a class="reference external" href="http://code.google.com/p/appengine-monkey/">appengine-monkey</a>, which adds several monkeypatches and replacement dummy modules to the environment to simulate a more typical environment.  It&#8217;s just a small list so far (mostly in <a class="reference external" href="http://appengine-monkey.googlecode.com/svn/trunk/appengine_monkey.py">this module</a>), but I expect as people experiment with other libraries the list will increase.  For example, I would welcome implementations of things like <a class="reference external" href="http://python.org/doc/current/lib/module-httplib.html">httplib</a> on top of <a class="reference external" href="http://code.google.com/appengine/docs/urlfetch/">urlfetch</a> in this library.  (Implementing httplib and stubbing out parts of socket would probably make <a class="reference external" href="http://code.google.com/p/googleappengine/issues/detail?id=61">urllib run</a>.)</p>
+<p>But the good news is that Pylons is pretty much working on App Engine, as is Setuptools and you can manage your libraries using <a class="reference external" href="http://pypi.python.org/pypi/virtualenv">virtualenv</a>.</p>
+<p>The instructions are all located in the <a class="reference external" href="http://code.google.com/p/appengine-monkey/wiki/Pylons">appengine-monkey Pylons wiki page</a>.  Please leave comments if you have improvements or problems with that process.  I also welcome contributors and developers to the project itself &#8212; this is a project for expediting App Engine development, it is not a project I care to champion or control.  Or support to any large&nbsp;degree.</p>
+<p>One ticket which is rather important is the apparent <a class="reference external" href="http://code.google.com/p/googleappengine/issues/detail?id=161">maximum number of files and blobs: 1000</a>.  Libraries involve lots of files, and the base Pylons install is only barely under this limit.  Now I just wish I could <a class="reference external" href="http://code.google.com/p/googleappengine/issues/detail?id=18">use lxml</a>, but that&#8217;s probably going to be a long time&nbsp;coming.</p>
+<p><strong>Update</strong>: As of April 2009 these issues were fixed; it took a year, but at least it&#8217;s done.  The 1000 file limit has been relaxed (1000 code plus 1000 static) but still exists.  lxml remains&nbsp;unlikely.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

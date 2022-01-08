@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>What PHP Deployment Gets Right</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2008-01-12T13:16:00-06:00">
+                Saturday, January 12nd, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/01/what-php-deployment-gets-right.html"
+                    rel="bookmark"
+                    title="Permalink to What PHP Deployment Gets Right"
+                    >What <span class="caps">PHP</span> Deployment Gets&nbsp;Right</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>With the recent talk on the blogosphere about <a class="reference external" href="http://blog.dreamhost.com/2008/01/07/how-ruby-on-rails-could-be-much-better/">deployment</a> (and <a class="reference external" href="http://www.b-list.org/weblog/2008/jan/10/hosts/">for Django</a>, and lots of other posts too), people are thinking about <a class="reference external" href="http://comments.deasil.com/2008/01/11/lessons-to-be-learned-from-php/"><span class="caps">PHP</span></a> a bit more analytically.  I think people mostly get it&nbsp;wrong.</p>
+<p>There are several different process models for the&nbsp;web:</p>
+<ol class="arabic simple">
+<li><span class="caps">CGI</span>, where every request creates a new process, and the process handles only one request.  (You could also fork a new process each request with mostly the same&nbsp;result.)</li>
+<li>Worker processes, where a process handles one request at a time, but the process is long-lived and will handle another request after finishing the&nbsp;first.</li>
+<li>Threaded, where a process handles multiple requests, each in its own thread.  Threads may or may not be reused (depending on whether you use a thread pool), and that&#8217;s kind of like the difference between <span class="caps">CGI</span> and worker processes.  But it&#8217;s not a big difference because either way the process is long lived, including all your&nbsp;objects.</li>
+<li>Asynchronous, where a process handles multiple requests without threads.  Typically your code is event driven: a request is an event, but so are things like &#8220;database results returned&#8221;, or &#8220;file read from disk&#8221;.  Code takes the form of short snippets between these&nbsp;events.</li>
+</ol>
+<p>What people don&#8217;t realize is that <span class="caps">PHP</span> is effectively a <span class="caps">CGI</span> model of execution.  People don&#8217;t appreciate this because <span class="caps">PHP</span> is implemented with mod_php, an Apache module.  There are many other modules like mod_perl (the first of these mod_language modules), mod_python, mod_ruby, etc.  None of these other modules are like mod_php.  This has led <a class="reference external" href="http://www.rubyinside.com/no-true-mod_ruby-is-damaging-rubys-viability-on-the-web-693.html">many a commentator astray</a> because they don&#8217;t get this.  This is because the <span class="caps">PHP</span> language <em>was written for</em> mod_php.  Perl, Python, Ruby &#8212; none of them were written to be used as an Apache module.  You can&#8217;t take one of these existing languages and just retrofit it to be like <span class="caps">PHP</span> or like&nbsp;mod_php.</p>
+<p>Why is it important that <span class="caps">PHP</span> has a <span class="caps">CGI</span> like model?  Mostly because it lets two groups separate their work: system administration types (including hosting companies) set up the environment, and developer types use the environment, and they don&#8217;t have to interact much.  The developers are empowered, and the administrators are not&nbsp;bothered.</p>
+<p>Some&nbsp;details:</p>
+<ul class="simple">
+<li><span class="caps">PHP</span> processes can leak memory like crazy.  It doesn&#8217;t matter because they only leak memory for one&nbsp;request.</li>
+<li><span class="caps">PHP</span> processes can be easily killed if they act badly (sucking up too much memory or if they get caught in an infinite&nbsp;loop).</li>
+<li><span class="caps">PHP</span> code has no global state.  It has lots of global variables, but since they only live for one request they are relatively harmless.  (Not entirely harmless, but what&#8217;s a major sin in another language is only a minor sin in <span class="caps">PHP</span>.)  The process cannot become&nbsp;corrupted.</li>
+<li>There&#8217;s no global set of installed libraries (besides what <span class="caps">PHP</span> is compiled with).  If you want to include a library you include files, typically relative paths.  You won&#8217;t include someone else&#8217;s library accidentally.  (This has changed in <span class="caps">PHP</span>, but the search path remains largely&nbsp;unused.)</li>
+<li>Most of the language is implemented in C, in a shared library.  In comparison Python has &#8220;batteries included&#8221;, but those batteries are largely written in Python.  Python code is not shareable, and can take time to load up.  So while a single Python <span class="caps">CGI</span> script might be small, it probably imports lots of code which would have to be loaded each request.  <span class="caps">PHP</span> scripts actually are small.  (Stuff like <a class="reference external" href="http://pear.php.net/"><span class="caps">PEAR</span></a> changes this by adding substantial libraries written in <span class="caps">PHP</span>, but also seriously effects <span class="caps">PHP</span>&nbsp;performance.)</li>
+<li>What few system-dependent libraries and C extensions that are required are compiled into <span class="caps">PHP</span>, and hosting companies have kind of figured out a consistent set of these libraries (stuff like database drivers, an image processing library, and <span class="caps">XML</span> parsing).  Individual developers write only <span class="caps">PHP</span> (and that&#8217;s all they are typically allowed to&nbsp;write).</li>
+</ul>
+<p>These features are all contrary to the design of these other languages, and even more contrary to the <em>conventions</em> in other language communities.  Python programmers <em>could</em> write all their libraries in C and start to make <span class="caps">CGI</span> scripts feasible, but they don&#8217;t and they&nbsp;won&#8217;t.</p>
+<p>Focusing on mod_php is a goose chase.  You have to focus on the features it&nbsp;provides.</p>
+<p>Here&#8217;s the features I think are&nbsp;important:</p>
+<ul class="simple">
+<li>The failure cases are isolated.  Processes never get wedged.  One user doesn&#8217;t take out another user&#8217;s application.  Even one bad page in an application won&#8217;t take out the entire&nbsp;application.</li>
+<li>File-based deployment.  There isn&#8217;t a build process for deploying a <span class="caps">PHP</span> application.  You put the files in the right place and they are deployed.  (Configuration in <span class="caps">PHP</span> is fuzzy, but <span class="caps">PHP</span> is not&nbsp;perfect.)</li>
+<li>Minimal global dependencies.  If you use libraries then you package those libraries with your application.  You don&#8217;t worry about the administrator upgrading something on the system and breaking your application.  (At least not much, there still things like upgrading mod_php that can break your application, or changing settings in php.ini.  <span class="caps">PHP</span> is not&nbsp;perfect.)</li>
+<li>It&#8217;s pretty easy to do multiple deployments for development.  You just drop another copy of the files somewhere else and change your database&nbsp;settings.</li>
+</ul>
+<p>And of course the high-level&nbsp;features:</p>
+<ul class="simple">
+<li>Working applications stay working.  (Even half-working applications at least stay&nbsp;half-working.)</li>
+<li>Administrators aren&#8217;t being hassled to make little changes and fixes all the&nbsp;time.</li>
+<li>Developers can do what they need to do without going through the&nbsp;administrators.</li>
+</ul>
+<p>People or organizations that are hybrid developer/administrators <a class="reference external" href="http://www.loudthinking.com/posts/21-the-deal-with-shared-hosts">don&#8217;t care about this so much</a>. And that makes sense; this is all about separating those two roles.  Though even developer/administrators would benefit from a better story here because it would let them concentrate more on being developers and the administration part will start taking care of&nbsp;itself.</p>
+<p>Solving this is all the harder because of how it interacts with the language itself.  But it&#8217;s not impossible.  Process model 2 &#8212; worker processes &#8212; are feasible for most languages.  You just need a really good process manager (including process setup for isolation, and process monitoring to mitigate problems).  Apache <em>alone</em> is not this manager.  <a class="reference external" href="http://www.fastcgi.com/">mod_fastcgi</a> <em>could</em> be this manager, but it&#8217;s not.  Maybe <a class="reference external" href="http://www.modwsgi.org/">mod_wsgi</a> will become this manager for&nbsp;Python.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

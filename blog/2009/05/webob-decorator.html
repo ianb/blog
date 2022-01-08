@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>WebOb decorator</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,88 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2009-05-22T20:35:00-05:00">
+                Friday, May 22nd, 2009
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2009/05/webob-decorator.html"
+                    rel="bookmark"
+                    title="Permalink to WebOb decorator"
+                    >WebOb&nbsp;decorator</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>Lately I&#8217;ve been writing a few applications (e.g., <a class="reference external" href="http://pickywiki.org">PickyWiki</a> and a revisiting a request-tracking application <a class="reference external" href="http://svn.pythonpaste.org/Paste/VaingloriousEye/trunk">VaingloriousEye</a>), and I usually use no framework at all.  <a class="reference external" href="http://pylonshq.com">Pylons</a> would be a natural choice, but given that I am comfortable with all the components, I find myself inclined to assemble the pieces&nbsp;myself.</p>
+<p>In the process I keep writing bits of code to make <span class="caps">WSGI</span> applications from simple <a class="reference external" href="http://pythonpaste.org/webob/">WebOb</a> -based request/response cycles.  The simplest form looks like&nbsp;this:</p>
+<pre class="literal-block">
+from webob import Request, Response, exc
+
+def wsgiwrap(func):
+    def wsgi_app(environ, start_response):
+        req = Request(environ)
+        try:
+            resp = func(req)
+        except exc.HTTPException, e:
+            resp = e
+        return resp(environ, start_response)
+    return wsgi_app
+
+&#64;wsgiwrap
+def hello_world(req):
+    return Response('Hi %s!' % (req.POST.get('name', 'You')))
+</pre>
+<p>But each time I&#8217;d write it, I change things slightly, implementing more or less features.  For instance, <a class="reference external" href="http://blog.ianbicking.org/2008/10/24/decorators-and-descriptors/">handling methods</a>, or coercing other responses, or handling&nbsp;middleware.</p>
+<p>Having implemented several of these (and <a class="reference external" href="http://svn.pythonpaste.org/Paste/WebOb/contrib">reading other people&#8217;s implementations</a>) I decided I wanted WebOb to include a kind of reference implementation.  But I don&#8217;t like to include anything in WebOb unless I&#8217;m sure I can get it <em>right</em>, so I&#8217;d really like feedback.  (There&#8217;s been some <a class="reference external" href="http://groups.google.com/group/paste-users/browse_thread/thread/7346e75940413f46">less than positive feedback</a>, but I trudge&nbsp;on.)</p>
+<p>My implementation is in a <a class="reference external" href="http://svn.pythonpaste.org/Paste/WebOb/branches/ianb-decorator-experiment">WebOb branch</a>, primarily in <a class="reference external" href="http://svn.pythonpaste.org/Paste/WebOb/branches/ianb-decorator-experiment/webob/dec.py">webob.dec</a> (along with some <a class="reference external" href="http://svn.pythonpaste.org/Paste/WebOb/branches/ianb-decorator-experiment/tests/test_dec.txt">doctests</a>).</p>
+<p>The most prominent way this is different from the example I gave is that it doesn&#8217;t change the function signature, instead it adds an attribute <tt class="docutils literal">.wsgi_app</tt> which is <span class="caps">WSGI</span> application associated with the function.  My goal with this is that the decorator isn&#8217;t intrusive.  Here&#8217;s the case where I&#8217;ve been&nbsp;bothered:</p>
+<pre class="literal-block">
+class MyClass(object):
+    &#64;wsgiwrap
+    def form(self, req):
+        return Response(form_html...)
+
+    &#64;wsgiwrap
+    def form_post(self, req):
+        handle submission
+</pre>
+<p><span class="caps">OK</span>, that&#8217;s fine, then I add&nbsp;validation:</p>
+<pre class="literal-block">
+&#64;wsgiwrap
+def form_post(self, req):
+    if req not valid:
+        return self.form
+    handle submission
+</pre>
+<p>This still works, because the decorator allows you to return <em>any</em> <span class="caps">WSGI</span> application, not just a WebOb Response object.  But that&#8217;s not helpful, because I need&nbsp;errors&#8230;</p>
+<pre class="literal-block">
+&#64;wsgiwrap
+def form_post(self, req):
+    if req not valid:
+        return self.form(req, errors)
+    handle submission
+</pre>
+<p>That is, I want to have an option argument to the <tt class="docutils literal">form</tt> method that passes in errors.  But I can&#8217;t do this with the traditional <tt class="docutils literal">wsgiwrap</tt> decorator, instead I have to refactor the code to have a third method that both <tt class="docutils literal">form</tt> and <tt class="docutils literal">form_post</tt> use.  Of course, there&#8217;s more than one way to address this issue, but this is the technique I&nbsp;like.</p>
+<p>The one other notable feature is that you can also make&nbsp;middleware:</p>
+<pre class="literal-block">
+&#64;wsgify.middleware
+def cap_middleware(req, app):
+    resp = app(req)
+    resp.body = resp.body.upper()
+    return resp
+
+capped_app = cap_middleware(some_wsgi_app)
+</pre>
+<p>Otherwise, for some reason I&#8217;ve found myself putting an inordinate amount of time into <tt class="docutils literal">__repr__</tt>.  Why I&#8217;ve done this I cannot&nbsp;say.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +116,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

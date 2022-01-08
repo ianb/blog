@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Tempita</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,33 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2007-08-06T16:50:00-05:00">
+                Monday, August 6th, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/08/tempita.html"
+                    rel="bookmark"
+                    title="Permalink to Tempita"
+                    >Tempita</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I mentioned a templating language I put into Paste <a class="reference external" href="http://blog.ianbicking.org/what-im-up-to-jun07.html">a while ago</a>, but since then I extracted it into a separate package called <a class="reference external" href="http://pythonpaste.org/tempita/">Tempita</a>.  I think the documentation is fairly complete (it&#8217;s a small language), but I&#8217;ll describe it shortly&nbsp;here.</p>
+<p>I wanted a text-substitution language, because I wanted something to be used to generate Python files, config files, etc.  I also didn&#8217;t want a complex <span class="caps">API</span>, with search paths and components or something that interacts with import machinery, or any of that.  <a class="reference external" href="http://python.org/doc/current/lib/node40.html">string.Template</a> is <em>almost</em> good enough, but not&nbsp;quite.</p>
+<p>I started with the idea of something vaguely like <a class="reference external" href="http://www.djangoproject.com/documentation/templates/">Django Templates</a>, though since I didn&#8217;t care about more advanced templating features like blocks that didn&#8217;t apply to my use cases.  You do variable substitution with <tt class="docutils literal">{{var|filter}}</tt>, and there&#8217;s no escape character, and that&#8217;s about where the similarity&nbsp;ends.</p>
+<p>I realized there was no real reason to use anything but <tt class="docutils literal"><span class="pre">{{...}}</span></tt>, so it&#8217;s just <tt class="docutils literal">{{if expr}}</tt>, <tt class="docutils literal">{{endif}}</tt>, etc.  There&#8217;s an escape for arbitrary Python, similar to how Kid does it &#8212; you can have blocks of Python code, but the Python code can only prepare variables and functions, it can&#8217;t write anything.  I think this gives a nice escape for complex logic (for times when you can&#8217;t put the logic in a <tt class="docutils literal">.py</tt> file), without the jumbled mish-mash of languages like <span class="caps">PHP</span> where you can trully mix functions and&nbsp;output.</p>
+<p>Because it allows Python expressions everywhere, special tags don&#8217;t seem so necessary.  Instead you can just provide functions to do whatever you need.  I wrote <a class="reference external" href="http://pythonpaste.org/tempita/#bunch-and-looper">a couple little ones</a> as a start.  There&#8217;s a few things that are awkward still, because there&#8217;s no way to define a block of template as a function, or pass the output of a block to a function.  I haven&#8217;t actually needed these yet, but I can <em>imagine</em> needing this (e.g., when creating nested&nbsp;structures).</p>
+<p>I wouldn&#8217;t suggest using this templating language in a web application, but I think it can be quite helpful for all the cases where you have to generate text and you <em>aren&#8217;t</em> writing a web application (e.g., a <a class="reference external" href="http://www.groovie.org/articles/2007/02/11/wsgi-middleware-isnt-middleware-time-for-better-language">Framework Component</a>).  In my experience the web templating languages tend to be complex to invoke and understand in these contexts (and <a class="reference external" href="http://projects.dowski.com/projects/buffet">Buffet</a> unfortunately doesn&#8217;t help in my mind, as it&#8217;s loading system is so&nbsp;vague).</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +61,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>The Magic Sentinel</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,70 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2008-12-03T22:59:00-06:00">
+                Wednesday, December 3rd, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/12/the-magic-sentinel.html"
+                    rel="bookmark"
+                    title="Permalink to The Magic Sentinel"
+                    >The Magic&nbsp;Sentinel</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>In an effort to get back on the blogging saddle, here&#8217;s a little note on default values in&nbsp;Python.</p>
+<p>In Python there are often default values.  The most typical default value is None &#8212; None is a object of vague meaning that almost screams &#8220;I&#8217;m a default&#8221;.  But sometimes None is a valid value, and sometimes you want to detect the case of &#8220;no value given&#8221; and None can hardly be called <em>no value</em>.</p>
+<p>Here&#8217;s an&nbsp;example:</p>
+<pre class="literal-block">
+def getuser(username, default=None):
+    if not user_exists(username):
+        return default
+    ...
+</pre>
+<p>In this case there is <em>always</em> a default, and so anytime you call <tt class="docutils literal">getuser()</tt> you have to check for a None result.  But maybe you have code where you&#8217;d really just like to get an exception if the user isn&#8217;t found.  To get this you can use a <a class="reference external" href="http://en.wikipedia.org/wiki/Sentinel_(computer_science)">sentinel</a>.  A sentinel is an object that has no particular meaning except to signal the end (like a <span class="caps">NULL</span> byte in a C string), or a special condition (like no default&nbsp;user).</p>
+<p>Sometimes people do it like&nbsp;this:</p>
+<pre class="literal-block">
+_no_default = ()
+def getuser(username, default=_no_default):
+    if not user_exists(username):
+        if default is _no_default:
+            raise LookupError(&quot;No user with the username %r&quot; % username)
+        return default
+    ...
+</pre>
+<p>This works because that zero-item tuple <tt class="docutils literal">()</tt> is a unique object, and since we are using the comparison <tt class="docutils literal">default is _no_default</tt> only that <em>exact</em> object will trigger that&nbsp;LookupError.</p>
+<p>Once you understand the pattern, this is easy enough to read.  But when you use <tt class="docutils literal">help()</tt> or other automatic generation it is a little confusing, because the default value just appears as <tt class="docutils literal">()</tt>.  You could also use <tt class="docutils literal">object()</tt> or <tt class="docutils literal">[]</tt> or anything else, but the automatically generated documentation still won&#8217;t look that nice.  So for a bit more polish I&nbsp;suggest:</p>
+<pre class="literal-block">
+class _NoDefault(object):
+    def __repr__(self):
+        return '(no default)'
+NoDefault = _NoDefault()
+del _NoDefault
+
+def getuser(username, default=NoDefault):
+    ...
+</pre>
+<p>You might then think &#8220;hey, why isn&#8217;t there one NoDefault that everyone can share?&#8221;  If you do share that sentinel you run the risk of accidentally passing in that value even though you didn&#8217;t intend to.  The value &#8220;NoDefault&#8221; will become overloaded with meaning, just as None is.  By having a more private sentinel object you avoid that.  A single nice sentinal factory (like <tt class="docutils literal">_NoDefault</tt> in this example) would be nice, though.  Though really <a class="reference external" href="http://www.python.org/dev/peps/pep-3102/"><span class="caps">PEP</span> 3102</a> will probably make sentinals like this unnecessary for Python&nbsp;3.0.</p>
+<p>Note that you can also implement arguments with no default via <tt class="docutils literal">*args</tt> and <tt class="docutils literal">**kwargs</tt>,&nbsp;e.g.:</p>
+<pre class="literal-block">
+def getuser(username, *args):
+    if not user_exists(username):
+        if not args:
+            raise LookupError(...)
+        else:
+            return args[0]
+</pre>
+<p>But to do this right you should test that <tt class="docutils literal"><span class="pre">len(args)&lt;=1</span></tt>, raise appropriate errors, maybe consider keyword arguments, and so one.  It&#8217;s a pain in the butt, and when you&#8217;re finished the signature displayed by <tt class="docutils literal">help()</tt> will be wrong&nbsp;anyway.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +98,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

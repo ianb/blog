@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>A Product Journal: Objects</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2015-07-16T00:00:00-05:00">
+                Thursday, July 16th, 2015
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2015/07/product-journal-objects.html"
+                    rel="bookmark"
+                    title="Permalink to A Product Journal: Objects"
+                    >A Product Journal:&nbsp;Objects</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><blockquote>
+<p>I&#8217;m blogging about the development of a new product in Mozilla, <a href="http://www.ianbicking.org/tag/product-journal.html">look here for my other posts in this&nbsp;series</a></p>
+</blockquote>
+<p>I&#8217;ve been reading the <a href="http://worrydream.com/EarlyHistoryOfSmalltalk/">Early History Of Smalltalk</a>, notes by Alan Kay, and <a href="http://worrydream.com/EarlyHistoryOfSmalltalk/#coda">this</a> small note jumped out at&nbsp;me:</p>
+<blockquote>
+<p>Another late-binding scheme that is already necessary is to get away from direct protocol matching when a new object shows up in a system of objects. In other words, if someone sends you an object from halfway around the world it will be unusual if it conforms to your local protocols. At some point it will be easier to have it carry even more information about itself–enough so its specifications can be “understood” and its configuration into your mix done by the more subtle matching of&nbsp;inference.</p>
+<p>[&#8230;]</p>
+<p>This higher computational finesse will be needed as the next paradigm shift–that of pervasive networking–takes place over the next five years. Objects will gradually become active agents and will travel the networks in search of useful information and tools for their managers. Objects brought back into a computational environment from halfway around the world will not be able to configure themselves by direct protocol matching as do objects today. Instead, the objects will carry much more information about themselves in a form that permits inferential docking. Some of the ongoing work in specification can be turned to this&nbsp;task.</p>
+</blockquote>
+<p>An object, sent over the network; it does not exactly have a common protocol, class, or <span class="caps">API</span>, but enough information so it can be understood, matched up with some function or purpose according to inference.  We could also assume given this is from Alan Kay that the vision here is that code, not just data, is part of the object and information (though to consider <em>code</em> to be <em>information</em>: that is quite a challenge to our modern&nbsp;sensibilities).</p>
+<p>When I read this, it struck me that we have these objects all around us.  The web page: remote, transferable, transformable, embodying functionality and data, with rich information suitable for&nbsp;inference.</p>
+<p>The web page has a kind of minimal protocol, though nothing is entirely forbidden in how it is interpreted.  For instance the page is named in its <code>&lt;title&gt;</code>.  But probably it has a better name in its <code>&lt;meta name=og:title&gt;</code>, should one exist; nothing is truly formal except by how it will be conventionally interpreted.  The protocol is flexible.  It has internal but opaque state.  The object can initiate activity in a few ways, primarily XMLHttpRequest and a small number of <a href="https://developer.mozilla.org/en-US/docs/WebAPI">APIs</a> available to it.  The page receives copious input in the form of&nbsp;events.</p>
+<p>It&#8217;s an impoverished object in so many ways.  And it&#8217;s hardly what you would call universal, it&#8217;s always representing visual pages for the browser.  When programming if the browser isn&#8217;t our intended audience then we choose something like <span class="caps">JSON</span> or <span class="caps">REST</span>: one dead data, one a possessed and untransferable object (I would assert that in <span class="caps">REST</span> the object is the server and not the&nbsp;document).</p>
+<p>And yet the web page is an incredible object!  Web pages are sophisticated and well cared for. Our understanding of them is meticulously documented, <em>including</em> the ambiguity.  The web stack is something that has not just been &#8220;defined&#8221; or &#8220;fixed&#8221;, but also discovered.  Web pages contain gateways into a tremendous number of systems, defined around a surprisingly small set of&nbsp;operations.</p>
+<p>But we don&#8217;t look at them as objects, we don&#8217;t try to deduce or infer much about them.  They don&#8217;t look like the objects we would define were we to design such a system.  But if we shift our gaze from design to discovery then the wealth becomes apparent: these might not be the objects we would ask for, but given the breadth and comprehensiveness of web pages they are the objects we should use.  And they actually <em>work</em>, they do a ton of useful&nbsp;things.</p>
+<p>Stepping back from the specific product of <a href="https://github.com/mozilla-services/pageshot">PageShot</a>, this is the broad direction that excites me: to understand and make use of these objects that are all around us.  (Objects to which Mozilla, with its user agent, has unique access.)  But we need to look more broadly at what we can do with these objects.  PageShot tries one fairly small thing: capture the visual state at one moment, <a href="http://www.ianbicking.org/blog/2015/04/product-journal-building-block.html">maybe do something with that state</a>.  If we just had a handful of these operations, exposed properly (not trapped in the depths of monolithic browsers) I think there are some incredible things to be done.  Maybe even a way to bridge from the ad hoc to something more formal; as crazy as the web page execution model seems, it has some nice features, and is the widest deployed sandboxing execution model we&nbsp;have.</p>
+<p>In this sense <a href="http://www.2ality.com/2015/06/web-assembly.html">Web Assembly</a> and <a href="http://asmjs.org/"><span class="caps">ASM</span>.js</a> are interesting as effectively competitors to JavaScript, but not competitors to the web platform or web-page-as-object.  That makes them different from <a href="https://en.wikipedia.org/wiki/Google_Native_Client">Google Native Client</a>.  Yes, Web Assembly is essentially another language for the web platform.  But Native Client uses <a href="https://en.wikipedia.org/wiki/Google_Native_Client#Pepper">Pepper</a> which is <em>not</em> the web platform, it&#8217;s a parallel platform that attempts to mimic the web platform.  <span class="caps">ASM</span>.js and Web Assembler are a demonstrations that we can change significant parts of the code execution while retaining the outward <span class="caps">API</span> of these&nbsp;pages.</p>
+<p>I find this all exciting, but I am somewhat half-hearted in my excitement.  Reading The Early History Of Smalltalk there&#8217;s a certain spirit to their work that I love and often despair at recreating.  There is a visionary aspect, but I think more importantly they took a holistic approach.  There&#8217;s something exciting about opening your mind to far off concepts (a vision) but then try to tie them together creatively, trying different approaches in an effort to maintain simplicity, avoid compromises.  The computing systems they worked on were like <a href="http://edutechwiki.unige.ch/en/Microworld">Microworlds</a> of their own creation, they could redefine problems, throw away state, reinvent any interface they chose.  And maybe that is also available to us: only when we hopelessly despair about problems we cannot fix are we trapped by our legacy.  That is, if you accept the web as it is there is a freedom, an agency in that, because you&#8217;ve put aside the things you can&#8217;t&nbsp;change.</p>
+<p>I suspect Alan Kay would take a dim view of this whole notion.  He is not a fan of the web.  Another observation from that&nbsp;history:</p>
+<blockquote>
+<p>Four techniques used together—persistent state, polymorphism, instantiation, and methods-as-goals for the object—account for much of the power. None of these require an &#8220;object-oriented language&#8221; to be employed—<span class="caps">ALGOL</span> 68 can almost be turned to this style—an <span class="caps">OOPL</span> merely focuses the designer&#8217;s mind in a particular fruitful direction. However, doing encapsulation right is a commitment not just to abstraction of state, but to eliminate state oriented metaphors from&nbsp;programming.</p>
+</blockquote>
+<p>I can&#8217;t even begin to phrase web pages in these terms.  State is a mess: much hosted on remote servers, some in the <span class="caps">URL</span>, some in the process of the running page, some in cookies or localStorage, all of it constantly being copied and thrown away.  Is the <span class="caps">URL</span> the class and the <span class="caps">HTML</span> served over <span class="caps">HTTP</span> the instantiation?  These are just painful contortions to find analogs.  Methods-as-goals is the one that seems most interesting and challenging, because I cannot quite identify the goals behind this whole endeavour.  Automation?  Insight?  Detection?  Creation?  Is it different from what Google is doing with its spiders?  Is there something distinct about interpretation in the context of a user agent?  And when the objects are not willing – I am proposing we bend pages to our will, wrestling control from the expectations of site owners – can you do any delegation?  Is there an object waiting to be smithed that encapsulates the&nbsp;page?  </p>
+<p>More tensions than resolutions.  Wish I had time to bathe in those tensions a bit&nbsp;longer.</p></div>
+        <!-- /.entry-content -->
+          <div class="comments">
+            <h2>Comments</h2>
+            <table class='table table-striped'>
+<tr><td style='padding-left: 0px' class='dU'>Bruce Smith</td><td class='dTS'>Fri, 21 Aug 2015</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>Very interesting.</p><p>An "elephant in the room" -- there are already organizations/systems which spend a lot of intelligence trying to automatically understand web pages as objects -- namely, Google and other search engines. They succeeded well enough to make the web vastly more useful, even when all they inferred from each object was its links to other objects.</p><p>Of course that is really just about pages being "data", whose representation is only semi-formal. (But then, understood data, when active in someone's mind, can redirecting their attention, give them understanding, reference something in the real world, etc. So it is not as inactive as it seems.)</p><p>Your analogy asks us to look for ways in which existing web pages are *active like an object in OO*, e.g. as interfaces to services with state. (This reminds me of a new thing I noticed recently (which you are probably familiar with), Swagger, which lets REST APIs be semi-formally described and become discoverable.)</p><p>I can't think of anything which has automatically understood existing web pages as OO objects nearly as successfully as Google has understood them as data. (I also think there is currently a lot less there to discover, than there is in simply viewing them as data about the world -- in that, we have still only scratched the surface.)</p></td></tr>
+</table>
+
+          </div>
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

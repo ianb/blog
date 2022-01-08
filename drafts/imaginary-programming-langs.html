@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Imaginary Programming Languages</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2018-09-01T00:00:00-05:00">
+                Saturday, September 1st, 2018
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/drafts/imaginary-programming-langs.html"
+                    rel="bookmark"
+                    title="Permalink to Imaginary Programming Languages"
+                    >Imaginary Programming&nbsp;Languages</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><h2>everdb: A Database-backed&nbsp;memory</h2>
+<p>Everdb uses a relational database for its heap. Classes are tables, instances are rows, everything is globally&nbsp;addressable.</p>
+<p>This has some peculiar&nbsp;effects:</p>
+<ul>
+<li><span class="dquo">&#8220;</span>Scalars&#8221; don&#8217;t really exist, since everything has to be in a table, and all tables are classes. There are no pre-built types that you can actually refer&nbsp;to.</li>
+<li>While stack variables act like normal, everything else is effectively &#8220;global&#8221;: there&#8217;s no information&nbsp;hiding</li>
+</ul>
+<p>Let&#8217;s see what this language looks like in practice. Since persistence is important, we will use <span class="caps">REST</span> todo-list example. It looks&nbsp;like:</p>
+<p><code>GET /todos</code>: get a list of all todos
+<code>PUT /todos/ID</code>: update a todo
+<code>POST /todos/create</code>: create a todo
+<code>DELETE /todos/ID</code>: delete a&nbsp;todo</p>
+<p>TODOs are <span class="caps">JSON</span>, like <code>{"title": "...", "done": true/false, "sortindex": N}</code></p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">web_server</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="n">create</span> <span class="n">incoming_requests</span> <span class="kn">from</span> <span class="nn">web_server.Request</span><span class="p">;</span>
+<span class="n">create</span> <span class="n">outgoing_responses</span> <span class="kn">from</span> <span class="nn">web_server.Response</span><span class="p">;</span>
+
+<span class="n">create</span> <span class="n">todos</span> <span class="p">(</span>
+  <span class="nb">id</span><span class="p">,</span>
+  <span class="n">title</span> <span class="n">string</span><span class="p">,</span>
+  <span class="n">done</span> <span class="nb">bool</span><span class="p">,</span>
+  <span class="n">sortindex</span> <span class="nb">float</span> <span class="n">default</span> <span class="mi">100</span>
+<span class="p">);</span>
+
+<span class="o">--</span> <span class="n">consume</span> <span class="n">will</span> <span class="n">take</span> <span class="n">a</span> <span class="n">row</span> <span class="kn">from</span> <span class="nn">a</span> <span class="nn">table</span><span class="p">,</span> <span class="n">treating</span> <span class="n">the</span> <span class="n">table</span> <span class="n">like</span> <span class="n">a</span> <span class="n">queue</span>
+<span class="n">consume</span> <span class="n">req</span> <span class="kn">from</span> <span class="nn">incoming_requests</span> <span class="nn">with</span> <span class="nn">transaction</span> <span class="p">(</span>
+  <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;GET&quot;</span> <span class="p">(</span>
+    <span class="o">--</span> <span class="n">assume</span> <span class="n">it</span><span class="s1">&#39;s GET /todos</span>
+    <span class="k">with</span> <span class="n">items</span> <span class="k">as</span> <span class="n">todos</span> <span class="n">sort</span> <span class="n">by</span> <span class="n">todos</span><span class="o">.</span><span class="n">sortindex</span> <span class="p">(</span>
+      <span class="n">insert</span> <span class="n">into</span> <span class="n">outgoing_responses</span> <span class="p">(</span>
+        <span class="n">request_id</span><span class="p">:</span> <span class="n">req</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">content_type</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+        <span class="n">body</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">todos</span><span class="p">)</span>
+      <span class="p">);</span>
+    <span class="p">);</span>
+  <span class="p">);</span>
+  <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;PUT&quot;</span> <span class="p">(</span>
+    <span class="o">--</span> <span class="n">PUT</span> <span class="o">/</span><span class="n">todo</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>
+    <span class="n">let</span> <span class="nb">id</span> <span class="o">=</span> <span class="n">split</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">];</span>
+    <span class="o">--</span> <span class="s2">&quot;only where&quot;</span> <span class="ow">is</span> <span class="n">like</span> <span class="s2">&quot;where&quot;</span><span class="p">,</span> <span class="n">but</span> <span class="n">expects</span> <span class="n">to</span> <span class="n">match</span> <span class="n">exactly</span> <span class="n">one</span> <span class="n">row</span>
+    <span class="k">with</span> <span class="n">updates</span> <span class="k">as</span> <span class="n">update</span> <span class="n">todos</span> <span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">sortindex</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">json.parse</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="n">only</span> <span class="n">where</span> <span class="n">todos</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span> <span class="p">(</span>
+      <span class="n">insert</span> <span class="n">into</span> <span class="n">outgoing_responses</span> <span class="p">(</span>
+        <span class="n">request_id</span><span class="p">:</span> <span class="n">req</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">status</span><span class="p">:</span> <span class="mi">200</span>
+      <span class="p">);</span>
+    <span class="p">)</span> <span class="k">except</span> <span class="p">(</span>
+      <span class="n">insert</span> <span class="n">into</span> <span class="n">outgoing_responses</span> <span class="p">(</span>
+        <span class="n">request_id</span><span class="p">:</span> <span class="n">req</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">status</span><span class="p">:</span> <span class="mi">404</span>
+      <span class="p">);</span>
+    <span class="p">)</span>
+  <span class="p">);</span>
+  <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;POST&quot;</span> <span class="p">(</span>
+    <span class="o">--</span> <span class="n">POST</span> <span class="n">creates</span> <span class="n">a</span> <span class="n">new</span> <span class="n">todo</span>
+    <span class="k">with</span> <span class="n">inserts</span> <span class="k">as</span> <span class="n">insert</span> <span class="n">into</span> <span class="n">todos</span> <span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">sortindex</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">json.parse</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="p">(</span>
+      <span class="n">let</span> <span class="n">new_body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">body</span><span class="p">);</span>
+      <span class="n">new_body</span><span class="p">[</span><span class="s2">&quot;id&#39;] = inserts.id;</span>
+      <span class="n">insert</span> <span class="n">into</span> <span class="n">outgoing_responses</span> <span class="p">(</span>
+        <span class="n">request_id</span><span class="p">:</span> <span class="n">req</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">content_type</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+        <span class="n">body</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">new_body</span><span class="p">)</span>
+      <span class="p">);</span>
+    <span class="p">);</span>
+  <span class="p">);</span>
+  <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;DELETE&quot;</span> <span class="p">(</span>
+    <span class="o">--</span> <span class="n">DELETE</span> <span class="o">/</span><span class="n">todos</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>
+    <span class="n">let</span> <span class="nb">id</span> <span class="o">=</span> <span class="n">split</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">];</span>
+    <span class="k">with</span> <span class="n">deleted</span> <span class="k">as</span> <span class="n">delete</span> <span class="kn">from</span> <span class="nn">todos</span> <span class="nn">only</span> <span class="nn">where</span> <span class="nn">todos.id</span> <span class="o">=</span> <span class="nb">id</span> <span class="p">(</span>
+      <span class="n">insert</span> <span class="n">into</span> <span class="n">outgoing_responses</span> <span class="p">(</span>
+        <span class="n">request_id</span><span class="p">:</span> <span class="n">req</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">status</span><span class="p">:</span> <span class="mi">200</span>
+      <span class="p">);</span>
+    <span class="p">)</span> <span class="k">except</span> <span class="p">(</span>
+      <span class="n">insert</span> <span class="n">into</span> <span class="n">outgoing_responses</span> <span class="p">(</span>
+        <span class="n">request_id</span><span class="p">:</span> <span class="n">req</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">status</span><span class="p">:</span> <span class="mi">404</span>
+      <span class="p">);</span>
+    <span class="p">);</span>
+  <span class="p">);</span>
+<span class="p">);</span>
+
+<span class="n">web_server</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">8080</span><span class="p">,</span> <span class="n">incoming_requests</span><span class="p">,</span> <span class="n">outgoing_requests</span><span class="p">);</span>
+</pre></div>
+
+
+<p>A common refactoring of an application like this would be to support multiple users (e.g., <code>GET /username/todos</code>).</p>
+<h2>Generator: the generative programming&nbsp;language</h2>
+<p>This makes <a href="">generative programming</a> a first-class concept, and along the way also includes a concept of mock objects directly in the&nbsp;language.</p>
+<p>Everything in Generator is either <em>deterministic</em> or <em>generative</em>.</p>
+<p>Unlike a (normal) deterministic function, a generative function does not always return the same value given the same inputs and program state. But in addition to not being deterministic, a generative function also knows how to generate the kinds of values that it might output. Testing is&nbsp;built-in!</p>
+<p>You can run a generative program like&nbsp;normal:</p>
+<div class="highlight"><pre><span></span>$ gn myprog.gn
+What<span class="err">&#39;</span>s your name?
+&gt; Ian
+Hello Ian!
+</pre></div>
+
+
+<p>But you can also have the program run with sample&nbsp;inputs:</p>
+<div class="highlight"><pre><span></span>$ gn --try myprog.gn
+What<span class="err">&#39;</span>s your name?
+&gt; nH8d
+Hello nH8d!
+</pre></div>
+
+
+<p>You can do it one time, or a hundred times, or a thousand&nbsp;times.</p>
+<p>Syntactically it looks much like Python (which looks much like boring old pseudocode), but uses a strong convention that generative functions end with <code>!</code>. Anything that calls a generative function becomes itself generative (unless marked explicitly as&nbsp;deterministic).</p>
+<p>You can also further specify the generation of your function. For instance, <code>read_file!(path)</code> is non-deterministic (the files can change). By default it will generate random bytes, but this is seldom what you want: though it&#8217;s correct and you should always handle any file contents (or file missing), usually you&#8217;ll want to do something else. Here&#8217;s an example that reads <span class="caps">JSON</span>:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="k">def</span> <span class="nf">read_json</span><span class="err">!</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">read_file</span><span class="err">!</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+<span class="n">generator</span> <span class="n">read_json</span><span class="err">!</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">with</span> <span class="n">seed</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">random_json</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">random_json</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">obj_keys</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">scalar</span><span class="p">:</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;array&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">options</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">seed</span><span class="o">.</span><span class="n">choose_tiered</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;number&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">seed</span><span class="o">.</span><span class="n">number</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">seed</span><span class="o">.</span><span class="n">string</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;array&quot;</span><span class="p">:</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">seed</span><span class="o">.</span><span class="n">positive_number</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">random_json</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="n">seed</span><span class="o">.</span><span class="n">sometimes</span><span class="p">(</span><span class="mf">0.9</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;object&quot;</span><span class="p">:</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">seed</span><span class="o">.</span><span class="n">positive_number</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">obj_keys</span> <span class="ow">and</span> <span class="n">seed</span><span class="o">.</span><span class="n">sometimes</span><span class="p">(</span><span class="mf">0.8</span><span class="p">):</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">seed</span><span class="o">.</span><span class="n">choose</span><span class="p">(</span><span class="n">obj_keys</span><span class="p">))]</span> <span class="o">=</span> <span class="n">random_json</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="n">seed</span><span class="o">.</span><span class="n">sometimes</span><span class="p">(</span><span class="mf">0.9</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">seed</span><span class="o">.</span><span class="n">string</span><span class="p">()]</span> <span class="o">=</span> <span class="n">random_json</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="n">seed</span><span class="o">.</span><span class="n">sometimes</span><span class="p">(</span><span class="mf">0.9</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+
+<p>Note that declared generators only add to the possible generated values. While we&#8217;ve created a custom generator for <code>read_json!</code>, the generator for <code>read_file!</code> will also sometimes be applied. So sometimes when generating results we&#8217;ll see <code>json.parse("s83ka2k")</code> (which will give an error), but sometimes <code>random_json()</code> will be&nbsp;invoked.</p>
+<p>An aside, there&#8217;s another non-deterministic file reader, <code>read_project_file()</code>, which reads some file that is part of the source code (e.g., a template). In this case the file is effectively part of the&nbsp;source.</p>
+<p>Of course there has to be two kind of exceptions in this language: <span class="caps">OK</span> Exceptions and Bad Exceptions. Bad inputs must raise these <span class="caps">OK</span>&nbsp;Exceptions.</p>
+<h2>Live Web Objects: <span class="caps">HTML</span> and <span class="caps">JS</span> as a programming&nbsp;environment</h2>
+<p>This isn&#8217;t a &#8220;language&#8221; so much as an &#8220;environment&#8221;. The language, as you might expect, is&nbsp;JavaScript.</p>
+<h2>SpeechScript: a voice-controlled scripting&nbsp;language</h2>
+<p>This isn&#8217;t much of a language, but it is <em>some</em> kind of language. Speech systems have some odd&nbsp;behavior:</p>
+<ul>
+<li>They interact with high-level&nbsp;applications</li>
+<li>They map speech to text, and map text to&nbsp;intents</li>
+<li>It&#8217;s hard to get an overview of what&#8217;s happening: speech only happens&nbsp;forward</li>
+</ul>
+<p>Still, it doesn&#8217;t seem crazy that you&#8217;d want to script speech controls. For example, here&#8217;s how you add a shortcut to send a specific&nbsp;text:</p>
+<div class="highlight"><pre><span></span><span class="err">Add script called send eta</span>
+<span class="err">-- adding script send eta</span>
+<span class="err">how long will it take to drive home</span>
+<span class="err">-- adding &quot;how long will it take to drive home&quot;</span>
+<span class="err">-- Example output:</span>
+<span class="err">-- Traffic to Home is light, so it should take 20 minutes via I-94 W</span>
+<span class="err">save output in X</span>
+<span class="err">-- Saving to X</span>
+<span class="err">look for time duration from X</span>
+<span class="err">-- Will look for a time duration. Example: 20 minutes</span>
+<span class="err">save output in Y</span>
+<span class="err">send message to Emily ETA load Y</span>
+<span class="err">-- adding &quot;send message to Emily&quot; with example &quot;20 minutes&quot;</span>
+</pre></div>
+
+
+<p>Variables can only be single characters. The content is highly textual: we don&#8217;t have good underlying structured data, instead we are forced to parse out the textual responses. However, we do get examples, and because we are using a medium the user is used to they can understand both the execution and how to find&nbsp;functionality.</p>
+<h2>The Symbolic Notebook: functional symbolic computation wrapped in an imperative&nbsp;environment</h2>
+<p>This plays on the idea of <a href="https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell">Functional Core, Imperative Shell</a> and makes it concrete and built into the&nbsp;language.</p>
+<p>There are two &#8220;languages&#8221; here, bound together in a rich notebook environment. The imperative part is, as a result, literally a visual shell around the functional&nbsp;bits.</p>
+<p>Similar to Generator, the functional language must be not only immutable, but also deterministic. Being completely deterministic and functional, it also means that input and output are always going to match, and while something might be computationally expensive, in most other ways it can&#8217;t be expensive: the output is probably size-related to the input, and it can&#8217;t interact with any external resources because those resources aren&#8217;t&nbsp;deterministic.</p>
+<p>As a result the shell language involves lots of assembling, and the inner language involves computation. Between the two are streams: streams of inputs, changing inputs (their own kinds of streams-over-time), and collections of&nbsp;results.</p>
+<h2>The language of why: a data-tracking&nbsp;language</h2>
+<p>We keep track of function calls in the call stack. It&#8217;s very helpful to know how and why a function was called. Wouldn&#8217;t it be nice to know the same thing about&nbsp;values?</p>
+<p>The language of why does exactly&nbsp;that.</p>
+<h2>Transformer</h2>
+<p>You&#8217;ve probably seen pattern matching&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="err">fib(0) -&gt; 0;</span>
+<span class="err">fib(1) -&gt; 1;</span>
+<span class="err">fib(n) -&gt; fib(n-1) + fib(n - 2);</span>
+</pre></div>
+
+
+<p>Transformer is like that, but for&nbsp;everything.</p>
+<h2>&#8230;?</h2>
+<p>Unlike most languages theres np function call and nesting. Instead you atomically transform the data and have watchers that might catch tge next&nbsp;step</p>
+<p>Radically point free, values and spots are visually connected (through&nbsp;lines)</p>
+<div class="highlight"><pre><span></span>
+</pre></div>
+
+
+<h2><span class="caps">COMEFROM</span>, the&nbsp;language</h2>
+<p>You can detect anything in the global space and act on&nbsp;it</p></div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>A Simple CMS</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2008-02-05T22:03:00-06:00">
+                Tuesday, February 5th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/02/a-simple-cms.html"
+                    rel="bookmark"
+                    title="Permalink to A Simple CMS"
+                    >A Simple <span class="caps">CMS</span></a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>A while back I was reading <a class="reference external" href="http://m.odul.us/2007/11/01/simpler-cms">this post</a> about creating a simple <span class="caps">CMS</span> in Grok.  Similar to the author over there I often get questions from friends and family who want to build a simple website about what I&#8217;d recommend.  I still haven&#8217;t figured it out.  Most of the big names (Plone, Drupal, etc) feel too big and complex and not content-oriented enough.  On the other hand, simple systems like Google Homepages are more like <span class="caps">HTML</span> editors and don&#8217;t really help with managing <em>content</em>.</p>
+<p>I have a vision for something much, much simpler; but I&#8217;m not sure it&#8217;s a realistic vision.  There&#8217;s always feature creep.  If you implement something simple, what happens when someone wants something more complicated?  Do you have to throw it out?  That sucks.  Do you have to implement the new feature?  That&#8217;s not very&nbsp;simple.</p>
+<p>Here&#8217;s what I wish&nbsp;existed:</p>
+<ul class="simple">
+<li>Just edit content.  Static&nbsp;files.</li>
+<li>Probably edit content that is slightly dynamic.  Probably <span class="caps">PHP</span> code, but without getting too fancy with the <span class="caps">PHP</span>.  E.g., put <tt class="docutils literal"><span class="pre">&lt;?php</span> <span class="pre">include('header.php')</span> <span class="pre">?&gt;</span></tt> at the top of each file along with a footer and some variable assignments (like <tt class="docutils literal">$title</tt>).</li>
+<li>Pages would have simple parent/child&nbsp;relationships.</li>
+<li>Sidebar navigation would be mostly manually managed.  It would be a single <span class="caps">PHP</span> file, like any other.  The parent/child relationships would help inform and automate aspects of that generation, but only on the <span class="caps">UI</span> side.  There would be no attempt to incorporate fancy navigation&nbsp;algorithms.</li>
+<li>The fancy things would be done with Javascript.  For instance, if you want to expand navigation depending on the context of the site.  This would be easy enough to implement in Javascript, serving everyone the same content and rendering it just slightly differently to emphasize&nbsp;context.</li>
+<li>Of course it would include the <em>important</em> stuff like versioning and staging.  With a file-oriented system you could use an existing version control system, or just simple&nbsp;archiving.</li>
+</ul>
+<p>At my <a class="reference external" href="http://imagescape.com">last job</a> we wrote a content management system, and one of the last features I added I found really clever; a kind of <a class="reference external" href="http://www.37signals.com/svn/posts/312-lingo-judo">coding judo</a>.  We wanted to add structured page types &#8212; things like a news feature with dates summary paragraphs.  Instead of adding a fancy structured page system (akin to <a class="reference external" href="http://plone.org/products/archetypes">Archetypes in Plone</a>) I just had the system look for an edit form alongside where the page would go (which itself is just a static file).  The edit form has the necessary fields, and when you save the page each field turns into a variable assignment.  Then there&#8217;s a template that uses these assignments.  In <span class="caps">PHP</span> you&#8217;d have something like&nbsp;this:</p>
+<pre class="literal-block">
+&lt;? include('header.php'); ?&gt;
+  &lt;h1&gt;&lt;? echo $page_title; ?&gt;&lt;/h1&gt;
+  Posted on: &lt;? echo $page_date ?&gt;&lt;br&gt;
+  &lt;blockquote&gt;&lt;? echo $page_summary ?&gt;&lt;/blockquote&gt;
+  &lt;div class=&quot;article&quot;&gt;&lt;? echo $page_article ?&gt;&lt;/div&gt;
+&lt;? include('footer.php'); ?&gt;
+</pre>
+<p>The edit&nbsp;form:</p>
+<pre class="literal-block">
+Title: &lt;input type=&quot;text&quot; name=&quot;title&quot;&gt;&lt;br&gt;
+Date: &lt;input type=&quot;text&quot; name=&quot;date&quot;&gt; (YYYY-mm-dd)&lt;br&gt;
+Summary:&lt;br&gt;
+&lt;textarea name=&quot;summary&quot;&gt;&lt;/textarea&gt; &lt;br&gt;
+Article:&lt;br&gt;
+&lt;textarea name=&quot;article&quot;&gt;&lt;/textarea&gt;
+</pre>
+<p>You would use Javascript to make this form fancy if you were so inclined; adding client-side validation (clients were trusted to submit valid data) or marking things for a <span class="caps">WYSIWYG</span> editor (usually just with <tt class="docutils literal"><span class="pre">class=&quot;wysiwyg&quot;</span></tt> and rely on <a class="reference external" href="http://en.wikipedia.org/wiki/Unobtrusive_JavaScript">unobtrusive Javascript</a> to enable&nbsp;it).</p>
+<p>For new pages you just give the form.  For editing a page you use <a class="reference external" href="http://formencode.org/htmlfill.html">htmlfill</a> to fill in the form with existing&nbsp;values.</p>
+<p>The thing that is saved looks&nbsp;like:</p>
+<pre class="literal-block">
+&lt;?
+# This page is automatically generated; do not edit directly!
+$page_title = 'A Title';
+$page_date = '2008-01-11';
+$page_summary = 'A summary\netc';
+$page_article = 'The Article';
+include('article.php');
+?&gt;
+</pre>
+<p>The system would know how to parse variable assignments (to get values) and would parse the <tt class="docutils literal">include</tt> statement to determine what editor would be&nbsp;used.</p>
+<p>Extending this system required a knowledge of <span class="caps">HTML</span> and <span class="caps">HTML</span> forms, and a little knowledge of <span class="caps">PHP</span> (or <a class="reference external" href="http://httpd.apache.org/docs/1.3/mod/mod_include.html">SSIs</a> would also work).  It fit our company well, as there were quite a few people with that kind of knowledge who would interact with clients, and wouldn&#8217;t need to come to the programmers to extend the system.  While I&#8217;d offer some advice on how to use the system, it was transparent enough that they could debug problems on their&nbsp;own.</p>
+<p>This whole concept is not something I can justify spending time on, but it&#8217;s a <span class="caps">CMS</span> that I wish existed.  It&#8217;s a <span class="caps">CMS</span> I could recommend to my&nbsp;friends.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

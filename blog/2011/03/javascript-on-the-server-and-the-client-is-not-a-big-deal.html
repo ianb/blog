@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Javascript on the server AND the client is not a big deal</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2011-03-30T16:09:00-05:00">
+                Wednesday, March 30th, 2011
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2011/03/javascript-on-the-server-and-the-client-is-not-a-big-deal.html"
+                    rel="bookmark"
+                    title="Permalink to Javascript on the server AND the client is not a big deal"
+                    >Javascript on the server <span class="caps">AND</span> the client is not a big&nbsp;deal</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>All the cool kids love <a class="reference external" href="http://nodejs.org/">Node.js</a>.  I&#8217;ve used it a little, and it&#8217;s fine; I was able to do what I wanted to do, and it wasn&#8217;t particularly painful.  It&#8217;s fun to use something new, and it&#8217;s relatively straight-forward to get started so it&#8217;s an <em>emotionally satisfying</em>&nbsp;experience.</p>
+<p>There are several reasons you might want to use Node.js, and I&#8217;ll ignore many of them, but I want to talk about one in&nbsp;particular:</p>
+<blockquote>
+Javascript on the client and the server!</blockquote>
+<p>Is this such a great feature?  I think&nbsp;not&#8230;</p>
+<div class="section" id="you-only-need-to-know-one-language">
+<h2>You only need to know one&nbsp;language!</h2>
+<p>Sure.  Yay ignorance!  But really, this is <em>fine</em> but unlikely to be relevant to any current potential audience for Node.js.  If you are shooting for an very-easy-to-learn client-server programming system, Node.js isn&#8217;t it.  Maybe <a class="reference external" href="http://couchapp.org/">Couch</a> or something similar has that potential?  But I&nbsp;digress.</p>
+<p>It&#8217;s not easy to have expertise at multiple languages.  But it&#8217;s not <em>that hard</em>.  It&#8217;s considerably harder to have expertise at <em>multiple platforms</em>.  Node.js gives you one language across client and server, but <em>not</em> one platform.  Node.js programming doesn&#8217;t <em>feel</em> like the browser environment.  They do adopt many conventions when it&#8217;s reasonable, but even then it&#8217;s not always the case &#8212; in particular because many browser APIs are the awkward product of C++ programmers exposing things to Javascript, and you don&#8217;t want to reproduce those same APIs if you don&#8217;t have to (and Node.js doesn&#8217;t have to!) &#8212; an example is the event pattern in Node, which is similar to a browser but less&nbsp;obtuse.</p>
+</div>
+<div class="section" id="you-get-to-share-libraries">
+<h2>You get to share&nbsp;libraries!</h2>
+<p>First: the same set of libraries is probably not applicable.  If you can do it on the client then you probably don&#8217;t <em>have</em> to do it on the server, and vice&nbsp;versa.</p>
+<p>But sometimes the same libraries are useful.  Can you really share them?  Browser libraries are often hard to use elsewhere because they rely on browser APIs.  These APIs are frequently <em>impossible to implement in Javascript</em>.</p>
+<p>Actually they are possible to implement in Javascript using <a class="reference external" href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Proxy">Proxies</a> (or maybe some other new and not-yet-standard Javascript features). But not in Node.js, which uses V8, and V8 is a pretty conservative implementation of the Javascript language. (<strong>Update</strong>: <a class="reference external" href="http://blog.ianbicking.org/2011/03/30/js-on-server-and-client-is-not-a-big-deal/comment-page-1/#comment-194005">it is noted</a> that you can <a class="reference external" href="https://github.com/isaacs/node-proxy/tree/master/src">implement proxies</a> &#8212; in this case a C++ extension to&nbsp;Node)</p>
+<p>Besides these unimplementable APIs, it is also just a different environment.  There is the trivial: the <tt class="docutils literal">window</tt> object in the browser has a Node.js equivalent, but it&#8217;s not named <tt class="docutils literal">window</tt>. Performance is different &#8212; Node has long-running processes, the browser <em>might</em>.  Node can have blocking calls, which are useful even if you can&#8217;t use them at runtime (e.g., <tt class="docutils literal">require()</tt>); but you can&#8217;t really have any of these at any time on the browser.  And then of course all the system calls, <em>none</em> of which you can use in the&nbsp;browser.</p>
+<p>All these may simply be surmountable challenges, through modularity, mocking, abstractions, and so on&#8230; but ultimately I think the motivation is lacking: the domain of changing a live-rendered <span class="caps">DOM</span> isn&#8217;t the same as producing bytes to put onto a&nbsp;socket.</p>
+</div>
+<div class="section" id="you-can-work-fluidly-across-client-and-server">
+<h2>You can work fluidly across client and&nbsp;server!</h2>
+<p>If anything I think this is <em>dangerous</em> rather than <em>useful</em>.  The client and the server are different places, with different expectations.  Any vagueness about that boundary is <em>wrong</em>.</p>
+<p>It&#8217;s wrong from a security perspective, as the security assumptions are nearly opposite on the two platforms.  The client trusts itself, and the server trusts itself, and both should hold the other in suspicion (though the client can be more trusting because the <em>browser</em> doesn&#8217;t trust the client&nbsp;code).</p>
+<p>But it&#8217;s also the wrong way to treat <span class="caps">HTTP</span>.  <span class="caps">HTTP</span> is pretty simple until you try to make it simpler.  Efforts to make it simpler mostly make it more complicated.  <span class="caps">HTTP</span> lets you send serialized data back and forth to a server, with a bunch of metadata and other do-dads.  And that&#8217;s all neat, but you should always be thinking about <em>sending</em> information.  And never <em>sharing</em> information.  It&#8217;s not a fluid boundary, and code that touches <span class="caps">HTTP</span> needs to be explicit about it and not pretend it is equivalent to any other non-network&nbsp;operation.</p>
+<p>Certainly you don&#8217;t <em>need</em> two implementation languages to keep your mind clear.  But it doesn&#8217;t&nbsp;hurt.</p>
+</div>
+<div class="section" id="you-can-do-validation-the-same-way-on-the-client-and-server">
+<h2>You can do validation the same way on the client and&nbsp;server!</h2>
+<p>One of the things people frequently bring up is that you can validate data on the client and server using the same code.  And of course, what web developer hasn&#8217;t been a little frustrated that they have to implement validation&nbsp;twice?</p>
+<p>Validation on the client is primarily a <em>user experience</em> concern, where you focus on bringing attention to problems with a form, and helping the user resolve those problems.  You may be able to avoid errors entirely with an input method that avoids the problem (e.g., if a you have a slider for a numeric input, you don&#8217;t have to worry about the user inputing a non-numeric&nbsp;value).</p>
+<p>Once the form is submitted, if you&#8217;ve done thorough client-side validation you can also avoid <em>friendly</em> server-side validation.  Of course all your client-side validation could be avoided through a malicious client, but you don&#8217;t need to give a friendly error message in that case, you can simply bail out with a simple 400 Bad Request&nbsp;error.</p>
+<p>At that point there&#8217;s not much in common between these two kinds of validation &#8212; the client is all user experience, and the server is all data&nbsp;integrity.</p>
+</div>
+<div class="section" id="you-can-do-server-side-javascript-as-a-fallback-for-the-client">
+<h2>You can do server-side Javascript as a fallback for the&nbsp;client!</h2>
+<p>Writing for clients without Javascript is becoming increasingly less relevant, and if we aren&#8217;t <em>there</em> yet, then we&#8217;ll certainly <em>get there</em> soon.  It&#8217;s only a matter of time, the writing is on the wall. Depending on the project you might have to put in workarounds, but we should keep those concerns out of architecture decisions.  Maintaining crazy hacks is <em>not</em> worth it. There&#8217;s so many terrible hacks that have turned into frameworks, and frameworks that have justified themselves because of the problems they solved that no longer matter&#8230; Node.js deserves better than to be one of&nbsp;those.</p>
+</div>
+<div class="section" id="in-conclusion-or-whatever">
+<h2>In Conclusion Or&nbsp;Whatever</h2>
+<p>I&#8217;m not saying Node.js is <em>bad</em>.  There are other arguments for it, and you don&#8217;t need to make <em>any</em> argument for it if you just feel like using it.  It&#8217;s fun to do something new.  And I&#8217;m as optimistic about Javascript as anyone.  But this one argument, I do not think it is very&nbsp;good.</p>
+</div>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

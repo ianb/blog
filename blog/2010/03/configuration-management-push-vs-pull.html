@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Configuration management: push vs. pull</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2010-03-10T19:45:00-06:00">
+                Wednesday, March 10th, 2010
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2010/03/configuration-management-push-vs-pull.html"
+                    rel="bookmark"
+                    title="Permalink to Configuration management: push vs. pull"
+                    >Configuration management: push vs.&nbsp;pull</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>Since I&#8217;ve been thinking about <a class="reference external" href="http://blog.ianbicking.org/category/silverlining">deployment</a> I&#8217;ve been thinking a lot more about what &#8220;configuration management&#8221; means, how it should work, what it should&nbsp;do.</p>
+<p>I guess my quick summary of configuration management is that it is <em>setting up a server correctly</em>.  &#8220;Correct&#8221; is an ambiguous term, but given that there are so many to configuration management the solutions are also&nbsp;ambiguous.</p>
+<p><a class="reference external" href="http://cloudsilverlining.org">Silver Lining</a> includes configuration management of a sort.  It is very simple.  Right now it is simply a bunch of files to rsync over, and one shell script (you can see the <a class="reference external" href="http://bitbucket.org/ianb/silverlining/src/tip/silverlining/server-files/serverroot/">files here</a> and the <a class="reference external" href="http://bitbucket.org/ianb/silverlining/src/tip/silverlining/server-files/update-server-script.sh">script here</a> &#8212; at least until I move them and those links start 404ing).  Also each &#8220;service&#8221; (e.g., a database) has a simple setup script.  I&#8217;m sure this system will become more complicated over time, but it&#8217;s <strong>really</strong> simple right now, and I like&nbsp;that.</p>
+<p>The other system I&#8217;ve been asked about the most about lately is <a class="reference external" href="http://reductivelabs.com/products/puppet/">Puppet</a>.  Puppet is a <em>real</em> configuration management system.  The driving forces are very different: I&#8217;m just trying to get a system set up that is in all ways <em>acceptable</em> for web application deployment.  I want <em>one</em> system set up for <em>one</em> kind of task; I am completely focused on that end, and I care about means only insofar as I don&#8217;t want to get distracted by those means.  Puppet is for people who care about the means, not just the ends.  People who want things to work in a particular <em>way</em>; I only care that they <em>work</em>.</p>
+<p>That&#8217;s the big difference between Puppet and Silver Lining.  The smaller difference (that I want to talk about) is &#8220;push&#8221; vs. &#8220;pull&#8221;.  <a class="reference external" href="http://agiletesting.blogspot.com/2010/03/automated-deployment-systems-push-vs.html">Grig wrote up some notes on two approaches</a>.  Silver Lining uses a &#8220;push&#8221; system (though calling it a &#8220;system&#8221; is kind of overselling what it does) while Puppet is &#8220;pull&#8221;.  Basically Silver Lining runs these commands (from your personal&nbsp;computer):</p>
+<pre class="literal-block">
+$ rsync -r &lt;silverlining&gt;/server-files/serverroot/ root&#64;server:/
+$ ssh root&#64;server &quot;$(cat &lt;silverlining&gt;/server-files/update-server-script.sh)&quot;
+</pre>
+<p>This is what happens when you run <tt class="docutils literal">silver <span class="pre">setup-node</span> server</tt>: it pushes a bunch of files over to the server, and runs a shell script.  If you update either of the files or the shell script you run <tt class="docutils literal">silver <span class="pre">setup-node</span></tt> again to update the server.  This is &#8220;push&#8221; because everything is initiated by the &#8220;master&#8221; (in this case, the developer&#8217;s personal&nbsp;computer).</p>
+<p>Puppet uses a pull model.  In this model there is a daemon running on every machine, and these machines call in to the master to see if there&#8217;s any new instructions for them.  If there are, the daemon applies those instructions to the machine it is running&nbsp;on.</p>
+<p>Grig identifies two big advantages to this pull&nbsp;model:</p>
+<ol class="arabic simple">
+<li>When a new server comes up it can get instructions from the master and start doing things.  You can&#8217;t push instructions to a server that isn&#8217;t there, and the server itself is most aware of when it is ready to do&nbsp;stuff.</li>
+<li>If a lot of servers come up, they can all do the setup work on their own, they only have to ask the master what to&nbsp;do.</li>
+</ol>
+<p>But&#8230; I don&#8217;t buy either&nbsp;justification.</p>
+<p>First: servers don&#8217;t just <em>do</em> things when they start up.  To get this to work you have to create custom images with Puppet installed, and configured to know where the master is, and either the image or the master needs some indication of <em>what kind</em> of server you intended to create.  All this is to avoid polling a server to see when it comes online.  Polling a server is lame (and is the best Silver Lining can do right now), but avoiding polling can be done with something a lot simpler than a complete change from push to&nbsp;pull.</p>
+<p>Second: there&#8217;s nothing unscalable about push.  Look at those commands: one <tt class="docutils literal">rsync</tt> and one <tt class="docutils literal">ssh</tt>.  The first is pretty darn cheap, and the second is cheap on the master and expensive on the remote machine (since it is doing things like installing stuff).  You need to do it on lots of machines?  Then fork a bunch of processes to run those two commands.  This is not complicated&nbsp;stuff.</p>
+<p>It is <em>possible</em> to write a push system that is hard to scale, if the master is doing lots of work.  But just don&#8217;t do that.  Upload your setup code to the remote server/slave and <em>run it there</em>.  Problem&nbsp;fixed!</p>
+<p>What are the advantages of&nbsp;push?</p>
+<ol class="arabic simple">
+<li>Easy to bootstrap.  A bare server can be setup with push, no customization needed.  Any customization is another kind of configuration, and configuration should be automated, and&#8230; well, this is why it&#8217;s a bootstrap&nbsp;problem.</li>
+<li>Errors are synchronous: if your setup code doesn&#8217;t work, your push system will get the error back, you don&#8217;t need some fancy monitor and you don&#8217;t need to check any logs.  Weird behavior is also synchronous; can&#8217;t tell why servers are doing something?  Run the commands and watch the&nbsp;output.</li>
+<li>Development is sensible: if you have a change to your setup scripts, you can try it out from your machine.  You don&#8217;t need to do anything exceptional, your machine doesn&#8217;t have to accept connections from the slave, you don&#8217;t need special instructions to keep the slave from setting itself up as a production machine, there&#8217;s no daemon that might need modifications&#8230; none of that.  You change the code, you run it, it&nbsp;works.</li>
+<li>It&#8217;s just so damn simple.  If you don&#8217;t start thinking about push and pull and other design choices, it simply becomes: do the obvious and easy&nbsp;thing.</li>
+</ol>
+<p>In conclusion: push is sensible, pull is needless&nbsp;complexity.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Git-as-sync, not source-control-as-deployment</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,45 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2012-02-14T02:30:00-06:00">
+                Tuesday, February 14th, 2012
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2012/02/git-as-sync-not-source-control-as-deployment.html"
+                    rel="bookmark"
+                    title="Permalink to Git-as-sync, not source-control-as-deployment"
+                    >Git-as-sync, not&nbsp;source-control-as-deployment</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I don&#8217;t like systems that use <tt class="docutils literal">git push</tt> for deployment (Heroku et al).  Why?  I do a lot of&nbsp;this:</p>
+<pre class="literal-block">
+$ git push deploy
+... realize I forgot a domain name ...
+$ git commit -m &quot;fix domain name&quot; -a ; git push deploy
+... realize I didn't do something right with the database setup ...
+$ git commit -m &quot;configure database right&quot; -a ; git push deploy
+... dammit, I didn't fix it quite right ...
+$ git commit -m &quot;typo&quot; -a ; git push deploy
+</pre>
+<p>And then maybe I&#8217;d actually like to keep my config out of my source control, or have a build process that I run locally, or any number of things.  I&#8217;d like to be able to test deployment, but every deployment is a commit, and I like to commit <em>tested</em> work.  I think I could use <tt class="docutils literal">git rebase</tt> but I lack the discipline to undo my work so I can do it correctly.  This is why I don&#8217;t do continuous&nbsp;commits.</p>
+<p>There&#8217;s a whole different level of weirdness when you use <a class="reference external" href="http://pages.github.com/">GitHub Pages</a> as you aren&#8217;t pushing to a deployment-specific remote, you are pushing to a deployment-specific&nbsp;branch.</p>
+<p>So I&#8217;ve generally thought: git deployment is&nbsp;wrong.</p>
+<p>Then I was talking to some other people at Mozilla and they mentioned that ops was using git for simply moving files around even though the stuff they were deploying was itself in Mercurial.  They had a particular site with a very large number of files, and it was faster to use git than rsync (git has more metadata than rsync; rsync has to look at <em>everything</em> everytime you sync).  And that all seemed very reasonable; git is a fine way to sync&nbsp;things.</p>
+<p>But I kind of forgot about it all, and just swore to myself as I did too many trivial commits and wrote too many meaningless commit&nbsp;messages.</p>
+<p>Still&#8230; it isn&#8217;t so hard to separate these concerns, is it?  So I wrote up a <a class="reference external" href="https://github.com/ianb/git-sync/blob/master/git-sync">quite small command</a> called <a class="reference external" href="https://github.com/ianb/git-sync">git-sync</a>.  The basic idea: copy the working directory to a new location (minus <tt class="docutils literal">.git/</tt>), commit that, and push the result to your deployment remote.  You can send modified and untracked files, and you can run a build script before committing and push the <em>result</em> of the build script, all without sullying your &#8220;real&#8221; source control.  And you happen to have a nice history of deployments, which is also&nbsp;nice.</p>
+<p>I&#8217;ve only used this a little bit, but I&#8217;ve enjoyed when I have used it, and it makes me feel much better/clearer about my actual commits.  It&#8217;s really short right now, and probably gets some things entirely wrong (e.g., moving over untracked files).  But it works well enough to be improved (<em>winkwinknudgenudge</em>).</p>
+<p>So check it out: <a class="reference external" href="https://github.com/ianb/git-sync">https://github.com/ianb/git-sync</a></p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +73,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

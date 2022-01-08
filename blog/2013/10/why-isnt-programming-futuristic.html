@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Why Isn’t Programming Futuristic</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2013-10-23T00:00:00-05:00">
+                Wednesday, October 23rd, 2013
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2013/10/why-isnt-programming-futuristic.html"
+                    rel="bookmark"
+                    title="Permalink to Why Isn’t Programming Futuristic"
+                    >Why Isn&#8217;t Programming&nbsp;Futuristic</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>If you think someone is asking a rhetorical question, it is usually most interesting to treat it as though it is a legitimate question. Especially if we&#8217;re talking about something <em>hard</em> &#8212; driving down to underlying assumptions through this questioning process is&nbsp;interesting.</p>
+<p>Applying this to Bret Victor&#8217;s talk <a href="http://worrydream.com/dbx/">&#8220;The Future Of Programming&#8221;</a> is useful. Why are we living with the programming technology of the 70s, when in the 70s there was so much excitement and expectation that we would create something better?  Bret&#8217;s talk has an implied challenge: what happened to the&nbsp;future?</p>
+<p>I have an affection for the thinking of the 60s and 70s that I also see in Bret&#8217;s talk.  There was a distinct tone in that decade across thinking in computer science, politics, culture&#8230; and even though I usually disagree with the specific ideas, I love the way in which those ideas were discussed and presented.  Optimistic, adventurous, often intimate.  To the degree Bret&#8217;s talk was a call for that flavor of thought, I heartily agree.  But I wonder that the optimism of this age was in part built on its ambition &#8212; when you imagine things you know you cannot make (at least not <em>yet</em>) you avoid confronting the tedium and problems of an actual implementation.  Looking back on the futurism of that time it seems defined more by its overambition than its&nbsp;success.</p>
+<p>But it would be unfair to engage so shallowly with just a comparison of the tones of yesteryear and today.  Bret identifies four things that it is implied we should at least <em>remember</em>, and perhaps that we should <em>pursue</em>.</p>
+<h2>procedures -&gt; goals and&nbsp;constraints</h2>
+<p>When you first read about Prolog, did it excite you?  It certainly excited me.  A whole programming language built on <em>magic</em>.</p>
+<p>But what then?  It&#8217;s magical, but you can&#8217;t make anything from it! Problems are never provided to us in clean forms.  Phrasing problems in solvable terms is more effort than solving them, so instead we use shortcuts that achieve our functional and concrete goals without any high minded&nbsp;&#8220;solutions&#8221;.</p>
+<p>I do think it could be argued we need more forms of expression in programming languages.  Regular expressions are pretty great, for all we complain about them.  Why don&#8217;t languages typically include other kinds of powerful search&nbsp;methods?</p>
+<p>When I say &#8220;programming language&#8221; I&#8217;m not referring to special built-in syntax.  Python&#8217;s regular expressions are better than Javascript&#8217;s despite the fact Python has no special syntax and Javascript does.  But neither is able to search anything but&nbsp;strings.</p>
+<p>We can implement new search techniques through libraries (and such libraries exist), but we can do more.  A programming language is <em>syntax</em>, but it is also an <em>object model</em>.  If a programming language includes general ways to traverse and interpret object models then we could see much more powerful general goal-oriented libraries.  <span class="caps">LINQ</span> is perhaps the best modern example of&nbsp;this.</p>
+<p>To get there I think we need a couple&nbsp;things:</p>
+<h4>Safe object&nbsp;traversal</h4>
+<p>You need to be able to inspect and traverse objects, all objects.  In python for instance you can do <code>dir(obj)</code> or <code>getattr(obj, attr)</code>, but those are incomplete and unsafe.  Pointing code at an arbitrary object graph and inviting it to inspect things based on this is somewhat dangerous.  Using <code>obj.__dict__</code> is actually safer, but incomplete in its own&nbsp;ways.</p>
+<p><span class="caps">JSON</span> is compelling in this case because it is highly constrained.  It can&#8217;t contain methods, all its attributes are concrete and enumerable. It makes something like <a href="http://jsonselect.org/">JSONSelect</a> reasonable.  But who wants to constrain themselves to large concrete <span class="caps">JSON</span> objects?  You don&#8217;t have derivative properties of objects, polymorphic tests, lazy loading of data,&nbsp;etc.</p>
+<p>To traverse objects <em>safely</em> and <em>completely</em> you need to be able enumerate aspects of the object.  Enumerate its properties, while also being certain there are no side effects to getting data, and identifying methods that can be safely&nbsp;called.</p>
+<h4>Ubiquitous object extensions to support&nbsp;querying</h4>
+<p>You can accomplish some stuff with traversal, giving you a baseline so that domain-specific portions of the code can be traversed, but there are always cases when you need to customize that traversal.  For instance, any object that supports a &#8220;method missing&#8221; style override (e.g., <code>__getattr__</code> in Python) needs a way to enumerate the actual properties.  And if they are innumerable then <em>still</em> you must enumerate&nbsp;something.</p>
+<p>There also must be a culture where proper extensions are regularly provided on objects.  Powerful tools are built on powerful paradigms, and <em>enabling</em> a paradigm isn&#8217;t the same thing as actually implementing it across a fully developed programming&nbsp;environment.</p>
+<h4>Code&nbsp;transport</h4>
+<p>Most things aren&#8217;t genuinely innumerable.  It&#8217;s more likely you can&#8217;t enumerate an object because the source of truth is outside the program.  If you want to access a database of users in your system, you can&#8217;t load it all into memory and query it from&nbsp;there.</p>
+<p>In the past, to the degree I&#8217;ve done anything like this, the transportation of code is extremely ad hoc.  It involves doing things like translating Python to <span class="caps">SQL</span>.  To what degree I understand <span class="caps">LINQ</span>, I think it also does this, though maybe with the ability to separate in-process from out-of-process portions of a single&nbsp;query.</p>
+<p>These limitations came to mind when I was reading a recent <a href="http://www.rackspace.com/blog/zerovm-smaller-lighter-faster/">announcement about ZeroVM</a> where they talk about &#8220;moving the app to the data&#8221; instead of the traditional task of moving the data to the app.  And the degree we are dealing with &#8220;objects&#8221; &#8212; data and methods combined &#8212; we really <em>can&#8217;t</em> move the data to the app, because it&#8217;s all apps.  The solution alluded to with ZeroVM is that running code can be transported to other environments, that this is reliable and deterministic, that code runs with limited defined interfaces to its environment, and that this is all done efficiently.  Maybe there is a solution&nbsp;there?</p>
+<h4>Combining it&nbsp;all</h4>
+<p>I struggle somewhat to imagine what all these things could be used for together.  Would my code become much more declarative?  I find declarative frameworks initially exciting but usually ultimately annoying.  Maybe with all the pieces in place it would stop being annoying?  I am skeptical.  I suspect the very idea of a &#8220;program&#8221; would change in the face of this.  And I&#8217;m not sure we want it to&nbsp;change.</p>
+<h2>text dump -&gt; spatial&nbsp;representations</h2>
+<p>Why, after all this time, are we still stuck with <span class="caps">ASCII</span>&nbsp;programs?</p>
+<p>For one answer: recall Microsoft Word.  Have you ever found yourself &#8220;debugging&#8221; a Word document?  &#8220;Why won&#8217;t this paragraph align with all the other paragraphs?!?&#8221;  There is hidden structure to a Word document.  When composing with Word you do not have access to that hidden structure.  You are only aware of parts of it, and some aspects may only reveal themselves in certain circumstances.  This sort of thing would not do for a program &#8212; it is enough that we must debug what the program <em>does</em>, a richer representation of the program means we would have to debug <em>the expression of the program itself</em>.</p>
+<p>You might counter: we must simply make an unambiguous and transparent spacial representation of a program.  And yes, without that constraint we are doomed.  But then what might we create?  On the large scale we might organize large modules of code using something besides files. And we do see some work like this, IDEs present code in ways that aren&#8217;t tied to text dumps.  But it&#8217;s not very interesting, because very little time is spent manipulating large modules of code.  When we rename and move files around it&#8217;s a relatively small task, and one that requires little debugging &#8212; the paths either work or they don&#8217;t. There&#8217;s room for improvement, but nothing&nbsp;revolutionary.</p>
+<p>What would be interesting is new representations of code at the more detailed level.  For that level we want clear, compact, composable representations.  But you know what?  We have spent millenia developing a clear, compact, composable representation of human thought.  And it fits in <span class="caps">ASCII</span>, and flows from left to right and down the page line by&nbsp;line.</p>
+<p>As an aside: why at least do we not allow meaningless stylistic annotations of source code?  Why can&#8217;t I make code italic or bold? Here we might blame a lowest-common-denominator of tools (which is a topic of its own), but also programmers avoid meaningless annotations. Because there&#8217;s no actual semantic meaning to bold text, or colored text, it would <em>imply</em> some intent without actually enforcing that intent.  We do allow implied intents &#8212; non-significant indentation and whitespace, unneeded parenthesis, and most of all comments &#8212; but it can lead to great hand-wringing, they are each an opportunity to mislead&nbsp;readers.</p>
+<p>Still, this is too pessimistic.  What could we do?  I don&#8217;t think we need to make a strong shift away from <span class="caps">ASCII</span> files on disk.  Ultimately anything we do needs to be serialized, and that serialization needs to be debuggable, and <span class="caps">ASCII</span> files work fine on both counts.  For serialization we could use <span class="caps">XML</span> or something with clear exposed structure, but we don&#8217;t need to: every programming language can be unambiguously parsed into something, usually an <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree"><span class="caps">AST</span></a>, which is typically exactly what we&#8217;d expect from an <span class="caps">XML</span>&nbsp;serialization.</p>
+<p>But the interaction between tools and source is crude.  The best we&#8217;ve managed at any scale is color&nbsp;highlighting.</p>
+<h4>Provenance</h4>
+<p>This is perhaps a personal pet concern of mine, maybe a stretch to connect to this topic, but I see it everywhere.  We need general ways to track artifacts back to their&nbsp;source.</p>
+<p>An recent improvement in provenance is the <a href="http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/">source map</a>, where you can compile something to Javascript and the browser debugging tools can trace errors back to their original (pre-compilation) source.  But that&#8217;s just one example &#8212; for example it doesn&#8217;t apply to <span class="caps">HTML</span> &#8212; and it&#8217;s only supported by a couple&nbsp;clients.</p>
+<p>With more extensive support for provenance you&#8217;d have more potential for alternative tools to manipulate source.  With support for provenance of data you could go further&nbsp;yet.</p>
+<p>I think the typical vision of a &#8220;spatial representation&#8221; of source code is very modernist.  It imagines a new, complete, better way of manipulating source.  Then we get annoyed no one has come up with the new, complete, better way&#8230; but it doesn&#8217;t exist, not as a single&nbsp;thing.</p>
+<h4>Better, more accessible&nbsp;ASTs</h4>
+<p>We&#8217;re just now starting to see complete ASTs being generated for languages.  Too often comments or other semantically insignificant items were left out, and even producing an <span class="caps">AST</span> is something many languages didn&#8217;t do for much of their&nbsp;history.</p>
+<p>So real progress is being made.  We need to be fully ready for the <span class="caps">AST</span> to be the true representation of the program.  That is, parsing, changing the <span class="caps">AST</span>, and serializing that <span class="caps">AST</span> should always be an acceptable step in development.  Sometimes this means better ASTs (like ones that include comments), sometimes this means developers have to suppress their individual preferences.  The good reception I&#8217;ve seen from developers of <a href="http://golang.org/cmd/gofmt/">gofmt</a> (which normalizes Go syntax, is opinionated, and is widely used) makes me think this is more acceptable than people&nbsp;think.</p>
+<p>Of course each langauge usually keeps the <span class="caps">AST</span> in memory, and tooling has to be very language-specific.  Maybe hoping for language agnosticism is too much.  But some standard protocol would certainly be nice &#8212; probably tools communicating via sockets with some language-specific parser.  But then to what end?  Each language&#8217;s <span class="caps">AST</span> is distinctive, and should be because that&#8217;s why we have different languages.  But a generic tool needs a generic <span class="caps">AST</span>.</p>
+<h2>coding -&gt; direct manipulation of&nbsp;data</h2>
+<p>On its face this is kind of an odd complaint.  We have lots of direct manipulation of data.  Photoshop is a pretty incredible tool. And there are lots similar tools that allow for the direct manipulation of&nbsp;data.</p>
+<p>We need to &#8220;code&#8221; when we need to handle data in an abstracted way. You can draw <em>one</em> picture with direct manipulation, but defining something that can be rendered into a picture in a variety of contexts is more difficult.  (Though even that has been achieved through various modeling&nbsp;tools.)</p>
+<p>How can you represent a loop or a variable in non-textual tools?  How do you draw a picture where one line is of length <code>x</code>, while another line is of length <code>x*2</code>, and another line is of length <code>5</code>?  What are the determining constraints that resolve the picture into something concrete for a given value of <code>x</code>?</p>
+<p>This question is what Bret seems to be struggling with through <a href="http://worrydream.com/#!/StopDrawingDeadFish">Stop Drawing Dead Fish</a> or <a href="http://worrydream.com/LearnableProgramming/">Learnable Programming</a>. We haven&#8217;t figured it out, and they didn&#8217;t have any more of a clue about it in the 70s either.  I wish Bret&nbsp;luck!</p>
+<p>It does bring graphical programming languages to mind.  Oddly these languages seem as focused on symbolic manipulation as textual programming languages are.  It seems to me that a graphical programming languages need to more fully embrace the graphics, and embrace a <em>result</em> that current programming languages are not well suited to provide.  It shouldn&#8217;t just be &#8220;easier&nbsp;programming&#8221;.</p>
+<h2>sequential -&gt;&nbsp;parallel</h2>
+<p>Parallel code can be really hard to write, debug, and understand. Sequential code is pretty&nbsp;nice.</p>
+<p>If this is an admonition that we should all just do more work to achieve parallelism, then it&#8217;s not very compelling.  It&#8217;s a reasonably compromise that we let a computer waste cycles so that developers can write faster and better and more&nbsp;reliably.</p>
+<p>As time goes on the benefit of parallelism increases.  But as time goes on the relative value of developer time to processor time also increases, because processing gets cheaper.  The real benefit of parallelism is doing things we couldn&#8217;t do before. It can feed into greater ubuquity of computing.  The admonitions imply some austere future where we <em>must</em> do things in parallel, and that won&#8217;t&nbsp;come.</p>
+<p>But I&#8217;m just pontificating.  My only real thought is that while there is an emphasis on declarative programming to enable parallelism, I think we should have an equal emphasis on deterministic programming. These two things are in some ways very similar, but I think &#8220;deterministic&#8221; is a more expansive idea that can encompass more programming techniques.  You could also say that &#8220;deterministic&#8221; is the same thing as &#8220;functional programming&#8221;, but that term also has a lot of unnecessary baggage.  We want side effects, because we want code that affects things!  <em>Deterministic</em> means we identify all inputs and effects.  Like the data flow analog of strict static&nbsp;typing.</p>
+<h2>Conclusion</h2>
+<p>It is productive to get computers to do the things that computers are good at.  The implication of the talk is that in the past we saw some potential in computers that we&#8217;ve lost.  But equally I think the mismatch between what we envisioned we&#8217;d do with computers, and what we are doing with computers, is that back then we <em>didn&#8217;t see</em> all the things computers are good&nbsp;at.</p>
+<p>The impact of computers has met or exceeded expectations.  It turns out computers are great for facilitating communication, and they are great at storing information, they can track history, facilitate transactions, and it&#8217;s hardly necessary for me to enumerate the things we do with them.  And we shouldn&#8217;t condemn developers for doing what is most impactful with the least effort.  But of course we must all, collectively and individually, determine what the most impactful <em>next</em> thing is to&nbsp;do.</p>
+<p>We can mine the past for some of that, there&#8217;s good stuff there.  But we shouldn&#8217;t get bummed out just because there&#8217;s more things to think about.  Rather it&#8217;s exciting to find new things, even in the&nbsp;past.</p>
+<p><a href="https://news.ycombinator.com/item?id=6601748">Comments on Hacker&nbsp;News</a></p></div>
+        <!-- /.entry-content -->
+          <div class="comments">
+            <h2>Comments</h2>
+            <table class='table table-striped'>
+<tr><td style='padding-left: 0px' class='dU'>Claudiu</td><td class='dTS'>Thu, 24 Oct 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>Very thoughtful post! I hadn't even though of generic object traversal before. I've wondered about why we still use ASCII to code, though. I feel like languages can be so much better than they are today, but they just aren't. Programming still has far to evolve. But I've thought for a while now that the next step of a language might be one where the editor is as much a part of the language as anything else. Sure ultimately it'll be a text file on disk, preferably a human-readable one (not XML), but it seems some things could be better represented than just blocks of mono-spaced text... maybe at least a nicer way of introducing comments or documentation strings instead of interspersing giant blocks of green or blue or red text in between the code.</p></td></tr>
+<tr><td style='padding-left: 50px' class='dU'>Ian Bicking</td><td class='dTS'>Thu, 24 Oct 2013</td></tr>
+<tr><td style='padding-left: 50px' colspan='2' class='dMessage'><p>Color Forth! <a href="http://www.colorforth.com/cf.htm" rel="nofollow noopener" title="http://www.colorforth.com/cf.htm">http://www.colorforth.com/c...</a></p><p>With an editable AST you could create tools that allow editing the code while representing it differently.  Make the first occurrence of a variable bold to indicate a variable declaration?  That would be doable.  Highlight a word in such a way to indicate that it is an imported symbol, removing the need to manage import statements?  That would actually be handy!  As I try to come up with examples, I keep getting things that feel more like macros, so I'm not sure where this is going.</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>snowmantw</td><td class='dTS'>Thu, 24 Oct 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>"Functional Programming" doesn't mean the program affects nothing, even in the languages like Haskell. Programmers are undoubtful welcome to do things with side-effects, as long as they can isolate and manage those side-effects code reasonably.</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>Terry A Davis</td><td class='dTS'>Thu, 24 Oct 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>TempleOS has 8-bit ASCII (IBM screen codes) in the entire tool chain and graphics in source.  I wrote a compiler and grep etc.  You cannot serialize.  <a href="http://www.templeos.org" rel="nofollow noopener" title="http://www.templeos.org">http://www.templeos.org</a></p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>Chris Carpenter</td><td class='dTS'>Thu, 24 Oct 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>Have you tried using common LISP? It allows you to do most/all of the things you are talking about I think. I don't use it myself (yet) but plan on using it soon.</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>bgporter</td><td class='dTS'>Fri, 01 Nov 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>w/r/t the visual representation of code, there's actually been a good deal of thought and research into the topic (see for example this book <a href="http://www.amazon.com/Human-Factors-Typography-Readable-Programs/dp/0201107457)" rel="nofollow noopener" title="http://www.amazon.com/Human-Factors-Typography-Readable-Programs/dp/0201107457)">http://www.amazon.com/Human...</a>, but as happens too often in this field, every generation ignores existing research in favor of doing stuff over.</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>cfry42</td><td class='dTS'>Fri, 01 Nov 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>This is an extremely important topic and the author has some significant things to say about it. The article is not as coherent as one might hope, but then this is complex stuff. Just getting the ideas out there is great.<br>Here's an attempt to bring a bit of coherency. I'm a language guy so I see things in terms of language. This viewpoint helps simplify and unify.<br>From the article:<br>" Each language’s AST is distinctive, and should be because that’s why we have different languages.  "<br>Basically I think this is wrong. The reason we have different language are:<br>1. To get a language out there, you must implement it. Implementing it is so hard<br>   that implementers have little time left over for actual language design.<br>   So languages tend to be poorly designed because of the complexity of implementation.<br>You must have a small team to do something so complex (and coherent) and a small team<br>usually doesn't have the resources to do decent language design.<br>2. we have an education system that nearly promotes bad language design.<br>Language design isn't taught in universities (Name a course and I'll show you a course that has failed). We encourage different representations for math, music, markup, etc.<br>3. language implementers don't agree on criteria for evaluation. This is not so much<br>a problem that there isn't one good set of criteria as it is an education problem. You need<br>to understand a lot before you can understand what the right criteria are.<br>3. Our economy doesn't support good language design. If you come up with a great idea for a language and you implement it, one of 2 things usually happens: <br>a) Nobody uses it and it dies<br>b) people start using it, then you must maintain backward compatibility and then you can<br>make substantial improvements and you're stuck with a mediocre design.<br>I say mediocre because you can't possibly anticipate all the things you want in a good lang<br>at the outset. <br>4. Fundamentally we need just one language. This solves the worst problems of programming today. But we can't get one because<br>a) lang designers are lousy and don't realize even obviously better ways of doing things<br>b) if a choice is arbitrary, just pick one and stick with it. But how can we do that?<br>If there are multiple reasonable ways of doing X in the world, all of them will exist somewhere.<br>Take "which side of the road should we drive on" for example, or which way should you read,<br>left-to right, right to left, top to bottom? You could say <br>"first person that gets into space X, picks the one choice and everyone else follows it"<br>but the first person usually doesn't pick the best way and we don't have the communication channel (though the web helps a lot).<br>Many would call me arrogant or even stupid for thinking that there can be one right language.<br>Its true that we can't hope to have one language that's the best possible syntax/semantics for<br>every possible domain BUT the interoperability between domains is SO important to<br>nearly every special purpose language (as is learnability), that if we compromise just a <br>bit on some domain-specific optimizations, we can get to one language for pretty much all programming and data representation tasks.<br>What are the key features?<br>We standardize on primitives. For instance, Python uses True and NONE where<br>JavaScript uses true and null. This is just stupid. (I'd go with JS here but it doesn't matter,<br>pick one and stick with it.)<br>OK get the rest of the primitives (numbers, strings, lists out of the way similarly)'<br>Get name-value pairs right with ONE representation:<br>we don't need JSON and Python dicts and hash tables and HTML attribute syntax and<br>CSS syntax.<br>We just need one name-value pair representation, That should work for<br>keyword passing of arguments in function calls too, of course.<br>Object system: use our name-value pairs and declare  the name of "_parent"<br>to be what the data structure uses to inherit from. <br>We'll have a fn call to GET a value from a name value pair, with an optional arg<br>to "lookup" if we want to inherit and another optional arg for a "default" if<br>the name doesn't exist.  We don't need getattr AND foo["bar"] and <br><a href="http://foo.bar" rel="nofollow noopener" title="foo.bar">foo.bar</a> (well maybe the latter is good for a Short cut)<br>And that's pretty much it for the object system.<br>We need flexible function calling that can have required args, optional args with<br>default values, &amp;rest args for unlimited args, and evaluation kinds so that<br><b>some text</b> can be a function call and not break because "some" isn't bound.<br>With the above we can represent control structures, data, anything SQL can do,<br>json like stuff, HTML like markup, etc. <br>Yes there's lots of details (and I've implemented most of them<br>in the language Water) , but we have an amazing resistance from programmers:<br>Guess what? It turns out we're a very conservative bunch. Why? I'd guess it has to<br>do with the shear complexity. Humans get conservative in the face of complexity.<br>Educators are also an extremely conservative bunch too. <br>They want to teach what they know and they know what they learned in school. <br>In general the status quo is conservative. If you are on top you don't want the<br>boat to be rocked. And if you are on top you control education curriculum amongst<br>many other things to maintain the status quo.</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>Matthew Fernandez</td><td class='dTS'>Fri, 01 Nov 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>Excellent points all round, Ian. I agree that one of the reasons alternative forms of displaying code haven't really taken off is because text is so good at expressing thought and intent already.</p><p>One of the areas you seem to be alluding to, but don't directly mention is the benefits of optimising compilers; particularly with respect to sequential vs parallel programming. A smarter compiler gives you the ability to write simpler, more readable code, without compromising on performance (c.f. tricks like tail call elimination). We've seen impressive advances in compiler optimisations in the last 20 years and I think there is still plenty of low hanging fruit in this area. A sufficiently clever compiler could even bring us closer to fully declarative code with the performance of imperative code. What are your thoughts about this?</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>Cristobal Dabed</td><td class='dTS'>Fri, 01 Nov 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>The funny thing about programming these days that we keep re-implementing stuff invented 30-40years ago. Functional programming concepts are more actual than ever, even co routines are back.</p><p>Interesting that you mentioned ZeroVm, Emerald a lesser know programming language <a href="http://en.wikipedia.org/wiki/Emerald_(programming_language)" rel="nofollow noopener" title="http://en.wikipedia.org/wiki/Emerald_(programming_language)">http://en.wikipedia.org/wik...</a>, did this already in the early 80s. However how reliable is reliable it was programmed such that the processes moved across the computers. The closed i have seen anything like this these days is Puppet or Chef when deploying environments to nodes (servers) still you are not moving pure processes around but you have the concept of nodes.</p><p>Perhaps most concepts invented 30-40years ago where too far ahead of its time ;)</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>Tristan Slominski</td><td class='dTS'>Sat, 09 Nov 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>One pet peeve... in section "procedures -&gt; goals and constraints" *objects* are simply assumed as a good idea in the first place. Worse yet, that enumerating object properties is a good idea. Both of those implied assumptions severely limit the solution space... consider, for example, actors, or object capabilities to contrast.</p></td></tr>
+<tr><td style='padding-left: 50px' class='dU'>Ian Bicking</td><td class='dTS'>Sun, 10 Nov 2013</td></tr>
+<tr><td style='padding-left: 50px' colspan='2' class='dMessage'><p>If you'd like to speculate in detail what it would mean to query actors or object capabilities, I'm all ears!</p></td></tr>
+<tr><td style='padding-left: 100px' class='dU'>Tristan Slominski</td><td class='dTS'>Sun, 10 Nov 2013</td></tr>
+<tr><td style='padding-left: 100px' colspan='2' class='dMessage'><p>One does not simply query actors or object capabilities... :)</p><p>From re-reading that section, it seems to me that the proposal calls for adding things to the objects themselves in order to support querying and traversal. The problem I see with this that in a run-time environment, this is a source of security issues of the "I'm not able to sandbox code" kind to the "I cannot reason about security of what has access to what anymore" kind. I am also referring to a type of security impossible in Python in the first place, so it's hard to fit this into that environment.</p><p>Consider an alternative model (inspired by actors and object capabilities (OCap)). Due to the nature of actors and OCap, they can't be queried or reveal their state by traversal.. well, they shouldn't because anyone could do that leading to poor security. But, accepting this constraint, what can then be done in an IDEnvironment? One proposal would be object proxies, and this could maybe be carried over perhaps into the python ideas you used as an example. There could be super-powerful security-breaking proxies in an IDE that allow you to reason about objects, however upon compilation/release (whatever that means in such a system), these are stripped away so that one cannot query or enumerate on objects. Source code distribution would include proxies... run-time distribution would not. I'll give this more thought, it's intriguing.</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>Tenn Leeuwenburg</td><td class='dTS'>Fri, 15 Nov 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>I think that programming isn't futuristic mainly because of the fact it's more about procedures than goals. I think our goal in the industry should be to continually strive to lift the level at which we work. However, much of that is as much about data as it is about code, as much about the scaffolding as the construction. Much of the complexity in our data comes about from the complexity of the world, but also from the organic nature of constructing things. I think for software construction to become more futuristic, we need more robust means of interactive with data.</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>collinmanderson</td><td class='dTS'>Tue, 10 Dec 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>typo: "from left to write"</p></td></tr>
+</table>
+
+          </div>
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

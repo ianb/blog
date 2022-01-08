@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Doctest.js & Callbacks</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2010-09-12T17:08:00-05:00">
+                Sunday, September 12nd, 2010
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2010/09/doctestjs-callbacks.html"
+                    rel="bookmark"
+                    title="Permalink to Doctest.js & Callbacks"
+                    >Doctest.js <span class="amp">&amp;</span>&nbsp;Callbacks</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>Many years ago I wrote a fairly straight-forward port of Python&#8217;s <a class="reference external" href="http://docs.python.org/library/doctest.html">doctest</a> to Javascript.  I thought it was cool, but I didn&#8217;t really talk about it that much.  Especially because I knew it had one fatal flaw: it was very unfriendly towards programming with callbacks, and Javascript uses a lot of&nbsp;callbacks.</p>
+<p>On a recent flight I decided to look at it again, and realized fixing that one flaw wasn&#8217;t actually a big deal.  So now doctest.js really works.  And I think it works well: <a class="reference external" href="http://doctestjs.org">doctest.js</a>.</p>
+<p>I have yet to really use doctest.js on more than a couple real cases, and as I do (or you do?) I expect to tweak it more to make it flow well. But having tried a couple of examples I am particularly liking how it can be used with&nbsp;callbacks.</p>
+<p>Testing with callbacks is generally a tricky thing.  You want to make assertions, but they happen entirely separately from the test runner&#8217;s own loop, and your callbacks may not run at all if there&#8217;s a&nbsp;failure.</p>
+<p>I came upon some tests recently that used <a class="reference external" href="http://pivotal.github.com/jasmine/">Jasmine</a>, a <a class="reference external" href="http://en.wikipedia.org/wiki/Behavior_Driven_Development"><span class="caps">BDD</span>-style</a> test framework.  I&#8217;m <a class="reference external" href="http://blog.ianbicking.org/behavior-driven-programming.html">not a big fan of <span class="caps">BDD</span></a> but I&#8217;m fairly new to serious Javascript development so I&#8217;m trying to withhold judgement.  The flow of the tests is a bit peculiar until you realize that it&#8217;s for async reasons.  I&#8217;ll try to show something that roughly approximates a real test of an XMLHttpRequest <span class="caps">API</span>&nbsp;call:</p>
+<pre class="literal-block">
+it(&quot;should give us no results&quot;, function() {
+  runs(function () {
+    var callback = createSpy('callback for results');
+    $.ajax({
+      url: '/search',
+      data: {q: &quot;query unlikely to match anything&quot;},
+      dataType: &quot;json&quot;,
+      success: callback
+    });
+  });
+  waits(someTimeout);
+  runs(function () {
+    expect(callback).toHaveBeenCalled();
+    expect(callback.mostRecentCall.args[0].length).toEqual(0);
+  });
+});
+</pre>
+<p>So, the basic pattern is <tt class="docutils literal">it()</tt> creates a group of tests, and each call to <tt class="docutils literal">run()</tt> is a set of items to call sequentially.  Then between these run blocks you can have signals to the runner to wait for some result, either a timeout (which is fragile), or you can setup specific&nbsp;conditions.</p>
+<p>Another popular test runner is <a class="reference external" href="http://docs.jquery.com/Qunit">QUnit</a>; it&#8217;s popular particularly because it&#8217;s what jQuery uses, and my own impression is that QUnit is just very simple and so least likely to piss you&nbsp;off.</p>
+<p>QUnit has its own style for&nbsp;async:</p>
+<pre class="literal-block">
+test(&quot;should give us no results&quot;, function () {
+  stop();
+  expect(1);
+  $.ajax({
+    url: '/search',
+    data: {q: &quot;query unlikely to match anything&quot;},
+    dataType: &quot;json&quot;,
+    success: function (result) {
+      ok(result.length == 0, 'No results');
+      start();
+    }
+  });
+});
+</pre>
+<p><tt class="docutils literal">stop()</tt> confused me for a bit until I realized what they were really referring to stopping the <em>test runner</em>; of course the function continues on regardless.  What will happen is that the function will return, but nothing will have really been tested &#8212; the <tt class="docutils literal">success</tt> callback will not have been run, and <em>cannot</em> run until all Javascript execution stops and control is given back to the browser.  So the test runner will use <tt class="docutils literal">setTimeout</tt> to let time pass before the test continues.  In this case it will continue once <tt class="docutils literal">start()</tt> is called. And <tt class="docutils literal">expect()</tt> also makes it fail if it didn&#8217;t get at least one assertion during that interval &#8212; it would otherwise be easy to simply miss an assertion (though in this example it would be okay because if the success callback isn&#8217;t invoked then <tt class="docutils literal">start()</tt> will never be called, and the runner will timeout and signal that as a&nbsp;failure).</p>
+<p>So&#8230; now for doctest.js.  Note that doctest.js isn&#8217;t &#8220;plain&#8221; Javascript, it looks like what an interactive Javascript session might look like (I&#8217;ve used shell-style prompts instead of typical console prompts, because the consoles didn&#8217;t exist when first I wrote this, and because <tt class="docutils literal"><span class="pre">&gt;&gt;&gt;/...</span></tt> kind of annoy me&nbsp;anyway).</p>
+<pre class="literal-block">
+$ success = Spy('success', {writes: true});
+$ $.ajax({
+&gt;   url: '/search',
+&gt;   data: {q: &quot;query unlikely to match anything&quot;},
+&gt;   dataType: &quot;json&quot;,
+&gt;   success: success.func
+&gt; });
+$ success.wait();
+success([])
+</pre>
+<p>With doctest.js you still get a fairly linear feel &#8212; it&#8217;s similar to how Jasmine works, except every <tt class="docutils literal">$</tt> prompt is potentially a place where the loop can be released so something async can happen.  Each prompt is equivalent to <tt class="docutils literal">run()</tt> (though unless you call wait, directly or indirectly, everything will run in&nbsp;sequence).</p>
+<p>There&#8217;s also an implicit assertion for each stanza, which is anything that is written must be matched (<tt class="docutils literal">{writes: true}</tt> makes the spy/mock object write out any invocations).  This makes it much harder to miss something in your&nbsp;tests.</p>
+<p><strong>Update</strong>: just for the record, doctest has changed some, and while that example still works, this would be the &#8220;right&#8221; way to do it&nbsp;now:</p>
+<pre class="literal-block">
+$.ajax({
+  url: '/search',
+  data: {q: &quot;query unlikely to match anything&quot;},
+  dataType: &quot;json&quot;,
+  success: Spy(&quot;search.success&quot;, {wait: true, ignoreThis: true})
+});
+// =&gt; search.success([])
+</pre>
+<p>There is a new format that I now prefer with plain Javascript and &#8220;expected output&#8221; in comments.  <cite>Spy(&#8220;search.success&#8221;, {wait: true, ignoreThis: true})</cite> causes the test to wait on the Spy immediately (though the same pattern as before is also possible and sometimes preferable), and in all likelihood jQuery will set <cite>this</cite> to something we don&#8217;t care about, so <cite>ignoreThis: true</cite> keeps it from being printed.  (Or maybe you are interested in it, in which case you&#8217;d leave that&nbsp;out)</p>
+<p>Anyway, back to the original conclusion (update&nbsp;over)&#8230;</p>
+<p>I&#8217;ve never actually found Python&#8217;s doctest to be a particularly good way to write docs, and I don&#8217;t expect any different from doctest.js, but I find it a very nice way to <em>write</em> and <em>run</em> tests&#8230; and while Python&#8217;s doctest is essentially abandoned and lacks many features to make it a more humane testing environment, maybe doctest.js can do&nbsp;better.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

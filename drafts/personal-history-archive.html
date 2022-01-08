@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Personal History Archive: a research tool</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2018-02-05T00:00:00-06:00">
+                Monday, February 5th, 2018
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/drafts/personal-history-archive.html"
+                    rel="bookmark"
+                    title="Permalink to Personal History Archive: a research tool"
+                    >Personal History Archive: a research&nbsp;tool</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I&#8217;d like to introduce an experiment and research tool I&#8217;ve been working&nbsp;on:</p>
+<p><a href="https://github.com/ianb/personal-history-archive/">Personal History Archive</a> is a project to create local corpus of your own browser history for your&nbsp;self-analysis.</p>
+<p>There&#8217;s three&nbsp;parts:</p>
+<ol>
+<li><a href="https://github.com/ianb/personal-history-archive/tree/master/tracker-extension">An extension</a> that saves your browser history to a local server/database. This can run in Chrome and Firefox (and maybe other&nbsp;browsers?)</li>
+<li>A script to launch Firefox with another <a href="https://github.com/ianb/personal-history-archive/tree/master/fetcher-extension">special extension</a> that will fetch and serialize the pages from your&nbsp;history.</li>
+<li>A <a href="https://github.com/ianb/personal-history-archive/tree/master/python">Python library</a> to access the database and&nbsp;pages.</li>
+</ol>
+<h2>Motivation</h2>
+<p>I think there&#8217;s semantic gold somewhere in this. I don&#8217;t know where, so the first step I&#8217;m taking is to collect information in a way that is reasonably easy to work&nbsp;with.</p>
+<p>I think a personal archive is also unique: it represents how <em>you</em> experience the web, and will contain lots of private information. Even with trackers and all the databases out there, no one really has this particular slice of information. Other corpuses of documents typically are organized around the site collecting the&nbsp;documents.</p>
+<p>By combining the archive of pages with the browsing history metadata there&#8217;s another set of behavioral data: not just the web page nouns, but the verbs of how you interacted with&nbsp;them.</p>
+<p>History isn&#8217;t just for analyzing the past, it&#8217;s also a stand-in for any browsing activity. Even if you only want to augment browsing in the present, you can judge the benefit by seeing how your augmentation would have applied to past&nbsp;behavior.</p>
+<p>Lastly, at this moment we&#8217;re all gaining confidence in handling relatively messy data through <span class="caps">AI</span> techniques. The old <a href="https://en.wikipedia.org/wiki/Semantic_Web">Semantic Web</a> imagined a formally parseable web, probably with an Oracle Of Truth that Knows All, in the form of a giant tuple-database. Google got over the formally parseable requirement, but they&#8217;ve still created one silo of truth, and the rest of us seem stuck in a morasse of non-understanding. We have the tools to consider local, contextual&nbsp;understanding.</p>
+<h3>The &#8220;Personal&#8221;&nbsp;Part</h3>
+<p>There&#8217;s been a lot of work on anonymized data. At Mozilla (where I work) there&#8217;s been active interest in <a href="https://en.wikipedia.org/wiki/Differential_privacy">differential privacy</a> so we can collect and analyze user data while retaining privacy. Doing this is very hard and full of controversy. Even if everything worked perfectly we&#8217;d still be throwing away lots of information, as everyone&#8217;s personal long tail has to be chopped off to preserve&nbsp;anonymity.</p>
+<p>Using just personal information gets around this problem. It has downsides. It&#8217;s disappointing we can&#8217;t share our source information. I do not intend to distribute my own corpus. But it&#8217;s better to enable personal experimentation than not experiment at&nbsp;all!</p>
+<p>This also lets us explore a personalized understanding that is different from what the incumbents do. Google can see a lot&#8230; but it can&#8217;t see Facebook. Facebook can see a lot&#8230; but it can&#8217;t read your email. If we want to put individuals at the center of computing – which I would like – then I think there&#8217;s value in using an individual as the center of exploration. And the only individual I have access to is me, so I&#8217;ll start&nbsp;there.</p>
+<p>This project is not intended for normal users. But I suspect, given a wealth of information, we can find productive uses for subsets of that information: subsets that are much easier to collect than this full document corpus. We don&#8217;t yet know what subsets are&nbsp;interesting</p>
+<h2>The&nbsp;Fetcher</h2>
+<p>Unlike many archiving tools, the page fetcher does not make and record <span class="caps">HTTP</span> sessions. Instead each page is opened in a browser, using a browser profile that hopefully has been logged-in to all your personal accounts. The fetcher waits for the page to truly finish loading, and then it is serialized from the browser&#8217;s <span class="caps">DOM</span>.</p>
+<p>This is slow, so it better be worth&nbsp;it!</p>
+<p>If you try it out, you&#8217;ll see the browser open pages from your past in several tabs, flop the focus around (Firefox has started deprioritizing background tabs in a way that foils our attempt at multitasking), and closing tabs when it is&nbsp;through.</p>
+<p>I&#8217;ve put a lot of attention into the pages that are saved. You can expect the markup to be unambiguous. Some information is&nbsp;added:</p>
+<ul>
+<li>Images have their dimensions&nbsp;added</li>
+<li>Elements that aren&#8217;t visible have <code>data-hidden="1"</code> added</li>
+<li>Elements that have an unusual <code>display</code> value (per <span class="caps">CSS</span>) get attributes like <code>data-display="block"</code> (this way you can, for instance, get a hint that a <code>&lt;span&gt;</code> is being used as a&nbsp;control)</li>
+<li>It takes a screenshot of the visible portion, and a smaller screenshot of the full&nbsp;page</li>
+<li>It tries to extract a readable article via <a href="https://github.com/mozilla/readability">Readability</a></li>
+<li>Any elements that would have been part of the readable view are marked with <code>data-is-readable="1"</code></li>
+<li>Any links to external resources are parsed&nbsp;out</li>
+</ul>
+<p>The hope is that later you won&#8217;t need the browser&#8217;s rendering engine to understand the page. But if you do need to render the page, we&#8217;ve kept enough information to render the page without the delays required in the initial&nbsp;fetch.</p>
+<h2>The Python&nbsp;library</h2>
+<p>I&#8217;ve only just started this library. The server is written with Node.js, and of course the extensions are JavaScript, and I started out trying to be somewhat language agnostic. But then I started writing some Python, and it quickly became clear to me that it was the easiest approach. Python has enough interesting libraries, and personal analysis doesn&#8217;t need the concurrency mental overhead of JavaScript. Python has become the standard language for this kind of work, and I&#8217;m quite happy with&nbsp;that.</p>
+<p>Publishing iPython notebooks is also an interesting collaboration tool: it lets someone demonstrate what they found in their personal corpus, it lets someone else kind of repeat that on their own corpus, but you can feel somewhat secure in what information you are actually sharing. I&#8217;ve only just started on an <a href="https://github.com/ianb/personal-history-archive/blob/master/python/example.ipynb">example notebook</a>, but I look forward to using it as a primary form of&nbsp;documentation.</p>
+<h2>Where&nbsp;Next?</h2>
+<p>I don&#8217;t know where this goes next. I&#8217;m still figuring it out. This is an invitation to figure out stuff together. Here&#8217;s a couple things I&#8217;ve thought&nbsp;about:</p>
+<ol>
+<li>History search (<span class="caps">IMHO</span> it&#8217;s not obvious what facets are most useful to&nbsp;search)</li>
+<li>Page summarization for recall: what&#8217;s the best way to show something from your&nbsp;past?</li>
+<li>Something like PageRank but using your own browsing activity (something a bit better than <a href="https://en.wikipedia.org/wiki/Frecency">frecency</a>)</li>
+<li>Next page prediction: give a page or set of tabs, what&#8217;s a likely next&nbsp;page?</li>
+<li>Next link prediction: given a page, which link from it seems most likely to interest you? Maybe this could be exposed during browsing with prefetching and&nbsp;summarization.</li>
+<li>Page clustering or categorization: what are the distinct <em>kinds</em> of work you do in your&nbsp;browser?</li>
+<li>Detect commonly revisited pages, summarize them in some&nbsp;fashion</li>
+<li>Use a <a href="https://en.wikipedia.org/wiki/MaxDiff">MaxDiff</a> approach to rank your own history, see what comes out of&nbsp;that</li>
+<li>Figure out ways to grab the images from your history, for&#8230; something? What this idea lacks in specificity it might make up for in visual&nbsp;appeal.</li>
+<li>Apply image analysis to the screenshots: does the <em>style</em> of the page imply&nbsp;anything?</li>
+<li>Personalized summaries: it&#8217;s possible to do summarization that comes out of the document set, not just a single document, and so it be possible to make a personalized summary based on what is likely to interest you given your past&nbsp;history.</li>
+<li>Assemble navigation trails that led to a page, including search queries and link titles; add that data to the page&#8217;s metadata (and use that in any of these other&nbsp;experiments)</li>
+<li>See if we can identify areas of pages that are uninteresting, insofar as they never get clicked on (to produce a new history&nbsp;item).</li>
+<li>Try to detect what pages signal&nbsp;distraction.</li>
+<li>Re-fetch pages to detect changes, see if you can train an algorithm to predict which pages are&nbsp;volatile.</li>
+<li>Given a page from history, what else were you looking at at the same time? Is that a meaningful&nbsp;group?</li>
+<li>Can we predict search queries from the pages open before the search was&nbsp;done?</li>
+<li>If two pages point to the same third page, does that mean something about&nbsp;them?</li>
+<li>Try to score pages based on implied dwell time. Unfortunately we don&#8217;t get dwell time, but <em>might</em> be able to reconstruct&nbsp;it.</li>
+<li>Is a page embarassing? Might require user input, but if we can train an embarassing-page-indicator then hsitory sharing might be&nbsp;easier.</li>
+<li>Can we detect self-generated content? Composed emails, composed documents&#8230; if we could, then we might be able to think of other kinds of engagement that aren&#8217;t simply page&nbsp;consumption.</li>
+<li>Create a Table Of Contents for a moment in time or a set of tabs. Can we figure out interesting ways to structure the information in a set of concurrently-browsed tabs, such that it can be shared or more easily&nbsp;consumed?</li>
+<li>Detect textual references across pages, when pages simply use the same language, even if they don&#8217;t formally link to each&nbsp;other.</li>
+</ol>
+<p>We can also just use the pages for general&nbsp;analysis:</p>
+<ol>
+<li>Test information extraction algorithms (e.g., finding product pages, phone numbers, addresses, etc). Assemble a contact list from your&nbsp;history.</li>
+<li>Try to detect if a page is personalized or authenticated (doing a second anonymous request should reveal facts that can be used in&nbsp;training)</li>
+<li>Train a new readable-article-extraction based on what Readability does, but maybe more&nbsp;generalizable</li>
+<li>Try some of the embedding techniques (similar to <a href="https://en.wikipedia.org/wiki/Word_embedding">word embedding</a>) on <span class="caps">DOM</span> structure. Maybe if we can create these vectors for <span class="caps">CSS</span> classes or element tags, we can use those to add more meaning to the enclosed&nbsp;words.</li>
+<li>Import other sources of data to mix with the personal data. E.g.,&nbsp;Wikipedia.</li>
+<li>Given the contents of an article, try to train a model to generate the actual&nbsp;title.</li>
+<li>Given the <code>&lt;title&gt;</code>, try to train a model to generate the <code>og:title</code>.</li>
+</ol>
+<p>Lots of stuff to&nbsp;try!</p></div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

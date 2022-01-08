@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Javascript Status Message Display</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,87 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2008-12-17T12:03:00-06:00">
+                Wednesday, December 17th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/12/javascript-status-message-display.html"
+                    rel="bookmark"
+                    title="Permalink to Javascript Status Message Display"
+                    >Javascript Status Message&nbsp;Display</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>In a <a class="reference external" href="http://www.bitbucket.org/ianb/pickywiki/">little wiki I&#8217;ve been playing with</a> I&#8217;ve been trying out little ideas that I&#8217;ve had but haven&#8217;t had a place to actually implement them.  One is how notification messages work.  I&#8217;m sure other people have done the same thing, but I thought I&#8217;d describe it&nbsp;anyway.</p>
+<p>A <a class="reference external" href="http://blog.ianbicking.org/web-application-patterns-status-notification.html">common pattern</a> is to accept a <span class="caps">POST</span> request and then redirect the user to some page, setting a status message.  Typically the status message is either set in a cookie or in the session, then the standard template for the application has some code to check for a message and display&nbsp;it.</p>
+<p>The problem with this is that this breaks all caching &#8212; at any time any page can have some message injected into it, basically for no reason at all.  So I thought: why not do the whole thing in Javascript?  The server will set a cookie, but only Javascript will read&nbsp;it.</p>
+<p>The code goes like this; on the server (easily translated into any&nbsp;framework):</p>
+<pre class="literal-block">
+resp.set_cookie('flash_message', urllib.quote(msg))
+</pre>
+<p>I quote the message because it can contain characters unsafe for cookies, and <span class="caps">URL</span> quoting is a particularly easy quoting to&nbsp;apply.</p>
+<p>Then I have this Javascript (using&nbsp;jQuery):</p>
+<pre class="literal-block">
+$(function () {
+    // Anything in $(function...) is run on page load
+    var flashMsg = readCookie('flash_message');
+    if (flashMsg) {
+        flashMsg = unescape(flashMsg);
+        var el = $('&lt;div id=&quot;flash-message&quot;&gt;'+
+          '&lt;div id=&quot;flash-message-close&quot;&gt;'+
+          '&lt;a title=&quot;dismiss this message&quot; '+
+          'id=&quot;flash-message-button&quot; href=&quot;#&quot;&gt;X&lt;/a&gt;&lt;/div&gt;'+
+          flashMsg + '&lt;/div&gt;');
+        $('a#flash-message-button', el).bind(
+          'click', function () {
+            $(this.parentNode.parentNode).remove();
+        });
+        $('#body').prepend(el);
+        eraseCookie('flash_message');
+    }
+});
+</pre>
+<p>Note that I&#8217;ve decided to treat the flash message as <span class="caps">HTML</span>.  I don&#8217;t see a strong risk of injection attack in this case, though I must admit I&#8217;m a little unclear about what the normal policies are for cross-domain cookie&nbsp;setting.</p>
+<p>I use <a class="reference external" href="http://www.quirksmode.org/js/cookies.html">these cookie functions</a> because oddly I can&#8217;t find cookie handling functions in jQuery.  It&#8217;s always weird to me how primitive <tt class="docutils literal">document.cookie</tt> is.  Anyway, <span class="caps">CSS</span> looks like&nbsp;this:</p>
+<pre class="literal-block">
+#flash-message {
+  margin: 0.5em;
+  border: 2px solid #000;
+  background-color: #9f9;
+  -moz-border-radius: 4px;
+  text-align: center;
+}
+
+#flash-message-close {
+  float: right;
+  font-size: 70%;
+  margin: 2px;
+}
+
+a#flash-message-button {
+  text-decoration: none;
+  color: #000;
+  border: 1px solid #9f9;
+}
+
+a#flash-message-button:hover {
+  border: 1px solid #000;
+  background-color: #009;
+  color: #fff;
+}
+</pre>
+<p>This doesn&#8217;t have non-Javascript fallback, but I think that&#8217;s okay.  This isn&#8217;t something that a spider would ever see (since spiders shouldn&#8217;t be submitting forms that result in update messages).  Accessible browsers generally implement Javascript so that&#8217;s also not particularly a problem, though there may be additional hints I could give in <span class="caps">CSS</span> or Javascript to help make this more readable (if there&#8217;s a message, it should probably be the first thing read on the&nbsp;page).</p>
+<p>Another common component of pages that varies separate from the page itself is logged-in status, but that&#8217;s more heavily connected to your application.  Get both into Javascript and you might be able to turn caching way up on a lot of your&nbsp;pages.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +115,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

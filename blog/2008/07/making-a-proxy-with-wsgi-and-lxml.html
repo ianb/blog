@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Making a proxy with WSGI and lxml</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2008-07-30T10:52:00-05:00">
+                Wednesday, July 30th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/07/making-a-proxy-with-wsgi-and-lxml.html"
+                    rel="bookmark"
+                    title="Permalink to Making a proxy with WSGI and lxml"
+                    >Making a proxy with <span class="caps">WSGI</span> and&nbsp;lxml</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>You can use <span class="caps">WSGI</span> to make rewriting middleware; <a class="reference external" href="http://pythonpaste.org/webob/">WebOb</a> specifically makes it easy to write.  And that&#8217;s cool, but it&#8217;s more satisfying to use your middleware right away without having to think about writing applications that might live behind the&nbsp;middleware.</p>
+<p>There&#8217;s two libraries I&#8217;ll describe here to make that possible: <a class="reference external" href="http://pythonpaste.org/modules/proxy.html#paste.proxy.Proxy">paste.proxy</a> to send <span class="caps">WSGI</span> requests out via <span class="caps">HTTP</span>, and <a class="reference external" href="http://codespeak.net/lxml/lxmlhtml.html">lxml.html</a> which lets you rewrite the <span class="caps">HTML</span> to fix up the&nbsp;links.</p>
+<p>To start, we need some kind of middleware that at least is noticeable.  How about something to make a word jumble of the page?  We&#8217;ll use lxml as&nbsp;well:</p>
+<pre class="literal-block">
+from lxml import html
+from random import shuffle
+
+def jumble_words(doc):
+    &quot;&quot;&quot;Mixes up the words in an HTML document (doesn't touch tags or attributes)&quot;&quot;&quot;
+    doc = html.fromstring(doc)
+    # .text_content() gives the text without tags or attributes,
+    # .body is the &lt;body&gt; tag:
+    words = doc.body.text_content().split()
+    shuffle(words)
+    for el in doc.body.iterdescendants():
+        # The ElementTree model puts all text in .text and .tail on elements, so that's
+        # what we mix up:
+        el.text = random_words(el.text, words)
+        el.tail = random_words(el.tail, words)
+    return html.tostring(doc)
+
+def random_words(text, words):
+    &quot;&quot;&quot;Pulls some words from the list words, with the same number of words in
+    the previous `text`&quot;&quot;&quot;
+    # text can be None, so we need this test:
+    if not text:
+        return text
+    word_count = len(text.split())
+    try:
+        return ' '.join(words.pop() for i in range(word_count))
+    except IndexError:
+        # This shouldn't happen, because we should have exactly
+        # the right number of words, but just in case...
+        return text
+
+from webob import Request
+
+class JumbleMiddleware(object):
+    &quot;&quot;&quot;Middleware that jumbles the words of HTML responses
+    &quot;&quot;&quot;
+    # This __init__ and __call__ are the basic pattern for middleware:
+    def __init__(self, app):
+        self.app = app
+    def __call__(self, environ, start_response):
+        req = Request(environ)
+        # We don't want 304 Not Modified responses, because we mix up the response
+        # differently every time.  So we'll make sure all the headers that could call that
+        # (If-Modified-Since, etc) are removed with .remove_conditional_headers():
+        req.remove_conditional_headers()
+        # This calls the application with the request, and then returns a response; this
+        # is the typical pattern for response-modifying middleware using WebOb:
+        resp = req.get_response(self.app)
+        if resp.content_type == 'text/html':
+            resp.body = jumble_words(resp.body)
+        return resp(environ, start_response)
+</pre>
+<p>Well, you don&#8217;t really need to jumble up your <em>own</em> pages, right?  Much more fun to jumble other people&#8217;s pages.  Enter the proxy.  Here&#8217;s a basic&nbsp;proxy:</p>
+<pre class="literal-block">
+from paste.proxy import Proxy
+# We use this to make sure we didn't mess up anything with JumbleMiddleware;
+# the validator checks for many WSGI requirements:
+from wsgiref.validate import validator
+import sys
+
+def main():
+    proxy_url = sys.argv[1]
+    app = JumbleMiddleware(
+        Proxy(proxy_url))
+    app = validator(app)
+    from paste.httpserver import serve
+    serve(app, 'localhost', 8080)
+
+if __name__ == '__main__':
+    main()
+</pre>
+<p>If you look at the <a class="reference external" href="http://svn.colorstudy.com/home/ianb/recipes/rewritingproxy.py">full source</a> the command-line is a bit fancier, but it&#8217;s all obvious&nbsp;stuff.</p>
+<p><span class="caps">OK</span>, so this will work, but the links will often be broken unless the server only gives relative links.  But you can rewrite the links using&nbsp;lxml&#8230;</p>
+<pre class="literal-block">
+import urlparse
+
+class LinkRewriterMiddleware(object):
+    &quot;&quot;&quot;Rewrites the response, assuming the HTML was generated as though based at
+    `dest_href`, and needs to be rewritten for the incoming request&quot;&quot;&quot;
+
+    # The normal __init__, __call__ pattern:
+    def __init__(self, app, dest_href):
+        self.app = app
+        if dest_href.endswith('/'):
+            dest_href = dest_href[:-1]
+        self.dest_href = dest_href
+
+    def __call__(self, environ, start_response):
+        req = Request(environ)
+        # .path_info (aka environ['PATH_INFO']) is the path of the request
+        # (URL rewriting doesn't really have to care about query strings)
+        dest_path = req.path_info
+        dest_href = self.dest_href + dest_path
+        # req.application_url is the base URL not including path_info or the query string:
+        req_href = req.application_url
+        def link_repl_func(link):
+            link = urlparse.urljoin(dest_href, link)
+            if not link.startswith(dest_href):
+                # Not a local link
+                return link
+            new_url = req_href + '/' + link[len(dest_href):]
+            return new_url
+        resp = req.get_response(self.app)
+        # This decodes any possible gzipped content:
+        resp.decode_content()
+        if (resp.status_int == 200
+            and resp.content_type == 'text/html'):
+            doc = html.fromstring(resp.body, base_url=dest_href)
+            doc.rewrite_links(link_repl_func)
+            resp.body = html.tostring(doc)
+        # Redirects need their redirect locations rewritten:
+        if resp.location:
+            resp.location = link_repl_func(resp.location)
+        return resp(environ, start_response)
+</pre>
+<p>Then we rewire the&nbsp;application:</p>
+<pre class="literal-block">
+app = JumbleMiddleware(
+    LinkRewriterMiddleware(Proxy(proxy_url), proxy_url))
+</pre>
+<p>Now there&#8217;s a fun little proxy for you to play with.  You can see the code <a class="reference external" href="http://svn.colorstudy.com/home/ianb/recipes/rewritingproxy.py">here</a>.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

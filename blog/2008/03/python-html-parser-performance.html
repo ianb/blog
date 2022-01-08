@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Python HTML Parser Performance</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2008-03-30T19:54:00-05:00">
+                Sunday, March 30th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/03/python-html-parser-performance.html"
+                    rel="bookmark"
+                    title="Permalink to Python HTML Parser Performance"
+                    >Python <span class="caps">HTML</span> Parser&nbsp;Performance</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>In preparation for my <a class="reference external" href="http://blog.ianbicking.org/2008/03/21/pycon-talks/">PyCon talk on <span class="caps">HTML</span></a> I thought I&#8217;d do a performance comparison of several parsers and document&nbsp;models.</p>
+<p>The situation is a little complex because there&#8217;s different steps in handling <span class="caps">HTML</span>:</p>
+<ol class="arabic simple">
+<li>Parse the <span class="caps">HTML</span></li>
+<li>Parse it <em>into</em> something (a document&nbsp;object)</li>
+<li>Serialize&nbsp;it</li>
+</ol>
+<p>Some libraries handle 1, some handle 2, some handle 1, 2, 3, etc.  For instance, <a class="reference external" href="http://effbot.org/zone/element-soup.htm">ElementSoup</a> uses <a class="reference external" href="http://effbot.org/zone/element-index.htm">ElementTree</a> as a document, but <a class="reference external" href="http://www.crummy.com/software/BeautifulSoup/">BeautifulSoup</a> as the parser.  BeautifulSoup itself has a document object included.  <a class="reference external" href="http://python.org/doc/current/lib/module-HTMLParser.html">HTMLParser</a> <em>only</em> parses, while <a class="reference external" href="http://code.google.com/p/html5lib/">html5lib</a> includes tree builders for several kinds of trees.  There is also <span class="caps">XML</span> and <span class="caps">HTML</span>&nbsp;serialization.</p>
+<p>So I&#8217;ve taken several combinations and made benchmarks.  The combinations&nbsp;are:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://codespeak.net/lxml/">lxml</a>: a parser, document, and <span class="caps">HTML</span> serializer.  Also can use BeautifulSoup and html5lib for&nbsp;parsing.</li>
+<li><a class="reference external" href="http://www.crummy.com/software/BeautifulSoup/">BeautifulSoup</a>: a parser, document, and <span class="caps">HTML</span>&nbsp;serializer.</li>
+<li><a class="reference external" href="http://code.google.com/p/html5lib/">html5lib</a>: a parser.  It has a serializer, but I didn&#8217;t use it.  It has a built-in document object (simpletree), but I don&#8217;t think it&#8217;s meant for much more than&nbsp;self-testing.</li>
+<li><a class="reference external" href="http://effbot.org/zone/element-index.htm">ElementTree</a>: a document object, and <span class="caps">XML</span> serializer (I think newer versions might include an <span class="caps">HTML</span> serializer, but I didn&#8217;t use it).  It doesn&#8217;t have a parser, but I used html5lib to parse to it.  (I didn&#8217;t use the&nbsp;ElementSoup.)</li>
+<li><a class="reference external" href="http://effbot.org/zone/celementtree.htm">cElementTree</a>: a document object implemented as a C extension.  I didn&#8217;t find any&nbsp;serializer.</li>
+<li><a class="reference external" href="http://python.org/doc/current/lib/module-HTMLParser.html">HTMLParser</a>: a parser.  It didn&#8217;t parse <em>to</em> anything.  It also doesn&#8217;t parse lots of normal (but maybe invalid) <span class="caps">HTML</span>.  When using it, I just ran documents through the parser, not constructing any&nbsp;tree.</li>
+<li><a class="reference external" href="http://formencode.org/htmlfill.html">htmlfill</a>: this library uses HTMLParser, but at least pays <em>a little</em> attention to the elements as they are&nbsp;parsed.</li>
+<li><a class="reference external" href="http://genshi.edgewall.org/">Genshi</a>: includes a parser, document, and <span class="caps">HTML</span>&nbsp;serializer.</li>
+<li><a class="reference external" href="http://python.org/doc/current/lib/module-xml.dom.minidom.html">xml.dom.minidom</a>: a document model built into the standard library, which html5lib can parse to.  (I do not recommend using minidom for anything &#8212; some reasons will become apparent in this post, but there are many other reasons not covered why you shouldn&#8217;t use&nbsp;it.)</li>
+</ul>
+<p>I expected lxml to perform well, as it is based on the C library <a class="reference external" href="http://xmlsoft.org/">libxml2</a>.  But it performed better than I realized, far better than any other library.  As a result, if it wasn&#8217;t for some persistent installation problems (especially on Macs) I would recommend lxml for just about any <span class="caps">HTML</span>&nbsp;task.</p>
+<p>You can try the code out <a class="reference external" href="http://svn.colorstudy.com/home/ianb/python-html-perf">here</a>.  I&#8217;ve included all the sample data, and the commands I ran for these graphs are <a class="reference external" href="http://svn.colorstudy.com/home/ianb/python-html-perf/results.html">here</a>.  These tests use a fairly random selection of <span class="caps">HTML</span> files (355 total) taken from&nbsp;python.org.</p>
+<p><strong>Parsing</strong></p>
+<img src="http://blog.ianbicking.org/wp-content/uploads/images/parsing-results.png" alt="lxml:0.6; BeautifulSoup:10.6; html5lib ElementTree:30.2; html5lib minidom:35.2; Genshi:7.3; HTMLParser:2.9; htmlfill:4.5" style="padding: 1em"><p>The first test parses the documents.  Things to note: lxml is 6x faster than even HTMLParser, even though HTMLParser isn&#8217;t <em>doing</em> anything (lxml is building a tree in memory).  I didn&#8217;t include all the things html5lib can parse to, because they all take about the same amount of time.  xml.dom.minidom is only included because it is so noticeably slow.  Genshi is fairly fast, but it&#8217;s the most fragile of the parsers.  html5lib, lxml, and BeautifulSoup are all fairly similarly robust.  html5lib has the benefit of (at least in theory) being <em>the</em> correct parsing of <span class="caps">HTML</span>.</p>
+<p>While I don&#8217;t really believe it matters often, lxml releases the <span class="caps">GIL</span> during&nbsp;parsing.</p>
+<p><strong>Serialization</strong></p>
+<img src="http://blog.ianbicking.org/wp-content/uploads/images/serialization-results.png" alt="lxml:0.3; BeautifulSoup:2.0; html5lib ElementTree:1.9; html5lib minidom:3.8; Genshi:4.4" style="padding: 1em"><p>Serialization is pretty fast across all the libraries, though again lxml leads the pack by a long distance.  ElementTree and minidom are only doing <span class="caps">XML</span> serialization, but there&#8217;s no reason that the <span class="caps">HTML</span> equivalent would be any faster.  That Genshi is slower than minidom is surprising.  That <em>anything</em> is worse than minidom is generally&nbsp;surprising.</p>
+<p><strong>Memory</strong></p>
+<img src="http://blog.ianbicking.org/wp-content/uploads/images/memory-results.png" alt="lxml:26; BeautifulSoup:82; BeautifulSoup lxml:104; html5lib cElementTree:54; html5lib ElementTree:64; html5lib simpletree:98; html5lib minidom:192; Genshi:64; htmlfill:5.5; HTMLParser:4.4" style="padding: 1em"><p>The last test is of memory.  I don&#8217;t have a lot of confidence in the way I made this test, but I&#8217;m sure it means <em>something</em>.  This was done by parsing all the documents and holding the documents in memory, and using the <span class="caps">RSS</span> size reported by <tt class="docutils literal">ps</tt> to see how much the process had grown.  All the libraries should be imported when calculating the baseline, so only the documents and parsing should cause the memory&nbsp;increase.</p>
+<p>HTMLParser is a baseline, as it just keeps the documents in memory as a string, and creates some intermediate strings.  The intermediate strings don&#8217;t end up accounting for anything, since the memory used is almost exactly the combined size of all the&nbsp;files.</p>
+<p>A tricky part of this measurement is that the Python allocator doesn&#8217;t let go of memory that it requests, so if a <em>parser</em> creates lots of intermediate strings and then releases them the process will still hang onto all that memory.  To detect this I tried allocating new strings until the process size grew (trying to detect allocated but unused memory), but this didn&#8217;t reveal much &#8212; only the BeautifulSoup parser, serialized to an lxml tree, showed much extra&nbsp;memory.</p>
+<p>This is one of the only places where html5lib with <strong>c</strong>ElementTree was noticeably different than html5lib with ElementTree.  Not that surprising, I guess, since I didn&#8217;t find a coded-in-C serializer, and I imagine the tree building is only going to be a lot faster for cElementTree if you are building the tree from C code (as its native <span class="caps">XML</span> parser would&nbsp;do).</p>
+<p>lxml is probably memory efficient because it uses native libxml2 data structures, and only creates Python objects on&nbsp;demand.</p>
+<p><strong>In&nbsp;Conclusion</strong></p>
+<p>I knew lxml was fast before I started these benchmarks, but I didn&#8217;t expect it to be quite <em>this</em>&nbsp;fast.</p>
+<p>So in conclusion: lxml kicks ass.  You can use it in ways you couldn&#8217;t use other systems.  You can parse, serialize, parse, serialize, and repeat the process a couple times with your <span class="caps">HTML</span> before the performance will hurt you.  With high-level constructs many constructs can happen in very fast C code without calling out to Python.  As an example, if you do an XPath query, the query string is compiled into something native and traverses the native libxml2 objects, only creating Python objects to wrap the query results.  In addition, things like the modest memory use make me more confident that lxml will act reliably even under unexpected&nbsp;load.</p>
+<p>I also am more confident about using a document model instead of stream parsing.  It is sometimes felt that streamed parsing is better: you don&#8217;t keep the entire document in memory, and your work generally scales linearly with your document size.  HTMLParser is a stream-based parser, emitting events for each kind of token (open tag, close tag, data, etc).  Genshi also uses this model, with higher-level stuff like <a class="reference external" href="http://genshi.edgewall.org/wiki/Documentation/0.4.x/filters.html">filters</a> to make it feel a bit more natural.  But the stream model is <em>not</em> the natural way to process a document, it&#8217;s actually a really awkward way to handle a document that is better seen as a single thing.  If you are processing gigabyte files of <span class="caps">XML</span> it can make sense (and both the normally document-oriented lxml and ElementTree offer options when this happens).  This doesn&#8217;t make any sense for <span class="caps">HTML</span>.  And these tests make me believe that even <em>really big</em> <span class="caps">HTML</span> documents can be handled quite well by lxml, so a huge outlying document won&#8217;t break a system that is appropriately optimized for handling normal sized&nbsp;documents.</p>
+</div>
+        <!-- /.entry-content -->
+          <div class="comments">
+            <h2>Comments</h2>
+            <table class='table table-striped'>
+<tr><td style='padding-left: 0px' class='dU'>manageyp</td><td class='dTS'>Fri, 22 Nov 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>Cool~</p></td></tr>
+</table>
+
+          </div>
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

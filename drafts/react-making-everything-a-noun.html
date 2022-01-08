@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>React, and making everything into a noun</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2015-02-26T00:00:00-06:00">
+                Thursday, February 26th, 2015
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/drafts/react-making-everything-a-noun.html"
+                    rel="bookmark"
+                    title="Permalink to React, and making everything into a noun"
+                    >React, and making everything into a&nbsp;noun</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>On a <a href="">recent project</a> I decided to look around for some more tools to try to keep my client-side/Javascript/<span class="caps">HTML</span> <span class="caps">UI</span> code in&nbsp;order.</p>
+<p>Previously I had stuck with using jQuery and manual manipulation of the <span class="caps">DOM</span>.  One advantage is that I never got bogged down in framework confusion, and it worked okay, but it was really hard keeping track of the <span class="caps">UI</span> code, and some things were really hard or resulted in really tangly&nbsp;code.</p>
+<p>One of the things I worry about most with <span class="caps">UI</span> technology is how it biases the interface design.  I want the <span class="caps">UI</span> to ultimately be the best <span class="caps">UI</span> it can be, to represent user&#8217;s idea of how things should work, to express information in the most understandable way.  Then there&#8217;s the underlying application, which represents the functionality of the application in a way that is stable and flexible and debuggable.  In my experience the two sides are often quite far apart (quite the opposite of <a href="https://en.wikipedia.org/wiki/Naked_objects">Naked Objects</a>).</p>
+<p>But when some kinds of <span class="caps">UI</span> are easy to implement, and others are hard, it&#8217;s easy to start to prefer the easy UIs not because they are easy, but because you can actually write them and they aren&#8217;t buggy and you can adjust them more easily.  <span class="caps">UI</span> code that is easy is the one you can tweak and the one you can grow &#8212; so the easy approach becomes the better approach, even if there is more potential in the hard&nbsp;approach.</p>
+<h3>Writing fully verb-oriented&nbsp;code</h3>
+<p>When you are using jQuery (or any straight <span class="caps">DOM</span> manipulation) you are in a very verb-oriented world.  You are always <em>doing things</em> to the <span class="caps">DOM</span>.  When your <span class="caps">UI</span> represents actions this works great: the actions map exactly to some <span class="caps">DOM</span> changes.  When you application is representing state, and that state updates, then it&#8217;s not great.  You have to somehow convert state into actions: figure out what is now missing, and delete it from the <span class="caps">DOM</span>, figure out how to update derived representations,&nbsp;etc.</p>
+<p>I managed to actually keep some of that under control by using generated class names as a kind of data binding.  An object would have an <span class="caps">ID</span> and attributes, like say if something was derived from an object Person, with <span class="caps">ID</span> 123, and the avatar attribute on that person, I&#8217;d look for all elements that matched <code>.person-123-avatar</code>.  And these Person domain objects wouldn&#8217;t really be deleted, they&#8217;d just be hidden, and so when I updated the <span class="caps">DOM</span> I could easily detect what I had to remove from the <span class="caps">DOM</span>.  It became like a very ad hoc and limited data binding&nbsp;system.</p>
+<p>This worked well for a pattern where my <span class="caps">UI</span> was primarily driven by events from the application.  Every time something was added or removed or changed there would be another event.  Initial state is handled just by emitting all a bunch of add events.  Updates remain&nbsp;tricky.</p>
+<h3>Templating</h3>
+<p>To make things a little less action-oriented everyone&#8217;s first stop is likely to be&nbsp;templates.</p>
+<p>Templates are a bit tricky, because you typically have to figure out what to rerender in response to changes.  You&#8217;ll also have brand-new <span class="caps">DOM</span> elements on every rerender, so anything dynamic you&#8217;ve attached to those elements has to be&nbsp;reapplied.</p>
+<p>Figuring out what to rerender can be tricky.  You have to have some sense of what depends on what.  You will probably break your templates down into sub-templates, so you can rerender just bits.  It&#8217;s not like server-side templates where you can have one large template that covers all of the page-specific <span class="caps">UI</span>.</p>
+<p>To reapply functionality to your rerendered templates you might associate that functionality declaratively so it happens automatically and consistently, paired with something that automatically reapplies the functionality when templates are rendered.  You could also rely on <a href="http://davidwalsh.name/event-delegate">event delegation</a> to apply all your handlers to the document, and then dispatch that handling based on <code>event.target</code>.</p>
+<p>I have found myself unable to love templating.  At best it feels like merely a better hack.  I don&#8217;t like how I have to break things into chunks and carefully track rerendering.  It feels like the manual <span class="caps">DOM</span> approach, only the granularity is somewhat larger and you get to use something that looks more like <span class="caps">HTML</span>, like <code>&lt;div&gt;{message}&lt;/div&gt;</code> instead of <code>$('&lt;div&gt;').text(message)</code></p>
+<p>I also like mushy programming, separation of concerns doesn&#8217;t itself excite me.  In a specific context, sure, but I&#8217;m always skeptical of where we place the separation, and I&#8217;m happier throwing the concepts into one big bucket and splitting it out when I&#8217;ve reestablished confidence about the right division.  I want to avoid too many preconceptions about how a program should be divided.  Templates feel like an expedient separation, but not necessarily the right&nbsp;separation.</p>
+<h3><span class="caps">MVC</span>&nbsp;Frameworks</h3>
+<p>I can&#8217;t comment much on the <span class="caps">MVC</span> frameworks because I can&#8217;t get myself to use one.  Every so often I try and&nbsp;fail.</p>
+<p>A general tension I&#8217;ve started to feel is verb-oriented <span class="caps">UI</span> (all actions) vs. noun-oriented <span class="caps">UI</span> (all rendered state), and the complications from choosing either or both.  With that perspective I understand more of the decisions Javascript <span class="caps">MVC</span> frameworks have&nbsp;made.</p>
+<p>I still don&#8217;t like those frameworks.  The decisions feel like an motley group of approaches, attacking the problem from all directions, even within a single framework.  And even if they get make great decisions, it&#8217;s still a framework, and I just don&#8217;t like&nbsp;frameworks.</p>
+<h3>An aside on&nbsp;frameworks</h3>
+<p>What defines a framework, to me, is that in some core way the framework code invokes your code.  The framework doesn&#8217;t just <em>do</em> things, you don&#8217;t just invoke its functions, but rather the framework <em>controls</em>&nbsp;things.</p>
+<p>The most innocent example of this is probably the <span class="caps">URL</span> router (client-side it might be reading&nbsp;fragments):</p>
+<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">router</span> <span class="o">=</span> <span class="nx">Router</span><span class="p">();</span>
+<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;user/{id}&quot;</span><span class="p">,</span> <span class="nx">showUser</span><span class="p">);</span>
+<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;settings&quot;</span><span class="p">,</span> <span class="nx">showSettings</span><span class="p">);</span>
+</pre></div>
+
+
+<p>Here the router calls <code>showUser</code> or <code>showSettings</code>, etc.  I don&#8217;t <em>hate</em> this, but even here I might happily replace this with a switch&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">router</span> <span class="o">=</span> <span class="nx">Router</span><span class="p">();</span>
+<span class="c1">// Now the first argument is a &#39;name&#39;:</span>
+<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;user/{id}&quot;</span><span class="p">);</span>
+<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;settings&quot;</span><span class="p">,</span> <span class="s2">&quot;settings&quot;</span><span class="p">);</span>
+<span class="nx">router</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;hashchange&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">match</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">match</span><span class="p">.</span><span class="nx">name</span> <span class="o">==</span> <span class="s2">&quot;user&quot;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">showUser</span><span class="p">();</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">match</span><span class="p">.</span><span class="nx">name</span> <span class="o">==</span> <span class="s2">&quot;settings&quot;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">showSettings</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p>I know, I&#8217;m hopelessly tedious and verbose.  But now you know something about my coding aesthetic and can judge as you&nbsp;will.</p>
+<p>Of course frameworks are far more complicated than this.  There is deep logic going on in the framework before it calls your code.  I&#8217;m not comfortable with deep logic I don&#8217;t personally understand.  I&#8217;ve written my own frameworks of course, and I understood those, and when I was writing them I thought frameworks were pretty great.  But I&#8217;m older and wiser or maybe just more conservative, and I&#8217;m not excited about frameworks anymore.  I know why they exist, but as technologists we must imagine what <em>could</em> be, not only what <em>is</em>, and every framework to me feels like it&#8217;s the perhaps-understandable stopgap because we haven&#8217;t factored the problem space correctly&nbsp;yet.</p>
+<p>This is a bit of a fantasy though &#8212; if you don&#8217;t use a framework, your application will <em>become</em> a framework.  It&#8217;s a kind of rephrasing of <a href="http://en.wikipedia.org/wiki/Greenspun%27s_tenth_rule">Greenspun&#8217;s Law</a>. So do you want to make a framework or use a framework?  The framework you make will be smaller, the person who writes it will understand it, and you&#8217;ll be a little more free to debug things at any level (though you will also have your own bugs at every level).  I personally prefer to write my own app-specific framework, perhaps because I&#8217;m older and wiser and more&nbsp;brash.</p>
+<p>But writing your own application, with an ad hoc informally-specified framework embedded in the application, works <strong>much</strong> better if the framework is small, and you&#8217;ve de-frameworked as many parts as you can.  Which is why I&#8217;ve been pretty excited about <a href="http://facebook.github.io/react/">React</a>.  But I&nbsp;digress&#8230;</p>
+<h3>React: banishing&nbsp;verbs!</h3>
+<p>So I&#8217;ve started thinking about the tension in these designs to be a contrast between action-oriented designs and rendered-state designs. Or verb vs. nouns.  Some view it as imperative vs. functional, which steeps the choice in a rich history, but I&#8217;m not sure I want to join that old&nbsp;battle.</p>
+<p>Since I don&#8217;t like <span class="caps">MVC</span> frameworks, and I wanted something better than the imperative <span class="caps">DOM</span> manipulation approach, and templates have some problems, I became interested in&nbsp;React.</p>
+<p>Honestly it was a hunch &#8212; I had a hard time figuring out what React actually was.  When I first encountered it there was a lot in its description about creating reusable components.  But who cares about reuse when you aren&#8217;t sure yet that you even want to use something? And what are components anyway? <a href="http://facebook.github.io/react/">The messaging is a bit more clear&nbsp;now.</a></p>
+<p>I actually understood React when I decided it was <strong>just a templating library</strong> that addresses the problems I have with using templates.  It addresses those problems by taking a much different approach to the separation of concerns than most templating&nbsp;libraries.</p>
+<p>The pattern React uses&nbsp;is:</p>
+<ol>
+<li>You figure out all the data your <span class="caps">UI</span>&nbsp;needs</li>
+<li>You give the data to a &#8220;Component&#8221;, which is more or less like a&nbsp;template</li>
+<li>The Component renders the data to a &#8220;virtual <span class="caps">DOM</span>&#8221;</li>
+<li>React takes that virtual <span class="caps">DOM</span> and makes it so in the real <span class="caps">DOM</span> (but making a minimum number of actual updates to make it&nbsp;so)</li>
+<li>React basically owns the <span class="caps">DOM</span>, or at least the <span class="caps">DOM</span> trees it renders, so any interactivity you include has to go through&nbsp;React</li>
+</ol>
+<p>That last part is what really makes React feel different, and kind of frustrating, and where something as pleasantly innocuous as a templating language turns into a framework.  But unlike other frameworks I think I might be okay with this&nbsp;one.</p>
+<p>On the React site they call this approach &#8220;data flow&#8221;; the data is always flowing from your application and domain objects into the <span class="caps">UI</span>. When something changes you always start over from step 1.  There&#8217;s nothing eclectic about the approach &#8212; for instance lists and conditionals aren&#8217;t treated specially, sub-Components (aka Partials) aren&#8217;t really very different from inlining the equivalent code.  It&#8217;s a highly consistent approach.  (It also seems inefficient, but React goes to great lengths to make the seemingly naive approach&nbsp;fast.)</p>
+<p>This is kind of awesome because it replaces all the varied approaches an <span class="caps">MVC</span> framework uses.  You statically define how some <span class="caps">UI</span> renders, and as necessary you rerender pretty much the entire&nbsp;thing.</p>
+<p>It also encourages you not to use mutable data structures, or at least to create a kind of immutable view on those structures.  (Being single-threaded, everything in Javascript is immutable if your code doesn&#8217;t mutate anything, at least for the period of time that code is in&nbsp;control.)</p>
+<p>Maybe you can think of it as a kind of transactional <span class="caps">UI</span>: everything can change, but nothing is reflected until you tell React that stuff has changed.  But you don&#8217;t have to be very specific about <em>what</em> changed, on every change you deliver everything up to&nbsp;React.</p>
+<p>Reading <a href="http://swannodette.github.io/2013/12/17/the-future-of-javascript-mvcs/">this post about Om and React</a> framed React well when I started using it &#8212; it talks about React from the perspective of a functional programming language (ClojureScript). I&#8217;m personally anti-compile-to-Javascript, but I still like hearing from people with alternative perspectives on what the Javascript runtime can&nbsp;be.</p>
+<h3>But not everything is a&nbsp;noun&#8230;?</h3>
+<p>What I have found challenging about React is the times when I want to create interactions that involve the <span class="caps">DOM</span>, but don&#8217;t feel like &#8220;state&#8221;. If I have a button that expands out to show options, the &#8220;show&#8221; state isn&#8217;t application state, it&#8217;s <span class="caps">UI</span>&nbsp;state.</p>
+<p>I have not figured this out.  I mean, I can make it <em>work</em>, but I don&#8217;t like what I&#8217;ve done.  Maybe I&#8217;ll gain confidence on techniques with experience, but I worry that with experience I&#8217;ll simply get good enough at doing things the way React wants me to, and I&#8217;ll forget that it&#8217;s actually weird. This is the same way functional programmers start to alienate themselves from mainstream programming &#8212; they get good enough at it that they forget what they are doing is weird, and maybe start to think &#8220;weird&#8221; is just subjective.  On <a href="http://jim-mcbeath.blogspot.com/2009/03/if-you-dont-understand-me-its-my-fault.html">principle</a> I do not want to take this approach &#8212; there&#8217;s bad weird, there&#8217;s good weird, but it&#8217;s no good to go off in a corner and say that the rest of the world is weird and you are the normal&nbsp;one.</p>
+<p>But I digress.  Because React assembles and manipulates the actual <span class="caps">DOM</span>, and attaches any handlers, you have to go through it most of the time.  And when you don&#8217;t <a href="https://plus.google.com/+IanBicking/posts/D1W2yqRh3BB">it gets tricky</a>.</p>
+<p>If you do it the React way you will find a way to create input data that renders whatever it is you want to render, meaning you turn every verb into a noun.  All side effects become an aspect of the state you use to render the <span class="caps">UI</span>.</p>
+<p>(Notably though you don&#8217;t need to use React on <em>everything</em> &#8212; I find the main layout of the page to be easier to write outside of React, for instance.  But everything in a specific <span class="caps">DOM</span> tree that React renders will have to be React-aware at&nbsp;least.)</p>
+<h3><span class="caps">JSX</span></h3>
+<p>React is essentially a <span class="caps">DOM</span>-building technique.  If you want to render some message, you might&nbsp;do:</p>
+<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">Message</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">React</span><span class="p">.</span><span class="nx">DOM</span><span class="p">.</span><span class="nx">div</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p>That&#8217;s more-or-less equivalent to <code>$('&lt;div&gt;').text(message)</code>.  And it doesn&#8217;t look like <span class="caps">HTML</span>, and that&#8217;s no good.  So React includes its own little Javascript dialect where you can&nbsp;do:</p>
+<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">Message</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">message</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;;</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p>At first I thought I&#8217;d stick with the ugly but unmagical first form, but I quickly put aside my code generation biases and used <span class="caps">JSX</span>. Conveniently Emacs supports <a href="http://en.wikipedia.org/wiki/ECMAScript_for_XML"><span class="caps">E4X</span></a> which is not the same as <span class="caps">JSX</span>, but is syntactically the same, and makes editing the code more&nbsp;pleasant.</p>
+<p>While the code is Javascript, I treat it as a template and keep it in a separate file from me other application&nbsp;code.</p>
+<p>I&#8217;ve appreciated having the full expressiveness of Javascript.  My only real annoyance so far has been that <span class="caps">JSX</span> isn&#8217;t <span class="caps">HTML</span>, and worse it&#8217;s for trivial reasons &#8212; you have to use <code>className="foo"</code> instead of <code>class="foo"</code> and <code>style={'background-color': 'red'}</code> instead of <code>style="background-color: red"</code>.</p>
+<h2>Thoughts on user interface&nbsp;design</h2>
+<p>I like that React gives me something that isn&#8217;t really a framework, but removes the need for lots of things a framework does.  But just as important it positively affects what is easy to do with your <span class="caps">UI</span>.</p>
+<p>Where this was most noticeable was in the activity stream we implemented.  An activity stream seems very simple and easy to represent as a series of template partials.  But there are rules that aren&#8217;t so&nbsp;simple:</p>
+<ul>
+<li>
+<p>Time-sorted seems natural, but you might want to keep some things above the fold regardless of proper&nbsp;sorting.</p>
+</li>
+<li>
+<p>We wanted to reveal some items in only certain circumstances.  For instance, when showing browser activity it&#8217;s boring when you go to <code>about:blank</code> &#8212; but if that&#8217;s your active tab then we want to show it&nbsp;anyway.</p>
+</li>
+<li>
+<p>Adjacent items can sometimes be&nbsp;combined.</p>
+</li>
+<li>
+<p>As things get old we might want to abbreviate&nbsp;them.</p>
+</li>
+<li>
+<p>We might want to note some context that isn&#8217;t contained in a single data item &#8212; for instance, when something else in the stream relates to another item, we might make a note in each about the&nbsp;other.</p>
+</li>
+</ul>
+<p>Using React the code for any of these is not hard.  But each change breaks down the one-to-one relationship between application objects and the <span class="caps">DOM</span>.  You can&#8217;t use a template partial.  Template partials work great if you have a set-it-and-forget-it approach, where you just pile things onto the stream and never update them.  But when pieces <em>interact</em> the other techniques are hard.  With React it&#8217;s&nbsp;easy.</p>
+<p>In my opinion good <span class="caps">UI</span> reflects the user&#8217;s conceptions above the application&#8217;s conceptions.  If you do this the <span class="caps">UI</span> can easily drift away from the application&#8217;s domain objects.  And you want to let them drift.  If you do then your <span class="caps">UI</span> layer has to handle the complexities of this&nbsp;mismatch.</p></div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

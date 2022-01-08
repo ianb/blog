@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Treating configuration values as templates</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,88 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2009-04-20T00:11:00-05:00">
+                Monday, April 20th, 2009
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2009/04/treating-configuration-values-as-templates.html"
+                    rel="bookmark"
+                    title="Permalink to Treating configuration values as templates"
+                    >Treating configuration values as&nbsp;templates</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>A while back I <a class="reference external" href="http://blog.ianbicking.org/2008/06/19/my-experience-writing-a-build-system/">described fassembler</a> and one of the things I liked in it is how the configuration works.  It uses a conventional declarative <span class="caps">INI</span>-style but also allows arbitrary code, so that defaults can be based on each&nbsp;other.</p>
+<p>Here&#8217;s a basic example of a default&nbsp;configuration:</p>
+<pre class="literal-block">
+[some_app]
+port_offset = 10
+port = {{int(section.DEFAULT['base_port'])+int(port_offset)}}
+</pre>
+<p>Then if another configuration file defines <tt class="docutils literal">base_port</tt> then this will all resolve.  You can do this in Python, but you don&#8217;t get sections, and you have to define everything in just the right order.  So while <tt class="docutils literal">base_port</tt> will probably be defined in a deployment-specific configuration, it has to be defined before these other derivative settings are defined.  On the other hand, you want deployment-specific configuration to take precedence&#8230; so there&#8217;s really no good&nbsp;ordering.</p>
+<p>Anyway, the implementation really isn&#8217;t that hard.  I use <a class="reference external" href="http://pythonpaste.org/tempita/">Tempita</a> as the templating language because, well, I wrote it, and because it&#8217;s simple and appropriate for small strings.  For the configuration parsing, <a class="reference external" href="http://docs.python.org/library/configparser.html">ConfigParser</a> will&nbsp;do.</p>
+<p>Here&#8217;s what the basic code looks like in&nbsp;ConfigParser:</p>
+<pre class="literal-block">
+from ConfigParser import ConfigParser
+from tempita import Template
+
+class TempitaConfigParser(ConfigParser):
+
+    def _interpolate(self, section, option, rawval, vars):
+        ns = _Namespace(self, section, vars)
+        tmpl = Template(rawval, name='%s.%s' % (section, option))
+        value = tmpl.substitute(ns)
+        return value
+</pre>
+<p>Actually instead of using <tt class="docutils literal">tempita.Template</tt>, we could just do <tt class="docutils literal">eval(rawval, {}, ns)</tt>, it would just require a lot more quoting (every value would have to be a valid Python expression).  Either with that or Tempita the implementation of <tt class="docutils literal">_Namespace</tt> will look the&nbsp;same.</p>
+<p>Here&#8217;s a simple&nbsp;implementation:</p>
+<pre class="literal-block">
+from UserDict import DictMixin
+
+class _Namespace(DictMixin):
+    def __init__(self, config, section, vars):
+        self.config = config
+        self.section = section
+        self.vars = vars
+
+    def __getitem__(self, key):
+        if key == 'section':
+            return _Section(self)
+        if self.config.has_option(self.section, key):
+            return self.config.get(self.section, key)
+        if vars and key in self.vars:
+            return self.vars[key]
+        raise KeyError(key)
+
+   def __setitem__(self, key, value):
+       if self.vars is None:
+           self.vars = {key: value}
+       else:
+           self.vars[key] = value
+</pre>
+<p>We&#8217;ve introduced a magic variable <tt class="docutils literal">section</tt>, which is used to refer to other sections.  It looks like&nbsp;this:</p>
+<pre class="literal-block">
+class _Section(object):
+    def __init__(self, namespace):
+        self._namespace = namespace
+
+    def __getattr__(self, attr):
+        if attr.startswith('_'):
+            raise AttributeError(attr)
+        return _Namespace(self._namespace.config, attr,     self._namespace.vars)
+</pre>
+<p>With these I think you get many of the benefits of using Python code as your configuration format, while still having the benefits of a more declarative approach to configuration, one that allows for forward and backward&nbsp;references.</p>
+<p>A full implementation has several more things than I show here, but you can see the full example <a class="reference external" href="http://svn.colorstudy.com/home/ianb/recipes/evalconfig.py">in my recipes</a>.  It also has an example of using <a class="reference external" href="http://pythonpaste.org/initools/">INITools</a> instead of ConfigParser to give more accurate filenames and line numbers when there is an exception, while otherwise using the same&nbsp;interface.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +116,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

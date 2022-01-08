@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>WebOb</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,33 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2007-08-18T19:37:00-05:00">
+                Saturday, August 18th, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/08/webob.html"
+                    rel="bookmark"
+                    title="Permalink to WebOb"
+                    >WebOb</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I&#8217;ve have it in my head to extract/rewrite parts of <a class="reference external" href="http://pythonpaste.org">Paste</a> lately.  <a class="reference external" href="http://blog.ianbicking.org/2007/08/06/tempita/">Tempita</a> was one&nbsp;example.</p>
+<p>The request and response functions in Paste grew very organically.  I wasn&#8217;t trying to create a framework, so I studiously avoided anything that might look like a request or response object.  I felt that would be stepping on toes or something.  Eventually, though, <a class="reference external" href="http://groovie.org/">Ben Bangert</a> really wanted a request object for <a class="reference external" href="http://pylonshq.com/">Pylons</a>, and it went in <a class="reference external" href="http://pythonpaste.org/module-paste.wsgiwrappers.html">paste.wsgiwrappers</a>.  And at a certain point I decided that the class-based access was really just fine, and doing lots of <tt class="docutils literal">function(environ, <span class="pre">...)</span></tt> was no better than <tt class="docutils literal"><span class="pre">Request(environ).function(...)</span></tt>.</p>
+<p>So I started <a class="reference external" href="http://pythonpaste.org/webob/">WebOb</a>.  WebOb has Request, Response, and some exceptions, incorporating the functionality of Paste&#8217;s <tt class="docutils literal">paste.request</tt>, <tt class="docutils literal">paste.response</tt>, <tt class="docutils literal">paste.wsgilib</tt>, <tt class="docutils literal">paste.httpexceptions</tt>, and <tt class="docutils literal">paste.httpheaders</tt>.  And some extra&nbsp;stuff.</p>
+<p>I&#8217;ve included a comparison with <a class="reference external" href="http://pythonpaste.org/webob/differences.html">a few other framework request/response objects</a>.  What this doesn&#8217;t note, though, is that WebOb has a much larger <a class="reference external" href="http://pythonpaste.org/webob/class-webob.Request.html">Request</a> and <a class="reference external" href="http://pythonpaste.org/webob/class-webob.Response.html">Response</a> objects.  I&#8217;ve taken almost all the <a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html"><span class="caps">HTTP</span> headers</a> and mapped them to parsed attributes.  So <tt class="docutils literal">req.if_modified_since</tt> returns a <tt class="docutils literal">datetime</tt> object, and <tt class="docutils literal">req.if_none_match</tt> returns a somewhat set-like object, as a few examples.  I created a lot of view-like objects for this, representing the canonical form of the information in several other forms (the <span class="caps">WSGI</span> request environment, and the status/headers/body of the&nbsp;response).</p>
+<p>It&#8217;s fairly well tested and includes almost everything I think it should include, but I reserve the right to change the <span class="caps">API</span> any way I want until 1.0; this means if you have <em>any</em> opinion on the <span class="caps">API</span> I have nothing to stop me from taking your opinions into&nbsp;account.</p>
+<p>Oh, and it has <a class="reference external" href="http://pythonpaste.org/webob/">docs</a>, really.  They may not be the best docs, but they mention most everything and are automatically tested for accuracy.  If you just want a sense of the feel, maybe the <a class="reference external" href="http://pythonpaste.org/webob/file-example.html">file-serving example</a> would be a good place to start (though really you&#8217;ll only read about the Response object&nbsp;there).</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +61,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

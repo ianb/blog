@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>TogetherJS as a Postmodern Programming Tool</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2013-10-31T00:00:00-05:00">
+                Thursday, October 31st, 2013
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2013/10/togetherjs-a-postmodern-tool.html"
+                    rel="bookmark"
+                    title="Permalink to TogetherJS as a Postmodern Programming Tool"
+                    >TogetherJS as a Postmodern Programming&nbsp;Tool</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>One of the papers that I continue to refer to in my own thinking about technology is <a href="http://www.mcs.vuw.ac.nz/comp/Publications/CS-TR-02-9.abs.html">Notes on Postmodern Programming</a>. Martin Fowler has a <a href="http://martinfowler.com/bliki/PostModernProgramming.html">short summary</a>:</p>
+<blockquote>
+<p>The essence of it (at least for me) is that software development has long had a modernist viewpoint that admirable software systems are composed of uniform components, composed in a uniform and simple way. (Smalltalk and Lisp are good examples of this kind of thinking.) A post-modern view is that software is all sorts of different very different stuff glued together in all sorts of different ways (think Perl and Unix), and this style of software (big bucket of glue) isn&#8217;t a bad&nbsp;thing.</p>
+</blockquote>
+<p>In the built world I think of roads and rail as an interesting analog, roads as postmodern and rail as modern.  Rail has a lot of cool properties.  It&#8217;s <a href="http://www.csx.com/index.cfm/about-csx/projects-and-partnerships/fuel-efficiency/">really efficient</a>, one driver can handle a hundred cars, you can feel confident about where the train will and won&#8217;t go, and it can be a pretty smooth ride. But roads have some great properties too.  You can ride all kinds of vehicles down them.  It&#8217;s easy to build a driveway to access a road. If someone stops on the road you can go around&nbsp;them.</p>
+<p>Or another perspective: postmodern developments accept the world as it is, while modern developments imagine a new better world.  A cohesive modern technology can be great, completist, robust; and without those kinds of systems we couldn&#8217;t build what we have, it would all fall down as the geometrically cumulative nature of failure and multiple components would doom our systems to constant collapse.  But modern systems are also more apt to fail during their development, to solve the wrong problem, to demand tolerances that are too low, or to be too&nbsp;ambitious.</p>
+<p>During the design of <a href="https://togetherjs.com">TogetherJS</a> &#8212; a realtime collaboration and co-browsing library &#8212; I&#8217;ve approached it as a postmodern&nbsp;component.</p>
+<p>The basic integration for TogetherJS isn&#8217;t an <span class="caps">API</span>, or a data model: it&#8217;s the <span class="caps">DOM</span>.  It involves scanning the page, looking for changes and events that are the exposed artifacts an application can&#8217;t hide even if it wanted&nbsp;to.</p>
+<p>There&#8217;s a lot we can do with the standard <span class="caps">DOM</span>, but we aren&#8217;t above integrating with other components.  We scan for <a href="http://codemirror.net/">CodeMirror</a> and <a href="http://codemirror.net/"><span class="caps">ACE</span></a> editors by looking for the attributes they attach to elements. If you opt-in to YouTube support, we load their libraries to interact with Flash elements.  We can&#8217;t support <em>everything</em>, but we&#8217;re not taking any principled stance on how much we&#8217;re willing to poke directly into other project&#8217;s&nbsp;artifacts.</p>
+<p>From the perspective of code isolation, we try to insulate TogetherJS from the page.  There&#8217;s only one exposed object (<code>TogetherJS</code>), there is a specific set of methods on that (our public interface).  We bundle jQuery but do not use any version of jQuery already on the page, nor do we encourage anyone to use our version of jQuery.  We try to avoid getting caught up in any messiness of the host application, but we do not judge you for your&nbsp;messiness.</p>
+<p>But we also expose TogetherJS.  You can import the modules, and we are not shy about exposing &#8220;private&#8221; parts of TogetherJS.  You can see all the messages that go back and forth between clients, regardless of what part of TogetherJS produces or consumes those&nbsp;messages.</p>
+<p>This creates potential fragility, but we try to mitigate that by making it very easy make your own static, stable, frozen copy of the client code.  Once you get that working, it&#8217;s working.  And this is why we work hard to keep the server as simple as possible.  Any smarts go in the client unless it is <em>absolutely</em> necessary that it go in the server.  (Arguably our server is modernist in&nbsp;design.)</p>
+<h2>Why?</h2>
+<p>I&#8217;m not always sure whether to say &#8220;I&#8221; or &#8220;we&#8221; &#8212; the architectural choices I&#8217;m describing are things that we came to consensus on as a team.  But exactly <em>why</em> we consensed on them I am not sure, I mostly know my own motivations for the&nbsp;architecture.</p>
+<p>We have built TogetherJS with an eye towards the breadth of the web. We considered creating a collaborative editor (with some other special features), but we didn&#8217;t really want to create a cool site, we wanted to create something that could magnify <em>other people&#8217;s</em> cool sites. What cool sites?  We didn&#8217;t know!  There has and continues to be a tension among all of us in the team as to how generic this tool can or should be: do we want to create an awesome tool for education, or support, or collaboration, or presentation,&nbsp;or&#8230;?</p>
+<p>But we are not domain experts, and we have not created a domain-specific tool.  This itself is a tension I see on the web in general: developers create the best tools for the domain they understand, development.  Developing something like TogetherJS requires some considerable expertise in lots of technical areas (the <span class="caps">DOM</span>, browser security models, Javascript code organization, server integration, and so on).  The domain experts are experts in other things.  We want to empower those experts, and empower them to make tools, and not just use the tools that computer experts have made.  We hope TogetherJS can meet them&nbsp;halfway.</p>
+<p>So we&#8217;ve created a tool that does a bunch of stuff by default, and doesn&#8217;t care too much about how you went about building your site or app.  With just a little integration you get lots of functionality.  I think it is relatively&nbsp;hackable.</p>
+<p>But we also want to enable really good collaboration, not just okay default collaboration.  This is why we build ways to customize the tool, and we&#8217;re always open to new ways to do that customization.  We also require integration for the client-side dynamic parts of your application, as you can&#8217;t seamlessly make everything work.  You <em>kind of</em> can make everything work (which I&#8217;ll talk about below), but we want collaboration experience that is high-fidelity and&nbsp;context-aware.</p>
+<p>Some examples where the context depends on the tools: you might want to let two people edit one document, but only one person can save it. You may want to allow two people to draw together, but simultaneously using different tools.  You might want to run a game where you score people separately&#8230; or maybe you want to score them together.  You might want a save to fork a document to some personal space, or you might want to keep the two people in sync.  I could go on about the choices an application might encounter for a long&nbsp;time.</p>
+<p>We also want something like progressive enhancement: you start out right away with something that works, and then improve upon that.  The tool itself serves as an introduction to the&nbsp;tool.</p>
+<h2>Roads Not&nbsp;Taken</h2>
+<p>Our basic task/intention with TogetherJS has been to enable real-time collaboration, co-browsing, co-presence.  Given that goal there are some two other viable approaches that I see, and that we didn&#8217;t choose to pursue.  I&#8217;d classify each as more modernist than what we&#8217;ve&nbsp;done.</p>
+<h3>The Realtime&nbsp;Database</h3>
+<p>One path is to create a modernist realtime collaborative foundation for your application&#8217;s data.  In this category is <a href="http://firebase.com/">Firebase</a>, <a href="http://www.meteor.com/">Meteor</a>, the <a href="https://developers.google.com/drive/realtime/">Google Realtime <span class="caps">API</span></a>, or <a href="http://sharejs.org/">ShareJS</a> With these tools you synchronize your Javascript models across all clients, and the rest of the collaboration flows from&nbsp;that.</p>
+<p>Obviously this approach this has a strong appeal, as the area is quite active.  The technique is robust, the tools can make a lot of guarantees about the models and consistency. To the degree you create reasonable deterministic predictable views on your models you can be assured of some consistency in the experience for all participants. Because the tools are low-level you can create a variety of collaboration experiences based on their core&nbsp;functionality.</p>
+<p>There are three reasons we didn&#8217;t want to take this&nbsp;approach:</p>
+<ol>
+<li>
+<p>These tools work best with greenfield development.  You have to make all your models aware of these external data and event sources. Some of the greatest benefits come when you rely on these tools for much of your&nbsp;persistence.</p>
+</li>
+<li>
+<p>The tools don&#8217;t apply very well to traditional websites. Sites that use <span class="caps">HTTP</span> requests and responses and dynamically generate <span class="caps">HTML</span> don&#8217;t have browser-accessible models to be synchronized (they have server-side models, but those don&#8217;t need to be synchronized and synchronizing them doesn&#8217;t itself provide a realtime&nbsp;experience).</p>
+</li>
+<li>
+<p>Database tools are not <span class="caps">UI</span>-aware.  A good collaboration experience doesn&#8217;t just involve synchronized state, it requires that people <em>understand</em> what is happening, and understand when other people are invoking&nbsp;actions.</p>
+</li>
+</ol>
+<p>TogetherJS isn&#8217;t incompatible with realtime databases.  In fact I think they should be very complementary: if your models are synchronized through a backend database you don&#8217;t have to synchronize through TogetherJS, removing a lot of the more challenging integration work with Javascript-heavy&nbsp;applications.</p>
+<h3>The&nbsp;Screenshare</h3>
+<p>Traditional screensharing happens at the pixel level, but I&#8217;m going to refer to something I&#8217;ll call <span class="caps">DOM</span> Screensharing.  In this model the current/live state of the <span class="caps">DOM</span> is transferred from one browser to another.  I&#8217;ll call the browser that starts the screensharing is the &#8220;source&#8221; and the browser that receives the <span class="caps">DOM</span> is the&nbsp;&#8220;viewer&#8221;.</p>
+<p>Examples of this are <a href="http://usefirefly.com/">Firefly</a> or a now-dormant project of mine, <a href="https://github.com/mozilla/browsermirror">Browser Mirror</a>.  I believe some other customer support tools also use this technique, but in general the technique seems fairly&nbsp;obscure.</p>
+<p>In this approach you look at all the elements on the source browser, scrub out any scripts or event handlers, maybe scrub hidden elements (or don&#8217;t).  Then you serialize this and send it to the viewer.  The page is then recreated at a new <span class="caps">URL</span>, visually hard to distinguish from the original page, but it&#8217;s &#8220;dead&#8221;.  Like with video you send diffs to save effort.  You&#8217;ll want special handling for form elements.  There are some other corner cases, but it&#8217;s all relatively doable.  When I first got Browser Mirror working it surprised me how feasible it is, though it&#8217;s certainly a 90/10 kind of&nbsp;problem.</p>
+<p>The benefit of this approach is that It Just Works in a lot of cases. It works behind authentication, works when pages are personalized, and interacts pretty well with dynamic pages (which ultimately display dynamic elements in the browser through the <span class="caps">DOM</span>).  It is robust and broadly applicable.  It is modernist while being almost the polar opposite of the realtime database&nbsp;approach.</p>
+<p>Because the viewer has a dead version of the application, it&#8217;s not exactly easy to interact with.  Form fields are easy.  Rich controls though are <em>really hard</em>.  You <em>can</em> pass events back to the source browser.  In Browser Mirror you could click on anything on the viewer, and that click would be transmitted back to the source browser.  This actually worked in lots of cases, though with a lot of latency.  In some cases it couldn&#8217;t realistically work &#8212; can you sync mousedown, mousemove, or hover events?  Unfortunately it&#8217;s also not possible to detect the presence of listeners on the <span class="caps">DOM</span> to detect what events are interesting, but even if you could those events are still too&nbsp;low-level.</p>
+<p>Also the screensharing technique <em>because</em> of its broad applicability is not contextually aware.  Do you want to give the viewer access to the application as though they are the same user as the person using the source browser?  You can allow things like both people being scrolled to a different part of the page, but beyond that parallel work processes across a site or using overlapping tools is not really&nbsp;feasible.</p>
+<p>Given these restrictions I was excited to learn from Browser Mirror but in TogetherJS to pursue something with the potential to be of a higher quality of&nbsp;experience.</p>
+<p>Still I&#8217;ve considered resurrecting some portion of Browser Mirror within TogetherJS.  Embracing a diversity of techniques only makes the tool more postmodern&nbsp;;)</p>
+<h2>An Additive&nbsp;Approach</h2>
+<p>This acceptance of postmodern approaches means TogetherJS is being developed using an additive approach.  More stuff.  More configuration. More flags.  More use&nbsp;cases.</p>
+<p>The additive approach nearly always produces better results with each addition.  But we all know where else it leads: unwieldy complexity, lack of focus, unreliable combinations.  The approach is perilous. Still we must learn from the past without overlearning from the past. As a project we have and continue to invest time in code organization, and remind ourselves of the dangers.  We&#8217;re trying our best to engage with the inherent complexity rather than denying or avoiding&nbsp;it.</p>
+<p>We&#8217;ll see where it&nbsp;goes&#8230;</p></div>
+        <!-- /.entry-content -->
+          <div class="comments">
+            <h2>Comments</h2>
+            <table class='table table-striped'>
+<tr><td style='padding-left: 0px' class='dU'>LTCooper</td><td class='dTS'>Thu, 31 Oct 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>Thanks Ian, TogetherJS is a really powerful tool to be sure.  Nice to hear a bit of the theory that went into making it.</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>interstar</td><td class='dTS'>Mon, 04 Nov 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>Isn't the trendy term "stigmergic"?</p></td></tr>
+</table>
+
+          </div>
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

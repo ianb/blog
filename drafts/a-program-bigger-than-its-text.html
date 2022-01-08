@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>A Program Bigger Than Its Text</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2015-07-18T00:00:00-05:00">
+                Saturday, July 18th, 2015
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/drafts/a-program-bigger-than-its-text.html"
+                    rel="bookmark"
+                    title="Permalink to A Program Bigger Than Its Text"
+                    >A Program Bigger Than Its&nbsp;Text</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>A couple new articles on live&nbsp;programming:</p>
+<ul>
+<li><a href="http://blog.comealive.io/Working-Toward-Bret-Victors-Learnable-Programming/">Working toward Bret Victor&#8217;s &#8220;Learnable&nbsp;Programming&#8221;</a></li>
+<li><a href="http://research.microsoft.com/en-us/um/people/smcdirm/apx/index.html">A Live Programming&nbsp;Experience</a></li>
+</ul>
+<p><a href="http://worrydream.com/LearnableProgramming/">Bret Victor&#8217;s Learnable Programming</a> emphasized these visual environments, which feel like a red herring to me. In the first article about Alive they say: <em>Live programming research should focus on making &#8220;boring&#8221; code easier to read and understand</em> – I think that&#8217;s a good way to think about it, as we want to spend less time on the boring problems, we want to push those problems aside and get to the meat of the program, the interesting and hard and vague problems we are exploring. These aren&#8217;t visually interesting&nbsp;problems.</p>
+<p>A digression: in a <a href="https://vimeo.com/71278954">The Future Of Programming</a> Bret compares binary programming (directly coding machine instructions), to assembly programming, to &#8220;high&#8221; level programming (such as Fortran). He describes Von Neumann criticizing a student for writing an assembler, as it would waste valuable machine time doing the assembly, which is the job of these clerical programmers. You can view the change to higher level programming as a change in economics: computer time became cheaper, and so we let the computer do more work. We could also say the computer is less likely to get things wrong. But there was a time, not impossibly long ago, when assembly was seen as awkward, but still <em>better</em> if you are willing to invest the time. More efficient and faster, even if challenging to write and get&nbsp;right.</p>
+<p>These days we know that you probably won&#8217;t make something faster and more efficient by getting down to assembly. The machine can look at the entirety of the program, and apply optimizations that you could not have made in isolation, or which might be too tedious to apply. Or optimizations that are fragile – but the computer will faithfully and without complaining remove the optimizations when you recompile with changes that invalidate that optimization (it&#8217;s much harder to get a human to do that, especially without complaining). Higher level languages let the computer know more about what your intention is, and let the computer take over some&nbsp;parts.</p>
+<p>We&#8217;ve been making yet <em>higher</em> level languages, but it&#8217;s the same approach. I think the intention of &#8220;live programming&#8221; (the term implies a specific approach, I infer an intention behind that) is about letting the computer take over even more, <em>qualitatively</em> more, different than just ever-higher-level&nbsp;languages.</p>
+<p>The essential thing is that the computer take over exploring your program. A visual representation shows how your drawing program runs. All programs run, even the boring ones! The live programming examples typically are very deterministic, and we see expectations that the computer can exhaust its exploration of the program. But I imagine something more incremental, less thorough, and more change-oriented. Let the computer simply <em>explore</em>, and point things&nbsp;out.</p>
+<p>Some&nbsp;challenges:</p>
+<ol>
+<li>
+<p>How does the computer explore a program? The problem is similar to <a href="https://en.wikipedia.org/wiki/Fuzz_testing">fuzzing</a>, the approach where you test a program with random inputs, but we need to give the computer more hints in order for it to successfully find interesting&nbsp;cases.</p>
+</li>
+<li>
+<p>We need repeatable and reliable runs of programs. A &#8220;program&#8221; can be a system, several things working together (e.g., a web server, database, and running web page), but we need to be able to reset and predictably repeat runs of that programming&nbsp;system.</p>
+</li>
+<li>
+<p>We need to be able to represent a run of the program to the programmer. If the computer finds something, how can we understand what it found? I suspect this will take some programmer work, specific work to show how to represent some of the domain objects in compact and useful ways. Like adding <code>__repr__</code> methods. But still even with programmer help we need to assemble this all into a large time-spanning&nbsp;representation.</p>
+</li>
+<li>
+<p>The computer needs to know what is interesting. Sometimes it might be &#8220;runs 2018 and 19402 changed or were invalidated by your edit&#8221;. But I think forms of self-testing will be important. Such as the assert statement or even simple warning statements. &#8220;Probes&#8221; are another approach. What changes this bit of <span class="caps">UI</span>? Maybe add global watch points: I&#8217;ve heard this peculiar behavior happens, show me all the cases where it&nbsp;does.</p>
+</li>
+<li>
+<p>The computer should know <em>why</em> things happen. So you&#8217;ve found an interesting case, how did it come to be? Fuzzers work hard at this to minimize their input.  What a fuzzer finds after ten thousand steps may only require a hundred steps to reproduce.  This is one form of answering <em>why</em>.  Another is embedded in that representation of how the program ran. Can we create a browser of program state?  Did we hit record before we ran the&nbsp;program?</p>
+</li>
+</ol>
+<p>Each of these problems is somewhat distinct, and can be approached independently. What I think brings it together is looking at the <em>execution of the program</em>, or of an entire system, and not focus only on its source code.  A way to look at all the emergent properties of a program; and we <em>want</em> emergent properties, that&#8217;s why we right programs and don&#8217;t just directly produce&nbsp;output.</p></div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Defaults & Inheritance</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,86 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2007-08-10T17:45:00-05:00">
+                Friday, August 10th, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/08/defaults-inheritance.html"
+                    rel="bookmark"
+                    title="Permalink to Defaults & Inheritance"
+                    >Defaults <span class="amp">&amp;</span>&nbsp;Inheritance</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I thought I&#8217;d note a way I try to make classes reasonably customizable without creating lots of classes, but letting other people create classes if they&nbsp;want.</p>
+<p>Here&#8217;s a common technique; I&#8217;m going to use a class from <a class="reference external" href="http://pythonpaste.org/wsgiproxy/">WSGIProxy</a> as an example, because that&#8217;s where I was about to use this technique when I thought it might make an okay&nbsp;post.</p>
+<p>In this example there&#8217;s a <span class="caps">WSGI</span> application that forwards requests to another <span class="caps">HTTP</span> server.  There&#8217;s different ways to forward requests, depending on what kind of data you want to give the remote server about the original request.  One example is Zope&#8217;s VirtualHostMonster, which takes requests like <tt class="docutils literal">/VirtualHostBase/http/example.org:80/rootdir/VirtualHostBase/path</tt> &#8212; the idea is that the server can then realize that the original request was for <tt class="docutils literal"><span class="pre">http://example.org/path</span></tt> (and should ignore any Host headers), and that Zope is supposed to serve that from the internal path <tt class="docutils literal">/rootdir/path</tt>.</p>
+<p>There&#8217;s a problem with this particular pattern, because there&#8217;s no way to mount, say, <tt class="docutils literal">/blog</tt> onto some Zope <tt class="docutils literal"><span class="pre">/sitename/blog-application</span></tt> path, because there&#8217;s no concept like in <span class="caps">WSGI</span> or <span class="caps">CGI</span> of SCRIPT_NAME &#8212; the base <em>path</em> of the request.  It only handles the base <em>host</em>.  So I didn&#8217;t just want to settle on&nbsp;that.</p>
+<p>I&#8217;m kind of inclined to prefer headers, like <tt class="docutils literal"><span class="pre">X-Script-Name:</span> /blog</tt>, <tt class="docutils literal"><span class="pre">X-Forwarded-Server:</span> example.org</tt>, etc.  But I want to support both&nbsp;forms.</p>
+<p>The common way to do this&nbsp;is:</p>
+<pre class="literal-block">
+class WSGIProxyApp(object):
+
+    def __init__(self, host): ...
+
+    def __call__(self, environ, start_response):
+        # actual application interface...
+        # Constructs the base request:
+        request = self.construct_request(environ)
+        # Uses one of these conventions:
+        self.update_headers(environ, request)
+        ... do stuff with request ...
+
+    def update_headers(self, orig_environ, request):
+        raise NotImplementedError
+
+class VirtualHostMonsterApp(WSGIProxyApp):
+
+    def update_headers(self, orig_environ, request):
+        request.environ['SCRIPT_NAME'] = (
+            '/VirtualHostRoot/%(wsgi.scheme)s/%(HTTP_HOST)s/VirtualHostRoot/'
+            % orig_environ)
+
+class HeaderSetterApp(WSGIProxyApp):
+
+    def update_headers(self, orig_environ, request):
+        request.environ['HTTP_X_SCRIPT_NAME'] = orig_environ['SCRIPT_NAME']
+        # and so on...
+</pre>
+<p>Then you use one of the subclasses depending on your needs. Personally I think this really sucks.  For one thing, you may have to determine which class to use based on some configuration parameter, which can get awkward.  And you might want to subclass the class to change the functionality some yourself, but you have to subclass <em>both</em> of them.  There&#8217;s patterns to handle this, with policies and factories and other crap; but it&#8217;s <em>not a hard problem</em>, and those patterns are hard solutions to a problem that <em>shouldn&#8217;t</em> be&nbsp;hard.</p>
+<p>Also, it&#8217;s harder to inform people about the options available to them, and somewhat harder to use these classes.  So I tend to do something&nbsp;like:</p>
+<pre class="literal-block">
+class WSGIProxyApp(object):
+    default_forwarding_style = 'headers'
+
+    def __init__(self, host, forwarding_style=None):
+        ...
+        if forwarding_style is None:
+            forwarding_style = self.default_forwarding_style
+        self.forwarding_style = forwarding_style
+
+    def __call__(self, environ, start_response):
+        ...
+        method = self.forwarding_style
+        if isinstance(method, str):
+            method = getattr(self, 'forward_'+self.forwarding_style)
+        method(environ, request)
+        ...
+
+    def forward_headers(self, orig_environ, request): ...
+    def forward_virtual_host_monster(self, orig_environ, request): ...
+</pre>
+<p>This way it&#8217;s just a simple parameter to change the style.  You can pass in your own function, or use one of the named methods already available.  The <tt class="docutils literal">default_forwarding_style</tt> class variable lets you change the default in subclasses.  If the default was in the function signature it would be much more awkard to change it, because you&#8217;d have to override the method and its signature with just that one change, then delegate back to the superclass&nbsp;method.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +114,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

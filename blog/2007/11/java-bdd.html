@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Java BDD</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,57 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2007-11-27T12:14:00-06:00">
+                Tuesday, November 27th, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/11/java-bdd.html"
+                    rel="bookmark"
+                    title="Permalink to Java BDD"
+                    >Java <span class="caps">BDD</span></a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I notice there&#8217;s another <a class="reference external" href="http://en.wikipedia.org/wiki/Behavior_driven_development">Behavior Driven Development</a> framework for Java called <a class="reference external" href="http://code.google.com/p/instinct/">Instinct</a> (<a class="reference external" href="http://bright-green.com/blog/2007_11_27/behaviour_driven_design.html">via</a>).   I have <a class="reference external" href="http://blog.ianbicking.org/behavior-driven-programming.html">commented on <span class="caps">BDD</span> before</a>.</p>
+<p>Here&#8217;s an <a class="reference external" href="http://code.google.com/p/instinct/wiki/InstinctIn2Minutes">example test</a>:</p>
+<pre class="literal-block">
+import static com.googlecode.instinct.expect.Expect.expect;
+import com.googlecode.instinct.marker.annotate.BeforeSpecification;
+import com.googlecode.instinct.marker.annotate.Context;
+import com.googlecode.instinct.marker.annotate.Specification;
+
+public final class AnEmptyStack {
+    private Stack&lt;Object&gt; stack;
+
+    &#64;BeforeSpecification
+    void setUp() {
+        stack = new StackImpl&lt;Object&gt;();
+    }
+
+    &#64;Specification
+    void mustBeEmpty() {
+        expect.that(stack.isEmpty()).equalTo(true);
+    }
+}
+</pre>
+<p>Yeah, that&#8217;s&#8230; great.  What would it look like in a&nbsp;doctest?</p>
+<pre class="literal-block">
+&gt;&gt;&gt; Stack&lt;Object&gt; stack = new StackImpl&lt;Object&gt;();
+&gt;&gt;&gt; stack.isEmpty()
+true
+</pre>
+<p>Of course you have to invent a <a class="reference external" href="http://en.wikipedia.org/wiki/REPL"><span class="caps">REPL</span></a> for Java, but I&#8217;m sure that&#8217;s not very&nbsp;hard.</p>
+<p>What does all that class infrastructure, <tt class="docutils literal">setUp</tt>, <tt class="docutils literal">mustBeEmpty</tt> and the weird DSLish stuff give you?  Beats me.  Doctest <a class="reference external" href="http://python.org/doc/current/lib/module-doctest.html">started in Python</a> but now also exists in <a class="reference external" href="http://clintonforbes.blogspot.com/2007/08/doctest-for-ruby-and-rails.html">Ruby</a> and <a class="reference external" href="http://svn.colorstudy.com/doctestjs/trunk/docs/index.html">Javascript</a>. Someone needs to port the concept to Java too.  People ported <a class="reference external" href="http://sunit.sourceforge.net/">SUnit</a> all over the place, so there&#8217;s no reason a good idea can&#8217;t spread.  I can&#8217;t help feel that <span class="caps">BDD</span> is a case of a bad idea spreading; the motivations for <span class="caps">BDD</span> are fine (a change in developer testing workflow), but the technique they use to try to reach the desired workflow is totally&nbsp;bizarre.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +85,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

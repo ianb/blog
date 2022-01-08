@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>A Few Corrections To “On Packaging”</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2008-12-14T15:53:00-06:00">
+                Sunday, December 14th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/12/a-few-corrections-to-on-packaging.html"
+                    rel="bookmark"
+                    title="Permalink to A Few Corrections To “On Packaging”"
+                    >A Few Corrections To &#8220;On&nbsp;Packaging&#8221;</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p><a class="reference external" href="http://www.b-list.org/weblog/2008/dec/14/packaging/">James Bennett recently wrote an article on Python packaging and installation</a>, and Setuptools.  There&#8217;s a lot of issues, and writing up my thoughts could take a long time, but I thought at least I should correct some errors, specifically category errors.  Figuring out where all the pieces in Setuptools (and pip and virtualenv) fit <em>is</em> difficult, so I don&#8217;t blame James for making some mistakes, but in the interest of clarifying the&nbsp;discussion&#8230;</p>
+<p>I will start with a kind of&nbsp;glossary:</p>
+<dl class="docutils">
+<dt>Distribution:</dt>
+<dd>This is something-with-a-setup.py.  A tarball, zip, a checkout, etc.  Distributions have names; this is the name in <tt class="docutils literal"><span class="pre">setup(name=&quot;...&quot;)</span></tt> in the setup.py file.  They have some other metadata too (description, version, etc), and Setuptools adds to that metadata some.  Distutils doesn&#8217;t make it very easy to add to the metadata &#8212; it&#8217;ll whine a little about things it doesn&#8217;t know, but won&#8217;t do anything with that extra data.  Fixing this problem in Distutils is an important aspect of Setuptools, and part of what Distutils itself unsuitable as a basis for good library&nbsp;management.</dd>
+<dt>package/module:</dt>
+<dd>This is something you import.  It is not the same as a distribution, though usually a distribution will have the same name as a package.  In my own libraries I try to name the distribution with mixed case (like Paste) and the package with lower case (like paste).  Keeping the terminology straight here is <em>very</em> difficult; and usually it doesn&#8217;t matter, but sometimes it&nbsp;does.</dd>
+<dt>Setuptools The&nbsp;Distribution:</dt>
+<dd>This is what you install when you install Setuptools.  It includes several pieces that Phillip Eby wrote, that work together but are not strictly a single&nbsp;thing.</dd>
+<dt>setuptools The&nbsp;Package:</dt>
+<dd>This is what you get when you do <tt class="docutils literal">import setuptools</tt>.  Setuptools largely works by monkeypatching distutils, so simply importing setuptools activates its functionality from then on.  This package is entirely focused on installation and package management, it is not something you should use at runtime (unless you are installing packages as your runtime, of&nbsp;course).</dd>
+<dt>pkg_resources The&nbsp;Module:</dt>
+<dd>This is also included in Setuptools The Distribution, and is for use at runtime.  This is a single module that provides the ability to query what distributions are installed, metadata about those distributions, information about the location where they are installed.  It also allows distributions to be &#8220;activated&#8221;.  A <em>distribution</em> can be available but not activated.  Activating a distribution means adding its location to <tt class="docutils literal">sys.path</tt>, and probably you&#8217;ve noticed how long sys.path is when you use easy_install.  Almost everything that allows different libraries to be installed, or allows different versions of libraries, does it through some management of sys.path.  pkg_resources also allows for generic access to &#8220;resources&#8221; (i.e., non-code files), and let&#8217;s those resources be in zip files.  pkg_resources is safe to use, it doesn&#8217;t do any of the funny stuff that people get annoyed&nbsp;with.</dd>
+<dt>easy_install:</dt>
+<dd>This is also in Setuptools The Distribution.  The basic functionality it provides is that given a name, it can search for package with that distribution name, and also satisfying a version requirement.  It then downloads the package, installs it (using <tt class="docutils literal">setup.py install</tt>, but with the setuptools monkeypatches in place).  After that, it checks the newly installed distribution to see if it requires any other libraries that aren&#8217;t yet installed, and if so it installs&nbsp;them.</dd>
+<dt>Eggs the Distribution&nbsp;Format:</dt>
+<dd>These are zip files that Setuptools creates when you run <tt class="docutils literal">python setup.py bdist_egg</tt>.  Unlike a tarball, these can be binary packages, containing compiled modules, and generally contain .pyc files (which are portable across platforms, but not Python versions).  This format only includes files that will actually be installed; as a result it does not include doc files or <tt class="docutils literal">setup.py</tt> itself.  All the metadata from <tt class="docutils literal">setup.py</tt> that is needed for installation is put in files in a directory <tt class="docutils literal"><span class="pre"><span class="caps">EGG</span>-<span class="caps">INFO</span></span></tt>.</dd>
+<dt>Eggs the Installation&nbsp;Format:</dt>
+<dd>Eggs the Distribution Format are a subset of the Installation Format.  That is, if you put an Egg zip file on the path, it is installed, no other process is necessary.  But the Installation Format is more general.  To have an egg installed, you either need something like <tt class="docutils literal"><span class="pre">DistroName-<span class="caps">X.Y.</span>egg/</span></tt> on the path, and then an <tt class="docutils literal"><span class="pre"><span class="caps">EGG</span>-<span class="caps">INFO</span>/</span></tt> directory under that with the metadata, or a path like <tt class="docutils literal"><span class="pre">DistroName.egg-info/</span></tt> with the metadata directly in that directory.  This metadata can exist anywhere, and doesn&#8217;t have to be directly alongside the actual Python code.  Egg directories are required for pkg_resources to activate and deactivate distributions, but otherwise they aren&#8217;t&nbsp;necessary.</dd>
+<dt>pip:</dt>
+<dd>This is an alternative to easy_install.  It works <em>somewhat</em> differently than easy_install, but not much.  Mostly it is <em>better</em> than easy_install, in that it has some extra features and is easier to use.  Unlike easy_install, it downloads all distributions up-front, and generates the metadata to read distribution and version requirements.  It uses Setuptools to generate this metadata from a setup.py file, and uses pkg_resources to parse this metadata.  It then installs packages <em>with the setuptools monkeypatches applied</em>.  It just happens to use an option <tt class="docutils literal">python setup.py <span class="pre">--single-version-externally-managed</span></tt>, which gets Setuptools to install packages in a more flat manner, with <tt class="docutils literal"><span class="pre">Distro.egg-info/</span></tt> directories alongside the package.  Pip installs eggs!  I&#8217;ve heard the many complaints about easy_install (and I&#8217;ve had many myself), but ultimately I think pip does well by just fixing a few small issues.  Pip is <em>not</em> a repudiation of Setuptools or the basic mechanisms that easy_install&nbsp;uses.</dd>
+<dt>PoachEggs:</dt>
+<dd>This is a defunct package that had some of the features of pip (particularly requirement files) but used easy_install for installation.  Don&#8217;t bother with this, it was just a bridge to get to&nbsp;pip.</dd>
+<dt>virtualenv:</dt>
+<dd>This is a little hack that creates isolated Python environments.  It&#8217;s based on <tt class="docutils literal"><span class="pre">virtual-python.py</span></tt>, which is something I wrote based on some documentation notes <span class="caps">PJE</span> wrote for Setuptools.  Basically virtualenv just creates a <tt class="docutils literal">bin/python</tt> interpreter that has its own value of <tt class="docutils literal">sys.prefix</tt>, but uses the system Python and standard library.  It also installs Setuptools to make it easier to bootstrap the environment (because bootstrapping Setuptools is itself a bit tedious).  I&#8217;ll add pip to it too sometime.  Using virtualenv you don&#8217;t have to worry about different library versions, because for any one environment you will probably only need one version of a library.  On any one <em>machine</em> you probably need different versions, which is why installing packages system-wide is problematic for most libraries.  (I&#8217;ve been meaning to write a post on why I think using system packaging for libraries is counter-productive, but that&#8217;ll wait for another&nbsp;time.)</dd>
+</dl>
+<hr class="docutils" />
+<p>So&#8230; there&#8217;s the pieces involved, at least the ones I can remember now.  And I haven&#8217;t really discussed .pth files, entry points, sys.path trickery, site.py, distutils.cfg&#8230; sadly this is a complex state of affairs, but it was also complex before&nbsp;Setuptools.</p>
+<p>There are a few things that I think people really dislike about&nbsp;Setuptools.</p>
+<p>First, zip files.  Setuptools prefers zip files, for reasons that won&#8217;t mean much to you, and maybe are more historical than anything.  When a distribution doesn&#8217;t indicate if it is zip-safe, Setuptools looks at the code and sees if it uses <tt class="docutils literal">__file__</tt>, an if not it presumes that the code is probably zip-safe.  The specific problem James cites is what appears to be a bug in Django, that Django looks for code and can&#8217;t traverse into zip files in the same way that Python itself can.  Setuptools didn&#8217;t itself add anything to Python to make it import zip files, that functionality was added to Python some time before.  The zipped eggs that Setuptools installs are using existing (standard!) Python&nbsp;functionality.</p>
+<p>That said, I don&#8217;t think zipping libraries up is all that useful, and while it <em>should</em> work, it doesn&#8217;t always, and it makes code harder to inspect and understand.  So since it&#8217;s not that useful, I&#8217;ve disabled it when pip installs packages.  I also have had it disabled on my own system for years now, by creating a <tt class="docutils literal">distutils.cfg</tt> file with <tt class="docutils literal">[easy_install] zip_ok = False</tt> in it.  Sadly App Engine is forcing me to use zip files again, because of its absurdly small file limits&#8230; but that&#8217;s a different topic.  (There is an experimental <tt class="docutils literal">pip zip</tt> command mostly intended for App&nbsp;Engine.)</p>
+<p>Another pain point is version management with <tt class="docutils literal">setup.py</tt> and Setuptools.  Indeed it is easy to get things messed up, and it is easy to piss people off by overspecifying, and sometimes things can get in a weird state for no good reason (often because of easy_install&#8217;s rather naive leap-before-you-look installation order).  Pip fixes that last point, but it also tries to suggest more constructive and less painful ways to manage other&nbsp;pieces.</p>
+<p>Pip requirement files are an assertion of <strong>versions that work together</strong>.  setup.py requirements (the Setuptools requirements) should contain two things: <strong>1</strong>: all the libraries used by the distribution (without which there&#8217;s no way it&#8217;ll work) and <strong>2</strong>: exclusions of the versions of those libraries that are <strong>known not to work</strong>.  setup.py requirements should not be viewed as an assertion that by satisfying those requirements everything <em>will</em> work, just that it <em>might</em> work.  Only the end developer, testing the system together, can figure out if it really works.  Then pip gives you a way to record that working set (using <a class="reference external" href="http://pip.openplans.org/#freezing-requirements">pip freeze</a>), separate from any single distribution or&nbsp;library.</p>
+<p>There&#8217;s also a lot of conflicts between Setuptools and package maintainers.  This is kind of a proxy war between developers and sysadmins, who have very different motivations.  It deserves a post of its own, but the conflicts are about more than just how Setuptools is&nbsp;implemented.</p>
+<p>I&#8217;d love if there was a language-neutral library installation and management tool that really worked.  Linux system package managers are absolutely not that tool; frankly it is absurd to even consider them as an alternative.  So for now we do our best in our respective language communities.  If we&#8217;re going to move forward, we&#8217;ll have to acknowledge what&#8217;s come before, and the reasoning for&nbsp;it.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

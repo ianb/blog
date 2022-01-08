@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Thoughts on the Firefox Email Tabs experiment</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2018-11-15T00:00:00-06:00">
+                Thursday, November 15th, 2018
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2018/11/thoughts-on-email-tabs.html"
+                    rel="bookmark"
+                    title="Permalink to Thoughts on the Firefox Email Tabs experiment"
+                    >Thoughts on the Firefox Email Tabs&nbsp;experiment</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>We recently released <a href="https://testpilot.firefox.com/experiments/email-tabs">Email Tabs</a> in <a href="https://testpilot.firefox.com/">Firefox Test Pilot</a>. This was a project I championed, and I wanted to offer some context on&nbsp;it.</p>
+<p>Email Tabs is a browser add-on that makes it easier to compose an email message from your tabs/pages. The <a href="https://testpilot.firefox.com/experiments/email-tabs">experiment page</a> describes how it works, but to summarize it from a technical point of&nbsp;view:</p>
+<ul>
+<li>You choose some&nbsp;tabs</li>
+<li>The add-on gets the best title and <span class="caps">URL</span> from the tab(s), makes a screenshot, and uses <a href="https://blog.mozilla.org/firefox/reader-view/">reader view</a> to get simplified content from the&nbsp;tab</li>
+<li>It opens a email compose&nbsp;page</li>
+<li>It asks you what you want your email to look like (links, entire articles,&nbsp;screenshots)</li>
+<li>It injects the <span class="caps">HTML</span> (somewhat brutally) into the email composition&nbsp;window</li>
+<li>When the email is sent, if offers to close the compose window or all the tabs you&#8217;ve&nbsp;sent</li>
+</ul>
+<p><a href="https://testpilot.firefox.com/experiments/email-tabs"><img style="float: right; width: 300px; height: auto" src="/media/email-tabs-1.jpg" /></a></p>
+<p>It&#8217;s not fancy engineering. It&#8217;s just-make-it-work engineering. It does not propose a new standard for composing <span class="caps">HTML</span> emails. It doesn&#8217;t pay attention to your existing mail settings. It does not push forward the state of the art. It has no mobile component. Notably, no one in Mozilla ever asked us to make this thing. And yet I really like this add-on, and so I feel a need to explain&nbsp;why.</p>
+<h3>User Research&nbsp;origins</h3>
+<p>A long time ago <a href="https://blog.mozilla.org/ux/2015/02/save-share-revisit/">Mozilla did research into Save/Share/Revisit</a>. The research was based on interviews, journals, and directly watching people do work on their&nbsp;computers.</p>
+<p>The results should not be surprising, but it was important to actually have them documented and backed up by&nbsp;research:</p>
+<ul>
+<li>People use simple&nbsp;techniques</li>
+<li>Everyone claims to be happy with their current&nbsp;processes</li>
+<li>Everyone used multiple tools that typically fed into each&nbsp;other</li>
+<li>Those processes might seem complicated and inefficient to me, but didn&#8217;t to&nbsp;them</li>
+<li>People said they <em>might</em> be open to improvements in specific&nbsp;steps</li>
+<li>People were not interested in revamping their overall&nbsp;processes</li>
+<li>Some techniques were particularly&nbsp;popular:</li>
+<li>Screenshots</li>
+<li>URLs</li>
+<li>Email</li>
+<li>Texting</li>
+<li>Bookmarks</li>
+</ul>
+<p><a href="https://testpilot.firefox.com/experiments/email-tabs"><img style="float: right; width: 300px; height: auto" src="/media/email-tabs-2.jpg" /></a></p>
+<p>Not everyone used all of these, but they were all&nbsp;popular.</p>
+<p>The research made me change a page-freezing/saving tool (Page Shot) into what is now <a href="https://screenshots.firefox.com/">Firefox Screenshots</a> (I didn&#8217;t intend to lose the freezing functionality along the way, but things happen when you&nbsp;ship).</p>
+<p>Even if the research was fairly clear, it wasn&#8217;t prescriptive, and life moved on. But it sat in the back of my head, both email and the <a href="http://www.ianbicking.org/blog/2018/02/web-small-composable-tools.html">general question of workflows</a>. And once I was doing less work on Screenshots I felt compelled to come back to it. Email stuck out, both because of how ubiquitous it was, and how little anyone cared about it. It seemed easy to improve&nbsp;on.</p>
+<p>Email is also multipurpose. People will apologetically talk about emailing themselves something in order to save it, even though everyone does it. It can be a note for the future, something to archive for later, a message, a question, an <span class="caps">FYI</span>. One of the features of Email Tabs that I&#8217;m fond of is the ability to send a set of tabs, and then close those same tabs. Have a set of tabs that represent something you don&#8217;t want to forget, but don&#8217;t want to use right now? Send it to yourself. And unlike structured storage (like a bookmark folder), you can describe as much as you want about your next steps in the email&nbsp;itself.</p>
+<h3>Choosing to integrate with&nbsp;webmail</h3>
+<p>The obvious solution is to make something that emails out a page. A little web service perhaps, and you give it a <span class="caps">URL</span> and it fetches it, and then something that forwards the current <span class="caps">URL</span> to that&nbsp;service&#8230;</p>
+<p>What seems simple becomes hard pretty quickly. Of course you have to fetch the page, and render it, and worry about JavaScript, and so on. But even if you skip that, then what email address will it come from? Do you integrate with a contact list? Make your own? How do you let people add a little note? A note per tab? Do you save a&nbsp;record?</p>
+<p>Prepopulating an email composition answers a ton of&nbsp;questions:</p>
+<ul>
+<li>All the mail&nbsp;infrastructure</li>
+<li>From addresses, email verification, selecting your address,&nbsp;etc</li>
+<li>To field, <span class="caps">CC</span>, address&nbsp;book</li>
+<li>The editable body gives the user control and the ability to explain why they are sending&nbsp;something</li>
+<li>It&#8217;s very transparent to the user what they are sending, and they confirm it by hitting&nbsp;Send</li>
+</ul>
+<p>Since then I&#8217;ve come to appreciate the power of editable documents. Again it should be obvious, but there&#8217;s this draw any programmer will feel towards structured data and read-only representations of that data. The open world of an email body is refreshingly&nbsp;unconstrained.</p>
+<h3>Email providers <span class="amp">&amp;</span> broken&nbsp;browsers</h3>
+<p>One downside to this integration is that we are shipping with only Gmail support. That covers <a href="https://www.statista.com/statistics/547531/e-mail-provider-ranking-consumer-usa-age/">most people</a>, but it feels&nbsp;wrong.</p>
+<p>This is an experiment, so keep it simple, right? And that was the plan until people from marketing kept asking over and over for us to support other clients and we thought: if they care so much maybe they are&nbsp;right.</p>
+<p>We didn&#8217;t get support for other providers ready for launch, but we did get a good start on it. Along the way I saw that <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1494105">Yahoo Mail is broken</a> and Outlook isn&#8217;t supported at all in Firefox (and the <a href="https://support.mozilla.org/en-US/kb/change-program-used-open-email-links">instructions</a> point to a pretty unhelpful <a href="https://addons.mozilla.org/en-US/firefox/search/?q=webmail">addons.mozilla.org search</a>). That&#8217;s millions of users who aren&#8217;t getting a good&nbsp;experience.</p>
+<p>Growing Firefox is a really hard problem. Of course Mozilla has also studied this quite a bit, and one of the strongest conclusions is that people change their browser when their browser breaks. People aren&#8217;t out there looking for something better, everyone has better things to do than think about their web browser. But if things don&#8217;t work people go&nbsp;searching.</p>
+<p>But what does broken really mean? I suspect if we looked more closely we might be surprised. The simple answer: something is broken if it doesn&#8217;t act the way it should. But what &#8220;should&#8221; something do? If you click a link and Mail.app opens up, and you don&#8217;t use Mail.app, that&#8217;s broken. To Mozilla developers, if Mail.app is your registered default mail provider, then it &#8220;should&#8221; open up. Who&#8217;s&nbsp;right?</p>
+<p>Email Tabs doesn&#8217;t offer particular insight into this, but I do like that we&#8217;ve created something with the purpose of enabling a <em>successful workflow</em>. Nothing is built to a spec, or to a standard, it&#8217;s only built to work. I think that process is itself&nbsp;revealing.</p>
+<h2>Listening to the&nbsp;research</h2>
+<p>Research requires interpretation. We asked questions about saving, sharing, and revisiting content, and we got back answers on those topics. Were those the right questions to ask? They seem pretty good, but there&#8217;s other pretty good questions that will lead to very different answers. What makes you worried when you use the web? What do you want from a browser? What do you think about Firefox? What do you use a browser for? What are you doing when you switch from a phone to a desktop browser? We&#8217;ve asked all these questions, and they point to different&nbsp;answers.</p>
+<p>And somewhere in there you have to find an intersection between what you hear in the research and what you know how to do. There&#8217;s no right answer. But there is something different when you <strong>start from</strong> the user research, instead of <strong>using</strong> the user research. There&#8217;s a different sort of honesty to the conclusions, and I hope that comes through in the&nbsp;product.</p>
+<p>I know what Email Tabs isn&#8217;t: it&#8217;s not part of any strategy. It&#8217;s not part of any kind of play for anything. There&#8217;s no ulterior motives. There&#8217;s no income potential. This makes its future very hazy. And it won&#8217;t be a blow-up success. It is merely useful. But I like it, and I hope we do&nbsp;more.</p></div>
+        <!-- /.entry-content -->
+          <div class="comments">
+            <h2>Comments</h2>
+            <table class='table table-striped'>
+<tr><td style='padding-left: 0px' class='dU'>disqus_vUjCkwVRW9</td><td class='dTS'>Fri, 16 Nov 2018</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>&gt; we are shipping with only Gmail support. That covers most people, but it feels wrong.</p><p>"most people in the US", you meant to say? At least, your source is US-only. Gmail is far less popular e.g. in Germany -- less than 20%, it seems: <a href="https://de.statista.com/statistik/daten/studie/151754/umfrage/nutzeranteile-von-e-mail-anbietern-in-deutschland/" rel="nofollow noopener" title="https://de.statista.com/statistik/daten/studie/151754/umfrage/nutzeranteile-von-e-mail-anbietern-in-deutschland/">https://de.statista.com/sta...</a></p></td></tr>
+<tr><td style='padding-left: 50px' class='dU'>Ian Bicking</td><td class='dTS'>Fri, 16 Nov 2018</td></tr>
+<tr><td style='padding-left: 50px' colspan='2' class='dMessage'><p>True, my research was fairly limited. Unfortunately the information in your link appears to be behind a paywall (but I am interested in what it says).</p></td></tr>
+<tr><td style='padding-left: 100px' class='dU'>disqus_vUjCkwVRW9</td><td class='dTS'>Fri, 16 Nov 2018</td></tr>
+<tr><td style='padding-left: 100px' colspan='2' class='dMessage'><p>Ah, it showed one site for free for me. :/</p><p>Does this work? <a href="https://publicare.de/wp-content/uploads/2016/09/Publicare_E-Mail-Studie_2016.jpg" rel="nofollow noopener" title="https://publicare.de/wp-content/uploads/2016/09/Publicare_E-Mail-Studie_2016.jpg">https://publicare.de/wp-con...</a></p><p>It is German, but the percentages should be understandable. The first graph is by company, the second by domain (<a href="http://web.de" rel="nofollow noopener" title="web.de">web.de</a> and <a href="http://gmx.de" rel="nofollow noopener" title="gmx.de">gmx.de</a> are owned by the same company, after United Internet bought them both). It is from <a href="https://publicare.de/blog/publicare-e-mail-studie-2016/" rel="nofollow noopener" title="https://publicare.de/blog/publicare-e-mail-studie-2016/">https://publicare.de/blog/p...</a></p><p>I didn't do any proper research either, just going for the first marker share numbers that are not posted by one of the providers themselves.</p></td></tr>
+<tr><td style='padding-left: 150px' class='dU'>Ian Bicking</td><td class='dTS'>Mon, 19 Nov 2018</td></tr>
+<tr><td style='padding-left: 150px' colspan='2' class='dMessage'><p>Thanks, that's useful! I realized the providers we ship CAN be localized (to match up with markets like this), but after a quick test I see that the mail providers for the German Firefox build are the same as the default. I'll have to make a bug about this!</p></td></tr>
+<tr><td style='padding-left: 0px' class='dU'>Amb!</td><td class='dTS'>Tue, 18 Dec 2018</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>Edge allows something vaguely like this. You can save a set of tabs for later, and then on each tab set there's a share option, which uses the Windows share contract. Share it to email and it populates a message with a list of links with page titles and thumbnails. I've found it somewhat useful, although it would be a lot better if the Edge set-aside feature existed on mobile and sync'd, and if OneNote had better share target support.</p></td></tr>
+</table>
+
+          </div>
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

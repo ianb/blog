@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Viewing Python execution with source code rewriting</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2018-11-20T00:00:00-06:00">
+                Tuesday, November 20th, 2018
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2018/11/viewing-python-execution-source-code-rewriting.html"
+                    rel="bookmark"
+                    title="Permalink to Viewing Python execution with source code rewriting"
+                    >Viewing Python execution with source code&nbsp;rewriting</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>A while back I experimented with a <a href="https://github.com/ianb/sheets">Jupyter Notebook-like</a> interface. Ultimately I hit some roadblocks and knew that I couldn&#8217;t keep working on it indefinitely, as I had no personal <em>purpose</em> for the&nbsp;project.</p>
+<p>But I do want to share the idea I most liked from the project: tracing execution with source code&nbsp;rewriting.</p>
+<h1>Print-based&nbsp;debugging</h1>
+<p>My go-to debugging in any environment is printing. You decide what you want to know about, then you sprinkle in some statements and find out. Repeat as necessary. I like printing because it&#8217;s like a way of creating a log of the execution. Maybe there&#8217;s better ways, but like many people this is one of the only techniques that sticks for me. Still, I think there&#8217;s ways of incrementally improving on print-based debugging, and this is one attempt on my&nbsp;part&#8230;</p>
+<h2>Source code&nbsp;rewriting</h2>
+<p>Instead of using <a href="https://docs.python.org/3/library/trace.html">trace</a> to follow along with the code, I thought we could inject the debugging into the code&nbsp;itself.</p>
+<p>I ended up implementing two kinds of source code rewriting. The first simply prints&nbsp;expressions:</p>
+<div class="highlight"><pre><span></span><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">my_object</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+<span class="n">my_object</span>
+</pre></div>
+
+
+<p>This normally prints out <code>my_object</code>, but it only works on the last expression (i.e., you wouldn&#8217;t see the value of <code>my_object.execute()</code>). This constraint is built into Python in <a href="https://docs.python.org/3/library/functions.html#compile">compile</a>, with the output being sent to <a href="https://docs.python.org/3/library/sys.html#sys.displayhook">sys.displayhook</a>. You can get around this problem by splitting up the cells carefully, but I find cell management to be an unpleasant part of notebook&nbsp;interfaces.</p>
+<p>I first tried putting an implicit <code>print()</code> around every top-level expression, so it&nbsp;becomes:</p>
+<div class="highlight"><pre><span></span><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">display_print</span><span class="p">(</span><span class="n">my_object</span><span class="o">.</span><span class="n">execute</span><span class="p">())</span>
+<span class="n">display_print</span><span class="p">(</span><span class="n">my_object</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Where <code>display_print()</code> is something simple&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">display_print</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">value</span>
+</pre></div>
+
+
+<p>This turned out to be confusing. What print statement went with which expression? I legitimately couldn&#8217;t tell, even with simple examples. So I made another change, rewriting it like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">display_print</span><span class="p">(</span><span class="s2">&quot;my_object.execute()&quot;</span><span class="p">,</span> <span class="n">my_object</span><span class="o">.</span><span class="n">execute</span><span class="p">())</span>
+<span class="n">display_print</span><span class="p">(</span><span class="s2">&quot;my_object&quot;</span><span class="p">,</span> <span class="n">my_object</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">display_print</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="s2">  </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">value</span>
+</pre></div>
+
+
+<p>It works great! You can track a bunch of expressions, interleave this with other explicit print statements, and the output is readable and&nbsp;useful.</p>
+<h3>Probes</h3>
+<p>But I had a problem: I could watch top-level expressions, but there were lots of interesting expressions that aren&#8217;t top-level. For this I added a new function <code>watch()</code>. But I still rewrote&nbsp;expressions:</p>
+<div class="highlight"><pre><span></span><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">object_enumerator</span><span class="p">():</span>
+    <span class="n">my_object</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">watch</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+</pre></div>
+
+
+<p>is rewritten&nbsp;to:</p>
+<div class="highlight"><pre><span></span><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">object_enumerator</span><span class="p">():</span>
+    <span class="n">my_object</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">watch_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="n">obj</span><span class="p">))</span> <span class="c1"># the 1 is an ID for the expression</span>
+</pre></div>
+
+
+<p>With an implementation of <code>watch_print()</code> like:</p>
+<div class="highlight"><pre><span></span><span class="n">watch_print_counter</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">watch_print_limit</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="k">def</span> <span class="nf">watch_print</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">watch_print_counter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">watch_print_limit</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="s2">  </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+        <span class="n">watch_print_counter</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">watch_print_counter</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">watch_print_counter</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">watch_print_limit</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  (omitting further values)&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span>
+</pre></div>
+
+
+<p>While I initially left out the limit, I quickly realized its importance: it&#8217;s very easy to run a denial of service attack on your own notebook! A more sophisticated implementation could start omitting values while leaving in every 100th or 1000th&nbsp;value.</p>
+<h3>Watching&nbsp;loops</h3>
+<p>I never implemented this, but I&#8217;m pretty sure the next step would be watching all loops, rewriting them as something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">watch_enumerator</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="s2">&quot;object_enumerator()&quot;</span><span class="p">,</span> <span class="n">object_enumerator</span><span class="p">()):</span>
+   <span class="o">...</span>
+</pre></div>
+
+
+<p>This would let you print out useful information, like if the execution is long you can indicate progress and possibly an expected completion time, or you could label inner watch statements or add other&nbsp;information.</p>
+<h1>Implementation</h1>
+<p>To implement this I used the <a href="https://astor.readthedocs.io/en/latest/">astor</a> library, which made this all very simple, though it required some&nbsp;experimentation:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RewriteExprToPrint</span><span class="p">(</span><span class="n">astor</span><span class="o">.</span><span class="n">TreeWalk</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">post_Module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_node</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rewrite_expr</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expr</span><span class="p">)</span> <span class="k">else</span> <span class="n">n</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">rewrite_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">expr_string</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">expr_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">expr_string</span> <span class="o">=</span> <span class="n">astor</span><span class="o">.</span><span class="n">to_source</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="n">node_string</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Str</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="n">expr_string</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expr</span><span class="p">):</span>
+            <span class="n">new_node</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Expr</span><span class="p">(</span>
+                <span class="n">ast</span><span class="o">.</span><span class="n">Call</span><span class="p">(</span>
+                    <span class="n">func</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;display_print&#39;</span><span class="p">,</span> <span class="n">ctx</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">Load</span><span class="p">()),</span>
+                    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">node_string</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">],</span>
+                    <span class="n">keywords</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">starargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_node</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Call</span><span class="p">(</span>
+                <span class="n">func</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;display_print&#39;</span><span class="p">,</span> <span class="n">ctx</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">Load</span><span class="p">()),</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">node_string</span><span class="p">,</span> <span class="n">node</span><span class="p">],</span>
+                <span class="n">keywords</span><span class="o">=</span><span class="p">[],</span>
+                <span class="n">starargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">fix_missing_locations</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_node</span>
+</pre></div>
+
+
+<p>Implementing <code>watch()</code> is a little more&nbsp;involved:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RewriteWatch</span><span class="p">(</span><span class="n">astor</span><span class="o">.</span><span class="n">TreeWalk</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">astor</span><span class="o">.</span><span class="n">TreeWalk</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_call</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">post_Name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cur_node</span><span class="o">.</span><span class="n">ctx</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Load</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_node</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="s2">&quot;watch&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">next_call</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">post_Call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_call</span><span class="p">:</span>
+            <span class="n">new_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rewrite_expr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cur_node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_call</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">rewrite_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">expr_string</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">expr_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">expr_string</span> <span class="o">=</span> <span class="n">astor</span><span class="o">.</span><span class="n">to_source</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="n">node_string</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Str</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="n">expr_string</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">new_node</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Call</span><span class="p">(</span>
+            <span class="n">func</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;watch_print&#39;</span><span class="p">,</span> <span class="n">ctx</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">Load</span><span class="p">()),</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">ast</span><span class="o">.</span><span class="n">Num</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id_counter</span><span class="p">),</span> <span class="n">node_string</span><span class="p">,</span> <span class="n">node</span><span class="p">],</span>
+            <span class="n">keywords</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">starargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ast</span><span class="o">.</span><span class="n">fix_missing_locations</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_node</span>
+</pre></div></div>
+        <!-- /.entry-content -->
+          <div class="comments">
+            <h2>Comments</h2>
+            <table class='table table-striped'>
+<tr><td style='padding-left: 0px' class='dU'>Alex Hall</td><td class='dTS'>Tue, 27 Nov 2018</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>You'll probably like <a href="https://github.com/alexmojaki/birdseye" rel="nofollow noopener" title="https://github.com/alexmojaki/birdseye">https://github.com/alexmoja...</a></p></td></tr>
+</table>
+
+          </div>
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

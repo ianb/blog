@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Avoiding Silos: “link” as a first-class object</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,66 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2008-12-27T13:09:00-06:00">
+                Saturday, December 27th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/12/avoiding-silos-link-as-a-first-class-object.html"
+                    rel="bookmark"
+                    title="Permalink to Avoiding Silos: “link” as a first-class object"
+                    >Avoiding Silos: &#8220;link&#8221; as a first-class&nbsp;object</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>One of the constant annoyances to me in web applications is the self-proclaimed need for those applications to know about everything and do everything, and only spotty ad hoc techniques for including things from other&nbsp;applications.</p>
+<p>An example might be blog navigation or search, where you can only include data from the application itself.  Or &#8220;Recent Posts&#8221; which can only show locally-produce posts.  What if I post something elsewhere?  I have to create some shoddy placeholder post to refer to it.  Bah!  Underlying this the data is usually structured in a specific way, with the <span class="caps">HTML</span> being a sort of artifact of the database, the markup transient and a slave to the database&#8217;s&nbsp;structure.</p>
+<p>An example of this might be a recent post listing&nbsp;like:</p>
+<pre class="literal-block">
+&lt;ul&gt;
+  for post in recent_posts:
+    &lt;li&gt;
+      &lt;a href=&quot;/post/{{post.year}}/{{post.month}}/{{post.slug}}&quot;&gt;
+        {{post.title}}&lt;/a&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p>There&#8217;s clearly no room for exceptions in this code.  I am thus proposing that any system like this should have the notion of a &#8220;link&#8221; as a first-class object.  The code should look like&nbsp;this:</p>
+<pre class="literal-block">
+&lt;ul&gt;
+  for post in recent_posts:
+    &lt;li&gt;
+      {{post.link()}}
+    &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+<p>Just like with <a class="reference external" href="http://blog.ianbicking.org/2008/10/24/hypertext-driven-urls/">changing IDs to links</a> in service documents, the template doesn&#8217;t actually look any more complicated than it did before (simpler, even).  But now we can use simple object-oriented techniques to create first-class links.  The code might look&nbsp;like:</p>
+<pre class="literal-block">
+class Post(SomeORM):
+    def url(self):
+        if self.type == 'link':
+            return self.body
+        else:
+            base = get_request().application_url
+            return '%s/%s/%s/%s' % (
+                base, self.year, self.month, self.slug)
+
+    def link(self):
+        return html('&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;') % (
+            self.url(), self.title)
+</pre>
+<p>The addition of the <tt class="docutils literal">.url()</tt> method has the obvious effect of making these offsite links work.  Using a <tt class="docutils literal">.link()</tt> method has the added advantage of allowing things like <span class="caps">HTML</span> snippets to be inserted into the system (even though that is not implemented here).  By allowing arbitrary <span class="caps">HTML</span> in certain places you make it possible for people to extend the site in little ways &#8212; possibly adding markup to a title, or allowing an item in the list that actually contains two URLs (e.g., <tt class="docutils literal">&lt;a <span class="pre">href=&quot;url1&quot;&gt;Some</span> <span class="pre">Item&lt;/a&gt;</span> (&lt;a <span class="pre">href=&quot;url2&quot;&gt;via&lt;/a&gt;)</span></tt>).</p>
+<p>In the context of Python I recommend making these into methods, not properties, because it allows you to later add keyword arguments to specialize the markup (like <tt class="docutils literal">post.link(abbreviated=True)</tt>).</p>
+<p>One negative aspect of this is that you cannot affect all the markup through the template alone, you may have to go into the Python code to change things.  Anyone have ideas for handling this&nbsp;problem?</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +94,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

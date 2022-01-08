@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>The Web Server Benchmarking We Need</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,48 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
+    <article>
+        <header>
+            <abbr class="published" title="2010-03-16T17:23:00-05:00">
+                Tuesday, March 16th, 2010
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2010/03/the-web-server-benchmarking-we-need.html"
+                    rel="bookmark"
+                    title="Permalink to The Web Server Benchmarking We Need"
+                    >The Web Server Benchmarking We&nbsp;Need</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>Another <a class="reference external" href="http://nichol.as/benchmark-of-python-web-servers"><span class="caps">WSGI</span> web server benchmark</a> was published.  It&#8217;s a decent benchmark, despite some criticisms.  But it benchmarks what everyone benchmarks: serving up a trivial app really really quickly.  This is not very useful to me.  Also, performance is not to me the most important differentiation of&nbsp;servers.</p>
+<p>In <a class="reference external" href="http://cloudsilverlining.org">Silver Lining</a> we&#8217;re using <a class="reference external" href="http://code.google.com/p/modwsgi/">mod_wsgi</a>.  Silver Lining isn&#8217;t tied to mod_wsgi (applications can&#8217;t really tell), and we may revisit that decision (mostly because of memory concerns), but it is a deliberate choice.  mod_wsgi is one of the few multiprocess <span class="caps">WSGI</span> servers, and it manages its children (the same way Apache manages all its children).  So if a child stops responding, it gets taken out of the pool and killed (brutal efficiency!  Or at least brutal terminology).  Child processes are also recycled, guarding against memory leaks or other peculiarities.  Sometimes these kinds of things are dismissed for covering up bugs, but (a) production is a lousy time to learn about bugs, (b) it&#8217;s like a third tier of garbage collection, and (c) the bugs you are avoiding are often bugs you can&#8217;t fix anyway (for instance, if your mysql driver leaks memory, is that the application developer&#8217;s&nbsp;fault?)</p>
+<p>I wish there was competition among servers not to see who can tweak their performance for entirely unrealistic situations, but to see who can implement the most fail-safe server.  We&#8217;re missing good benchmarks.  Unfortunately benchmarks are a pain in the butt to write and&nbsp;manage.</p>
+<p>But I hope someone writes a benchmark like that.  Here&#8217;s some things I&#8217;d like to see&nbsp;benchmarked:</p>
+<ul class="simple">
+<li>A &#8220;realistic&#8221; <span class="caps">CPU</span>-bound application.  <tt class="docutils literal">for i in xrange(10000000): pass</tt> is a reasonable&nbsp;start.</li>
+<li>An application that generates big responses, e.g., <tt class="docutils literal"><span class="pre">&quot;x&quot;*100000</span></tt>.</li>
+<li>An I/O bound application.  E.g., one that reads a big&nbsp;file.</li>
+<li>A simply slow application (<tt class="docutils literal">time.sleep(1)</tt>).</li>
+<li>Applications that wedge.  <tt class="docutils literal">while 1: pass</tt> perhaps?  Or <tt class="docutils literal">lock = <span class="pre">threading.Lock();</span> <span class="pre">lock.acquire();</span> lock.acquire()</tt>.  Wedging in C and wedging in Python are different, so a bunch of different kinds of&nbsp;wedging.</li>
+<li>Applications that segfault.  ctypes is specially designed for&nbsp;this.</li>
+<li>Applications that leak memory like a sieve, e.g., <tt class="docutils literal"><span class="pre">global_var.extend(['x']*10000)</span></tt>.</li>
+<li>Large&nbsp;uploads.</li>
+<li>Slow uploads, like a client that takes 30 seconds to upload&nbsp;1Mb.</li>
+<li>Also slow&nbsp;downloads.</li>
+<li>In each case it is interesting what happens when something bad happens to just a portion of requests.  E.g., if 1% of requests wedge hard.  A good container will serve the other 99% of requests properly.  A bad container will have its worker pool exhausted and completely&nbsp;stop.</li>
+<li>Mixing and matching these could be interesting.  For instance Dave Beazley <a class="reference external" href="http://www.dabeaz.com/blog/2010/02/revisiting-thread-priorities-and-new.html">found some bad <span class="caps">GIL</span> results mixing I/O and <span class="caps">CPU</span>-bound code</a>.</li>
+<li>Add ideas in the comments and I&#8217;ll copy them into this&nbsp;list.</li>
 </ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+<p>The hardest part of writing this is not the applications (they are simple).  One annoyance is wiring up the applications, but handily Nicholas covers that well in <a class="reference external" href="http://nichol.as/benchmark-of-python-web-servers">his benchmark</a>.  You also have to make sure to clean up, as many servers will not exit cleanly from some of the tests.  Another nuisance is that some of these require funny clients.  These aren&#8217;t too hard to write, but you can&#8217;t just use <tt class="docutils literal">ab</tt>.  Then you have to&nbsp;report.</p>
+<p>Anyway: I would <strong>love it</strong> if someone did this, and packaged it as repeatable/runnable code/scripts.  I&#8217;ll help some, but I can&#8217;t lead.  I&#8217;d both really like to see the results, and in my ideal world people writing servers would start using these benchmarks to make their servers more&nbsp;robust.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +76,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

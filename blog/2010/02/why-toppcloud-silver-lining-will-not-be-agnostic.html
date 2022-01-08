@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Why toppcloud (Silver Lining) will not be agnostic</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,35 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2010-02-10T00:41:00-06:00">
+                Wednesday, February 10th, 2010
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2010/02/why-toppcloud-silver-lining-will-not-be-agnostic.html"
+                    rel="bookmark"
+                    title="Permalink to Why toppcloud (Silver Lining) will not be agnostic"
+                    >Why toppcloud (Silver Lining) will not be&nbsp;agnostic</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I haven&#8217;t received a great deal of <em>specific</em> feedback on toppcloud (<strong>update</strong>: renamed Silver Lining), only a few people (Ben Bangert, Jorge Vargas) seem to have really dived deeply into it.  But &#8212; and this is not unexpected &#8212; I have already gotten several requests about making it more agnostic with respect to&#8230; stuff.  Maybe that it not (at least forever) require Ubuntu.  Or maybe that it should support different process models (e.g., threaded and multiple processes).  Or other versions of&nbsp;Python.</p>
+<p>The more I think about it, and the more I work with the tool, the more confident I am that toppcloud should not be agnostic on these issues.  This is not so much about an &#8220;opinionated&#8221; tool; toppcloud is not actually very opinionated.  It&#8217;s about a well-understood&nbsp;system.</p>
+<p>For instance, Ben noticed a problem recently with <a class="reference external" href="http://code.google.com/p/modwsgi/issues/detail?id=177">weird import errors</a>.  I don&#8217;t know <em>quite</em> why mod_wsgi has this particular problem (when other <span class="caps">WSGI</span> servers that I&#8217;ve used haven&#8217;t), but the fix isn&#8217;t that hard.  So Ben <a class="reference external" href="http://bitbucket.org/ianb/toppcloud/changeset/27a470352a5e/">committed a fix</a> and the problem went&nbsp;away.</p>
+<p>Personally I think this is a bug with mod_wsgi.  Maybe it&#8217;s also a Python bug.  But it doesn&#8217;t really matter.  When a bug exists it &#8220;belongs&#8221; to everyone who encounters&nbsp;it.</p>
+<p>toppcloud is not intended to be a transparent system.  When it&#8217;s working correctly, you should be able to ignore most of the system and concentrate on the relatively simple abstractions given to your application.  So if the configuration reveals this particular bug in Python/mod_wsgi, then the bug is essentially a toppcloud bug, and toppcloud should (and <em>can</em>) fix&nbsp;it.</p>
+<p>A more flexible system can ignore such problems as being &#8220;somewhere else&#8221; in the system.  Or, if you don&#8217;t define these problems as someone else&#8217;s problem, then a more flexible system is essentially always broken somewhere; there is always some untested combination, some new component, or some old component that might get pushed into the mix.  Fixes for one person&#8217;s problem may introduce a new problem in someone else&#8217;s stack.  Some fixes aren&#8217;t even clear.  toppcloud has Varnish in place, so it&#8217;s quite clear where a <a class="reference external" href="http://bitbucket.org/ianb/toppcloud/changeset/614d5366be67/">fix related to Django and Varnish configuration goes</a>.  If these were each components developed by different people at different times (like with buildout recipes) then fixing something like this could get&nbsp;complicated.</p>
+<p>So I feel very resolved: toppcloud will hardcode everything it possibly can.  Python 2.6 and only 2.6!  (Until 2.7, but then <strong>only 2.7</strong>!).  Only Varnish/Apache/mod_wsgi.  I haven&#8217;t figured out threads/processes exactly, but once I do, there will be only one way!  And if I get it wrong, then everyone (<strong>everyone</strong>) will have to switch when it is corrected!  Because I&#8217;d much rather have a system that is inflexible than one that doesn&#8217;t work.  With a clear and solid design I think it is feasible to get this to work, and that is no small&nbsp;feat.</p>
+<p>Relatedly, <a class="reference external" href="http://blog.ianbicking.org/2010/02/09/leaving-topp/comment-page-1/#comment-151194">I think I&#8217;m going to change the name of toppcloud</a>, so ideas are&nbsp;welcome!</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +63,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

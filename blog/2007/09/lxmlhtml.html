@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>lxml.html</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2007-09-24T08:32:00-05:00">
+                Monday, September 24th, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/09/lxmlhtml.html"
+                    rel="bookmark"
+                    title="Permalink to lxml.html"
+                    >lxml.html</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>Over the summer I did quite a bit of work on <a class="reference external" href="http://codespeak.net/svn/lxml/trunk/doc/lxmlhtml.txt">lxml.html</a>.  I&#8217;m pretty excited about it, because with just a little work <span class="caps">HTML</span> starts to be very usefully manipulatable.  This isn&#8217;t how I&#8217;ve felt about <span class="caps">HTML</span> in the past, with all <span class="caps">HTML</span> emerging from templates and consumed only by&nbsp;browsers.</p>
+<p>The ElementTree representation (which lxml copies) is a bit of a nuisance when representing <span class="caps">HTML</span>.  A <a class="reference external" href="http://codespeak.net/lxml/dev/lxmlhtml.html#html-element-methods">few methods</a> improve it, but it is still awkward for content with mixed tags and text (common in <span class="caps">HTML</span>, uncommon in most other <span class="caps">XML</span>).  Looking at <a class="reference external" href="http://genshi.edgewall.org/wiki/Documentation/filters.html#transformer">Genshi Transforms</a> there are some things I wish we could do, like simply &#8220;unwrap&#8221; text and then wrap it again.  But once you remove a tag the text is thoroughly merged into its neighbors.  Another little nuisance is that <tt class="docutils literal">el.text</tt> and <tt class="docutils literal">el.tail</tt> can be None, which means you have to guard a lot of&nbsp;code.</p>
+<p>That said, here&#8217;s the Genshi&nbsp;example:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; html = HTML('''&lt;html&gt;
+...   &lt;head&gt;&lt;title&gt;Some Title&lt;/title&gt;&lt;/head&gt;
+...   &lt;body&gt;
+...     Some &lt;em&gt;body&lt;/em&gt; text.
+...   &lt;/body&gt;
+... &lt;/html&gt;''')
+&gt;&gt;&gt; print html | Transformer('body/em').map(unicode.upper, TEXT) \
+...                                    .unwrap().wrap(tag.u).end() \
+...                                    .select('body/u') \
+...                                    .prepend('underlined ')
+</pre>
+<p>Here&#8217;s how you&#8217;d do it with&nbsp;lxml.html:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; html = fromstring('''... same thing ...''')
+&gt;&gt;&gt; def transform(doc):
+...     for el in doc.xpath('body/em'):
+...         el.text = (el.text or '').upper()
+...         el.tag = 'u'
+...     for el in doc.xpath('body/u'):
+...         el.text = 'underlined ' + (el.text or '')
+</pre>
+<p>I&#8217;m not sure if Genshi works in-place here, or makes a copy; otherwise these are pretty much equivalent.  Which is better?  Personally I prefer mine, and actually prefer it quite strongly, because it&#8217;s quite simple &#8212; it&#8217;s a function with loops and assignments.  It&#8217;s practically pedestrian in comparison to the Genshi example, which uses methods to declaratively create a&nbsp;transformer.</p>
+<p>Some of the things now in lxml.html&nbsp;include:</p>
+<ul>
+<li><p class="first"><a class="reference external" href="http://codespeak.net/lxml/dev/lxmlhtml.html#working-with-links">Link handling</a>,   which is particularly focused on rewriting links so you can put <span class="caps">HTML</span>   fragments into a new context without breaking the relative&nbsp;links.</p>
+</li>
+<li><p class="first"><a class="reference external" href="http://codespeak.net/lxml/dev/lxmlhtml.html#running-html-doctests">Smart doctest comparisons</a>   (attribute-order-neutral comparisons, with improved diffs, and also   whitespace neutral, based loosely on <a class="reference external" href="http://formencode.org/module-formencode.doctest_xml_compare.html">formencode.doctest_xml_compare</a>).   Inside your doctest choose <span class="caps">XML</span> parsing with <tt class="docutils literal">from lxml import&nbsp;&nbsp; usedoctest</tt> or <span class="caps">HTML</span> parsing with <tt class="docutils literal">from lxml.html import&nbsp;&nbsp; usedoctest</tt>.  I consider the import trick My Worst Monkeypatch   Ever, but it kind of reads nicely.  For testing it is very&nbsp;nice.</p>
+</li>
+<li><p class="first"><a class="reference external" href="http://codespeak.net/lxml/dev/lxmlhtml.html#cleaning-up-html">Cleaning code</a>, to   avoid <span class="caps">XSS</span> attacks, in <tt class="docutils literal">lxml.html.clean</tt>.  This is still pretty   messy, because there&#8217;s lots of little things you may or may not want   to protect against.  E.g., I think I can mostly clean out style tags   (at least of Javascript), but some people might want to remove all   style.  So there&#8217;s an option.  There&#8217;s lots of options.  Too&nbsp;many.</p>
+</li>
+<li><p class="first">With the cleaning code there&#8217;s <a class="reference external" href="http://codespeak.net/lxml/dev/lxmlhtml.html#wordwrap">word-wrapping code</a> and   <a class="reference external" href="http://codespeak.net/lxml/dev/lxmlhtml.html#autolink">autolinking code</a>.  I think   of these as clean-up-people&#8217;s-scrappy-<span class="caps">HTML</span> tools.  Also important   for putting untrusted <span class="caps">HTML</span> in a new&nbsp;context.</p>
+</li>
+<li><p class="first">I rewrote <a class="reference external" href="http://formencode.org/htmlfill.html">htmlfill</a> in   <tt class="docutils literal">lxml.html.formfill</tt>.  It&#8217;s a bit simpler, and keeps error   messages separate from actual value filling.  They were really only   combined because I didn&#8217;t want to do two passes with <tt class="docutils literal">HTMLParser</tt>   for the two steps, but that doesn&#8217;t matter when you load the   document into memory.  I also stopped using markup like   <tt class="docutils literal">&lt;form:error&gt;</tt> for placing error messages; it&#8217;s all automatic now,   which I suppose is both good and&nbsp;bad.</p>
+</li>
+<li><p class="first"><em>After</em> I wrote <tt class="docutils literal">lxml.html.formfill</tt> I got it into my head to make    smarter forms more natively.  So now you can&nbsp;do:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from lxml.html import parse
+&gt;&gt;&gt; page = parse('http://tripsweb.rtachicago.com/').getroot()
+&gt;&gt;&gt; form = page.forms[0]
+&gt;&gt;&gt; from pprint import pprint
+&gt;&gt;&gt; pprint(form.form_values())
+[('action', 'entry'),
+ ('resptype', 'U'),
+ ('Arr', 'D'),
+ ('f_month', '09'),
+ ('f_day', '21'),
+ ('f_year', '2007'),
+ ('f_hours', '9'),
+ ('f_minutes', '30'),
+ ('f_ampm', 'AM'),
+ ('Atr', 'N'),
+ ('walk', '0.9999'),
+ ('Min', 'T'),
+ ('mode', 'A')]
+&gt;&gt;&gt; for key in sorted(f.fields.keys()):
+...     print key
+None
+Arr
+Atr
+Dest
+Min
+Orig
+action
+dCity
+endpoint
+f_ampm
+f_day
+f_hours
+f_minutes
+f_month
+f_year
+mode
+oCity
+resptype
+startpoint
+walk
+&gt;&gt;&gt; f.fields['Orig'] = '1500 W Leland'
+&gt;&gt;&gt; f.fields['Dest'] = 'LINCOLN PARK ZOO'
+&gt;&gt;&gt; from lxml.html import submit_form()
+&gt;&gt;&gt; result = parse(submit_form(f)).getroot()
+</pre>
+<p>From there I&#8217;d have to actually scrape the results to figure out   what the best trip was, which isn&#8217;t as&nbsp;easy.</p>
+</li>
+<li><p class="first"><span class="caps">HTML</span> diffing and something like <tt class="docutils literal">svn blame</tt> for a series of   documents, in <tt class="docutils literal">lxml.html.diff</tt>.  Someone noted a similarity   between htmldiff and <a class="reference external" href="http://code.google.com/p/templatemaker/">templatemaker</a>, and they are   conceptually similar, but with very different purposes.  htmldiff   goes to great trouble to <em>ignore</em> markup and focus only on changes   to textual content.  As such it is great for a history page.   <tt class="docutils literal">templatemaker</tt> focuses on the dissection of computer-generated   <span class="caps">HTML</span> and extracting its human-generated components.  Templatemaker   is focused on screen scraping.  It might be handy in that form   example&nbsp;above&#8230;</p>
+</li>
+<li><p class="first">There&#8217;s also a fairly complete implementation of <a class="reference external" href="http://codespeak.net/lxml/dev/cssselect.html"><span class="caps">CSS</span> 3 selectors</a>.  It would be   interesting to mix this with <a class="reference external" href="http://code.google.com/p/cssutils/">cssutils</a>.</p>
+<p>Though <a class="reference external" href="http://alex.dojotoolkit.org/?p=625">some people aren&#8217;t so enthusiastic about <span class="caps">CSS</span> namespaces</a> (and I can&#8217;t really blame   him), conveniently this <span class="caps">CSS</span> 3 feature makes <span class="caps">CSS</span> selectors applicable to all <span class="caps">XML</span>.   I don&#8217;t know if anyone is actually going to use them instead of   XPath on non-<span class="caps">HTML</span> documents, but you <em>could</em>.  Because the implementation  just   compiles <span class="caps">CSS</span> to XPath, you could potentially use this module with   other <span class="caps">XML</span> libraries that know XPath.  Of which I only actually know   <a class="reference external" href="http://uche.ogbuji.net/tech/4suite/amara/">one</a> (or <cite>two   &lt;http://genshi.edgewall.org /&gt;</cite>?) &#8212; though compiling <span class="caps">CSS</span> to XPath,   then having XPath parsed and interpreted in Python, is probably not   a good idea.  But if you are so inclined, there&#8217;s also a parser in   there you could&nbsp;use.</p>
+</li>
+<li><p class="first">lxml and <a class="reference external" href="http://www.crummy.com/software/BeautifulSoup/">BeautifulSoup</a> are no longer   exclusive choices: <tt class="docutils literal">lxml.html.ElementSoup.parse()</tt> can parse pages   with BeautifulSoup into lxml data structures.  While the native   lxml/libxml2 <span class="caps">HTML</span> parser works on pretty bad <span class="caps">HTML</span>, BeautifulSoup   works on <em>really</em> bad <span class="caps">HTML</span>.  It would be nice to have something   similar with <a class="reference external" href="http://code.google.com/p/html5lib/">html5lib</a>.</p>
+</li>
+</ul>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

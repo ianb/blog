@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>A Product Journal: CSS Object Model</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2015-12-29T00:00:00-06:00">
+                Tuesday, December 29th, 2015
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2015/12/product-journal-css-object-model.html"
+                    rel="bookmark"
+                    title="Permalink to A Product Journal: CSS Object Model"
+                    >A Product Journal: <span class="caps">CSS</span> Object&nbsp;Model</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><blockquote>
+<p>I&#8217;m blogging about the development of a new product in Mozilla, <a href="http://www.ianbicking.org/tag/product-journal.html">look here for my other posts in this&nbsp;series</a></p>
+</blockquote>
+<p>And now for something entirely&nbsp;technical!</p>
+<p>We&#8217;ve had a contributor from <a href="https://outernet.is/">Outernet</a> exploring ways of using PageShot for capturing pages for distribution on their network.  Outernet satellite-based content distribution network.  It&#8217;s a neat idea, but one challenge is that it&#8217;s <em>very</em> one-way – anyone (given the equipment) can listen in to what the satellites broadcast, but that&#8217;s it (at least for the most interesting use cases).  Lots of modern websites aren&#8217;t setup well for that, so acquiring content can be&nbsp;tricky.</p>
+<p>Given that interest I started thinking more about inlining resources.  We&#8217;ve been hotlinking to resources simply out of laziness.  Some things are easy to handle, but <span class="caps">CSS</span> is a bit more annoying because of the indirection of <code>@import</code> and yet more relatively URLs.  Until I started poking around I had no idea that there is a <a href="https://developer.mozilla.org/en-US/docs/Web/API/CSS_Object_Model"><span class="caps">CSS</span> Object Model</a>!</p>
+<p>Given this there is now experimental support for inlining all <span class="caps">CSS</span> rules into the captured page in PageShot.  The support is still incomplete, and my understanding of everything you can do with <span class="caps">CSS</span> is still incomplete.  But the code isn&#8217;t very hard.  One fun thing is that we can test each <span class="caps">CSS</span> rule against the page and see if it is needed.  Doing this typically allows 80% of rules to be&nbsp;omitted.</p>
+<p>Some highlights of what I&#8217;ve learned so&nbsp;far:</p>
+<p>There&#8217;s two interesting objects: <a href="https://developer.mozilla.org/en-US/docs/Web/API/CSSStylesheet">CSSStylesheet</a> (which inherits from <a href="https://developer.mozilla.org/en-US/docs/Web/API/Stylesheet">Stylesheet</a>) and <a href="https://developer.mozilla.org/en-US/docs/Web/API/CSSRule">CSSRule</a>.  </p>
+<p><code>document.styleSheets</code>: a list of all stylesheets, both remote (<code>&lt;link&gt;</code>), inline, and imported (<code>@import</code>)&nbsp;stylesheets.</p>
+<p><code>styleSheet.href</code>: the <span class="caps">URL</span> of the stylesheet (<code>null</code> if it was&nbsp;inline).</p>
+<p><code>styleSheet.cssRules</code>: a list of all the rules in the&nbsp;stylesheet.  </p>
+<p><code>cssRule.type</code>: there&#8217;s <a href="https://developer.mozilla.org/en-US/docs/Web/API/CSSRule#Type_constants">several types of rules</a>.  I&#8217;ve chosen to ignore everything but <code>STYLE_RULE</code> and <code>MEDIA_RULE</code> out of&nbsp;laziness.</p>
+<p><code>cssRule.cssRules</code>: <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media">media rules</a> (like <code>@media (max-width: 600px) {.nav {display: none}}</code>) contain sub-rules (<code>.nav {display: none}</code> in this&nbsp;case).</p>
+<p><code>cssRule.parentRule</code>: points back to a media rule if there is&nbsp;one.</p>
+<p><code>cssRule.parentStyleSheet</code>: points back to the parent stylesheet.  There are probably ways of nesting media rules and stylesheets (that can have <code>media</code> attributes) in ways to create compound media rules that I haven&#8217;t accounted&nbsp;for.</p>
+<p><code>cssRule.cssText</code>: the text of the rule.  This includes both selectors and style, or media queries and all the sub-rules.  I just split on <code>{</code> to separate the selector or query.  I <em>assume</em> these are representations of the parsed <span class="caps">CSS</span>, and so normalized, but I haven&#8217;t explored that in&nbsp;detail.</p>
+<p>There&#8217;s all sorts of ways to create trees of media restrictions and other complexities that I know I haven&#8217;t taken account of, but things Mostly Work&nbsp;Anyway.</p>
+<p>Here&#8217;s an example that makes use of this to create a single inline stylesheet for a page containing only necessary rules (using <span class="caps">ES6</span>):</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">allRules</span> <span class="o">=</span> <span class="p">[];</span>
+
+<span class="c1">// CSS rules, some of which may be media queries, form a kind of tree; this gets</span>
+<span class="c1">// this puts all the style rules in a flat list</span>
+<span class="kd">function</span> <span class="nx">addRules</span><span class="p">(</span><span class="nx">sheet</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">rule</span> <span class="k">of</span> <span class="nx">sheet</span><span class="p">.</span><span class="nx">cssRules</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">rule</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="nx">rule</span><span class="p">.</span><span class="nx">MEDIA_RULE</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">addRules</span><span class="p">(</span><span class="nx">rule</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rule</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="nx">rule</span><span class="p">.</span><span class="nx">STYLE_RULE</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">allRules</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">rule</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Then we traverse all the stylesheets and grab rules from each:</span>
+<span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">styleSheet</span> <span class="k">of</span> <span class="nb">document</span><span class="p">.</span><span class="nx">styleSheets</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">styleSheet</span><span class="p">.</span><span class="nx">media</span><span class="p">.</span><span class="nx">length</span> <span class="o">&amp;&amp;</span> <span class="nx">styleSheet</span><span class="p">.</span><span class="nx">media</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="nx">styleSheet</span><span class="p">.</span><span class="nx">media</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;screen&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// This is a stylesheet for some media besides screen</span>
+    <span class="k">continue</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="nx">addRules</span><span class="p">(</span><span class="nx">styleSheet</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Then we collect the rules up again, clustered by media queries (with</span>
+<span class="c1">// rulesByMedia[&quot;&quot;] for no media query)</span>
+<span class="kd">let</span> <span class="nx">rulesByMedia</span> <span class="o">=</span> <span class="p">{};</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">rule</span> <span class="k">of</span> <span class="nx">allRules</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">selector</span> <span class="o">=</span> <span class="nx">rule</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">trim</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="nx">selector</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1">// Skip selectors that don&#39;t match anything</span>
+    <span class="k">continue</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="kd">let</span> <span class="nx">mediaType</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">rule</span><span class="p">.</span><span class="nx">parentRule</span> <span class="o">&amp;&amp;</span> <span class="nx">rule</span><span class="p">.</span><span class="nx">parentRule</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="nx">rule</span><span class="p">.</span><span class="nx">MEDIA_RULE</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">mediaType</span> <span class="o">=</span> <span class="nx">rule</span><span class="p">.</span><span class="nx">parentRule</span><span class="p">.</span><span class="nx">cssText</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">trim</span><span class="p">();</span>
+  <span class="p">}</span>
+  <span class="nx">rulesByMedia</span><span class="p">[</span><span class="nx">mediaType</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rulesByMedia</span><span class="p">[</span><span class="nx">mediaType</span><span class="p">]</span> <span class="o">||</span> <span class="p">[];</span>
+  <span class="nx">rulesByMedia</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">rule</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Now we can create a new clean stylesheet:</span>
+<span class="kd">let</span> <span class="nx">lines</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">mediaType</span> <span class="k">in</span> <span class="nx">rulesByMedia</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">mediaType</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">lines</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">mediaType</span> <span class="o">+</span> <span class="s2">&quot; {&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">rule</span> <span class="k">of</span> <span class="nx">rulesByMedia</span><span class="p">[</span><span class="nx">mediaType</span><span class="p">])</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">padding</span> <span class="o">=</span> <span class="nx">mediaType</span> <span class="o">?</span> <span class="s2">&quot;  &quot;</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+    <span class="nx">lines</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">padding</span> <span class="o">+</span> <span class="nx">rule</span><span class="p">.</span><span class="nx">cssText</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">mediaType</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">lines</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">style</span> <span class="o">=</span> <span class="s2">&quot;&lt;style&gt;&quot;</span> <span class="o">+</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;\n&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&lt;/style&gt;&quot;</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Obviously there could be rules that apply to <span class="caps">DOM</span> elements that aren&#8217;t present <em>right now</em> but could be created.  And I&#8217;m sure it&#8217;s omitting fonts and animations.  But it&#8217;s fun to hack around&nbsp;with.</p>
+<p>It might be fun to use this hooked up to <a href="https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver">mutation observers</a> during your testing and find orphaned&nbsp;rules.</p></div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>A new way to deploy web applications</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2010-01-29T14:21:00-06:00">
+                Friday, January 29th, 2010
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2010/01/a-new-way-to-deploy-web-applications.html"
+                    rel="bookmark"
+                    title="Permalink to A new way to deploy web applications"
+                    >A new way to deploy web&nbsp;applications</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>Deployment is one of the things I like least about development, and yet without deployment the development doesn&#8217;t really&nbsp;matter.</p>
+<p>I&#8217;ve tried a few things (e.g. <a class="reference external" href="http://blog.ianbicking.org/2008/06/19/my-experience-writing-a-build-system/">fassembler</a>), built a few things (<a class="reference external" href="http://virtualenv.openplans.org">virtualenv</a>, <a class="reference external" href="http://pip.openplans.org">pip</a>), but deployment just sucked <em>less</em> as a result.  Then I got excited about <a class="reference external" href="http://appengine.google.com">App Engine</a>; everyone else was getting excited about &#8220;scaling&#8221;, but really I was <a class="reference external" href="http://blog.ianbicking.org/2008/04/09/app-engine-and-open-source/">excited about an accessible deployment process</a>.  When it comes to deployment App Engine is the first thing that has really felt good to&nbsp;me.</p>
+<p><strong>But</strong> I can&#8217;t actually <em>use</em> App Engine.  I was able to come to terms with the idea of writing an application to the platform, but there are limits&#8230; and with App Engine there were simply too many limits.  Geo stuff on App Engine is at best a crippled hack, I miss <a class="reference external" href="http://codespeak.net/lxml/">lxml</a> terribly, I never hated relational databases, and almost nothing large works without some degree of rewriting.  Sometimes you can work around it, but you can never be sure you won&#8217;t hit some wall later.  And frankly working around the platform is tiring and not very&nbsp;rewarding.</p>
+<hr class="docutils" />
+<p>So&#8230; App Engine seemed neat, but I couldn&#8217;t use it, and deployment was still a&nbsp;problem.</p>
+<p>What I like about App Engine: an application is just files.  There&#8217;s no build process, no fancy copying of things in weird locations, nothing like that; you upload files, and uploading files <em>just works</em>.  Also, you can check <em>everything</em> into version control.  Not just your application code, but every library you use, the exact files that you installed.  I really wanted a system like&nbsp;that.</p>
+<p>At the same time, I started looking into &#8220;the cloud&#8221;.  It took me a while to get a handle on what &#8220;cloud computing&#8221; really means.  What I learned: don&#8217;t overthink it.  It&#8217;s not magic.  It&#8217;s just virtual private servers that can be requisitioned automatically via an <span class="caps">API</span>, and are billed on a short time cycle.  You can expand or change the definition a bit, but this definition is the one that matters to <em>me</em>.  (I&#8217;ve also realized that I cannot get excited about complicated solutions; only once I realized how simple cloud computing is could I really get excited about the&nbsp;idea.)</p>
+<p>Given the modest functionality of cloud computing, why does it matter? Because with a cloud computing system you can actually <em>test</em> the full deployment stack.  You can create a brand-new server, identical to all servers you will create in the future; you can set this server up; you can deploy to it.  You get it wrong, you throw away that virtual server and start over from the beginning, fixing things until you get it right.  Billing is important here too; with hourly billing you pay cents for these tests, and you don&#8217;t need a pool of ready servers because the cloud service basically manages that pool of ready servers for&nbsp;you.</p>
+<p>Without &#8220;cloud computing&#8221; we each too easily find ourselves in a situation where deployments are ad hoc, server installations develop over time, and servers and applications are inconsistent in their configuration.  Cloud computing makes servers disposable, which means we can treat them in consistent ways, testing our work as we go.  It makes it easy to treat operations with the same discipline as&nbsp;software.</p>
+<p>Given the idea from App Engine, and the easy-to-use infrastructure of a cloud service, I started to script together something to manage the servers and start up applications.  I didn&#8217;t know what exactly I wanted to do to start, and I&#8217;m not completely sure where I&#8217;m going with this.  But on the whole this feels pretty right.  So I present the provisionally-named: <a class="reference external" href="http://toppcloud.colorstudy.com">toppcloud</a> (<strong>Update</strong>: this has been renamed Silver&nbsp;Cloud).</p>
+<hr class="docutils" />
+<p>How it works: first you have a directory of files that defines your application.  This probably includes a checkout of your &#8220;application&#8221; (let&#8217;s say in <tt class="docutils literal">src/mynewapp/</tt>), and I find it also useful to use source control on the libraries (which are put in <tt class="docutils literal">lib/python/</tt>).  There&#8217;s a file in <tt class="docutils literal">app.ini</tt> that defines some details of the application (very similar to <tt class="docutils literal">app.yaml</tt>).</p>
+<p>While app.ini is a (<a class="reference external" href="http://toppcloud.colorstudy.com/appconfig.html">very minimal</a>) description of the <em>application</em>, there is no description of the environment.  You do not specify database connection details, for instance.  Instead your application <em>requests</em> access to a database service.  For instance, one of these services is a PostgreSQL/PostGIS database (which you get if you put <tt class="docutils literal">service.postgis</tt> in your app.ini file).  If you ask for that then there will be evironmental variables, <tt class="docutils literal">CONFIG_PG_DBNAME</tt> etc., that will tell your application how to connect to the database.  (For local development you can provide your own configuration, based on how you have PostgreSQL or some other service&nbsp;installed.)</p>
+<p>The standard setup is also a <a class="reference external" href="http://virtualenv.openplans.org">virtualenv</a> environment.  It is setup so <em>every time</em> you start that virtualenv environment you&#8217;ll get those configuration-related environmental variables.  This means your application configuration is always present, your services always available.  It&#8217;s available in tests just like it is during a request.  Django accomplishes something similar with the (much maligned) <tt class="docutils literal">$DJANGO_SETTINGS_MODULE</tt> but toppcloud builds it into the virtualenv environment instead of the shell&nbsp;environment.</p>
+<p>And how is the server setup?  Much like with App Engine that is merely an implementation detail.  Unlike App Engine that&#8217;s an implementation detail you can actually <em>look</em> at and change (by changing toppcloud), but it&#8217;s not something you are supposed to concern yourself with during regular application&nbsp;development.</p>
+<p>The basic lifecycle using toppcloud looks&nbsp;like:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">toppcloud <span class="pre">create-node</span></tt></dt>
+<dd>Create a new virtual server; you can create any kind of supported server, but only Ubuntu Jaunty or Karmic are supported (and Jaunty should probably be dropped).  This step is where the &#8220;cloud&#8221; part actually ends.  If you want to install a bare Ubuntu onto an existing physical machine that&#8217;s fine too &#8212; after <tt class="docutils literal">toppcloud <span class="pre">create-node</span></tt> the &#8220;cloud&#8221; part of the process is pretty much done.  Just don&#8217;t go using some old Ubuntu install; this tool is for clean systems that are used only for&nbsp;toppcloud.</dd>
+<dt><tt class="docutils literal">toppcloud <span class="pre">setup-node</span></tt></dt>
+<dd>Take that bare Ubuntu server and set it up (or update it) for use with toppcloud.  This installs all the basic standard stuff (things like Apache, mod_wsgi, Varnish) and some management script that toppcloud runs.  This is written to be safe to run over and over, so upgrading and setting up a machine are the same.  It needs to be a bare server,&nbsp;but</dd>
+<dt><tt class="docutils literal">toppcloud init path/to/app/</tt></dt>
+<dd>Setup a basic virtualenv environment with some toppcloud&nbsp;customizations.</dd>
+<dt><tt class="docutils literal">toppcloud serve path/to/app</tt></dt>
+<dd>Serve up the application&nbsp;locally.</dd>
+<dt><tt class="docutils literal">toppcloud update <span class="pre">--host=test.example.com</span> path/to/app/</tt></dt>
+<dd>This creates or updates an application at the given host.  It edits <tt class="docutils literal">/etc/hosts</tt> so that the domain is locally&nbsp;viewable.</dd>
+<dt><tt class="docutils literal">toppcloud run test.example.com script.py</tt></dt>
+<dd>Run a script (from <tt class="docutils literal">bin/</tt>) on a remote server.  This allows you to run things like <tt class="docutils literal"><span class="pre">django-admin.py</span> syncdb</tt>.</dd>
+</dl>
+<p>There&#8217;s a few other things &#8212; stuff to manage the servers and change around hostnames or the active version of applications.  It&#8217;s growing to fit a variety of workflows, but I don&#8217;t think its growth is&nbsp;unbounded.</p>
+<hr class="docutils" />
+<p>So&#8230; this is what toppcloud.  From the outside it doen&#8217;t do a lot.  From the inside it&#8217;s not actually that complicated either.  I&#8217;ve included a lot of constraints in the tool but I think it offers an excellent balance.  The constraints are workable for applications (insignificant for many applications), while still exposing a simple and consistent system that&#8217;s easier to reason about than a&nbsp;big-ball-of-server.</p>
+<p>Some of the&nbsp;constraints:</p>
+<ol class="arabic simple">
+<li>Binary packages are supported via Ubuntu packages; you only upload portable files.  If you need a library like lxml, you need to request that package (<tt class="docutils literal"><span class="pre">python-lxml</span></tt>) to be installed in your app.ini.  If you need a version of a binary library that is not yet packaged, I think creating a new deb is&nbsp;reasonable.</li>
+<li>There is no Linux distribution abstraction, but I don&#8217;t&nbsp;care.</li>
+<li>There is no option for the way your application is run &#8212; there&#8217;s one way applications are run, because I believe there is a best practice.  I might have gotten the best practice wrong, but that should be resolved inside toppcloud, not inside applications. Is Varnish a terrible cache?  Probably not, but if it is we should all be able to agree on that and replace it.  If there are genuinely different needs then maybe additional application or deployment configuration will be called for &#8212; but we shouldn&#8217;t add configuration just because someone <em>says</em> there is a better practice (and a better practice that is not universally better); there must be&nbsp;justifications.</li>
+<li>By abstracting out services and persistence some additional code is required for each such service, and that code is centralized in toppcloud, but it means we can also start to add consistent tools usable across a wide set of applications and&nbsp;backends.</li>
+<li>All file paths have to be relative, because files get moved around.  I know of some particularly problematic files (e.g., <tt class="docutils literal">.pth</tt> files), and toppcloud fixes these automatically.  Mostly this isn&#8217;t so hard to&nbsp;do.</li>
+</ol>
+<p>These particular compromises are ones I have not seen in many systems (and <a class="reference external" href="http://toppcloud.colorstudy.com/comparisons.html">I&#8217;ve started to look more</a>).  App Engine I think goes too far with its constraints.  <a class="reference external" href="http://heroku.com/">Heroku</a> is close, but closed&nbsp;source.</p>
+<p>This is different than a strict everything-must-be-a-package strategy.  This deployment system is light and simple and takes into account reasonable web development workflows.  The pieces of an application that move around a lot are all well-greased and agile.  The parts of an application that are better to Do Right And Then Leave Alone (like Apache configuration) are&nbsp;static.</p>
+<p>Unlike generalized systems like buildout this system avoids &#8220;building&#8221; entirely, making deployment a simpler and lower risk action, leaning on system packages for the things they do best.  Other open source tools emphasize a greater degree of flexibility than I think is necessary, allowing people to encode exploratory service integration into what <em>appears</em> to be an encapsulated build (I&#8217;m looking at you&nbsp;buildout).</p>
+<p>Unlike <a class="reference external" href="http://pip.openplans.org/requirement-format.html">requirement sets</a> and packaging and versioning libraries, this makes all the Python libraries (typically the most volatile libraries) explicit and controlled, and can better ensure that small updates really are small.  It doesn&#8217;t invalidate installers and versioning, but it makes that process even more explicit and encourages greater&nbsp;thoughtfulness.</p>
+<p>Unlike many production-oriented systems (what I&#8217;ve seen in a lot of &#8220;cloud&#8221; tools) this encorporates both the development environment and production environment; but unlike some developer-oriented systems this does not try to normalize everyone&#8217;s environment and instead relies on developers to set up their systems however is appropriate.  And unlike platform-neutral systems this can ensure an amount of reliability and predictability through extremely hard requirements (it is deployed on Ubuntu Jaunty/Karmic <em>only</em>).</p>
+<p>But it&#8217;s not all constraints.  Toppcloud is solidly web framework neutral.  It&#8217;s even <a class="reference external" href="http://toppcloud.colorstudy.com/php.html">slightly language neutral</a>.  Though it does require support code for each persistence technique, it is fairly easy to do, and there are no requirements for &#8220;scalable systems&#8221;; I think unscalable systems are a perfectly reasonable implementation choice for many problems.  I believe a more scalable system could be built on this, but as a deployment and development option, not a starting&nbsp;requirement.</p>
+<p>So far I&#8217;ve done some deployments using toppcloud; not a lot, but some.  And I can say that it feels really good; lots of rough edges still, but the core concept feels really right.   I&#8217;ve made a lot of sideways attacks on deployment, and a few direct attacks&#8230; sometimes I write things that I think are useful, and sometimes I write things that I think are right.  Toppcloud is at the moment maybe more right than useful.  But I genuinely believe this is (in theory) a universally appropriate deployment&nbsp;tool.</p>
+<hr class="docutils" />
+<p>Alright, so now you think maybe you should look more at&nbsp;toppcloud&#8230;</p>
+<p>Well, I can offer you <a class="reference external" href="http://toppcloud.colorstudy.com">a fair amount of documentation</a>.  A lot of that documentation refers to design, and a bit of it to examples.  There&#8217;s also a couple projects you can look at; they are all small, but&nbsp;:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://bitbucket.org/geraldmc/frank-src/src/tip/build-fs-layout">Frank</a> (will be interactivesomerville.org) which is another similar Django/Pinax project (Pinax was a bit tricky).  This is probably the largest project.  It&#8217;s a Django/Pinax volunteer-written application for collecting community feedback the Boston Greenline project, if that sounds interesting to you might want to chip in on the development (if so <a class="reference external" href="https://projects.openplans.org/greenline">check out the wiki</a>).</li>
+<li><a class="reference external" href="http://github.com/ianb/neighborly/blob/master/INSTALL.txt">Neighborly</a>, with minimal functionality (we need to run more sprints) but an installation&nbsp;story.</li>
+<li><a class="reference external" href="http://bitbucket.org/ianb/bbdocs/src/tip/create-layout.sh">bbdocs</a> which is a very simple bitbucket document generator, that makes the toppcloud&nbsp;site.</li>
+<li><a class="reference external" href="http://bitbucket.org/ianb/geodns">geodns</a> which is another simple no-framework PostGIS&nbsp;project.</li>
+</ul>
+<hr class="docutils" />
+<p>Now, the letdown.  One thing I cannot offer you is support.  <strong><span class="caps">THERE</span> <span class="caps">IS</span> <span class="caps">NO</span> <span class="caps">SUPPORT</span></strong>.  I cannot now, and I might never really be able to support this tool.  This tool is appropriate for collaborators, for people who like the idea and are ready to build on it.  If it grows well I hope that it can grow a community, I hope people can support each other.  I&#8217;d like to help that happen.  But I can&#8217;t do that by bootstrapping it through unending support, because I&#8217;m not good at it and I&#8217;m not consistent and it&#8217;s unrealistic and unsustainable.  This is not a open source dead drop.  But it&#8217;s also not My Future; I&#8217;m not going to build a company around it, and I&#8217;m not going to use all my free time supporting it.  It&#8217;s a tool I want to exist.  I <strong>very much</strong> want it to exist.  But even very much wanting something is not the same as being an undying champion, and I am not an undying champion.  If you want to tell me what my process <em>should</em> be, please&nbsp;do!</p>
+<hr class="docutils" />
+<blockquote>
+If you want to see me get philosophical about packaging and deployment and other stuff like that, see my upcoming talk at <a class="reference external" href="http://us.pycon.org/">PyCon</a>.</blockquote>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

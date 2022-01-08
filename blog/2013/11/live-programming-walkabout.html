@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Live Programming, Walkabout.js</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2013-11-27T11:30:00-06:00">
+                Wednesday, November 27th, 2013
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2013/11/live-programming-walkabout.html"
+                    rel="bookmark"
+                    title="Permalink to Live Programming, Walkabout.js"
+                    >Live Programming,&nbsp;Walkabout.js</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>There&#8217;s a number of &#8220;live programming&#8221; environments used for education.  <a href="https://www.khanacademy.org/cs">Khan Academy</a> is one example.  In it, you write code on the left hand side, and you immediately see the result on the right hand side.  You don&#8217;t hit &#8220;save&#8221; or &#8220;run&#8221; &#8212; it&#8217;s just always&nbsp;running.</p>
+<p><center><img style="width: 100%" src="/static/media/khan-screenshot.png"></center></p>
+<p>There are a lot of nice features to this.  There&#8217;s the feedback cycle: everything always <em>happens</em>.  Or, if you get something wrong, it distinctly <em>doesn&#8217;t happen</em>.  It&#8217;s similar to the static analysis we so often use &#8212; from the simplest case of syntax highlighting (which often finds syntax errors) to code lint tools, type checking or <a href="http://en.wikipedia.org/wiki/Intelli-sense">Intelli-sense</a>.  Live coding takes this further and makes execution itself somewhat&nbsp;static.</p>
+<p>One of the nice parts about actually <em>running</em> the code is that you aren&#8217;t relying on static analysis, which is always limited.  The only thorough analysis is to model the program&#8217;s execution by executing the program.  Not to mention it allows the programmer to detect bugs that just cause the program to do the wrong thing, or to be incomplete, but not clearly incorrect, not in error.  For instance, in the Khan example I make the shapes&nbsp;transparent:</p>
+<p><center><img style="width: 100%" src="/static/media/khan-screenshot-transparent.png"></center></p>
+<p>No static analysis could tell me that this produces an unattractive picture of a person.  Proponents of static analysis tend to have a limited concept of &#8220;bug&#8221; that doesn&#8217;t include this sort of&nbsp;problem.</p>
+<p>To imagine what live execution might look like when applied more dramatically, you might want to check out <a href="http://worrydream.com/LearnableProgramming/">Learnable Programming</a> by Bret Victor.  Underlying all his mockups is the expectation that the code is being run and analyzed at all&nbsp;times.</p>
+<p><center><img style="width: 100%" src="/static/media/learnable-screenshot.png"></center></p>
+<p>That&#8217;s all cool&#8230; except you can&#8217;t just <em>run</em> code all the time.  It works for code that produces basically the same output every time it is run, that requires no input, that isn&#8217;t reactive or interactive. This is all true for <a href="http://processingjs.org/">Processing.js</a> programs which Khan Academy and the other live programming environments I&#8217;ve seen use (and Khan Academy even disables random numbers to ensure consistency). Processing.js is focused on drawing pictures, and drawing via code is okay, but&#8230; it doesn&#8217;t excite me. What excites me about code is its emergent properties, how the execution of the program evolves. When you write interesting code you can enable things you didn&#8217;t realize, things that you won&#8217;t realize until you explore that same code.  What happens when you interact with it in a new order?  What happens when you give it new input?  When a program always produces the same output it makes me feel like the program could be substituted by its output. Who needs to program a drawing when you can just use a drawing&nbsp;program?</p>
+<p>I was thinking about these things when I was looking at <a href="http://waterbearlang.com/">Waterbear</a>, which is a graphical/pluggable-tile programming language (very similar to <a href="http://scratch.mit.edu/">Scratch</a>).</p>
+<p><center><img style="width: 100%" src="/static/media/waterbear-screenshot.png"></center></p>
+<p>A nice aspect of that sort of language is that you are forced to think in terms of the <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree"><span class="caps">AST</span></a> instead of text, because all those tiles <em>are</em> the <span class="caps">AST</span>.  You also get a menu of everything the language can do, including its primitive&nbsp;functions.</p>
+<p><center><img src="/static/media/waterbear-screenshot-list.png"></center></p>
+<p>With the language laid out like that, I saw that most of it was nice and static and deterministic.  Control structures are deterministic: <code>if COND then IFTRUE else IFFALSE</code> always executes the same code given the same input.  Most everything is: appending to a list always produces the same result, adding numbers always produces the same result.  The list of the non-deterministic building blocks of a program is <em>really small</em>.</p>
+<p>And this is exciting!  If you can find all the non-deterministic parts of a program and come up with a range of viable results to plug in (i.e., mock) then you can run more-or-less the entire program.  And the more I think about it, the more I realize that the list of non-deterministic parts can be quite small for many&nbsp;programs.</p>
+<p>For instance, consider this&nbsp;program:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="k">def</span> <span class="nf">guesser</span><span class="p">():</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I&#39;m thinking of a number between 1 and 10&quot;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="nb">input</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please enter a number&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">number</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You win!&quot;</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">number</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Too small!&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Too large!&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>This is a simple program, but it can execute in lots of ways.  There&#8217;s two non-deterministic parts: <code>random.randint()</code> and <code>input()</code>. The first can be made deterministic by seeding the random number generator with a known value (and the program can be exercised with multiple runs with multiple seeds).  The second is trickier.  We know <code>input()</code> returns a string that the user inputs, one line long. But if you throw random strings at the program you won&#8217;t get something very interesting.  So we need just a little more help, a suggestion of what the person might return.  E.g., <code>input.suggest_returns = lambda: str(random.randint(-1, 11))</code> &#8212; it&#8217;s still valid that it can return anything, but we&#8217;ll be able to best exercise the program with those inputs.  We still don&#8217;t have a smart player for our game, but it&#8217;s&nbsp;something.</p>
+<p>This approach to exercising code is exciting because it&#8217;s basically automatic: you write your program, and if you are using primitives that have been setup for mocking, then it&#8217;s testable.  You can build tools around it, the tools can find cases where things go wrong and replay those specific cases for the programmer until they are&nbsp;fixed.</p>
+<p>It&#8217;s still a challenge to actually get deep into the program: the primitives often don&#8217;t express the expectation.  For instance in this guessing program it&#8217;s valid to enter &#8220;one&#8221;, but it&#8217;s not not very <em>interesting</em>.  If you are testing something interactive you might have a Cancel button that undoes a bunch of inputs; while it&#8217;s worth hitting Cancel every so often, generally it&#8217;s not interesting, even&nbsp;anti-interesting.</p>
+<p>But with these thoughts in mind I was naturally drawn to the browser. A browser Javascript program is handy because it has very specific and a fairly limited set of primitives.  Nearly everything that&#8217;s not deterministic would be considered part of the <a href="http://en.wikipedia.org/wiki/Document_Object_Model"><span class="caps">DOM</span></a>, which includes not just the <span class="caps">HTML</span> page but also (at least in the terminology used by browser insiders) includes all the browser-specific functions exposed to&nbsp;content.</p>
+<p>In the case of a browser program, the program tends to be fairly reactive: much of what happens is the program listening for events. This means much of the logic of the program is invoked from the outside.  This is helpful because (with some effort) we can detect those listeners, and figure out what events the program is actually interested in (since something like a click can happen <em>anywhere</em>, but usually to no effect).  Then you must also filter out handlers that apply to something that is not at the moment possible, for instance a click handler on an element that is not&nbsp;visible.</p>
+<p>Trying to exercise a program is not the same as actually confirming the program did the right thing.  This testing practice will reward the program that is littered with asserts.  Asserts can&#8217;t be statically examined, and in that way they are worse than static types, but they can address things that can&#8217;t be statically&nbsp;described.</p>
+<p>I believe there is a term for this concept: <em>generative testing</em> (for example, <a href="https://github.com/strangeloop/strangeloop2012/blob/master/slides/sessions/SpiewakBedra-PontificatingQuantification.pdf">some slides from a presentation</a>. Most of what I&#8217;ve seen under that name involves relatively small examples, with explicitly defined domains of input and output. I&#8217;m proposing to do this at the scale of an application, not a routine; to define inputs as any non-deterministic query or listener; and to define failure as some inline assertion error or&nbsp;warning.</p>
+<h2>Let&#8217;s Do&nbsp;It&#8230;?</h2>
+<p>With this in mind I created a library: <a href="https://github.com/ianb/walkabout.js">Walkabout.js</a>.  This either uses the evidence jQuery leaves about bound event handlers, or it can use source code rewriting to track event handlers (tracking event handlers is harder than I would like).  From this list it can create a list of plausible actions that can take place, seeing what elements might be clicked, hovered over, selected, etc., filtering out elements that aren&#8217;t visible, and so on.  Then it uses a pseudo-random number generator to select an action, while checking for uncaught exceptions or warnings written to the&nbsp;console.</p>
+<p>The library isn&#8217;t complete in what it mocks out, but that&#8217;s just a matter of doing more work.  It&#8217;s a little harder to mock out server interaction, because there&#8217;s easy no way to know what exactly to expect back from the server &#8212; though if the server is deterministic (and the server&#8217;s state can be reset each run) then it&#8217;s okay to use it without mocking.  <strong>Nothing deterministic need be mocked</strong> including external&nbsp;components.</p>
+<p>There&#8217;s a lot I&#8217;d like to change about Walkabout.js&#8217;s code itself (my opinions on Javascript have changed since I first wrote it), but I worry I get ahead of myself by doing another round of development on it right now.  There&#8217;s non-trivial tooling required to use this tool, and I need to find a larger environment where it can make sense.  Or at least I <em>want</em> to find that environment, because I think the result will be more&nbsp;compelling.</p>
+<p>Another big task to consider is how to actually explore the program in depth.  It&#8217;s easy to come up with really boring, long, useless sequences of actions.  Open dialog, close dialog x 100.  Enter text, clear text x 10.  Hitting some control that terminates the application is only interesting once.  And though computers are <em>fast</em> they aren&#8217;t so fast they can spend most of their time doing completely useless things.  I want my failures&nbsp;now!</p>
+<p>To explore an application in depth we need to effectively <em>search</em> the application, using the range of possible inputs.  The first idea for scoring a result that I thought of is code coverage: if you are reaching new code, then you are doing something interesting.  Then the tooling becomes even more heavy-weight, you have to do code coverage and constantly track it to find productive avenues.  Then a second, simpler idea: look for new sets of available inputs.  If there&#8217;s a new button to click or new fields to interact with, then we&#8217;ve probably accomplished something.  Continue to explore from that point forward. This option requires only the tooling we already&nbsp;have!</p>
+<h2>Why Are We Doing This&nbsp;Again?</h2>
+<p>In addition to just thinking about &#8220;live programming&#8221; I think this can be a great testing tool in general.  And generally I&#8217;m suspicious of programming tools that are only applicable to toy/educational programming&nbsp;environments.</p>
+<p>A common alternative approach to what I describe is to <em>record</em> user input, and then replay it as a test.  It&#8217;s like random testing, only instead of a random number generator you have a person.  This is basically a refinement of the standard practice of creating a script for a functional test that exercises your full&nbsp;application.</p>
+<p>If you&#8217;ve used this approach you&#8217;ve probably found it annoying. Because it is.  When you replay a recording and it doesn&#8217;t work, what is more likely: the application is broken, or you deliberately changed the application in a way that affects how the recording replays?  In my experience 9 times out of 10 it&#8217;s the latter.  <strong>We spend too much time fixing test failures that are not&nbsp;bugs.</strong></p>
+<p>The beauty of the generative approach is that it responds to your changes.  It takes your program as it is, not as you might wish it to be.  It runs the actions that are valid with <em>this</em> code, not some past version of your code.  And the &#8220;tests&#8221; aren&#8217;t expected input and output, they are assertions, and those assertions live right with the code and stay updated with that code.  If we care about testing, why don&#8217;t we include testing in the code itself?  If you want to entertain various possible inputs why not suggest what you are expecting directly in the&nbsp;code?</p>
+<p>Once you are exercising the code, you can also learn a lot more about the code at runtime.  What kinds of object are assigned to a particular variable?  How are pieces of code linked?  What is the <em>temporally</em> related code?  Given code coverage, you could isolate patterns that exercise a particular line of code.  Having found a bug, you also have a script to reach that bug.  Having made a change, you could identify past scripts that reach that changed area, giving you a chance to dive into the effect of that change.  Many of these kinds of tools would be valid in a general sense, but require a well-exercised program to be useful &#8212; because most software tooling doesn&#8217;t include a &#8220;do lots of stuff&#8221; option we&#8217;re holding ourself back when it comes to runtime&nbsp;analysis.</p>
+<p>So what do you&nbsp;think?</p>
+<p>If you want to give it a really quick/rough try, go <a href="http://ianb.github.io/walkabout.js/">here</a>, grab the bookmarklet, and go to a single-page app and try it out.  It might do silly things, or nothing, but maybe it&#8217;ll do something&nbsp;interesting?</p></div>
+        <!-- /.entry-content -->
+          <div class="comments">
+            <h2>Comments</h2>
+            <table class='table table-striped'>
+<tr><td style='padding-left: 0px' class='dU'>jiyinyiyong</td><td class='dTS'>Sun, 01 Dec 2013</td></tr>
+<tr><td style='padding-left: 0px' colspan='2' class='dMessage'><p>I like some ideas in the first half of the article. I feel it too that scripting languages should run the code while coding, to make the code visible. And I thought tests are the thing to help dynamic languages run in coding too.</p><p>But the for the graphical part, I hope I can find another solution for that issue. Showing how code is running like a flame graph is much better making code clear.</p></td></tr>
+</table>
+
+          </div>
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

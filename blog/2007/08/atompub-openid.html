@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Atompub & OpenID</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,45 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
+    <article>
+        <header>
+            <abbr class="published" title="2007-08-06T11:38:00-05:00">
+                Monday, August 6th, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/08/atompub-openid.html"
+                    rel="bookmark"
+                    title="Permalink to Atompub & OpenID"
+                    >Atompub <span class="amp">&amp;</span>&nbsp;OpenID</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>One of the thinmgs I would like to do is to interact with <a class="reference external" href="http://atompub.org/rfc4287.html">Atompub (aka Atom Publishing Protocol)</a> stores in Javascript through the browser.  Since this effectively the browser itself interacting with the Atompub server, browser-like authentication methods would be nice.  But services like Atompub don&#8217;t work nicely with the kinds of authentication methods that normal websites use.  One of these is <a class="reference external" href="http://openid.net/">OpenID</a>, which is particularly&nbsp;browser-focused.</p>
+<p>From the perspective of a client, OpenID basically works like&nbsp;this:</p>
+<ul class="simple">
+<li>You need to login.  You tell the original server what your OpenID   <span class="caps">URL</span> is,&nbsp;somehow.</li>
+<li>The original server does some redirects, maybe some popups,&nbsp;etc.</li>
+<li>Your OpenID server (attached to your OpenID <span class="caps">URL</span>) authenticates you   in some fashion, and then tells the original&nbsp;server.</li>
+<li>The original server probably sets a signed cookie so that in   subsequent requests you stay logged in.  You cannot do this little   redirection dance for every request, since it&#8217;s actually quite&nbsp;intrusive.</li>
 </ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+<p>So what happens when I have an XMLHttpRequest that needs to be authenticated?  Neither the XMLHttpRequest nor Javascript generally can do the authentication.  Only the browser can, with the user&#8217;s&nbsp;interaction.</p>
+<p>One thought I have is a 401 Unauthorized response, with a header&nbsp;like:</p>
+<pre class="literal-block">
+WWW-Authenticate: Cookie location=&quot;http://original.server/login.html&quot;
+</pre>
+<p>Which means I need to open up <tt class="docutils literal"><span class="pre">http://original.server/login.html</span></tt> and have the user log in, and the final result is that a cookie will be set.  XMLHttpRequest sends cookies automatically I believe, so once the browser has the cookie then all the Javascript requests get the same cookie and hence&nbsp;authentication.</p>
+<p>One problem, though, is that you have to wait around for a while for the login to succede, then continue on your way.  A typical situation is that you have to return to the original page you were requesting, and people often do something like <tt class="docutils literal"><span class="pre">/login?redirect_to=original_url</span></tt>.  In this case we might want something like <tt class="docutils literal"><span class="pre">/login?opener_call=reattempt_request</span></tt>, where when the login process is over we call <tt class="docutils literal">window.opener.reattempt_request()</tt> in&nbsp;Javascript.</p>
+<p>Maybe it would make sense for that <tt class="docutils literal">location</tt> variable to be a <a class="reference external" href="http://bitworking.org/projects/URI-Templates/draft-gregorio-uritemplate-01.html"><span class="caps">URI</span> Template</a>, with some predefined variables, like opener, back,&nbsp;etc.</p>
+<p>For general backward compatibility, would it be reasonable to send 307 Temporary Redirect plus <span class="caps">WWW</span>-Authenticate, and let XMLHttpRequests or other service clients sort it out, while normal browser requests do the normal login&nbsp;redirect?</p>
+<p><strong>Update:</strong> Another question/thought: is it okay to send multiple <span class="caps">WWW</span>-Authenticate headers, to give the client options for how it wants to do authentication?  It seems vaguely okay, according to <a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.47"><span class="caps">RFC</span> 2616 14.47</a>.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +73,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

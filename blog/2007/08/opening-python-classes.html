@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Opening Python Classes</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,61 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2007-08-08T14:03:00-05:00">
+                Wednesday, August 8th, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/08/opening-python-classes.html"
+                    rel="bookmark"
+                    title="Permalink to Opening Python Classes"
+                    >Opening Python&nbsp;Classes</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>So, I was reading through comments to despam my old posts before archiving them, and came upon <a class="reference external" href="http://dan.chokola.com/journal/?user=dan&amp;entry=2007-01-27.105426">this old reply</a> to <a class="reference external" href="http://blog.ianbicking.org/re-ruby-and-python-compared.html">this old post of mine</a> which was a reply to <a class="reference external" href="http://web.archive.org/web/20070329162213/http://www.rexx.com/~oinkoink/Ruby_v_Python.html">this much older post</a>.</p>
+<p>I won&#8217;t reply to that post much, because it&#8217;s mostly&#8230; well, not useful to respond to.  But people often talk about the wonders of Open Classes in Ruby.  For Python people who aren&#8217;t familiar with what that means, you can&nbsp;do:</p>
+<pre class="literal-block">
+# Somehow acquire SomeClassThatAlreadyExists
+class SomeClassThatAlreadyExists
+    def some_method(blahblahblah)
+        stuff
+    end
+end
+</pre>
+<p>And <tt class="docutils literal">SomeClassThatAlreadyExists</tt> has a <tt class="docutils literal">some_method</tt> added to it (or if that method already exists, then the method is replaced with the new&nbsp;implementation).</p>
+<p>In Python when you do this, you&#8217;ve defined an entirely new class that just happens to have the name <tt class="docutils literal">SomeClassThatAlreadyExists</tt>.  It doesn&#8217;t actually effect the original class, and probably will leave you confused because of the two very different classes with the same name.  In Ruby when you define a class that already exists, you are extending the class&nbsp;in-place.</p>
+<p>You can change Python classes in-place, but there&#8217;s no special syntax for it, so people either think you can&#8217;t do it, or don&#8217;t realize that you are doing the same thing as in Ruby but without the syntactic help.  I guess this will be easier with <a class="reference external" href="http://www.python.org/dev/peps/pep-3129/">class decorators</a>, but some time ago I also wrote a recipe using normal decorators that looks like&nbsp;this:</p>
+<pre class="literal-block">
+&#64;magic_set(SomeClassThatAlreadyExists)
+def some_method(self, blahblahblah):
+    stuff
+</pre>
+<p>The only thing that is even slightly magic about the setting is that I look at the first argument of the function to determine if you are adding an instance, class, or static method to an object, and let you add it to classes or instances.  It&#8217;s really not that magic, even if it is called <a class="reference external" href="http://svn.colorstudy.com/home/ianb/recipes/magicset.py">magicset</a>.</p>
+<p>I think with class decorators you could do&nbsp;this:</p>
+<pre class="literal-block">
+&#64;extend(SomeClassThatAlreadyExists)
+class SomeClassThatAlreadyExists:
+    def some_method(self, blahblahblah):
+        stuff
+</pre>
+<p>Implemented like&nbsp;this:</p>
+<pre class="literal-block">
+def extend(class_to_extend):
+    def decorator(extending_class):
+        class_to_extend.__dict__.update(extending_class.__dict__)
+        return class_to_extend
+    return decorator
+</pre>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +89,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

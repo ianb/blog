@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>More Sentinels</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,34 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2010-04-02T12:26:00-05:00">
+                Friday, April 2nd, 2010
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2010/04/more-sentinels.html"
+                    rel="bookmark"
+                    title="Permalink to More Sentinels"
+                    >More&nbsp;Sentinels</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I&#8217;ve been casually perusing <a class="reference external" href="http://norvig.com/paip.html">Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp</a>.  One of the things I am noticing is that Lisp traditionally has a terrible lack of sentinels: special objects denoting some kind of meaning.  Specifically in Common Lisp the empty list and false and nil are all the same thing.  As a result there&#8217;s all these cases where you want to distinguish false from empty, especially when false represents a failure of some sort.  In these <span class="caps">AI</span> examples, usually a failure to find something, while in many cases the empty list could mean &#8220;the thing is already found, no need to look&#8221;.  But there&#8217;s also lots of other examples when this causes&nbsp;problems.</p>
+<p>More modern languages usually distinguish between these objects. Python for instance has <tt class="docutils literal">[]</tt>, <tt class="docutils literal">False</tt> and <tt class="docutils literal">None</tt>.  They might all test as &#8220;falsish&#8221;, but if you care to tell the difference it is easy to do; especially common is a test for <tt class="docutils literal">x is None</tt>.  Modern Lisps also stopped folding together all these notions (Scheme for example has <tt class="docutils literal">#f</tt> for false as a completely distinct object, though null and the empty list are still the same).  <span class="caps">XML</span>-<span class="caps">RPC</span> is an example of a language missing null&#8230; and though <span class="caps">JSON</span> is almost the same data model, it is a great deal superior for having null.  In comparison no one seems to care much one way or the other about making a strong distinction between True/False and&nbsp;1/0.</p>
+<p>These are all examples of sentinels: special objects that represent some state.  None doesn&#8217;t <em>mean</em> anything in particular, but it means lots of things specifically.  Maybe it means &#8220;not found&#8221; in one place, or &#8220;give me anything I don&#8217;t care&#8221; in another.  But sometimes you need more than one of these in the same place, or None isn&#8217;t entirely&nbsp;clear.</p>
+<p>One thing I noticed while reading some Perl 6 examples is that they&#8217;ve added a number of new sentinels.  One is <tt class="docutils literal">*</tt>.  So you could write something like <tt class="docutils literal"><span class="pre">item(*)</span></tt> to mean &#8220;give me any item, your choice&#8221;. While the Perl tendency to use punctuation is legend, words work&nbsp;too.</p>
+<p>I wonder if we need a few more sentinel conventions?  If so&nbsp;what?</p>
+<p>Of course any object can become a sentinel if you use it like that, None isn&#8217;t <em>more</em> unique than any other object.  (None <em>is</em> conveniently available&nbsp;everywhere.)</p>
+<p><tt class="docutils literal">Any</tt> seems useful, ala Perl&#8217;s <tt class="docutils literal">*</tt>.  But&#8230; there&#8217;s already an <a class="reference external" href="http://docs.python.org/library/functions.html#any">any</a> available everywhere as well.  It happens to be a function, but it&#8217;s also a unique named object&#8230; would it be entirely too weird to do <tt class="docutils literal">obj is any</tt>?  And there&#8217;s very few cases where the actual function <tt class="docutils literal">any</tt> would be an appropriate input, making it a good&nbsp;sentinel.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +62,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

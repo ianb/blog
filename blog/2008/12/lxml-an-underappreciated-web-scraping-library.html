@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>lxml: an underappreciated web scraping library</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2008-12-10T21:19:00-06:00">
+                Wednesday, December 10th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/12/lxml-an-underappreciated-web-scraping-library.html"
+                    rel="bookmark"
+                    title="Permalink to lxml: an underappreciated web scraping library"
+                    >lxml: an underappreciated web scraping&nbsp;library</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>When people think about web scraping in Python, they usually think <a class="reference external" href="http://www.crummy.com/software/BeautifulSoup/">BeautifulSoup</a>.  That&#8217;s okay, but I would encourage you to also consider <a class="reference external" href="http://codespeak.net/lxml/">lxml</a>.</p>
+<p>First, people think BeautifulSoup is better at parsing broken <span class="caps">HTML</span>.  <strong>This is not correct.</strong>  lxml parses broken <span class="caps">HTML</span> quite nicely.  I haven&#8217;t done any thorough testing, but at least <a class="reference external" href="http://www.crummy.com/software/BeautifulSoup/documentation.html#Parsing%20HTML">the BeautifulSoup broken <span class="caps">HTML</span> example</a> is parsed better by lxml (which knows that <tt class="docutils literal">&lt;td&gt;</tt> elements should go inside <tt class="docutils literal">&lt;table&gt;</tt> elements).</p>
+<p>Second, people feel lxml is harder to install.  This is correct.  <strong><span class="caps">BUT</span></strong>, lxml 2.2alpha1 includes an option to compile static versions of the underlying C libraries, which should improve the installation experience, especially on Macs.  <a class="reference external" href="http://lxml.de/build.html#building-lxml-on-macos-x">To install</a> this new way,&nbsp;try:</p>
+<pre class="code sh literal-block">
+$ <span class="nv">STATIC_DEPS</span><span class="o">=</span><span class="nb">true</span> easy_install <span class="s1">'lxml&gt;=2.2alpha1'</span>
+</pre>
+<p>One you have lxml installed, you have a great parser (which happens to be <a class="reference external" href="http://blog.ianbicking.org/2008/03/30/python-html-parser-performance/">super-fast</a> and that is <strong>not a tradeoff</strong>).  You get a fairly familiar <span class="caps">API</span> based on <a class="reference external" href="http://docs.python.org/library/xml.etree.elementtree.html#module-xml.etree.ElementTree">ElementTree</a>, which though a little strange feeling at first, offers a compact and canonical representation of a document tree, compared to more traditional representations.  But there&#8217;s&nbsp;more&#8230;</p>
+<p>One of the features that should be appealing to many people doing screen scraping is that you get <span class="caps">CSS</span> selectors.  You can use XPath as well, but usually that&#8217;s more complicated (<a class="reference external" href="http://css2xpath.appspot.com/?css=div.pad%20a&amp;amp;format=html">for example</a>).  Here&#8217;s <a class="reference external" href="http://crowtheries.net/?p=60">an example I found</a> getting links from a menu in a page in&nbsp;BeautifulSoup:</p>
+<pre class="code python literal-block">
+<span class="kn">from</span> <span class="nn">BeautifulSoup</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s1">'http://java.sun.com'</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="n">menu</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s1">'div'</span><span class="p">,</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s1">'class'</span><span class="p">:</span><span class="s1">'pad'</span><span class="p">})</span>
+<span class="k">for</span> <span class="n">subMenu</span> <span class="ow">in</span> <span class="n">menu</span><span class="p">:</span>
+    <span class="n">links</span> <span class="o">=</span> <span class="n">subMenu</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s1">'a'</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">links</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> : </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">link</span><span class="o">.</span><span class="n">string</span><span class="p">,</span> <span class="n">link</span><span class="p">[</span><span class="s1">'href'</span><span class="p">])</span>
+</pre>
+<p>Here&#8217;s the same example in&nbsp;lxml:</p>
+<pre class="code python literal-block">
+<span class="kn">from</span> <span class="nn">lxml.html</span> <span class="kn">import</span> <span class="n">parse</span>
+<span class="n">doc</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="s1">'http://java.sun.com'</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">cssselect</span><span class="p">(</span><span class="s1">'div.pad a'</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s1">'</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">link</span><span class="o">.</span><span class="n">text_content</span><span class="p">(),</span> <span class="n">link</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'href'</span><span class="p">))</span>
+</pre>
+<p>lxml generally knows more about <span class="caps">HTML</span> than BeautifulSoup.  Also I think it does well with the small details; for instance, the lxml example will match elements in <tt class="docutils literal">&lt;div <span class="pre">class=&quot;pad</span> menu&quot;&gt;</tt> (space-separated classes), which the BeautifulSoup example does not do (obviously there are other ways to search, but <a class="reference external" href="http://www.crummy.com/software/BeautifulSoup/documentation.html#Searching%20by%20CSS%20class">the obvious and documented technique</a> doesn&#8217;t pay attention to <span class="caps">HTML</span>&nbsp;semantics).</p>
+<p>One feature that I think is really useful is <tt class="docutils literal">.make_links_absolute()</tt>.  This takes the base <span class="caps">URL</span> of the page (<tt class="docutils literal">doc.base</tt>) and uses it to make all the links absolute.  This makes it possible to relocate snippets of <span class="caps">HTML</span> or whole sets of documents (as with <a class="reference external" href="http://svn.colorstudy.com/home/ianb/PageCollector/trunk">this program</a>).  This isn&#8217;t just <tt class="docutils literal">&lt;a href&gt;</tt> links, but stylesheets, inline <span class="caps">CSS</span> with <tt class="docutils literal">&#64;import</tt> statements, <tt class="docutils literal">background</tt> attributes, etc.  It doesn&#8217;t see quite <em>all</em> links (for instance, links in Javascript) but it sees most of them, and works well for most sites.  So if you want to make a local copy of a&nbsp;site:</p>
+<pre class="code python literal-block">
+<span class="kn">from</span> <span class="nn">lxml.html</span> <span class="kn">import</span> <span class="n">parse</span><span class="p">,</span> <span class="n">open_in_browser</span>
+<span class="n">doc</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="s1">'http://wiki.python.org/moin/'</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">make_links_absolute</span><span class="p">()</span>
+<span class="n">open_in_browser</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+</pre>
+<p><tt class="docutils literal">open_in_browser</tt> serializes the document to a temporary file and then opens a web browser (using <a class="reference external" href="http://docs.python.org/library/webbrowser.html">webbrowser</a>).</p>
+<p>Here&#8217;s <a class="reference external" href="http://svn.colorstudy.com/home/ianb/recipes/lxmldiff.py">an example</a> that compares two pages using <tt class="docutils literal">lxml.html.diff</tt>:</p>
+<pre class="code python literal-block">
+<span class="kn">from</span> <span class="nn">lxml.html.diff</span> <span class="kn">import</span> <span class="n">htmldiff</span>
+<span class="kn">from</span> <span class="nn">lxml.html</span> <span class="kn">import</span> <span class="n">parse</span><span class="p">,</span> <span class="n">tostring</span><span class="p">,</span> <span class="n">open_in_browser</span><span class="p">,</span> <span class="n">fromstring</span>
+
+<span class="k">def</span> <span class="nf">get_page</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+    <span class="n">doc</span><span class="o">.</span><span class="n">make_links_absolute</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">tostring</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">compare_pages</span><span class="p">(</span><span class="n">url1</span><span class="p">,</span> <span class="n">url2</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="s1">'body div'</span><span class="p">):</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">url1</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+    <span class="n">basis</span><span class="o">.</span><span class="n">make_links_absolute</span><span class="p">()</span>
+    <span class="n">other</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">url2</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+    <span class="n">other</span><span class="o">.</span><span class="n">make_links_absolute</span><span class="p">()</span>
+    <span class="n">el1</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">cssselect</span><span class="p">(</span><span class="n">selector</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">el2</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">cssselect</span><span class="p">(</span><span class="n">selector</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">diff_content</span> <span class="o">=</span> <span class="n">htmldiff</span><span class="p">(</span><span class="n">tostring</span><span class="p">(</span><span class="n">el1</span><span class="p">),</span> <span class="n">tostring</span><span class="p">(</span><span class="n">el2</span><span class="p">))</span>
+    <span class="n">diff_el</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="n">diff_content</span><span class="p">)</span>
+    <span class="n">el1</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">el1</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">el1</span><span class="p">),</span> <span class="n">diff_el</span><span class="p">)</span>
+    <span class="n">el1</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">el1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">basis</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">compare_pages</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">open_in_browser</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+</pre>
+<p>You can use it&nbsp;like:</p>
+<pre class="code sh literal-block">
+$ python lxmldiff.py <span class="se">\
+</span><span class="s1">'http://wiki.python.org/moin/BeginnersGuide?action=recall&amp;rev=70'</span> <span class="se">\
+</span><span class="s1">'http://wiki.python.org/moin/BeginnersGuide?action=recall&amp;rev=81'</span> <span class="se">\
+</span><span class="s1">'div#content'</span>
+</pre>
+<p>Another feature lxml has is form handling.  All the cool sexy new sites use minimal forms, but searching for &#8220;registration forms&#8221; I get <a class="reference external" href="http://www.actuaryjobs.com/cform.html">this nice complex form</a>.  Let&#8217;s look at&nbsp;it:</p>
+<pre class="code python literal-block">
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">lxml.html</span> <span class="kn">import</span> <span class="n">parse</span><span class="p">,</span> <span class="n">tostring</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="s1">'http://www.actuaryjobs.com/cform.html'</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">doc</span><span class="o">.</span><span class="n">forms</span>
+<span class="p">[</span><span class="o">&lt;</span><span class="n">Element</span> <span class="n">form</span> <span class="n">at</span> <span class="o">-</span><span class="mi">48232164</span><span class="o">&gt;</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">form</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">forms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">form</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="p">[</span><span class="s1">'thank_you_title'</span><span class="p">,</span> <span class="s1">'City'</span><span class="p">,</span> <span class="s1">'Zip'</span><span class="p">,</span> <span class="o">...</span> <span class="p">]</span>
+</pre>
+<p>Now we have a form object.  There&#8217;s two ways to get to the fields: <tt class="docutils literal">form.inputs</tt>, which gives us a dictionary of all the actual <tt class="docutils literal">&lt;input&gt;</tt> elements (and textarea and select).  There&#8217;s also <tt class="docutils literal">form.fields</tt>, which is a dictionary-like object.  The dictionary-like object is convenient, for&nbsp;instance:</p>
+<pre class="code python literal-block">
+<span class="o">&gt;&gt;&gt;</span> <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">'cEmail'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'me&#64;example.com'</span>
+</pre>
+<p>This actually updates the input element&nbsp;itself:</p>
+<pre class="code python literal-block">
+<span class="o">&gt;&gt;&gt;</span> <span class="n">tostring</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="s1">'cEmail'</span><span class="p">])</span>
+<span class="s1">'&lt;input type=&quot;input&quot; name=&quot;cEmail&quot; size=&quot;30&quot; value=&quot;test2&quot;&gt;'</span>
+</pre>
+<p>I think it&#8217;s actually a nicer <span class="caps">API</span> than <a class="reference external" href="http://formencode.org/htmlfill.html">htmlfill</a> and can serve the same purpose on the server&nbsp;side.</p>
+<p>But then you can also use the same interface for scraping, by filling fields and getting the submission.  That looks&nbsp;like:</p>
+<pre class="code python literal-block">
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">urllib</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">action</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">action</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">data</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">form_values</span><span class="p">())</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">'GET'</span><span class="p">:</span>
+<span class="o">...</span>     <span class="k">if</span> <span class="s1">'?'</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+<span class="o">...</span>         <span class="n">action</span> <span class="o">+=</span> <span class="s1">'&amp;'</span> <span class="o">+</span> <span class="n">data</span>
+<span class="o">...</span>     <span class="k">else</span><span class="p">:</span>
+<span class="o">...</span>         <span class="n">action</span> <span class="o">+=</span> <span class="s1">'?'</span> <span class="o">+</span> <span class="n">data</span>
+<span class="o">...</span>     <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp_doc</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+</pre>
+<p>Lastly, there&#8217;s <a class="reference external" href="http://codespeak.net/lxml/lxmlhtml.html#cleaning-up-html"><span class="caps">HTML</span> cleaning</a>.  I think all these features work together well, do useful things, and it&#8217;s based on an actual understanding <span class="caps">HTML</span> instead of just treating tags and attributes as arbitrary.  (Also if you really like jQuery, you might want to look at <a class="reference external" href="http://pypi.python.org/pypi/pyquery">pyquery</a>, which is a jQuery-like <span class="caps">API</span> on top of&nbsp;lxml).</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

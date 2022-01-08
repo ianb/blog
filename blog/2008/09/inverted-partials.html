@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Inverted Partials</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,98 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2008-09-08T21:12:00-05:00">
+                Monday, September 8th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/09/inverted-partials.html"
+                    rel="bookmark"
+                    title="Permalink to Inverted Partials"
+                    >Inverted&nbsp;Partials</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I was talking with a coworker some time ago about <a class="reference external" href="http://melkjug.com/">his project</a>, and he needed to update a piece of the page in-place when you go back to the page, and setting the page as uncacheable didn&#8217;t really work.  Which probably makes sense; I think at one time browsers <em>did</em> respect those cache controls, but as a result going back in history <em>through</em> a page could cause some intermediate page to be refreshed and needlessly slow down your&nbsp;progress.</p>
+<p>Anyway, Rails uses <a class="reference external" href="http://wiki.rubyonrails.org/rails/pages/UnderstandingPartials">partials</a> to facilitate this kind of stuff in a general way.  Bigger chunks of your page are defined in their own template, and instead of rendering the full page you can ask just for a chunk of the page.  Then you do something like <tt class="docutils literal"><span class="pre">document.getElementById('some_block').innerHTML</span> = req.responseText</tt>.  Mike Bayer just <a class="reference external" href="http://techspot.zzzeek.org/?p=29">described how to do this in Mako too</a>, using template&nbsp;functions.</p>
+<p>When asked, another technique also occurred to me, using just <span class="caps">HTML</span>.  Just add a general way of fetching an element by <span class="caps">ID</span>.  At any time you say &#8220;refresh the element with id X&#8221;, and it asks the server for the current version of that element (using a query string variable <tt class="docutils literal">document_id=X</tt>) and replaces the content of that element in the&nbsp;browser.</p>
+<p>The client side looks like this (it would be much simpler if you used a Javascript&nbsp;library):</p>
+<pre class="literal-block">
+function refreshId(id) {
+    var el = document.getElementById(id);
+    if (! el) {
+        throw(&quot;No element by id '&quot; + id + &quot;'&quot;);
+    }
+    function handler(data) {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                el.innerHTML = this.responseText;
+            } else {
+                throw(&quot;Bad response getting &quot; + idURL + &quot;: &quot;
+                      + this.status);
+            }
+        }
+    }
+    var req = new XMLHttpRequest();
+    req.onreadystatechange = handler;
+    var idURL = location.href + '';
+    if (idURL.indexOf('?') == -1) {
+        idURL += '?';
+    } else {
+        idURL += '&amp;';
+    }
+    idURL += 'document_id='+escape(id);
+    req.open(&quot;GET&quot;, idURL);
+    req.send();
+}
+</pre>
+<p>Then you need the server-side component.  Here&#8217;s something written for <a class="reference external" href="http://pylonshq.com/">Pylons</a> (using <a class="reference external" href="http://codespeak.net/lxml/lxmlhtml.html">lxml.html</a>, and Pylons 0.9.7 which is configured to use <a class="reference external" href="http://pythonpaste.org/webob/">WebOb</a>):</p>
+<pre class="literal-block">
+from pylons import request, response
+from lxml import html
+
+def get_id(response, id):
+    if (response.content_type == 'text/html'
+        and response.status_int == 200):
+        doc = html.fromstring(response.body)
+        try:
+            el = doc.get_element_by_id(id)
+        except KeyError:
+            pass
+        else:
+            response.body = html.tostring(el)
+    return response
+
+class BaseController(WSGIController):
+    def __after__(self):
+        id = req.GET.get('document_id')
+        if id:
+            get_id(response, id)
+</pre>
+<p>Though I&#8217;m not sure this is appropriate for middleware, you could do it as middleware&nbsp;too:</p>
+<pre class="literal-block">
+from webob import Request
+class DocumentIdMiddleware(object):
+    def __init__(self, app):
+        self.app = app
+    def __call__(self, environ, start_response):
+        req = Request(environ)
+        id = req.GET.get('document_id')
+        if not id:
+            return self.app(environ, start_response)
+        resp = req.get_response(self.app)
+        resp = get_id(resp, id)
+        return resp(environ, start_response)
+</pre>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +126,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Documents vs. Objects</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2008-01-15T19:28:00-06:00">
+                Tuesday, January 15th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/01/documents-vs-objects.html"
+                    rel="bookmark"
+                    title="Permalink to Documents vs. Objects"
+                    >Documents vs.&nbsp;Objects</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>Let&#8217;s imagine we live in a <a class="reference external" href="http://en.wikipedia.org/wiki/Name_binding#Binding_time">late binding</a> world, a programming world of messages, what should that look like?  What does it look like in the&nbsp;large?</p>
+<p>The Smalltalk notion of this is many, many independent referencable objects.  Objects all the way down.  So you might get something like <tt class="docutils literal">buddies do: [ buddy | buddy sendMessage: myMessage]</tt>.</p>
+<p>At runtime this means something&nbsp;like:</p>
+<ul class="simple">
+<li>Send the <tt class="docutils literal">buddies</tt> object (some reference we obtained elsewhere)   the <tt class="docutils literal">do:</tt> message, with the argument <tt class="docutils literal">[ buddy | buddy&nbsp;&nbsp; sendMessage: myMessage]</tt>.  Except remember that that <tt class="docutils literal"><span class="pre">[...]</span></tt> is a   block (aka closure), and it&#8217;s also an object.  Which only makes   sense, because <tt class="docutils literal">buddies</tt> doesn&#8217;t know what <tt class="docutils literal">myMessage</tt> means.  So all <tt class="docutils literal">buddies</tt> knows is that it gets an&nbsp;argument.</li>
+<li>The <tt class="docutils literal">buddies</tt> object receives this <tt class="docutils literal">do:</tt> message, with an   argument we&#8217;ll call <tt class="docutils literal">block</tt> (that <tt class="docutils literal"><span class="pre">[...]</span></tt> stuff).  By convention   <tt class="docutils literal">do:</tt> is sent to sequence-like things, and calls its argument   multiple times.  So buddies figures out some items &#8212; maybe it&#8217;s a   concrete sequence (like an <tt class="docutils literal">Array</tt>) or maybe it looks it up in a   database, or does a call over the net, or&nbsp;whatever.</li>
+<li>Once <tt class="docutils literal">buddies</tt> gets an item, it calls <tt class="docutils literal">block value: item</tt>.  That   is, it sends a <tt class="docutils literal">value:</tt> message back to the <tt class="docutils literal">block</tt> object, with   the argument <tt class="docutils literal">item</tt>.</li>
+<li>The block has just received that <tt class="docutils literal">value:</tt> message.  The block   wouldn&#8217;t <em>have</em> to be that <tt class="docutils literal"><span class="pre">[...]</span></tt> syntactic construct, it just   usually is.  So it receives that value, and locally binds the   <tt class="docutils literal">buddy</tt> variable to the argument and evaluates the inside of that&nbsp;block.</li>
+<li>Our expression then sends the <tt class="docutils literal">sendMessage:</tt> message to that   buddy object, with another object as the argument.  That argument   might be a string, but it also might be markup, or a richer object   that itself does all sorts of magical things.  Maybe the buddy   object sends the object over the net to your remote buddy, then the   remote buddy calls <tt class="docutils literal">message displayOn: myScreen</tt>, and the message   object reponds to <tt class="docutils literal">displayOn:</tt> by sending <tt class="docutils literal">screen showText:&nbsp;&nbsp; someString withColor: #blue</tt>.  This can go on for a&nbsp;while.</li>
+</ul>
+<p>As you can see, there can be a lot of tracing through code in this style.  This has been called <a class="reference external" href="http://en.wikipedia.org/wiki/Ravioli_code">Ravioli code</a>.  Many people lean heavily on concepts like classes and methods to make sense of this kind of code, though if you look through my description you&#8217;ll notice they don&#8217;t show up; it is apparently somewhat frustrating for Alan Kay that he first used the term &#8220;object-oriented&#8221; when he would have preferred this message-oriented concept.  Classes and methods are just implementation details.  Messages and object references are the true fundamental&nbsp;concept.</p>
+<p>Doing this in the large means that a lot of these messages go over the network.  It means we can get a handle to an object that lives on another computer.  It <em>might</em> result in a system that is very chatty (many systems with transparent <span class="caps">RPC</span> do end up being unintentionally chatty).  But it doesn&#8217;t have to.  You can make this asynchronous to facilitate these kinds of&nbsp;efficiencies.</p>
+<p>That said, there is another distinct technique for programming in the large: document oriented programming.  This is what <span class="caps">REST</span> is focused on: transmitting state in as complete a form as feasible, with explicit references whenever referring to another&nbsp;resource.</p>
+<p>Resources and objects are in many ways similar, but in other ways completely opposite.  An object has behavior but no visible state.  It responds to messages, passing more objects along.  Resources themselves have no behavior.  They are just bare state.  <span class="caps">REST</span> and the web <em>kind of</em> adds behavior, but strict <span class="caps">REST</span> avoids even that.  <span class="caps">PUT</span> is not behavior.  <span class="caps">PUT</span> is almost like a declaration of fact.  When you <span class="caps">PUT</span> to a resource you are claiming that the new state of the resource represents the truth of that resource.  Any behavior that occurs because of that is hidden.  Other resources may change as a result of the <span class="caps">PUT</span>, but this is not exposed in any way.  To find out what&#8217;s changed you simply have to refresh all the state you&#8217;ve acquired &#8212; re-<span class="caps">GET</span> the resources.  (<span class="caps">POST</span>, except when used simply to create a resource, is more like a verb than a statement of truth; the <span class="caps">HTTP</span> model is not pure in this&nbsp;respect.)</p>
+<p>For programming on a web scale resources have become the dominant technique.  <span class="caps">REST</span> was really an acknowledgement of this idea, not the invention of it.  It&#8217;s also an advocacy effort that our future work should be built on this past success.  It&#8217;s been focused very clearly on advocating resources over the object/message-based systems of <span class="caps">WS</span>-*, but the <span class="caps">WS</span>-* design is hardly the first or only object based system of its kind; anything called &#8220;<span class="caps">RPC</span>&#8221; comes from that line of thinking.  But now that <span class="caps">WS</span>-* isn&#8217;t king of the hill anymore maybe we can more be more thoughtful about how <span class="caps">REST</span> relates to other programming&nbsp;techniques.</p>
+<p>A way to describe the difference in terms of programming language design is that with resources everything we do is <a class="reference external" href="http://en.wikipedia.org/wiki/Call_by_value#Call_by_value">call by value</a>.  Resources are <em>values</em>, and we pass them around in their complete form.  You can pass around a reference value (a <span class="caps">URI</span>), but this is like calling a function with a pointer argument.  Object/<span class="caps">RPC</span> techniques are <a class="reference external" href="http://en.wikipedia.org/wiki/Call_by_value#Call_by_reference">call by reference</a> (though at some level there are true &#8220;values&#8221;, things like integers and strings, as things would simply be too chatty&nbsp;otherwise).</p>
+<p>One interesting place where objects and resources can overlap is in functional programming.  Thinking in terms of call by value or call by reference, in a functional programming language these are identical.  Because values are not mutable a value and a copy of the value are equivalent.  You can also pass an object between systems by reference, in whole, or some lazy compromise where the object is only incrementally communicated between the&nbsp;processes.</p>
+<p>Resources are in a sense immutable regardless of your programming language.  When you retrieve a resource you cannot modify it in place, as the result is no longer representative of what the resource really <em>is</em>.  You can put a new resource in a named location (<span class="caps">PUT</span>), and you can copy resources (maybe making an internal copy).  Incidentally this is why I think <a class="reference external" href="http://blog.ianbicking.org/2007/08/02/atom-models/">literal document models are best</a>.  It would probably be useful to have a native representation of what a &#8220;resource&#8221; really is in programming languages, though usually this is not done.  A resource should really be a document (content type, some bytes, perhaps a cache of parsed representations) plus the name (<span class="caps">URI</span>) and the <em>time</em>.  Resources aren&#8217;t eternal, but given a time and <span class="caps">URI</span> there is (in a <span class="caps">REST</span> world) a single canonical&nbsp;representation.</p>
+<p>Further investigations of functional programming languages would probably be useful here.  I believe strict functional languages have interesting metaphors for handling this kind of information; the eternal immutable sense of what a thing is at a point in time, and a way to reconcile the incomplete knowledge of what a resource is <em>right now</em>.  I don&#8217;t think this is a clear pattern in Erlang, but is in&nbsp;Haskell.</p>
+<p>One useful aspect of resources is the ability to spy on the process, to get a snapshot of it, to understand it in a kind of literal way.  This is <em>view source</em> in a browser, or just poking around with curl.  You can feel a certain confidence that you can get a real sense of what the truth is using these tools.  In an object-based system you can only poke around with a process of 20 questions, hoping that there isn&#8217;t some hidden truth that you are unaware of.  For instance, talking to a proxy that is <em>almost exactly</em> like the original object, but with some small replacement.  Of course internally a server can be peculiarly coupled as well, with relationships between the resources that aren&#8217;t explicit or obvious.  But at least the faces it projects are fully&nbsp;formed.</p>
+<p>I still haven&#8217;t fully figured out what distinguishes a document model from an object model, but I think the distinction between the two contains some interesting stuff worth&nbsp;exploring.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

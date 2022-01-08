@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Fast CGI that isn’t FastCGI</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,34 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2007-08-03T15:33:00-05:00">
+                Friday, August 3rd, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/08/fast-cgi-that-isnt-fastcgi.html"
+                    rel="bookmark"
+                    title="Permalink to Fast CGI that isn’t FastCGI"
+                    >Fast <span class="caps">CGI</span> that isn&#8217;t&nbsp;FastCGI</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>There&#8217;s a bunch of techniques for doing deployments of long-running processes (Zope, Python server, Rails, etc).  A pretty good technique is to do <span class="caps">HTTP</span> proxying.  There&#8217;s some details and conventions I&#8217;d like to <a class="reference external" href="http://blog.ianbicking.org/http-proxying-questions.html">see for <span class="caps">HTTP</span></a>, but that&#8217;s not my concern&nbsp;here.</p>
+<p><span class="caps">HTTP</span> proxying isn&#8217;t great for commodity hosting.  Mostly you need to set up a new long-running process, and commodity hosts don&#8217;t make that easy or reliable.  <a class="reference external" href="http://www.fastcgi.com/">FastCGI</a> offers one solution to that, essentially putting the process management into Apache or whatever web server you are&nbsp;using.</p>
+<p>The problem with FastCGI is that it is finicky.  There&#8217;s lots of configuration parameters, lots of parts don&#8217;t work right, and there seems to be a golden path where things actually work but it&#8217;s hard to know exactly what that&nbsp;is.</p>
+<p>Another technique that has been used in the past instead of FastCGI is a very small <span class="caps">CGI</span> script.  One example in <a class="reference external" href="http://python.ca/scgi/"><span class="caps">SCGI</span></a> is called <a class="reference external" href="http://quixote.python.ca/scgi.dev/cgi2scgi.c">cgi2scgi</a>.  This small script is fast to run (it compiles to 12kb), and all it does is take the <span class="caps">CGI</span> request and turn it into a <span class="caps">SCGI</span> request to a long-running&nbsp;server.</p>
+<p>This is a nice start, and easy to deploy, except it doesn&#8217;t handle long-running processes.  A great feature to add to something like this would be simple process management.  I imagine something where if the socket (named or a port) that the <tt class="docutils literal">cgi2scgi</tt> script connects to isn&#8217;t up or working, it runs a script that will start the server.  If another request comes in while the server is starting up, it shouldn&#8217;t try to start the server twice.  If the server is randomly killed (as is common on commodity hosters) then the next request will try to bring the server&nbsp;up.</p>
+<p>Unlike FastCGI, this won&#8217;t try to handle different process models or anything fancy.  It&#8217;s up to the startup script to set everything up properly, start multiple worker processes if necessary, etc.  There&#8217;s probably some tricky details I haven&#8217;t thought of, and it&#8217;s slightly annoying to write all this in C (but necessary, since it&#8217;s part of the <span class="caps">CGI</span> script, which must be small).  But I think it can be done better than existing in-the-wild FastCGI&nbsp;implementations.</p>
+<p>And when we&#8217;re done, I think we could have something that would be a really good basis for commodity hosting of a whole bunch of non-<span class="caps">PHP</span> frameworks.  You can distribute the Linux binaries, as all the Commodity Hosts That Matter can run those (even the <span class="caps">BSD</span> ones should be fine).  Easy application installation practically falls right out of&nbsp;that.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +62,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

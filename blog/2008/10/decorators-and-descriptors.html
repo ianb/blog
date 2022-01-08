@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Decorators and Descriptors</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,98 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2008-10-24T00:18:00-05:00">
+                Friday, October 24th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/10/decorators-and-descriptors.html"
+                    rel="bookmark"
+                    title="Permalink to Decorators and Descriptors"
+                    >Decorators and&nbsp;Descriptors</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>So, <a class="reference external" href="http://www.python.org/dev/peps/pep-0318/">decorators</a> are neat (maybe check out a <a class="reference external" href="http://www.artima.com/weblogs/viewpost.jsp?thread=240808">new tutorial on them</a>).  <a class="reference external" href="http://users.rcn.com/python/download/Descriptor.htm">Descriptors</a> are neat but may seem hard (though they hardly take a long time to describe).  Sometimes these two things intersect, and this post describes&nbsp;how.</p>
+<p>Here&#8217;s an example decorator where this comes up.  First, we want something that looks like a <span class="caps">WSGI</span>&nbsp;application:</p>
+<pre class="literal-block">
+def application(environ, start_response):
+    start_response('200 OK', [('content-type', 'text/html')])
+    return ['hi!']
+</pre>
+<p>But we want to use WebOb,&nbsp;like:</p>
+<pre class="literal-block">
+from webob import Request, Response
+def application(environ, start_response):
+    req = Request(environ)
+    resp = Response('hi!')
+    return resp(environ, start_response)
+</pre>
+<p>(We don&#8217;t use <tt class="docutils literal">req</tt> in this example, but of course you probably would in a real <span class="caps">WSGI</span>&nbsp;application)</p>
+<p>Now <tt class="docutils literal">req = Request(environ)</tt> is boilerplate, and it&#8217;d be nicer to just do <tt class="docutils literal">return resp</tt> instead of <tt class="docutils literal">return resp(environ, start_response)</tt>.  So let&#8217;s make a decorator to do&nbsp;that:</p>
+<pre class="literal-block">
+class wsgiapp(object):
+    def __init__(self, func):
+        self.func = func
+    def __call__(self, environ, start_response):
+        resp = self.func(Request(environ))
+        return resp(environ, start_response)
+
+&#64;wsgiapp
+def application(req):
+    return Response('hi!')
+</pre>
+<p>If you don&#8217;t understand what happened there, go read up on decorators.
+Now, what if you want to decorate a method?  For&nbsp;instance:</p>
+<pre class="literal-block">
+class Application(object):
+    def __init__(self, text):
+        self.text = text
+    &#64;wsgiapp
+    def __call__(self, req):
+        return Response(self.text)
+application = Application('hi!')
+</pre>
+<p>This won&#8217;t <em>quite</em> work, because <tt class="docutils literal">&#64;wsgiapp</tt> will call <tt class="docutils literal">Application.__call__(req)</tt> &#8212; with <em>no self argument</em>.  This is generally a problem with any decorator that changes the signature, because the signature for methods has this extra <tt class="docutils literal">self</tt> argument.  Descriptors can handle this.  First we&#8217;ll have the same <tt class="docutils literal">wsgiapp</tt> definition as we had before, but we&#8217;ll add the magic descriptor method <tt class="docutils literal">__get__</tt>:</p>
+<pre class="literal-block">
+class wsgiapp(object):
+    def __init__(self, func):
+        self.func = func
+    def __call__(self, environ, start_response):
+        resp = self.func(Request(environ))
+        return resp(environ, start_response)
+    def __get__(self, obj, type=None):
+        if obj is None:
+            return self
+        new_func = self.func.__get__(obj, type)
+        return self.__class__(new_func)
+</pre>
+<p>So, to&nbsp;explain:</p>
+<p>When you get an attribute from an instance, like <tt class="docutils literal"><span class="pre">Application().__call__</span></tt>, Python will check if the object that was fetched has a <tt class="docutils literal">__get__</tt> method.  If it does, it will call that method and use the result of that&nbsp;method.</p>
+<p>This&nbsp;part:</p>
+<pre class="literal-block">
+if obj is None:
+    return self
+</pre>
+<p>is what happens when you do <tt class="docutils literal">Application.__call__</tt> &#8212; in other words, when get a class attribute.  In that case <tt class="docutils literal">obj</tt> (self) will be None, and it will just return the descriptor (it <em>could</em> do something else, like in <a class="reference external" href="http://svn.colorstudy.com/home/ianb/recipes/classinstance.py">this example</a>, but usually it&nbsp;doesn&#8217;t).</p>
+<p>Functions already have a <tt class="docutils literal">__get__</tt> method.  You can try it&nbsp;yourself:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; def example(*args):
+...     print 'got', args
+&gt;&gt;&gt; example_bound = example.__get__(1)
+&gt;&gt;&gt; example_bound('test')
+got (1, 'test')
+</pre>
+<p>So in the example with <tt class="docutils literal">wsgiapp</tt> we are just changing the decorator to wrap the new <em>bound</em> function instead of the old unbound function.  This allows <tt class="docutils literal">wsgiapp</tt> to be compatible with both plain functions and methods.  In fact, it would probably be preferable to <em>always</em> call <tt class="docutils literal">func.__get__(obj, type)</tt> (even if <tt class="docutils literal">obj is None</tt>), as then we could also wrap class methods or other kinds of&nbsp;descriptors.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +126,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

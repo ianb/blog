@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Woonerf and Python</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2009-01-16T13:09:00-06:00">
+                Friday, January 16th, 2009
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2009/01/woonerf-and-python.html"
+                    rel="bookmark"
+                    title="Permalink to Woonerf and Python"
+                    >Woonerf and&nbsp;Python</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>At <a class="reference external" href="http://topp.openplans.org/"><span class="caps">TOPP</span></a> there&#8217;s a lot of traffic discussion, since a substantial portion of the organization is dedicated to <a class="reference external" href="http://www.livablestreets.com/">Livable Streets</a> initiatives.  One of the traffic ideas people have gotten excited about is <a class="reference external" href="http://www.livablestreets.com/streetswiki/woonerf">Woonerf</a>.  This is a Dutch traffic planning idea.  In areas where there&#8217;s the intersection of lots of kinds of traffic (car, pedestrian, bike, destinations and through traffic) you have to deal with the contention for the streets.  Traditionally this is approached as a complicated system of rules and right-of-ways.  There&#8217;s spaces for each mode of transportation, lights to say which is allowed to go when (with lots of red and green arrows), crosswalk islands, concrete barriers, and so&nbsp;on.</p>
+<p>A problem with this is that a person can only pay attention to so many things at a time.  As the number of traffic controls increases, the controls themselves dominate your attention.  It&#8217;s based on the ideal that so long as everyone pays attention tothe controls, they don&#8217;t have to pay attention to each other.  Of course, if there&#8217;s a circumstance the controls don&#8217;t take into account then people will deviate (for instance, crossing somewhere other than the crosswalk, or getting in the wrong lane for a turn, or the simple existance of a bike is usually unaccounted for).  If all attention is on the controls, and everyone trusts that the controls are being obeyed, these deviations can lead to accidents.  This can create a negative feedback cycle where the controls become increasingly complex to try to take into account every possibility, with the addition of things like <a class="reference external" href="http://en.wikipedia.org/wiki/Jersey_barriers">Jersey barriers</a> to exclude deviant traffic.  At least in the U.S., and especially in the suburbs or in complex intersections, this feeling of an overcontrolled and restricted traffic plan is&nbsp;common.</p>
+<img alt="Copenhagen retail street" class="align-right" src="/wp-content/uploads/images/Copenhagen_retail_street.jpg" />
+<p>So: Woonerf.  This is an extreme reaction to traffic controls.  An intersection designed with the principles of Woonerf eschews all controls.  This includes even things like curbs and signage.  It removes most cues about behavior, and specifically of the concept of &#8220;right of way&#8221;.  Every person entering the intersection must view it as a <em>negotiation</em>.  The use of eye contact, body language, and hand signals determines who takes the right of way.  In this way all kinds of traffic are peers, regardless of destination or mode of transport.  Also each person must focus on where they are right now, and not where they will be a minute from now; they must stay&nbsp;engaged.</p>
+<hr class="docutils" />
+<img alt="Code as Jersey Barrier" class="align-left" src="/wp-content/uploads/images/code-based-jersey-barrier.jpg" />
+<p>So, I was reading a critique of Python where someone was saying how they missed public/private/protected distinctions on attributes and methods.  And it occurred to me: Python&#8217;s object model is like&nbsp;Woonerf.</p>
+<p>Python does not enforce rules about what you must and must not do.  There are cues, like leading underscores, the <tt class="docutils literal">__magic_method__</tt> naming pattern, or at the module level there&#8217;s <tt class="docutils literal">__all__</tt>.  But there are no curbs, you won&#8217;t even feel the slightest bump when you access a &#8220;private&#8221; attribute on an&nbsp;instance.</p>
+<p>This can lead to conflicts.  For example, during discussions on installation, some people will argue for creating requirements like <tt class="docutils literal"><span class="pre">&quot;SomeLibrary&gt;=1.0,&lt;2.0&quot;</span></tt>, with the expectation that while version 2.0 doesn&#8217;t exist, so long as you install something in the 1.x line it will maintain compatibility with your application.  This is an unrealistic expectation.  Do you and the library maintainer have the same idea about what compatibility means?  What if you depend on something the maintainer considers a&nbsp;bug?</p>
+<p>Practically, you can&#8217;t be sure that future versions of a library will work.  You also can&#8217;t be sure they won&#8217;t work; there&#8217;s nothing that <em>requires</em> the maintainer of the library to break your application with version 2.0.  This is where it becomes a negotiation.  If you decide to cross without a crosswalk (use a non-public <span class="caps">API</span>) then okay.  You just have to keep an eye out.  And library authors, whether they like it or not, need to consider the <span class="caps">API</span>-as-it-is-used as much as the <span class="caps">API</span>-they-have-defined.  In open source in particular, there are a lot of ways to achieve this communication.  We don&#8217;t use some third party (e.g., a <span class="caps">QA</span> team or language features) to enforce rules on both sides (there are no traffic controls), instead the communication is more flat, and speaks as much to <em>intentions</em> as <em>mechanisms</em>.  When someone asks &#8220;how do I do X?&#8221; a common response is: &#8220;what are you trying to accomplish?&#8221;  Often an answer to the second question makes the first question&nbsp;irrelevant.</p>
+<p>Woonerf is great for small towns, for creating a humane space.  Is it right for big cities and streets, for busy people who want to get places fast, for trucking and industry?  I&#8217;m not sure, but probably not.  This is where a multi-paradigm approach is necessary.  Over time libraries have to harden, become more static, innovation should happen on top of them and not in the library.  Some times we create third party controls through interfaces (of <a class="reference external" href="http://wiki.zope.org/Interfaces/FrontPage">one kind</a> or <a class="reference external" href="http://www.python.org/dev/peps/pep-0333/">another</a>).  I suppose in this case there is a kind of negotiation about how we negotiate &#8212; there&#8217;s no one process for how to build negotiation-free foundations in Python.  But it&#8217;s best not to harden things you aren&#8217;t sure are right, and I&#8217;m pretty sure there&#8217;s no &#8220;right&#8221; at this very-human level of&nbsp;abstraction.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

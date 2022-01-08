@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>FlatAtompub</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,43 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
+    <article>
+        <header>
+            <abbr class="published" title="2007-09-12T20:50:00-05:00">
+                Wednesday, September 12nd, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/09/flatatompub.html"
+                    rel="bookmark"
+                    title="Permalink to FlatAtompub"
+                    >FlatAtompub</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>A little while ago I decided to whip up a small <a class="reference external" href="http://atompub.org/">Atompub</a> server to get my head around the Atom Publishing Protocol.  I called it FlatAtomPub because it was just storing stuff in flat files.  I&#8217;m not committing to that name.  It was also a chance to kick the tires on <a class="reference external" href="http://pythonpaste.org/webob/">WebOb</a>.</p>
+<p>What I take out of the&nbsp;process:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.tbray.org/ape/"><span class="caps">APE</span></a> was very handy.  I lazily did   very little unit testing, instead relying on <span class="caps">APE</span> to do the work for   me.  This seemed to work quite well.  It is fun doing test driven   development when someone else develops the&nbsp;tests.</li>
+<li>I wrote a <a class="reference external" href="http://svn.pythonpaste.org/Paste/apps/FlatAtomPub/trunk/flatatompub/dec.py">little decorator</a>   that serves as a kind of framework.  It worked pretty well, I think.   This might be the prototype of what the   <tt class="docutils literal">PylonsController.__call__</tt> method does in some WebOb-using&nbsp;future.</li>
+<li>Stuff like conditional requests and responses are mostly implemented   in WebOb itself, which works well.  <span class="caps">HTTP</span> is clear about how   conditional requests work, so if you can just setup the basic info   (ETag, Last-Modified) you can let the library handle the rest.  I   could probably save a little work by paying closer attention to   ETags and Last-Modified up-front, but since there&#8217;s no complicated   template rendering the work saved doesn&#8217;t seem&nbsp;significant.</li>
+<li>The <a class="reference external" href="https://svn.openplans.org/svn/TaggerClient/trunk/taggerclient/atom.py">atom library</a>   removed most concern about the <span class="caps">XML</span>&nbsp;itself.</li>
+<li>I don&#8217;t know what to with <a class="reference external" href="http://bitworking.org/projects/atom/draft-ietf-atompub-protocol-17.html#rfc.section.8.3.3">collections</a>.   I guess I could allow multiple collections via configuration.  If   the store wasn&#8217;t a dumb store (e.g., it was plugged directly into a   blog, it didn&#8217;t just passively store things) it would be clearer   what a collection would mean.  As it is, collections are just a way   of aggregating multiple Atompub servers into one service document,   which doesn&#8217;t seem very&nbsp;useful.</li>
+<li>Handling links and slugs is kind of annoying.  I took the lazy way   out for this, using relative links and treating the slug and link as   the same thing.  This isn&#8217;t a good long-term solution, as it can   mess things up if you start handing entries around, or worse move a   server, and I don&#8217;t even set <tt class="docutils literal">xml:base</tt> on elements.  In theory   it should all work, but it makes the client do more effort than I   would like.  On the other hand, I suppose a client <em>should</em> do that   extra work anyway, as it shouldn&#8217;t rely on the server not being   lazy.  So maybe I&#8217;m better off sticking with a lazy solution, and   making sure I work with non-lazy&nbsp;clients.</li>
+<li>I considered pluggable storage, but ultimately decided it didn&#8217;t   matter.  Storing entries in files is fine; files are easy, and they   work.  I put in pluggable indexing instead.  <a class="reference external" href="http://trac.defuze.org/wiki/amplee">Amplee</a> is another Python Atompub   server, and I looked at <a class="reference external" href="https://svn.defuze.org/oss/amplee/amplee/storage/">Amplee storage backends</a>.  It&#8217;s kind of   clever to have things like svn or S3 backends.  But I&#8217;m not sure   what use I&#8217;d actually <em>do</em> with&nbsp;that.</li>
+<li>I haven&#8217;t yet considered transactions; if something fails part way   through, stuff will be inconsistent.  Admittedly this is where files   make things harder.  Probably a clear way to re-index would be   useful too, as at least there&#8217;s a clear location for the canonical   data (the&nbsp;files).</li>
+<li>The dependencies are still a little tangled; even though the library   doesn&#8217;t <em>use</em> a great deal of stuff, there&#8217;s enough pieces that some   people have had a hard time getting it&nbsp;setup.</li>
+<li>Ignoring authentication is nice.  I should see what it takes to   setup some authentication, but implementing it directly is out of   scope for&nbsp;FlatAtomPub.</li>
 </ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+<p>Interested people can look at the <a class="reference external" href="http://svn.pythonpaste.org/Paste/apps/FlatAtomPub/trunk">svn repository</a>.</p>
+<p>This makes me wonder how hard WebDAV would&nbsp;be&#8230;</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +71,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

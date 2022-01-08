@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Ian Bicking: a home&nbsp;page</title>
+        <title>Runtime vs. Test time</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
@@ -26,25 +26,34 @@
   <div id="main-wrapper2">
   <div id="main-container">
         <header id="banner" class="body">
-                <h1><a href="https://www.ianbicking.org">Ian Bicking: a home page</a></h1>
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <p>You&#8217;ve reached my homepage on the world wide web.&nbsp;Hello!</p>
-<p>On the internet I&#8217;m a computer programmer. Not on the internet I am also a computer programmer, but I also have a <a href="http://emilymurphy.com">wife</a> and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can&#8217;t find a social media home, but I guess <a href="https://twitter.com/ianbicking">Twitter</a> is what I&#8217;m re-trying&nbsp;lately.</p>
-<p>Until recently (August 2020) I worked for <a href="http://www.mozilla.org/">Mozilla</a>. You can read more about what I&#8217;m doing on my <a href="/projects.html"><strong>projects page</strong></a>.</p>
-<h2>Getting in&nbsp;contact</h2>
-<p>My list of online&nbsp;personas:</p>
-<ul>
-<li><a href="mailto:ian@ianbicking.org">ian@ianbicking.org</a></li>
-<li><a href="/blog/">My&nbsp;blog</a></li>
-<li><a href="https://twitter.com/ianbicking">@ianbicking on&nbsp;Twitter</a></li>
-<li><a href="http://www.linkedin.com/in/ianbicking">LinkedIn</a></li>
-<li><a href="https://www.facebook.com/ianbicking">Facebook</a> (personal/family,&nbsp;non-professional)</li>
-<li><a href="https://github.com/ianb/">ianb on&nbsp;github</a></li>
-<li><a href="/Ian_Bicking_resume.pdf">Resume</a></li>
-</ul>
-<p>Not online, my mobile number is <strong>773-870-0645</strong>, and I will rely on you to use that appropriately (never really been a problem so far; I guess cold calling is too scary). And my address is <strong>3015 10th Ave. S, Minneapolis, <span class="caps">MN</span> 55407</strong>.</p>
-<p>This blog is powered by <a href="http://getpelican.com/">Pelican</a>. The theme was based on <a href="http://github.com/getpelican/pelican-themes">cebong</a>. The entire thing is on <a href="https://github.com/ianb/blog">github</a>.</p>
+    <article>
+        <header>
+            <abbr class="published" title="2008-02-06T22:39:00-06:00">
+                Wednesday, February 6th, 2008
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2008/02/runtime-vs-test-time.html"
+                    rel="bookmark"
+                    title="Permalink to Runtime vs. Test time"
+                    >Runtime vs. Test&nbsp;time</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>Defenders of static typing have long claimed that it helps them avoid bugs, the compiler providing a constant test of code consistency. Agile practitioners counter that tests do the same thing and much&nbsp;more.</p>
+<p>I find myself inclined to something more in the middle. I don’t care for static typing, but I think <a class="reference external" href="http://en.wikipedia.org/wiki/Design_by_contract">programming by contract</a> has a lot of validity, is more powerful and helpful than static typing, and works just as well in a dynamically typed language. Programming by contract is more a principle than a particular technology. Unit testing is not <a class="reference external" href="http://en.wikipedia.org/wiki/XUnit">xUnit</a>; that’s just one way to do it. You can do unit testing perfectly well without any framework or special infrastructure at all. Similarly programming by contract just means: state and check your up-front expectations in a piece of code, and state and check our expectations for what that code returns or does. This can be as simple as “assert isinstance(n, int)“ in your&nbsp;code.</p>
+<p>Programming by contract is not enough to produce quality code. While the contract is checked at runtime that only means that exceptions are raised early and bad or inconsistent data does not propagate into the system. But it only works if you go through the code paths to invoke all those&nbsp;contracts.</p>
+<p>Here’s where <a class="reference external" href="http://en.wikipedia.org/wiki/System_testing">functional tests</a> come in. A functional test does stuff. In a web application a functional test does a simulated <span class="caps">HTTP</span> request and gives you the result. Generally they are high-level and go through the entire application stack. This is in contrast to unit tests that test just one piece of&nbsp;code.</p>
+<p>Proponents of unit tests say that functional tests are problematic. They often give confusing output, so that you have to work harder to debug problems when you are invoking so much code. You have combinatorial problems where it can be difficult to run tests that really get to all branches of the code. Functional tests can be&nbsp;slow.</p>
+<p>Of course no one really claims you shouldn’t have a mixture of both functional and unit tests for your code, this is more a question of what the best balance is. Functional tests without runtime checks in your code <em>are</em> a problem. They can be fragile because people look for every detail of how the application responds to identify how specific features function. But every detail that is verified is a detail that might change and require updates to the&nbsp;tests.</p>
+<p>With runtime tests functional tests can be much more compact. You can do things like simply verify that a page renders, or that code completes without an exception. If you have some confidence that it won’t be complete <em>wrong</em> — wrong as in without any exception but with errors — then simply exercising to code can be sufficient. In addition to getting more use out of your functional tests, you also have some assurance that production code will act in a sane way — that is, if it <em>is</em> broken, the code will <em>act</em> broken. Given a good deployment situation, the turnaround on fixing deployed bugs can be much&nbsp;shorter.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
 </section>
         <section id="extras" class="body">
                 <div class="links">
@@ -53,6 +62,9 @@
                     <li><a href="/blog/">blog</a></li>
                     <li><a href="/projects.html">projects</a></li>
                     <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
                     </ul>
                 </div>
                 <div class="social">

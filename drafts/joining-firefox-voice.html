@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Joining Firefox Voice</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2019-09-12T00:00:00-05:00">
+                Thursday, September 12nd, 2019
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/drafts/joining-firefox-voice.html"
+                    rel="bookmark"
+                    title="Permalink to Joining Firefox Voice"
+                    >Joining Firefox&nbsp;Voice</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I have recently joined a new team and group at Mozilla, in Emerging Technologies, Voice Interfaces, and specifically the project creating a browser-based voice&nbsp;assistant.</p>
+<p>Being back in the world of prototyping new products and user experiences is comfortable and enjoyable. It reaffirms my own understanding that I am not a good <span class="caps">SRE</span>. I technically have all the qualifications to be an <span class="caps">SRE</span>, which is why in the midst of organizational change I sometimes end up unintentionally in those kinds of roles. But it&#8217;s no good for anyone. I sometimes feel guilty about this, but I&#8217;m trying to get over this. No one would accidentally assign me to a visual design role, and I would not reluctantly say &#8220;sure, I can do that.&#8221; But if it&#8217;s some kind of <em>programming</em> then I can&#8217;t help&nbsp;myself.</p>
+<p>But now I feel like I&#8217;m back in my wheelhouse. Even though I&#8217;m inheriting a project, it was fairly small, within the scope of being completely refactored. I realize I do well when I can keep an entire project in my head, which is a combination of project scope, self-determined architecture, and me investing the time to keep it under control. Nothing about this scales, but that&#8217;s why I like early projects. An early project also makes it <em>worth it</em> for me to keep everything in my head, because that gives me the confidence to embrace substantial change and revision as we discover what the project should&nbsp;be.</p>
+<p>The specific project I am working on is a voice assistant for the browser. I want to explain why I&#8217;m excited about it, but I feel like I have to preface this by acknowledging that my ambitions for the project may never come to pass. I don&#8217;t want you, reader, to confuse this for a project roadmap. This is more like a time capsule I&#8217;m creating for myself, that I can compare against what we really&nbsp;make.</p>
+<p>There&#8217;s a few different ways to think about voice&nbsp;interfaces:</p>
+<ol>
+<li>Supportive technology for people or situations where other inputs and interfaces don&#8217;t&nbsp;work</li>
+<li>A way to create more ambient or subtle interfaces, without visual impositions, and without a need for immediate physical&nbsp;presence</li>
+<li>A way to interace using natural language instead of defined interfaces with visual feedback establishing the exact options&nbsp;available</li>
+</ol>
+<p>As an example of (1) I search for things on my phone using voice because it&#8217;s annoying to type some queries. My daughter can use Alexa to play music even though she is not literate. In this area the focus is on&nbsp;algorithms.</p>
+<p>A lot of futurism focuses on (3), and it&#8217;s kind of the fantasy of ubiquitous household technology. Home voice assistants focus a lot on this, and there&#8217;s a lot of focus on&nbsp;hardware.</p>
+<p>(3) is what I get excited about. I use voice to create reminders on my phone for this reason, it&#8217;s the ability to express something in a sentence that would otherwise require a series of navigations, date inputs, typing input, and perhaps mental&nbsp;calculations.</p>
+<p>There&#8217;s been experiments in natural-language input in the past, such as <a href="">Ubiquity</a>. Voice makes that natural language input easier, sloppier, more casual, and deliberately orthogonal to other clicky or typy interfaces. There&#8217;s obviously upsides and downsides to these features. But hopefully voice interfaces are a good reason to try&nbsp;again.</p>
+<p>In turn there&#8217;s two approaches to voice&nbsp;interfaces:</p>
+<ol>
+<li>Allow individual applications to define their own voice interaces. Make sure it&#8217;s easy for them to get the input they want. Potentially create a hub that will direct voice input to the appropriate application, as a kind of federated&nbsp;approach.</li>
+<li>Voice is used to control the singular user agent, that interprets and executes the command. In this model applications at most provide semantically-defined verbs, and the user agent decides how to make use of&nbsp;them.</li>
+</ol>
+<p>Traditionally Mozilla has chosen approach (1), often with new Web APIs or specifications. And we may well do so for voice, but in <em>this</em> project we are exploring (2): the user agent collecting and interpreting voice input, and then executing the command as it sees fit, potentially across services, and without the service or application opting-in to&nbsp;anything.</p>
+<p>Creating a voice web user agent is both easier and harder than the first approach. It&#8217;s harder because interpreting and acting on arbitrary commands, across the extensive diversity of the web, is hard! It&#8217;s easier because having done it, the tool actually does something; while having defined a specification, nothing in the world will have changed until and unless people make use of that&nbsp;specification.</p>
+<p>Making a voice-based web user agent is, of course, much more work than our little team can possibly do. So we also need a great deal of scaffolding. For this project, desktop Firefox is that scaffolding. The number of things this provides to us is hard to enumerate: installation systems, permissions, account systems, multitasking, interface surface area, and a completely capable fallback to the normal mouse-and-keyboard interface. We&#8217;ll be leaning on this very, very heavily for the foreseeable&nbsp;future.</p>
+<p>Unfortunately for all its benefits, the ceiling is pretty low on what we can achieve in the context of desktop Firefox. People don&#8217;t <em>want</em> to talk to their desktop computers. There&#8217;s a good chance you have Siri or Cortana available to you right now. Do you use them? I don&#8217;t. Instead there&#8217;s this rich, complete, familiar, well-optimized mouse-and-keyboard interface, and I&#8217;m at my computer because for whatever I&#8217;m doing that&#8217;s a good&nbsp;interface.</p>
+<p>This sounds pessimistic, and it is, but I don&#8217;t want us to create unreasonable expectations. We&#8217;re not going to get a lot of people using this tool, at least not in this form factor. If we&#8217;re successful, it will be by creating something useful that has lessons and approaches we can translate elsewhere. I have some ideas where that &#8220;elsewhere&#8221; can be, but for now there&#8217;s lots of work and risk in just making something&nbsp;useful.</p>
+<p>So what would make this&nbsp;useful?</p>
+<p>Visual interfaces involve lots of categorization and narrowing focus: you get things done by navigation, reading categories, parsing visual groupings, until you find a&nbsp;control.</p>
+<p>Voice controls just wait for you to say something, then try to make sense of it. There&#8217;s no enforced focus or scope, except of course the assistant&#8217;s dense&nbsp;incomprehension.</p>
+<p>A good assistant will, I think, support commands across services, and without this focus-switch-refocus-act&nbsp;behavior.</p></div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

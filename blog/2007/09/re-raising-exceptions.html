@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Re-raising Exceptions</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2007-09-12T10:16:00-05:00">
+                Wednesday, September 12nd, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/09/re-raising-exceptions.html"
+                    rel="bookmark"
+                    title="Permalink to Re-raising Exceptions"
+                    >Re-raising&nbsp;Exceptions</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>After reading Chris McDonough&#8217;s <a class="reference external" href="http://plope.com/Members/chrism/now_not_to_write_python">What Not To Do When Writing Python Software</a>, it occurred to me that many people don&#8217;t actually know <em>how</em> to properly re-raise exceptions.  So a little mini-tutorial for Python programmers, about&nbsp;exceptions&#8230;</p>
+<p>First, this is&nbsp;bad:</p>
+<pre class="literal-block">
+try:
+    some_code()
+except:
+    revert_stuff()
+    raise Exception(&quot;some_code failed!&quot;)
+</pre>
+<p>It is bad because all the information about how <tt class="docutils literal">some_code()</tt> failed is lost.  The traceback, the error message itself.  Maybe it was an expected error, maybe it&nbsp;wasn&#8217;t.</p>
+<p>Here&#8217;s a modest improvement (but still not very&nbsp;good):</p>
+<pre class="literal-block">
+try:
+    some_code()
+except:
+    import traceback
+    traceback.print_exc()
+    revert_stuff()
+    raise Exception(&quot;some_code failed!&quot;)
+</pre>
+<p><tt class="docutils literal">traceback.print_exc()</tt> prints the original traceback to stderr. Sometimes that&#8217;s the best you can do, because you really want to recover from an unexpected error.  But if you aren&#8217;t recovering, <em>this</em> is what you should&nbsp;do:</p>
+<pre class="literal-block">
+try:
+    some_code()
+except:
+    revert_stuff()
+    raise
+</pre>
+<p>Using <tt class="docutils literal">raise</tt> with no arguments re-raises the last exception. Sometimes people give a blank <em>never use &#8220;except:&#8220;</em> statement, but this particular form (<tt class="docutils literal">except:</tt> + <tt class="docutils literal">raise</tt>) is&nbsp;okay.</p>
+<p>There&#8217;s another form of <tt class="docutils literal">raise</tt> that not many people know about, but can also be handy.  Like <tt class="docutils literal">raise</tt> with no arguments, it can be used to keep the&nbsp;traceback:</p>
+<pre class="literal-block">
+try:
+    some_code()
+except:
+    import sys
+    exc_info = sys.exc_info()
+    maybe_raise(exc_info)
+
+def maybe_raise(exc_info):
+    if for some reason this seems like it should be raised:
+        raise exc_info[0], exc_info[1], exc_info[2]
+</pre>
+<p>This can be handy if you need to handle the exception in some different part of the code from where the exception happened.  But usually it&#8217;s not that handy; it&#8217;s an obscure feature for a&nbsp;reason.</p>
+<p>Another case when people often clobber the traceback is when they want to add information to it,&nbsp;e.g.:</p>
+<pre class="literal-block">
+for lineno, line in enumerate(file):
+    try:
+        process_line(line)
+    except Exception, exc:
+        raise Exception(&quot;Error in line %s: %s&quot; % (lineno, exc))
+</pre>
+<p>You keep the error message here, but lose the traceback.  There&#8217;s a couple ways to keep that traceback.  One I sometimes use is to retain the exception, but change the&nbsp;message:</p>
+<pre class="literal-block">
+except Exception, exc:
+    args = exc.args
+    if not args:
+        arg0 = ''
+    else:
+        arg0 = args[0]
+    arg0 += ' at line %s' % lineno
+    exc.args = arg0 + args[1:]
+    raise
+</pre>
+<p>It&#8217;s a little awkward.  Technically (though it&#8217;s deprecated) you can raise <em>anything</em> as an exception.  If you use <tt class="docutils literal">except Exception:</tt> you won&#8217;t catch things like string exceptions or other weird types. It&#8217;s up to you to decide if you care about these cases; I generally ignore them.  It&#8217;s also possible that an exception won&#8217;t have <tt class="docutils literal">.args</tt>, or the string message for the exception won&#8217;t be derived from those arguments, or that it will be formatted in a funny way
+(<tt class="docutils literal">KeyError</tt> formats its message differently, for instance).  So this isn&#8217;t foolproof.  To be a bit more robust, you can get the exception like&nbsp;this:</p>
+<pre class="literal-block">
+except:
+    exc_class, exc, tb = sys.exc_info()
+</pre>
+<p><tt class="docutils literal">exc_class</tt> will be a string, if someone does something like <tt class="docutils literal">raise &quot;not found&quot;</tt>.  There&#8217;s a reason why that style is deprecated. Anyway, if you really want to mess around with things, you can then&nbsp;do:</p>
+<pre class="literal-block">
+new_exc = Exception(&quot;Error in line %s: %s&quot;
+                    % (lineno, exc or exc_class))
+raise new_exc.__class__, new_exc, tb
+</pre>
+<p>The confusing part is that you&#8217;ve changed the exception class around, but you have at least kept the traceback intact.  It can look a little odd to see <tt class="docutils literal">raise <span class="pre">ValueError(...)</span></tt> in the traceback, and <tt class="docutils literal">Exception</tt> in the error&nbsp;message.</p>
+<p>Anyway, a quick summary of proper ways to re-raise exceptions in Python.  May your tracebacks&nbsp;prosper!</p>
+<p><strong>Update:</strong> Kumar notes the problem of errors in your error handler.  Things get more long winded, but here&#8217;s the simplest way I know of to deal with&nbsp;that:</p>
+<pre class="literal-block">
+try:
+    code()
+except:
+    exc_info = sys.exc_info()
+    try:
+        revert_stuff()
+    except:
+        # If this happens, it clobbers exc_info, which is why we had
+        # to save it above
+        import traceback
+        print &gt;&gt; sys.stderr, &quot;Error in revert_stuff():&quot;
+        traceback.print_exc()
+    raise exc_info[0], exc_info[1], exc_info[2]
+</pre>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

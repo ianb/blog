@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Of Microformats and the Semantic Web</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://www.ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://www.ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://www.ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie.css"/>
+                <script src="https://www.ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://www.ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://www.ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+            <abbr class="published" title="2007-08-14T11:52:00-05:00">
+                Tuesday, August 14th, 2007
+            </abbr>
+            <h1 class="entry-title">
+                <a
+                    href="https://www.ianbicking.org/blog/2007/08/of-microformats-and-the-semantic-web.html"
+                    rel="bookmark"
+                    title="Permalink to Of Microformats and the Semantic Web"
+                    >Of Microformats and the Semantic&nbsp;Web</a
+                >
+            </h1>
+        </header>
+
+        <div class="entry-content"><p>I was talking a little with <a class="reference external" href="http://eikeon.com/">Daniel Krech</a> (author of <a class="reference external" href="http://rdflib.net/">rdflib</a>) about Semantic Web stuff and <a class="reference external" href="http://microformats.org/">microformats</a> and what they all mean. And he was saying that microformats were nice, because you could <em>do</em> something with them, but it would be nice to see that&nbsp;generalized.</p>
+<p>By &#8220;generalized&#8221; I think he meant a general way of expressing arbitrary relationships.  As an example, in <a class="reference external" href="http://microformats.org/wiki/hcard">hCard</a> you can&nbsp;do:</p>
+<pre class="code html literal-block">
+<span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;tel&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;type&quot;</span><span class="p">&gt;</span>home<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>:
+  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;value&quot;</span><span class="p">&gt;</span>773-555-3821<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</pre>
+<p>The hCard specification (itself leaning heavily on vCard) defines <tt class="docutils literal">tel</tt>, <tt class="docutils literal">type</tt>, and there&#8217;s a general pattern of what <tt class="docutils literal">value</tt> means.  But if you want to describe some new kind of structure, there&#8217;s no way to do that really; there&#8217;s no marital status format, for instance (which would be useful for a singles search engine, as an&nbsp;example).</p>
+<p>So I started thinking: can you really generalize it?  And I started to think about <a class="reference external" href="http://bitworking.org/news/193/Do-we-need-WADL">Joe Gregorio&#8217;s attack of <span class="caps">WADL</span></a>:</p>
+<blockquote>
+<p>Here is the very <a class="reference external" href="http://bitworking.org/projects/pastebin/main.cgi/bin/7">first example in the <span class="caps">WADL</span> specification</a>.</p>
+<p>That <span class="caps">WADL</span> file is a description of a search interface. But <a class="reference external" href="http://bitworking.org/projects/pastebin/main.cgi/bin/8">here     is how you should really do it</a>. That&#8217;s     an <a class="reference external" href="http://www.opensearch.org/Home">OpenSearch</a> document, that     also describes a search&nbsp;interface.</p>
+<p><strong>Q</strong>: What&#8217;s the&nbsp;difference?</p>
+<p><strong>A</strong>: A&nbsp;mime-type.</p>
+<p><strong>Q</strong>: That doesn&#8217;t seem like much, does it make a&nbsp;difference?</p>
+<p><strong>A</strong>: Yes, it makes a big difference. When you get an OpenSearch     document there is a whole data model and a set of interactions you     know are possible because you read the OpenSearch     specification. By reading that spec you know how to construct     search queries. When I get a <span class="caps">WADL</span> document it might describe     anything, from how to construct a search, to the <a class="reference external" href="http://bitworking.org/projects/atom/"><span class="caps">APP</span></a>, to <a class="reference external" href="http://bitworking.org/news/JEP"><span class="caps">JEP</span></a>, to <span class="caps">XML</span>-<span class="caps">RPC</span>.</p>
+<p>&#8230;</p>
+<p>So when I say the difference is a &#8216;mime-type&#8217;, what I mean is that     there is an entire spec somewhere which describes what that     document means, and that meaning may include hypertext     functionality, ala (X)<span class="caps">HTML</span>, XForms, and&nbsp;OpenSearch.</p>
+</blockquote>
+<p>This made me think of shared understanding more than explicit descriptions.  OpenSearch, <span class="caps">APP</span>, and Atom are very well described, but I think that&#8217;s only half of it: they are useful when they describe something that many people already&nbsp;understand.</p>
+<p>Digressing slightly, one &#8220;semantic markup&#8221; ideal that still bugs me is <tt class="docutils literal">&lt;strong&gt;</tt> and <tt class="docutils literal">&lt;em&gt;</tt> vs. <tt class="docutils literal">&lt;b&gt;</tt> and <tt class="docutils literal">&lt;i&gt;</tt>.  When I compose text I choose to make some words bold and some italic.  I have no idea what &#8220;strong&#8221; and &#8220;emphasis&#8221; are even supposed to mean.  When I&#8217;m composing text, I don&#8217;t actually know <em>why</em> I choose one or the other.  If I sat down and thought about it I&#8217;m sure I could come up with a set of rules that describe when bold is appropriate and when italic is appropriate.  But that is reflecting on my choice, it is not describing my choice.  There is no intermediate semantic meaning between what I am saying and bold and italic.  I <em>think</em> in bold and italic.  Readers in turn find meaning in the text itself; they do not parse my writing into semantic markup in their&nbsp;brain.</p>
+<p>I think there&#8217;s some connection between this and the shared understanding that microformats represents, and a more generalized <span class="caps">RDF</span> model does not represent.  I know what hCard means; not just in an intellectual way, but I can imagine a dozen functional uses of it without hardly trying, and of course I am entirely clear on what contact information <em>means</em>.  Moreover, I know what it means without actually figuring out what it means; if you asked me to articulate what contact information means I&#8217;d have to think a little, and I&#8217;m sure many people would come up with bad answers or be stumped.  And yet they all actually understand what it&nbsp;means.</p>
+<p>Bringing this back to Joe&#8217;s post, if I write something that produces or consumes Atom, Atompub, or OpenSearch, I understand the <em>why</em> of my code.  With both <span class="caps">WADL</span> and <span class="caps">RDF</span> my code is divorced of the why.  This isn&#8217;t about my personal understanding either; explaining it to <em>me</em> doesn&#8217;t serve any purpose, because with any exchange format it has to make sense to many many people to be useful.  Even an education campaign won&#8217;t fix this: education by description is far inferior to education by doing, and there&#8217;s no &#8220;doing&#8221; to <span class="caps">WADL</span> and <span class="caps">RDF</span> right&nbsp;now.</p>
+<p>That said, what is sufficiently obvious in the future may not be obvious now.  Maybe we&#8217;ll all get smarter.  Maybe someone will pioneer this stuff in a way that is really useful (Facebook?), and grow the public&#8217;s intuition about describing relationships in an abstract way. But <em>until then</em> I think microformats are going about this the right way, describing those things that are most easily&nbsp;describable.</p>
+</div>
+        <!-- /.entry-content -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://www.ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://www.ianbicking.org/archives.html">archives</a> &amp; <a href="https://www.ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://www.ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://www.ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://www.ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://www.ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://www.ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://www.ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">The Firefox Experiments I Would Have Liked To&nbsp;Try</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/overengaged-knowledge-worker.html">The Over-engaged Knowledge&nbsp;Worker</a></li>
+                    <li><a href="https://www.ianbicking.org/blog/2019/01/we-need-open-hosting-platforms.html">We Need Open Hosting&nbsp;Platforms</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-2442258-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+<script type="text/javascript">
+    var disqus_shortname = 'ianbicking';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>
