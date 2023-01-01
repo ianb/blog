@@ -48,52 +48,49 @@
 <p>But if lots of people are wrong, then there&#8217;s probably <em>something</em> right about the wrong&nbsp;thing.</p>
 <h2>Print vs. the <span class="caps">REPL</span></h2>
 <p>In a <span class="caps">REPL</span> (Read-Eval-Print-Loop) you can understand some of what is&nbsp;happening:</p>
-<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">my_function</span><span class="p">())</span>
+<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">my_function</span><span class="p">())</span>
 <span class="o">&lt;</span><span class="n">Object</span> <span class="n">foo</span><span class="o">...&gt;</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>You get to see the return value, but not much else. If <code>my_function()</code> is causing problems, or even if you just want to understand the function, you have to start looking inside the function. You can look at the implementation, call the things it calls and as a result inspect the inner workings of the&nbsp;function.</p>
 <p>Another approach is to edit the code itself, add some prints. and re-run everything from the top. You don&#8217;t have to dissect the function, and you get to see loops and all kinds of things happen. This is often more reliable, because you are calling everything the way it was &#8220;meant&#8221; to be&nbsp;called.</p>
 <p>This might be very specific to debugging, but I don&#8217;t believe so: I believe this is a larger pattern. And because I don&#8217;t know what it&#8217;s called, I&#8217;ll call it &#8220;dynamically scoped return&nbsp;values&#8221;.</p>
 <h2>Dynamically vs. Lexically Scoped&nbsp;Variables</h2>
 <p>A long time ago there used to be some questions about <a href="https://en.wikipedia.org/wiki/Scope_(computer_science)#Lexical_scope_vs._dynamic_scope">dynamic vs. lexical scoping</a>, but it was settled that only lexical scope made any sense. But to explain, here&#8217;s something you can write in Logo, which is dynamically&nbsp;scoped:</p>
-<div class="highlight"><pre><span></span><span class="n">make</span> <span class="s">&quot;size 100</span>
+<div class="highlight"><pre><span></span><code><span class="n">make</span><span class="w"> </span><span class="s">&quot;size 100</span>
 
-<span class="n">to</span> <span class="n">square</span>
-  <span class="n">repeat</span> <span class="mi">4</span> <span class="p">[</span>
-    <span class="nl">fd</span> <span class="p">:</span><span class="n">size</span>
-    <span class="n">rt</span> <span class="mi">90</span>
-  <span class="p">]</span>
-<span class="n">end</span>
+<span class="n">to</span><span class="w"> </span><span class="n">square</span><span class="w"></span>
+<span class="w">  </span><span class="n">repeat</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="nl">fd</span><span class="w"> </span><span class="p">:</span><span class="n">size</span><span class="w"></span>
+<span class="w">    </span><span class="n">rt</span><span class="w"> </span><span class="mi">90</span><span class="w"></span>
+<span class="w">  </span><span class="p">]</span><span class="w"></span>
+<span class="n">end</span><span class="w"></span>
 
-<span class="n">square</span>
-<span class="p">;</span> <span class="n">a</span> <span class="n">square</span> <span class="n">of</span> <span class="n">size</span> <span class="mi">100</span> <span class="n">is</span> <span class="n">printed</span>
+<span class="n">square</span><span class="w"></span>
+<span class="p">;</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">square</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">printed</span><span class="w"></span>
 
-<span class="n">to</span> <span class="nl">flower</span> <span class="p">:</span><span class="n">size</span>
-  <span class="n">repeat</span> <span class="mi">5</span> <span class="p">[</span>
-    <span class="n">rt</span> <span class="mi">72</span>
-    <span class="n">square</span>
-  <span class="p">]</span>
-<span class="n">end</span>
+<span class="n">to</span><span class="w"> </span><span class="n">flower</span><span class="w"> </span><span class="o">:</span><span class="n">size</span><span class="w"></span>
+<span class="w">  </span><span class="n">repeat</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="n">rt</span><span class="w"> </span><span class="mi">72</span><span class="w"></span>
+<span class="w">    </span><span class="n">square</span><span class="w"></span>
+<span class="w">  </span><span class="p">]</span><span class="w"></span>
+<span class="n">end</span><span class="w"></span>
 
-<span class="n">flower</span> <span class="mi">50</span>
-<span class="p">;</span> <span class="n">a</span> <span class="n">flower</span> <span class="n">is</span> <span class="n">made</span><span class="p">,</span> <span class="n">with</span> <span class="n">squares</span> <span class="n">of</span> <span class="n">size</span> <span class="mi">50</span>
-</pre></div>
-
+<span class="n">flower</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
+<span class="p">;</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">flower</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">made</span><span class="p">,</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">squares</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
+</code></pre></div>
 
 <p>That is, when you reference the variable <code>:size</code>, it doesn&#8217;t look locally, it doesn&#8217;t even look globally, rather it looks back through the&nbsp;callstack.</p>
 <p>This can be very hard to understand (why does <code>flower</code> even take an argument?), but Logo isn&#8217;t a language written for&nbsp;maintainability.</p>
 <p>That said, dynamic scope can be the right thing, and it&#8217;s widely simulated. Print is a common case,&nbsp;like:</p>
-<div class="highlight"><pre><span></span><span class="n">old_stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+<div class="highlight"><pre><span></span><code><span class="n">old_stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">run_some_function</span><span class="p">()</span>
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">old_stdout</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>But instead of using any formal reference to dynamic scope, we&#8217;re temporarily modifying global objects. And there&#8217;s lots of <a href="https://docs.python.org/3/library/threading.html#thread-local-data">caveats</a>, even more so with async (incidentally <a href="https://github.com/python-trio/trio">Trio</a> attempts to address&nbsp;this).</p>
 <p>What dynamic scoping addresses is <em>passing data through</em>. You could change the definition of <code>run_some_function()</code> to <code>run_some_function(output_fp=sys.stdout)</code>, and then you wouldn&#8217;t need all this. But then everything <code>run_some_function()</code> calls has to also take that argument, even if you don&#8217;t know if it <em>needs</em> that argument. And then you either give everything in your program a bunch of seemingly dumb arguments, create a <a href="https://en.wikipedia.org/wiki/God_object">God Object</a>, or you skip the whole&nbsp;thing.</p>
@@ -102,11 +99,10 @@
 <p>I have always looked at dynamic scoping as a way to create a bounded environment for code, a way of giving code a context. But I realize much of the time that&#8217;s just scaffolding to get values <em>out</em>.</p>
 <p>The print example makes this clear: the only purpose of changing <code>sys.stdout</code> is to get out what was printed during the function call. The replacement <code>sys.stdout</code> isn&#8217;t really&nbsp;&#8220;input&#8221;.</p>
 <p>The question then: how do you get a return value from a function you yourself did not call? The answer to that is what I&#8217;ll call &#8220;dynamically scoped return&#8221;: the exchange across the call stack. It&#8217;s &#8220;dynamic&#8221; because the call stack is always&nbsp;dynamic:</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_some_function</span><span class="p">():</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">run_some_function</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">something_is_true</span><span class="p">():</span>
         <span class="n">run_other_function</span><span class="p">()</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Will <code>run_other_function()</code> be called?  Neither static typing nor pure functional programming offers any additional insight, you just have to execute it and find out at runtime. That&#8217;s the &#8220;dynamic&#8221; part. The scope is what you are capturing, a function call, or perhaps in Trio it would be scoped to a <a href="https://trio.readthedocs.io/en/latest/reference-core.html#nurseries-and-spawning">nursery</a>.</p>
 <p>Of course given the dynamic semantics, you should be prepared for a plurality of return&nbsp;values.</p>
@@ -117,14 +113,13 @@
 <h2>How many side effects are dynamic&nbsp;returns?</h2>
 <p>As I think about this, I wonder: how many side effects in programming are due to a lack of dynamic&nbsp;returns?</p>
 <p>In many cases the simplest way to remove side effects is just to have&nbsp;promises:</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">do_stuff</span><span class="p">():</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">do_stuff</span><span class="p">():</span>
     <span class="n">filesystem</span><span class="o">.</span><span class="n">writefile</span><span class="p">(</span><span class="s2">&quot;some/path.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;some text&quot;</span><span class="p">);</span>
 
 <span class="k">with</span> <span class="n">filesystem</span><span class="o">.</span><span class="n">context</span><span class="p">()</span> <span class="k">as</span> <span class="n">fs</span><span class="p">:</span>
     <span class="n">do_stuff</span><span class="p">()</span>
     <span class="n">fs</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now it&#8217;s become something that looks like a transaction or a command&nbsp;queue.</p>
 <h2>Does the language need first-class&nbsp;support?</h2>
@@ -133,18 +128,17 @@
 <p>The caveats – and future yet-to-be-seen caveats – do signal something of a problem. When a concept is ad hoc then other people won&#8217;t account for it in their systems. It took a while to get <a href="https://docs.python.org/3/library/threading.html#thread-local-data">threading.local</a> in Python, and it&#8217;s still a very low-level tool. Asyncio does not account for this, though Trio attempts&nbsp;to.</p>
 <p>Existing approaches also all rely on side&nbsp;effects.</p>
 <p>There was a time that people implemented functions like&nbsp;this:</p>
-<div class="highlight"><pre><span></span>  <span class="err">$</span><span class="n">query</span> <span class="o">=</span> <span class="ss">&quot;How many items?&quot;</span>
-  <span class="n">GOSUB</span> <span class="n">input_number</span>
-  <span class="n">number_of_items</span> <span class="o">=</span> <span class="n">x</span>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="p">$</span><span class="nv">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;How many items?&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nv">GOSUB</span><span class="w"> </span><span class="nv">input_number</span><span class="w"></span>
+<span class="w">  </span><span class="nv">number_of_items</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x</span><span class="w"></span>
 
-<span class="n">input_number</span><span class="p">:</span>
-  <span class="n">PRINT</span> <span class="n">query$</span>
-  <span class="k">INPUT</span> <span class="n">x$</span>
-  <span class="n">x</span> <span class="o">=</span> <span class="n">VAL</span><span class="p">(</span><span class="n">x$</span><span class="p">)</span>
-  <span class="k">IF</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">THEN</span> <span class="k">GOTO</span> <span class="p">:</span><span class="n">input_number</span>
-  <span class="k">RETURN</span>
-</pre></div>
-
+<span class="nv">input_number</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="nv">PRINT</span><span class="w"> </span><span class="nv">query</span><span class="p">$</span><span class="w"></span>
+<span class="w">  </span><span class="nv">INPUT</span><span class="w"> </span><span class="nv">x</span><span class="p">$</span><span class="w"></span>
+<span class="w">  </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">VAL</span><span class="p">(</span><span class="nv">x</span><span class="p">$)</span><span class="w"></span>
+<span class="w">  </span><span class="nv">IF</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="nv">THEN</span><span class="w"> </span><span class="nv">GOTO</span><span class="w"> </span><span class="o">:</span><span class="nv">input_number</span><span class="w"></span>
+<span class="w">  </span><span class="nv">RETURN</span><span class="w"></span>
+</code></pre></div>
 
 <p>Instead of return values there were just conventions around global variables. The patterns will exist even if the language doesn&#8217;t support them. But they fail in all kinds of&nbsp;ways.</p>
 <h2>Is a function call the right&nbsp;scope?</h2>
@@ -227,15 +221,6 @@
         var pageTracker = _gat._getTracker("UA-2442258-1");
     pageTracker._trackPageview();
     } catch(err) {}</script>
-<script type="text/javascript">
-    var disqus_shortname = 'ianbicking';
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-</script>
         </div><!-- /#main-container -->
         </div><!-- /#main-wrapper2 -->
         </div><!-- /#main-wrapper1 -->

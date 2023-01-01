@@ -57,7 +57,7 @@
 <code>POST /todos/create</code>: create a todo
 <code>DELETE /todos/ID</code>: delete a&nbsp;todo</p>
 <p>TODOs are <span class="caps">JSON</span>, like <code>{"title": "...", "done": true/false, "sortindex": N}</code></p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">web_server</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">web_server</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
 <span class="n">create</span> <span class="n">incoming_requests</span> <span class="kn">from</span> <span class="nn">web_server.Request</span><span class="p">;</span>
@@ -70,8 +70,8 @@
   <span class="n">sortindex</span> <span class="nb">float</span> <span class="n">default</span> <span class="mi">100</span>
 <span class="p">);</span>
 
-<span class="o">--</span> <span class="n">consume</span> <span class="n">will</span> <span class="n">take</span> <span class="n">a</span> <span class="n">row</span> <span class="kn">from</span> <span class="nn">a</span> <span class="nn">table</span><span class="p">,</span> <span class="n">treating</span> <span class="n">the</span> <span class="n">table</span> <span class="n">like</span> <span class="n">a</span> <span class="n">queue</span>
-<span class="n">consume</span> <span class="n">req</span> <span class="kn">from</span> <span class="nn">incoming_requests</span> <span class="nn">with</span> <span class="nn">transaction</span> <span class="p">(</span>
+<span class="o">--</span> <span class="n">consume</span> <span class="n">will</span> <span class="n">take</span> <span class="n">a</span> <span class="n">row</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">table</span><span class="p">,</span> <span class="n">treating</span> <span class="n">the</span> <span class="n">table</span> <span class="n">like</span> <span class="n">a</span> <span class="n">queue</span>
+<span class="n">consume</span> <span class="n">req</span> <span class="kn">from</span> <span class="nn">incoming_requests</span> <span class="k">with</span> <span class="n">transaction</span> <span class="p">(</span>
   <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;GET&quot;</span> <span class="p">(</span>
     <span class="o">--</span> <span class="n">assume</span> <span class="n">it</span><span class="s1">&#39;s GET /todos</span>
     <span class="k">with</span> <span class="n">items</span> <span class="k">as</span> <span class="n">todos</span> <span class="n">sort</span> <span class="n">by</span> <span class="n">todos</span><span class="o">.</span><span class="n">sortindex</span> <span class="p">(</span>
@@ -113,7 +113,7 @@
   <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;DELETE&quot;</span> <span class="p">(</span>
     <span class="o">--</span> <span class="n">DELETE</span> <span class="o">/</span><span class="n">todos</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>
     <span class="n">let</span> <span class="nb">id</span> <span class="o">=</span> <span class="n">split</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">];</span>
-    <span class="k">with</span> <span class="n">deleted</span> <span class="k">as</span> <span class="n">delete</span> <span class="kn">from</span> <span class="nn">todos</span> <span class="nn">only</span> <span class="nn">where</span> <span class="nn">todos.id</span> <span class="o">=</span> <span class="nb">id</span> <span class="p">(</span>
+    <span class="k">with</span> <span class="n">deleted</span> <span class="k">as</span> <span class="n">delete</span> <span class="kn">from</span> <span class="nn">todos</span> <span class="n">only</span> <span class="n">where</span> <span class="n">todos</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span> <span class="p">(</span>
       <span class="n">insert</span> <span class="n">into</span> <span class="n">outgoing_responses</span> <span class="p">(</span>
         <span class="n">request_id</span><span class="p">:</span> <span class="n">req</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
         <span class="n">status</span><span class="p">:</span> <span class="mi">200</span>
@@ -128,8 +128,7 @@
 <span class="p">);</span>
 
 <span class="n">web_server</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">8080</span><span class="p">,</span> <span class="n">incoming_requests</span><span class="p">,</span> <span class="n">outgoing_requests</span><span class="p">);</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>A common refactoring of an application like this would be to support multiple users (e.g., <code>GET /username/todos</code>).</p>
 <h2>Generator: the generative programming&nbsp;language</h2>
@@ -137,25 +136,23 @@
 <p>Everything in Generator is either <em>deterministic</em> or <em>generative</em>.</p>
 <p>Unlike a (normal) deterministic function, a generative function does not always return the same value given the same inputs and program state. But in addition to not being deterministic, a generative function also knows how to generate the kinds of values that it might output. Testing is&nbsp;built-in!</p>
 <p>You can run a generative program like&nbsp;normal:</p>
-<div class="highlight"><pre><span></span>$ gn myprog.gn
+<div class="highlight"><pre><span></span><code>$ gn myprog.gn
 What<span class="err">&#39;</span>s your name?
 &gt; Ian
 Hello Ian!
-</pre></div>
-
+</code></pre></div>
 
 <p>But you can also have the program run with sample&nbsp;inputs:</p>
-<div class="highlight"><pre><span></span>$ gn --try myprog.gn
+<div class="highlight"><pre><span></span><code>$ gn --try myprog.gn
 What<span class="err">&#39;</span>s your name?
 &gt; nH8d
 Hello nH8d!
-</pre></div>
-
+</code></pre></div>
 
 <p>You can do it one time, or a hundred times, or a thousand&nbsp;times.</p>
 <p>Syntactically it looks much like Python (which looks much like boring old pseudocode), but uses a strong convention that generative functions end with <code>!</code>. Anything that calls a generative function becomes itself generative (unless marked explicitly as&nbsp;deterministic).</p>
 <p>You can also further specify the generation of your function. For instance, <code>read_file!(path)</code> is non-deterministic (the files can change). By default it will generate random bytes, but this is seldom what you want: though it&#8217;s correct and you should always handle any file contents (or file missing), usually you&#8217;ll want to do something else. Here&#8217;s an example that reads <span class="caps">JSON</span>:</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
 
 <span class="k">def</span> <span class="nf">read_json</span><span class="err">!</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">read_file</span><span class="err">!</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
@@ -163,13 +160,13 @@ Hello nH8d!
 <span class="n">generator</span> <span class="n">read_json</span><span class="err">!</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">with</span> <span class="n">seed</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">random_json</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">random_json</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">obj_keys</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">random_json</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">obj_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">scalar</span><span class="p">:</span>
         <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;array&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">options</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">seed</span><span class="o">.</span><span class="n">choose_tiered</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;null&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;number&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">seed</span><span class="o">.</span><span class="n">number</span><span class="p">()</span>
     <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span><span class="p">:</span>
@@ -186,8 +183,7 @@ Hello nH8d!
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">result</span><span class="p">[</span><span class="n">seed</span><span class="o">.</span><span class="n">string</span><span class="p">()]</span> <span class="o">=</span> <span class="n">random_json</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">scalar</span><span class="o">=</span><span class="n">seed</span><span class="o">.</span><span class="n">sometimes</span><span class="p">(</span><span class="mf">0.9</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">result</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Note that declared generators only add to the possible generated values. While we&#8217;ve created a custom generator for <code>read_json!</code>, the generator for <code>read_file!</code> will also sometimes be applied. So sometimes when generating results we&#8217;ll see <code>json.parse("s83ka2k")</code> (which will give an error), but sometimes <code>random_json()</code> will be&nbsp;invoked.</p>
 <p>An aside, there&#8217;s another non-deterministic file reader, <code>read_project_file()</code>, which reads some file that is part of the source code (e.g., a template). In this case the file is effectively part of the&nbsp;source.</p>
@@ -202,21 +198,20 @@ Hello nH8d!
 <li>It&#8217;s hard to get an overview of what&#8217;s happening: speech only happens&nbsp;forward</li>
 </ul>
 <p>Still, it doesn&#8217;t seem crazy that you&#8217;d want to script speech controls. For example, here&#8217;s how you add a shortcut to send a specific&nbsp;text:</p>
-<div class="highlight"><pre><span></span><span class="err">Add script called send eta</span>
-<span class="err">-- adding script send eta</span>
-<span class="err">how long will it take to drive home</span>
-<span class="err">-- adding &quot;how long will it take to drive home&quot;</span>
-<span class="err">-- Example output:</span>
-<span class="err">-- Traffic to Home is light, so it should take 20 minutes via I-94 W</span>
-<span class="err">save output in X</span>
-<span class="err">-- Saving to X</span>
-<span class="err">look for time duration from X</span>
-<span class="err">-- Will look for a time duration. Example: 20 minutes</span>
-<span class="err">save output in Y</span>
-<span class="err">send message to Emily ETA load Y</span>
-<span class="err">-- adding &quot;send message to Emily&quot; with example &quot;20 minutes&quot;</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="n">Add</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="n">called</span><span class="w"> </span><span class="n">send</span><span class="w"> </span><span class="n">eta</span><span class="w"></span>
+<span class="o">--</span><span class="w"> </span><span class="n">adding</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="n">send</span><span class="w"> </span><span class="n">eta</span><span class="w"></span>
+<span class="n">how</span><span class="w"> </span><span class="n">long</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">take</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">drive</span><span class="w"> </span><span class="n">home</span><span class="w"></span>
+<span class="o">--</span><span class="w"> </span><span class="n">adding</span><span class="w"> </span><span class="s2">&quot;how long will it take to drive home&quot;</span><span class="w"></span>
+<span class="o">--</span><span class="w"> </span><span class="n">Example</span><span class="w"> </span><span class="n">output</span><span class="p">:</span><span class="w"></span>
+<span class="o">--</span><span class="w"> </span><span class="n">Traffic</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">Home</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">light</span><span class="p">,</span><span class="w"> </span><span class="n">so</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">take</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="n">minutes</span><span class="w"> </span><span class="n">via</span><span class="w"> </span><span class="n">I</span><span class="o">-</span><span class="mi">94</span><span class="w"> </span><span class="n">W</span><span class="w"></span>
+<span class="n">save</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">X</span><span class="w"></span>
+<span class="o">--</span><span class="w"> </span><span class="n">Saving</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">X</span><span class="w"></span>
+<span class="n">look</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="n">duration</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">X</span><span class="w"></span>
+<span class="o">--</span><span class="w"> </span><span class="n">Will</span><span class="w"> </span><span class="n">look</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="n">duration</span><span class="o">.</span><span class="w"> </span><span class="n">Example</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="n">minutes</span><span class="w"></span>
+<span class="n">save</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">Y</span><span class="w"></span>
+<span class="n">send</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">Emily</span><span class="w"> </span><span class="n">ETA</span><span class="w"> </span><span class="nb">load</span><span class="w"> </span><span class="n">Y</span><span class="w"></span>
+<span class="o">--</span><span class="w"> </span><span class="n">adding</span><span class="w"> </span><span class="s2">&quot;send message to Emily&quot;</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">example</span><span class="w"> </span><span class="s2">&quot;20 minutes&quot;</span><span class="w"></span>
+</code></pre></div>
 
 <p>Variables can only be single characters. The content is highly textual: we don&#8217;t have good underlying structured data, instead we are forced to parse out the textual responses. However, we do get examples, and because we are using a medium the user is used to they can understand both the execution and how to find&nbsp;functionality.</p>
 <h2>The Symbolic Notebook: functional symbolic computation wrapped in an imperative&nbsp;environment</h2>
@@ -229,19 +224,17 @@ Hello nH8d!
 <p>The language of why does exactly&nbsp;that.</p>
 <h2>Transformer</h2>
 <p>You&#8217;ve probably seen pattern matching&nbsp;like:</p>
-<div class="highlight"><pre><span></span><span class="err">fib(0) -&gt; 0;</span>
-<span class="err">fib(1) -&gt; 1;</span>
-<span class="err">fib(n) -&gt; fib(n-1) + fib(n - 2);</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="n">fib</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="n">fib</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 
 <p>Transformer is like that, but for&nbsp;everything.</p>
 <h2>&#8230;?</h2>
 <p>Unlike most languages theres np function call and nesting. Instead you atomically transform the data and have watchers that might catch tge next&nbsp;step</p>
 <p>Radically point free, values and spots are visually connected (through&nbsp;lines)</p>
-<div class="highlight"><pre><span></span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
 
 <h2><span class="caps">COMEFROM</span>, the&nbsp;language</h2>
 <p>You can detect anything in the global space and act on&nbsp;it</p></div>
@@ -308,15 +301,6 @@ Hello nH8d!
         var pageTracker = _gat._getTracker("UA-2442258-1");
     pageTracker._trackPageview();
     } catch(err) {}</script>
-<script type="text/javascript">
-    var disqus_shortname = 'ianbicking';
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-</script>
         </div><!-- /#main-container -->
         </div><!-- /#main-wrapper2 -->
         </div><!-- /#main-wrapper1 -->

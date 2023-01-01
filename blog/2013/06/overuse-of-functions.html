@@ -46,29 +46,27 @@
 
         <div class="entry-content"><p>A programming quandry (related to <a href="https://plus.google.com/u/0/+IanBicking/posts/ipAD1j3QNT1">some thoughts I&#8217;ve had on locality</a>):</p>
 <p>The prevailing wisdom says that you should keep your functions small and concise, refactoring and extracting functions as necessary.  But this hurts the locality of expectations that I have been thinking about.&nbsp;Consider:</p>
-<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">updateUserStatus</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="s2">&quot;active&quot;</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;&lt;li /&gt;&quot;</span><span class="p">).</span><span class="nx">appendTo</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#userlist&quot;</span><span class="p">)</span>
-      <span class="p">.</span><span class="nx">text</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">)</span>
-      <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;user-&quot;</span> <span class="o">+</span> <span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#user-&quot;</span> <span class="o">+</span> <span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">updateUserStatus</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;&lt;li /&gt;&quot;</span><span class="p">).</span><span class="nx">appendTo</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#userlist&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">.</span><span class="nx">text</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;user-&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#user-&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
 
 <p>Code like this is generally considered to be terrible – there&#8217;s logic for users and their status, mixed in with a bunch of very specific <span class="caps">UI</span>-related code.  (Which is all tied to a <span class="caps">DOM</span> state that is defined somewhere else entirely &#8212; but I&nbsp;digress.)</p>
 <p>So a typical refactoring would&nbsp;be:</p>
-<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">updateUserStatus</span><span class="p">()</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="s2">&quot;active&quot;</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">displayUserInList</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="nx">removeUserFromList</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">updateUserStatus</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">displayUserInList</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">removeUserFromList</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
 
 <p>With the obvious definition of <code>displayUserInList()</code> and <code>removeUserFromList()</code>.  But the first approach had certain invariants that the second does not.  Assuming you don&#8217;t mess with the <span class="caps">UI</span>/<span class="caps">DOM</span> directly, and assuming that <code>updateUserStatus()</code> is called when it needs to be called, the user will be in the list or not based strictly on the value of <code>user.status</code>. After refactoring there are functions that could be called in other contexts (e.g., <code>displayUserInList()</code>). You can look at the code and see that particular things happen when <code>updateUserStatus()</code> is called, but it&#8217;s not as easy to determine what is going to happen when inspect the code from the bottom up.  For instance, you want to understand why things end up in <code>&lt;ul id="userlist"&gt;&lt;/ul&gt;</code> &#8212; you search for <code>#userlist</code> but you now get two functions instead of one, and to understand the logic you have to trace that back to the calling function, and you have to wonder if now or in the future anyone else will call those&nbsp;functions.</p>
 <p>The advantage of the first function is that blocks of code are strict. You execute from the top to the bottom, with clear control structures. When <span class="caps">GOTO</span> existed you couldn&#8217;t reason so well, but we&#8217;ve gotten rid of that!  (Of course there are still other exceptions.)  It&#8217;s not entirely clear what intention drives the refactoring (besides adherence to conventional standards of code beauty), but it&#8217;s probably more about code organization than about making the control flow more flexible. Extracting those functions means that you now have the power to make the <span class="caps">UI</span> inconsistent with the model, and that hardly seems like a&nbsp;feature.</p>
@@ -158,15 +156,6 @@
         var pageTracker = _gat._getTracker("UA-2442258-1");
     pageTracker._trackPageview();
     } catch(err) {}</script>
-<script type="text/javascript">
-    var disqus_shortname = 'ianbicking';
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-</script>
         </div><!-- /#main-container -->
         </div><!-- /#main-wrapper2 -->
         </div><!-- /#main-wrapper1 -->

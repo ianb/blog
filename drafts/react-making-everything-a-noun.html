@@ -66,26 +66,24 @@
 <h3>An aside on&nbsp;frameworks</h3>
 <p>What defines a framework, to me, is that in some core way the framework code invokes your code.  The framework doesn&#8217;t just <em>do</em> things, you don&#8217;t just invoke its functions, but rather the framework <em>controls</em>&nbsp;things.</p>
 <p>The most innocent example of this is probably the <span class="caps">URL</span> router (client-side it might be reading&nbsp;fragments):</p>
-<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">router</span> <span class="o">=</span> <span class="nx">Router</span><span class="p">();</span>
-<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;user/{id}&quot;</span><span class="p">,</span> <span class="nx">showUser</span><span class="p">);</span>
-<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;settings&quot;</span><span class="p">,</span> <span class="nx">showSettings</span><span class="p">);</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="kd">var</span><span class="w"> </span><span class="nx">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Router</span><span class="p">();</span><span class="w"></span>
+<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;user/{id}&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">showUser</span><span class="p">);</span><span class="w"></span>
+<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;settings&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">showSettings</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
 
 <p>Here the router calls <code>showUser</code> or <code>showSettings</code>, etc.  I don&#8217;t <em>hate</em> this, but even here I might happily replace this with a switch&nbsp;like:</p>
-<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">router</span> <span class="o">=</span> <span class="nx">Router</span><span class="p">();</span>
-<span class="c1">// Now the first argument is a &#39;name&#39;:</span>
-<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;user/{id}&quot;</span><span class="p">);</span>
-<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;settings&quot;</span><span class="p">,</span> <span class="s2">&quot;settings&quot;</span><span class="p">);</span>
-<span class="nx">router</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;hashchange&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">match</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">match</span><span class="p">.</span><span class="nx">name</span> <span class="o">==</span> <span class="s2">&quot;user&quot;</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">showUser</span><span class="p">();</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">match</span><span class="p">.</span><span class="nx">name</span> <span class="o">==</span> <span class="s2">&quot;settings&quot;</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">showSettings</span><span class="p">();</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="kd">var</span><span class="w"> </span><span class="nx">router</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Router</span><span class="p">();</span><span class="w"></span>
+<span class="c1">// Now the first argument is a &#39;name&#39;:</span><span class="w"></span>
+<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;user/{id}&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="nx">router</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;settings&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;settings&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="nx">router</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;hashchange&quot;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">(</span><span class="nx">match</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">match</span><span class="p">.</span><span class="nx">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">showUser</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">match</span><span class="p">.</span><span class="nx">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;settings&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">showSettings</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre></div>
 
 <p>I know, I&#8217;m hopelessly tedious and verbose.  But now you know something about my coding aesthetic and can judge as you&nbsp;will.</p>
 <p>Of course frameworks are far more complicated than this.  There is deep logic going on in the framework before it calls your code.  I&#8217;m not comfortable with deep logic I don&#8217;t personally understand.  I&#8217;ve written my own frameworks of course, and I understood those, and when I was writing them I thought frameworks were pretty great.  But I&#8217;m older and wiser or maybe just more conservative, and I&#8217;m not excited about frameworks anymore.  I know why they exist, but as technologists we must imagine what <em>could</em> be, not only what <em>is</em>, and every framework to me feels like it&#8217;s the perhaps-understandable stopgap because we haven&#8217;t factored the problem space correctly&nbsp;yet.</p>
@@ -118,22 +116,20 @@
 <p>(Notably though you don&#8217;t need to use React on <em>everything</em> &#8212; I find the main layout of the page to be easier to write outside of React, for instance.  But everything in a specific <span class="caps">DOM</span> tree that React renders will have to be React-aware at&nbsp;least.)</p>
 <h3><span class="caps">JSX</span></h3>
 <p>React is essentially a <span class="caps">DOM</span>-building technique.  If you want to render some message, you might&nbsp;do:</p>
-<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">Message</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">React</span><span class="p">.</span><span class="nx">DOM</span><span class="p">.</span><span class="nx">div</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="kd">var</span><span class="w"> </span><span class="nx">Message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="nx">render</span><span class="o">:</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">React</span><span class="p">.</span><span class="nx">DOM</span><span class="p">.</span><span class="nx">div</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre></div>
 
 <p>That&#8217;s more-or-less equivalent to <code>$('&lt;div&gt;').text(message)</code>.  And it doesn&#8217;t look like <span class="caps">HTML</span>, and that&#8217;s no good.  So React includes its own little Javascript dialect where you can&nbsp;do:</p>
-<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">Message</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">message</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;;</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="kd">var</span><span class="w"> </span><span class="nx">Message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="nx">render</span><span class="o">:</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">message</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre></div>
 
 <p>At first I thought I&#8217;d stick with the ugly but unmagical first form, but I quickly put aside my code generation biases and used <span class="caps">JSX</span>. Conveniently Emacs supports <a href="http://en.wikipedia.org/wiki/ECMAScript_for_XML"><span class="caps">E4X</span></a> which is not the same as <span class="caps">JSX</span>, but is syntactically the same, and makes editing the code more&nbsp;pleasant.</p>
 <p>While the code is Javascript, I treat it as a template and keep it in a separate file from me other application&nbsp;code.</p>
@@ -223,15 +219,6 @@
         var pageTracker = _gat._getTracker("UA-2442258-1");
     pageTracker._trackPageview();
     } catch(err) {}</script>
-<script type="text/javascript">
-    var disqus_shortname = 'ianbicking';
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-</script>
         </div><!-- /#main-container -->
         </div><!-- /#main-wrapper2 -->
         </div><!-- /#main-wrapper1 -->

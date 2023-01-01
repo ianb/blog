@@ -49,9 +49,7 @@
   "showHighlights": true
 }
 </script>
-
 <script src="https://hypothes.is/embed.js" async></script>
-
 <style>
 .entry-content {
   padding-left: 4em;
@@ -276,10 +274,9 @@
 <p><a href="https://www.calormen.com/jslogo/">This Logo interpreter</a> is a decent generic logo interpreter. (I <a href="https://github.com/inexorabletash/jslogo/pull/70">learned Promises</a> while contributing async support.) But when I use it with my kids it’s kind of awkward, and we always lose our&nbsp;place.</p>
 <p>It would be nice to make use of the interpreter in a different&nbsp;environment.</p>
 <p>First, I’m thinking less interactive/<span class="caps">REPL</span> and more about creating a full program. Right now the typical program we write is&nbsp;like:</p>
-<div class="highlight"><pre><span></span><span class="err">cs</span>
-<span class="err">repeat 4 [forward 100 rt 90]</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>cs
+repeat 4 [forward 100 rt 90]
+</code></pre></div>
 
 <p>That is, always start with <code>cs</code> (clear screen) and then a bunch of commands so it can be re-run from the beginning after&nbsp;adjustments.</p>
 <p>I imagine making these repeatable code blocks the standard interaction pattern, treating them something like unnamed functions. Then if you want you can name them and compose them as well (<em>without</em> the clear screen of&nbsp;course).</p>
@@ -374,12 +371,11 @@
 <p>The name has some similarity to <a href="https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell">Functional Core, Imperative Shell</a> and probably some similar motivations, but encodes the idea directly into the tool and&nbsp;languages.</p>
 <p>I’m wondering if I could do this with a deterministic subset of Python. Things like “import” are environment setup, and maybe even function definitions, while there’s innards that are&nbsp;deterministic.</p>
 <p>It may be <span class="caps">OK</span> for the code to stateful, <em>if</em> the statefulness is part of the analysis. That is, you could have a cell&nbsp;like:</p>
-<div class="highlight"><pre><span></span><span class="n">most_populous_cities</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight"><pre><span></span><code><span class="n">most_populous_cities</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">all_cities</span><span class="p">:</span>
     <span class="n">most_populous_cities</span><span class="o">.</span><span class="n">push</span><span class="p">((</span><span class="n">city</span><span class="p">[</span><span class="err">“</span><span class="n">population</span><span class="err">”</span><span class="p">],</span> <span class="n">city</span><span class="p">[</span><span class="err">“</span><span class="n">name</span><span class="err">”</span><span class="p">]))</span>
 <span class="n">most_populous_cities</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>It both creates a new global variable, <em>and</em> modifies it in place. But if <code>all_cities</code> is the same then the result of this calculation will be the same. You could consider its input to be <code>[all_cities]</code> and its output is an addition to the environment <code>[most_populous_cities]</code>. (Also <code>city</code> is set and almost certainly is not important, but that’s the kind of detail we’d need to figure out. Also it’s not <span class="caps">OK</span> for another cell to modify <code>most_populous_cities</code> – modifications need to create new global&nbsp;variables.)</p>
 <p>I think <a href="https://observablehq.com/">Observable</a> has bits of this in its&nbsp;concept?</p>
@@ -400,15 +396,14 @@
 <h3><span id="partial-evaluation">Partial evaluation as the execution&nbsp;engine</span></h3>
 <p>I think this might be what I actually am thinking of when I think of <a href="#symbolic-execution">symbolic execution</a>.</p>
 <p>Partial evaluation is taking an expression and evaluating the parts you already know. So if you see&nbsp;this:</p>
-<div class="highlight"><pre><span></span><span class="c1"># My apologies for this lazily constructed example...</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># My apologies for this lazily constructed example...</span>
 <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
   <span class="k">if</span> <span class="n">x</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">10</span>
   <span class="k">return</span> <span class="n">y</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Answer:&quot;</span><span class="p">,</span> <span class="n">calculate</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">some_func</span><span class="p">()))</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Then you can look at how <code>calculate()</code> is called with one known value (<code>10</code>) and then see that <code>if x:</code> will be true, and so on, reducing it all to <code>print("Answer:", 20)</code>.</p>
 <p>There are limitations to how well you can do this in an imperative language. For instance in this case we&#8217;ve optimized away the call to <code>some_func()</code>, and that might not be correct: the function might actually do something important, even if its return value is thrown&nbsp;away.</p>
@@ -434,49 +429,48 @@
 <p><strong>Update:</strong></p>
 <p>I&#8217;ve started on this some, using <a href="https://github.com/benjamn/recast">Recast</a> to operate on JavaScript ASTs. Working in <a href="https://github.com/ianb/partial-language">github/ianb/partial-language</a>.</p>
 <p>Right now it&#8217;s stuck to JavaScript syntax, though not necessarily JavaScript semantics. I expect this may be a problem. A series of transformations looks&nbsp;like:</p>
-<div class="highlight"><pre><span></span><span class="c1">// Original input, note order of declaration is not important:</span>
-<span class="nx">x</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">?</span> <span class="nx">func</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">:</span> <span class="o">!</span><span class="nx">y</span><span class="p">;</span>
-<span class="kr">const</span> <span class="nx">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="kd">function</span> <span class="nx">func</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="nx">p</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">4</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// Original input, note order of declaration is not important:</span><span class="w"></span>
+<span class="nx">x</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">func</span><span class="p">(</span><span class="mf">10</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">!</span><span class="nx">y</span><span class="p">;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span><span class="w"></span>
+<span class="kd">function</span><span class="w"> </span><span class="nx">func</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">4</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="c1">// Rewrite 1 (function and variable definitions consumed and remembered):</span>
-<span class="nx">x</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">?</span> <span class="nx">func</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">:</span> <span class="o">!</span><span class="nx">y</span><span class="p">;</span>
+<span class="c1">// Rewrite 1 (function and variable definitions consumed and remembered):</span><span class="w"></span>
+<span class="nx">x</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">func</span><span class="p">(</span><span class="mf">10</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">!</span><span class="nx">y</span><span class="p">;</span><span class="w"></span>
 
-<span class="c1">// Rewrite 2 (x and func substituted):</span>
-<span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span>
-    <span class="o">?</span> <span class="p">((</span><span class="nx">p</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-          <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="nx">p</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">4</span><span class="p">;</span>
-      <span class="p">})(</span><span class="mi">10</span><span class="p">)</span>
-    <span class="o">:</span> <span class="o">!</span><span class="nx">y</span><span class="p">;</span>
+<span class="c1">// Rewrite 2 (x and func substituted):</span><span class="w"></span>
+<span class="mf">1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">1</span><span class="w"></span>
+<span class="w">    </span><span class="o">?</span><span class="w"> </span><span class="p">((</span><span class="nx">p</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="k">return</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">4</span><span class="p">;</span><span class="w"></span>
+<span class="w">      </span><span class="p">})(</span><span class="mf">10</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="o">!</span><span class="nx">y</span><span class="p">;</span><span class="w"></span>
 
-<span class="c1">// Rewrite 3 (1 == 1 substituted, parameter moved into function):</span>
-<span class="kc">true</span>
-    <span class="o">?</span> <span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
-          <span class="kr">const</span> <span class="nx">p</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
-          <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="nx">p</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">4</span><span class="p">;</span>
-      <span class="p">})()</span>
-    <span class="o">:</span> <span class="o">!</span><span class="nx">y</span><span class="p">;</span>
+<span class="c1">// Rewrite 3 (1 == 1 substituted, parameter moved into function):</span><span class="w"></span>
+<span class="kc">true</span><span class="w"></span>
+<span class="w">    </span><span class="o">?</span><span class="w"> </span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="kd">const</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10</span><span class="p">;</span><span class="w"></span>
+<span class="w">          </span><span class="k">return</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">4</span><span class="p">;</span><span class="w"></span>
+<span class="w">      </span><span class="p">})()</span><span class="w"></span>
+<span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="o">!</span><span class="nx">y</span><span class="p">;</span><span class="w"></span>
 
-<span class="c1">// Rewrite 4 (?: evaluated, p substituted):</span>
-<span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">4</span><span class="p">;</span>
-<span class="p">})();</span>
+<span class="c1">// Rewrite 4 (?: evaluated, p substituted):</span><span class="w"></span>
+<span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">4</span><span class="p">;</span><span class="w"></span>
+<span class="p">})();</span><span class="w"></span>
 
-<span class="c1">// Rewrite 5 (arrow function with one return removed):</span>
-<span class="mi">1</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">4</span><span class="p">;</span>
+<span class="c1">// Rewrite 5 (arrow function with one return removed):</span><span class="w"></span>
+<span class="mf">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="o">**</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">4</span><span class="p">;</span><span class="w"></span>
 
-<span class="c1">// Rewrite 6 (math):</span>
-<span class="mi">1</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">/</span> <span class="mi">4</span><span class="p">;</span>
+<span class="c1">// Rewrite 6 (math):</span><span class="w"></span>
+<span class="mf">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">100</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">4</span><span class="p">;</span><span class="w"></span>
 
-<span class="c1">// Rewrite 7 (more math):</span>
-<span class="mi">1</span> <span class="o">+</span> <span class="mi">25</span><span class="p">;</span>
+<span class="c1">// Rewrite 7 (more math):</span><span class="w"></span>
+<span class="mf">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">25</span><span class="p">;</span><span class="w"></span>
 
-<span class="c1">// Rewrite 8 (last math):</span>
-<span class="mi">26</span><span class="p">;</span>
-</pre></div>
-
+<span class="c1">// Rewrite 8 (last math):</span><span class="w"></span>
+<span class="mf">26</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
 
 <p>It&#8217;s cute, doesn&#8217;t take too much code. I&#8217;m not sure how far it can go. Having more control of the syntax would be nice, for instance substituting <code>func(10)</code> for an inline arrow function is not the best, but there aren&#8217;t block expressions in&nbsp;JavaScript.</p>
 <h2><span id="ai"><span class="caps">AI</span></a></h2>
@@ -562,8 +556,8 @@
 <p><strong>Cons:</strong> Maybe I’m <a href="https://www.theredhandfiles.com/the-lyrics-just-arent-coming/">not ready</a> to decide what I believe, maybe it simply has not yet arrived? Is this indulgent? It would probably not be fun, it would be hard&nbsp;work</p>
 <h2><span id="conclusion">Conclusion</span></h2>
 <p>Now that I&#8217;ve written all these down I&#8217;m worried I won&#8217;t get through any of them (except hopefully a job). Am I looking to expand my own thinking, my own skills, make something that is fun, or something that has future&nbsp;potential?</p>
-<div class="highlight"><pre><span></span>
-</pre></div></div>
+<div class="highlight"><pre><span></span><code>
+</code></pre></div></div>
         <!-- /.entry-content -->
     </article>
 </section>
@@ -627,15 +621,6 @@
         var pageTracker = _gat._getTracker("UA-2442258-1");
     pageTracker._trackPageview();
     } catch(err) {}</script>
-<script type="text/javascript">
-    var disqus_shortname = 'ianbicking';
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-</script>
         </div><!-- /#main-container -->
         </div><!-- /#main-wrapper2 -->
         </div><!-- /#main-wrapper1 -->
