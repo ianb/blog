@@ -1,240 +1,953 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
-<script type="text/javascript">/*<![CDATA[*/(function(a){function b(a,b){if(+a)return~a||(d.cookie=h+"=; path=/");j=d.createElement(e),k=d.getElementsByTagName(e)[0],j.src=a,b&&(j.onload=j.onerror=b),k.parentNode.insertBefore(j,k)}function c(){n.api||b(l.shift()||-1,c)}if(this.Mobify)return;var d=document,e="script",f="mobify",g="."+f+".com/",h=f+"-path",i=g+"un"+f+".js",j,k,l=[!1,1],m,n=this.Mobify={points:[+(new Date)],tagVersion:[6,0]},o=/(; |#|&|^)mobify-path=([^&;]*)/g.exec(location.hash+"; "+d.cookie);o?(m=o[2])&&!+(m=sessionStorage[h]||m)&&(l=[!0,"//preview"+g+escape(m)]):(l=a()||l,l[0]&&l.push("//cdn"+i,"//files01"+i)),l.shift()?(d.write('<plaintext style="display:none;">'),setTimeout(c)):b(l[0])})(function(){if(/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)){return[1,"//cdn.mobify.com/sites/ians-blog/production/mobify.js"]}})/*]]>*/</script>
-<!-- END MOBIFY -->
-	<title>Ian Bicking: a blog   ::  Avoiding Silos: &#8220;link&#8221; as a first-class object</title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<meta name="generator" content="WordPress 3.4.2" /><!-- LEAVE FOR STATS -->
-	<meta name="description" content="" />
-	<link rel="stylesheet" title="plaintxtSimpler" href="../../../../wp-content/themes/Barthelme-ianb/style.css" type="text/css" media="all" />
-	<link rel="start" href="../../../../index.html" title="Ian Bicking: a blog" />
-	<link rel="alternate" type="application/atom+xml" title="Ian Bicking: a blog Atom Feed" href="../../../../feed/atom/index.html" />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog RSS 2.0 Feed" href="../../../../feed/rss/index.html" />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog Comments RSS 2.0 Feed" href="../../../../comments/feed/index.html" />
-	<link rel="alternate" type="application/rdf+xml" title="Ian Bicking: a blog RSS 1.0" href="../../../../feed/rdf/index.html" />
-	<link rel="alternate" type="text/xml" title="Ian Bicking: a blog RSS 0.92 Feed" href="../../../../feed/rss/index.html" />
-	<link rel="pingback" href="../../../../xmlrpc.php" />
-	<link rel="openid.server" href="http://www.myopenid.com/server" />
-	<link rel="openid.delegate" href="http://ianb.myopenid.com" />
-        <link rel="me" type="text/html" href="http://www.google.com/profiles/ianbicking"/>
-		<link rel='archives' title='October 2012' href='../../../../2012/10/index.html' />
-	<link rel='archives' title='February 2012' href='../../../../2012/02/index.html' />
-	<link rel='archives' title='April 2011' href='../../../../2011/04/index.html' />
-	<link rel='archives' title='March 2011' href='../../../../2011/03/index.html' />
-	<link rel='archives' title='September 2010' href='../../../../2010/09/index.html' />
-	<link rel='archives' title='August 2010' href='../../../../2010/08/index.html' />
-	<link rel='archives' title='May 2010' href='../../../../2010/05/index.html' />
-	<link rel='archives' title='April 2010' href='../../../../2010/04/index.html' />
-	<link rel='archives' title='March 2010' href='../../../../2010/03/index.html' />
-	<link rel='archives' title='February 2010' href='../../../../2010/02/index.html' />
-	<link rel='archives' title='January 2010' href='../../../../2010/01/index.html' />
-	<link rel='archives' title='September 2009' href='../../../../2009/09/index.html' />
-	<link rel='archives' title='May 2009' href='../../../../2009/05/index.html' />
-	<link rel='archives' title='April 2009' href='../../../../2009/04/index.html' />
-	<link rel='archives' title='January 2009' href='../../../../2009/01/index.html' />
-	<link rel='archives' title='December 2008' href='../../index.html' />
-	<link rel='archives' title='November 2008' href='../../../11/index.html' />
-	<link rel='archives' title='October 2008' href='../../../10/index.html' />
-	<link rel='archives' title='September 2008' href='../../../09/index.html' />
-	<link rel='archives' title='August 2008' href='../../../08/index.html' />
-	<link rel='archives' title='July 2008' href='../../../07/index.html' />
-	<link rel='archives' title='June 2008' href='../../../06/index.html' />
-	<link rel='archives' title='May 2008' href='../../../05/index.html' />
-	<link rel='archives' title='April 2008' href='../../../04/index.html' />
-	<link rel='archives' title='March 2008' href='../../../03/index.html' />
-	<link rel='archives' title='February 2008' href='../../../02/index.html' />
-	<link rel='archives' title='January 2008' href='../../../01/index.html' />
-	<link rel='archives' title='November 2007' href='../../../../2007/11/index.html' />
-	<link rel='archives' title='October 2007' href='../../../../2007/10/index.html' />
-	<link rel='archives' title='September 2007' href='../../../../2007/09/index.html' />
-	<link rel='archives' title='August 2007' href='../../../../2007/08/index.html' />
-	<link rel='archives' title='July 2007' href='../../../../2007/07/index.html' />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog &raquo; Avoiding Silos: &#8220;link&#8221; as a first-class object Comments Feed" href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/feed/" />
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="../../../../xmlrpc.php?rsd" />
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="../../../../wp-includes/wlwmanifest.xml" /> 
-<link rel='prev' title='Javascript Status Message Display' href='../../17/javascript-status-message-display/index.html' />
-<link rel='next' title='Atompub as an alternative to WebDAV' href='../../../../2009/01/11/atompub-instead-o-webdav/index.html' />
-<meta name="generator" content="WordPress 3.4.2" />
-<link rel='canonical' href='index.html' />
-<link rel='shortlink' href='http://blog.ianbicking.org/?p=90' />
-<link rel="stylesheet" href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"  type="text/css" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+    <head>
+        <!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
+        <script type="text/javascript">
+            /*<![CDATA[*/ (function (a) {
+                function b(a, b) {
+                    if (+a) return ~a || (d.cookie = h + "=; path=/");
+                    (j = d.createElement(e)),
+                        (k = d.getElementsByTagName(e)[0]),
+                        (j.src = a),
+                        b && (j.onload = j.onerror = b),
+                        k.parentNode.insertBefore(j, k);
+                }
+                function c() {
+                    n.api || b(l.shift() || -1, c);
+                }
+                if (this.Mobify) return;
+                var d = document,
+                    e = "script",
+                    f = "mobify",
+                    g = "." + f + ".com/",
+                    h = f + "-path",
+                    i = g + "un" + f + ".js",
+                    j,
+                    k,
+                    l = [!1, 1],
+                    m,
+                    n = (this.Mobify = {
+                        points: [+new Date()],
+                        tagVersion: [6, 0],
+                    }),
+                    o = /(; |#|&|^)mobify-path=([^&;]*)/g.exec(
+                        location.hash + "; " + d.cookie
+                    );
+                o
+                    ? (m = o[2]) &&
+                      !+(m = sessionStorage[h] || m) &&
+                      (l = [!0, "//preview" + g + escape(m)])
+                    : ((l = a() || l),
+                      l[0] && l.push("//cdn" + i, "//files01" + i)),
+                    l.shift()
+                        ? (d.write('<plaintext style="display:none;">'),
+                          setTimeout(c))
+                        : b(l[0]);
+            })(function () {
+                if (
+                    /ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(
+                        navigator.userAgent
+                    )
+                ) {
+                    return [
+                        1,
+                        "//cdn.mobify.com/sites/ians-blog/production/mobify.js",
+                    ];
+                }
+            }); /*]]>*/
+        </script>
+        <!-- END MOBIFY -->
+        <title>
+            Ian Bicking: a blog :: Avoiding Silos: &#8220;link&#8221; as a
+            first-class object
+        </title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta name="generator" content="WordPress 3.4.2" />
+        <!-- LEAVE FOR STATS -->
+        <meta name="description" content="" />
+        <link
+            rel="stylesheet"
+            title="plaintxtSimpler"
+            href="../../../../wp-content/themes/Barthelme-ianb/style.css"
+            type="text/css"
+            media="all"
+        />
+        <link
+            rel="start"
+            href="../../../../index.html"
+            title="Ian Bicking: a blog"
+        />
+        <link
+            rel="alternate"
+            type="application/atom+xml"
+            title="Ian Bicking: a blog Atom Feed"
+            href="../../../../feed/atom/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog RSS 2.0 Feed"
+            href="../../../../feed/rss/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog Comments RSS 2.0 Feed"
+            href="../../../../comments/feed/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rdf+xml"
+            title="Ian Bicking: a blog RSS 1.0"
+            href="../../../../feed/rdf/index.html"
+        />
+        <link
+            rel="alternate"
+            type="text/xml"
+            title="Ian Bicking: a blog RSS 0.92 Feed"
+            href="../../../../feed/rss/index.html"
+        />
+
+        <link
+            rel="archives"
+            title="October 2012"
+            href="../../../../2012/10/index.html"
+        />
+        <link
+            rel="archives"
+            title="February 2012"
+            href="../../../../2012/02/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2011"
+            href="../../../../2011/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="March 2011"
+            href="../../../../2011/03/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2010"
+            href="../../../../2010/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2010"
+            href="../../../../2010/08/index.html"
+        />
+        <link
+            rel="archives"
+            title="May 2010"
+            href="../../../../2010/05/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2010"
+            href="../../../../2010/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="March 2010"
+            href="../../../../2010/03/index.html"
+        />
+        <link
+            rel="archives"
+            title="February 2010"
+            href="../../../../2010/02/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2010"
+            href="../../../../2010/01/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2009"
+            href="../../../../2009/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="May 2009"
+            href="../../../../2009/05/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2009"
+            href="../../../../2009/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2009"
+            href="../../../../2009/01/index.html"
+        />
+        <link rel="archives" title="December 2008" href="../../index.html" />
+        <link
+            rel="archives"
+            title="November 2008"
+            href="../../../11/index.html"
+        />
+        <link
+            rel="archives"
+            title="October 2008"
+            href="../../../10/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2008"
+            href="../../../09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2008"
+            href="../../../08/index.html"
+        />
+        <link rel="archives" title="July 2008" href="../../../07/index.html" />
+        <link rel="archives" title="June 2008" href="../../../06/index.html" />
+        <link rel="archives" title="May 2008" href="../../../05/index.html" />
+        <link rel="archives" title="April 2008" href="../../../04/index.html" />
+        <link rel="archives" title="March 2008" href="../../../03/index.html" />
+        <link
+            rel="archives"
+            title="February 2008"
+            href="../../../02/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2008"
+            href="../../../01/index.html"
+        />
+        <link
+            rel="archives"
+            title="November 2007"
+            href="../../../../2007/11/index.html"
+        />
+        <link
+            rel="archives"
+            title="October 2007"
+            href="../../../../2007/10/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2007"
+            href="../../../../2007/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2007"
+            href="../../../../2007/08/index.html"
+        />
+        <link
+            rel="archives"
+            title="July 2007"
+            href="../../../../2007/07/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog &raquo; Avoiding Silos: &#8220;link&#8221; as a first-class object Comments Feed"
+            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/feed/"
+        />
+        <link
+            rel="EditURI"
+            type="application/rsd+xml"
+            title="RSD"
+            href="../../../../xmlrpc.php?rsd"
+        />
+        <link
+            rel="wlwmanifest"
+            type="application/wlwmanifest+xml"
+            href="../../../../wp-includes/wlwmanifest.xml"
+        />
+        <link
+            rel="prev"
+            title="Javascript Status Message Display"
+            href="../../17/javascript-status-message-display/index.html"
+        />
+        <link
+            rel="next"
+            title="Atompub as an alternative to WebDAV"
+            href="../../../../2009/01/11/atompub-instead-o-webdav/index.html"
+        />
+        <meta name="generator" content="WordPress 3.4.2" />
+        <link rel="canonical" href="index.html" />
+        <link rel="shortlink" href="https://ianbicking.org/?p=90" />
+        <link
+            rel="stylesheet"
+            href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"
+            type="text/css"
+        />
+        <style type="text/css">
+            .recentcomments a {
+                display: inline !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        </style>
         <style type="text/css" media="all">
-/*<![CDATA[*/
-body { font-size: 100%; }
-body { font-family: tahoma, geneva, sans-serif; }
-div.post-header, h2.post-title, p.post-date-single, h2.post-title-single, div.post-entry h1, div.post-entry h2, div.post-entry h3, div.post-entry h4, div.post-entry h5, div.post-entry h6, div.post-entry blockquote, div.post-footer, h3#comment-count, h4#comment-header, div#comments ol li p.comment-metadata, h4#respond { font-family: verdana, geneva, sans-serif; }
-div.post-entry p { text-align: left; }
-div#wrapper { width: 100%; }
+            /*<![CDATA[*/
+            body {
+                font-size: 100%;
+            }
+            body {
+                font-family: tahoma, geneva, sans-serif;
+            }
+            div.post-header,
+            h2.post-title,
+            p.post-date-single,
+            h2.post-title-single,
+            div.post-entry h1,
+            div.post-entry h2,
+            div.post-entry h3,
+            div.post-entry h4,
+            div.post-entry h5,
+            div.post-entry h6,
+            div.post-entry blockquote,
+            div.post-footer,
+            h3#comment-count,
+            h4#comment-header,
+            div#comments ol li p.comment-metadata,
+            h4#respond {
+                font-family: verdana, geneva, sans-serif;
+            }
+            div.post-entry p {
+                text-align: left;
+            }
+            div#wrapper {
+                width: 100%;
+            }
 
-/*]]>*/
-</style>
-</head>
-<body>
-
-<div id="wrapper">
-
-	<div id="header" onclick="location.href='http://blog.ianbicking.org/';" style="cursor:pointer;">
-		<h1 id="title"><a href="../../../../index.html" title="Ian Bicking: a blog">Ian Bicking: a blog</a></h1>
-		<p id="description"></p>
-	</div>
-<!-- WP Theme Credits -->
-<div style="display: none;">We can answer on question <a href="http://www.olnevhost.net/vps-hosting.html">what is VPS</a>? and
-what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap dedicated servers</strong></a>?</div>
-<!-- END HEADER -->
-<div id="container">
-	<div id="content" class="widecolumn">
-
-
-		<div id="post-90" class="post single-post">
-			<p class="post-date-single">{ 2008 12 27 }</p>
-			<h2 class="post-title-single">Avoiding Silos: &#8220;link&#8221; as a first-class object</h2>
-			<div class="post-entry">
-				<div class="document">
-<p>One of the constant annoyances to me in web applications is the self-proclaimed need for those applications to know about everything and do everything, and only spotty ad hoc techniques for including things from other applications.</p>
-<p>An example might be blog navigation or search, where you can only include data from the application itself.  Or &quot;Recent Posts&quot; which can only show locally-produce posts.  What if I post something elsewhere?  I have to create some shoddy placeholder post to refer to it.  Bah!  Underlying this the data is usually structured in a specific way, with the HTML being a sort of artifact of the database, the markup transient and a slave to the database&#8217;s structure.</p>
-<p>An example of this might be a recent post listing like:</p>
-<div class="dean_ch" style="white-space: wrap;"><br />
-&lt;ul&gt;<br />
-&nbsp; <span class="kw1">for</span> post <span class="kw1">in</span> recent_posts:<br />
-&nbsp; &nbsp; &lt;li&gt;<br />
-&nbsp; &nbsp; &nbsp; &lt;a href=<span class="st0">&quot;/post/{{post.year}}/{{post.month}}/{{post.slug}}&quot;</span>&gt;<br />
-&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><span class="br0">&#123;</span>post.<span class="me1">title</span><span class="br0">&#125;</span><span class="br0">&#125;</span>&lt;/a&gt;<br />
-&nbsp; &nbsp; &lt;/li&gt;<br />
-&lt;/ul&gt;<br />
-&nbsp;</div>
-<p>There&#8217;s clearly no room for exceptions in this code.  I am thus proposing that any system like this should have the notion of a &quot;link&quot; as a first-class object.  The code should look like this:</p>
-<div class="dean_ch" style="white-space: wrap;"><br />
-&lt;ul&gt;<br />
-&nbsp; <span class="kw1">for</span> post <span class="kw1">in</span> recent_posts:<br />
-&nbsp; &nbsp; &lt;li&gt;<br />
-&nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><span class="br0">&#123;</span>post.<span class="me1">link</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#125;</span><span class="br0">&#125;</span><br />
-&nbsp; &nbsp; &lt;/li&gt;<br />
-&lt;/ul&gt;<br />
-&nbsp;</div>
-<p>Just like with <a class="reference external" href="../../../10/24/hypertext-driven-urls/index.html">changing IDs to links</a> in service documents, the template doesn&#8217;t actually look any more complicated than it did before (simpler, even).  But now we can use simple object-oriented techniques to create first-class links.  The code might look like:</p>
-<div class="dean_ch" style="white-space: wrap;"><br />
-<span class="kw1">class</span> Post<span class="br0">&#40;</span>SomeORM<span class="br0">&#41;</span>:<br />
-&nbsp; &nbsp; <span class="kw1">def</span> url<span class="br0">&#40;</span><span class="kw2">self</span><span class="br0">&#41;</span>:<br />
-&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="kw2">self</span>.<span class="kw2">type</span> == <span class="st0">'link'</span>:<br />
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">self</span>.<span class="me1">body</span><br />
-&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span>:<br />
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; base = get_request<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">application_url</span><br />
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'%s/%s/%s/%s'</span> % <span class="br0">&#40;</span><br />
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; base, <span class="kw2">self</span>.<span class="me1">year</span>, <span class="kw2">self</span>.<span class="me1">month</span>, <span class="kw2">self</span>.<span class="me1">slug</span><span class="br0">&#41;</span><br />
-<br />
-&nbsp; &nbsp; <span class="kw1">def</span> link<span class="br0">&#40;</span><span class="kw2">self</span><span class="br0">&#41;</span>:<br />
-&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> html<span class="br0">&#40;</span><span class="st0">'&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;'</span><span class="br0">&#41;</span> % <span class="br0">&#40;</span><br />
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">self</span>.<span class="me1">url</span><span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="kw2">self</span>.<span class="me1">title</span><span class="br0">&#41;</span><br />
-&nbsp;</div>
-<p>The addition of the <tt class="docutils literal"><span class="pre">.url()</span></tt> method has the obvious effect of making these offsite links work.  Using a <tt class="docutils literal"><span class="pre">.link()</span></tt> method has the added advantage of allowing things like HTML snippets to be inserted into the system (even though that is not implemented here).  By allowing arbitrary HTML in certain places you make it possible for people to extend the site in little ways &#8212; possibly adding markup to a title, or allowing an item in the list that actually contains two URLs (e.g., <tt class="docutils literal"><span class="pre">&lt;a</span> <span class="pre">href=&quot;url1&quot;&gt;Some</span> <span class="pre">Item&lt;/a&gt;</span> <span class="pre">(&lt;a</span> <span class="pre">href=&quot;url2&quot;&gt;via&lt;/a&gt;)</span></tt>).</p>
-<p>In the context of Python I recommend making these into methods, not properties, because it allows you to later add keyword arguments to specialize the markup (like <tt class="docutils literal"><span class="pre">post.link(abbreviated=True)</span></tt>).</p>
-<p>One negative aspect of this is that you cannot affect all the markup through the template alone, you may have to go into the Python code to change things.  Anyone have ideas for handling this problem?</p>
-</div>
-<p>Automatically generated list of related posts:</p><ol>
-<li><a href='../../../../2009/01/11/atompub-instead-o-webdav/index.html' rel='bookmark' title='Atompub as an alternative to WebDAV'>Atompub as an alternative to WebDAV</a> <small>I&#8217;ve been thinking about an import/export API for PickyWiki; I...</small></li>
-<li><a href='../../../10/24/hypertext-driven-urls/index.html' rel='bookmark' title='Hypertext-driven URLs'>Hypertext-driven URLs</a> <small>Roy T. Fielding, author of the REST thesis wrote an...</small></li>
-<li><a href='../../../03/23/html-accessibility/index.html' rel='bookmark' title='HTML Accessibility'>HTML Accessibility</a> <small>So I gave a presentation at PyCon about HTML, which...</small></li>
-<li><a href='../../10/lxml-an-underappreciated-web-scraping-library/index.html' rel='bookmark' title='lxml: an underappreciated web scraping library'>lxml: an underappreciated web scraping library</a> <small>When people think about web scraping in Python, they usually...</small></li>
-</ol>											</div><!-- END POST-ENTRY  -->
-			<!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            /*]]>*/
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div
+                id="header"
+                onclick="location.href='https://ianbicking.org/';"
+                style="cursor: pointer"
+            >
+                <h1 id="title">
+                    <a href="../../../../index.html" title="Ian Bicking: a blog"
+                        >Ian Bicking: a blog</a
+                    >
+                </h1>
+                <p id="description"></p>
+            </div>
+            <!-- WP Theme Credits -->
+            <div style="display: none">
+                We can answer on question
+                <a href="http://www.olnevhost.net/vps-hosting.html"
+                    >what is VPS</a
+                >? and what is
+                <a href="http://www.olnevhost.net/dedicated-servers.html"
+                    ><strong>cheap dedicated servers</strong></a
+                >?
+            </div>
+            <!-- END HEADER -->
+            <div id="container">
+                <div id="content" class="widecolumn">
+                    <div id="post-90" class="post single-post">
+                        <p class="post-date-single">{ 2008 12 27 }</p>
+                        <h2 class="post-title-single">
+                            Avoiding Silos: &#8220;link&#8221; as a first-class
+                            object
+                        </h2>
+                        <div class="post-entry">
+                            <div class="document">
+                                <p>
+                                    One of the constant annoyances to me in web
+                                    applications is the self-proclaimed need for
+                                    those applications to know about everything
+                                    and do everything, and only spotty ad hoc
+                                    techniques for including things from other
+                                    applications.
+                                </p>
+                                <p>
+                                    An example might be blog navigation or
+                                    search, where you can only include data from
+                                    the application itself. Or &quot;Recent
+                                    Posts&quot; which can only show
+                                    locally-produce posts. What if I post
+                                    something elsewhere? I have to create some
+                                    shoddy placeholder post to refer to it. Bah!
+                                    Underlying this the data is usually
+                                    structured in a specific way, with the HTML
+                                    being a sort of artifact of the database,
+                                    the markup transient and a slave to the
+                                    database&#8217;s structure.
+                                </p>
+                                <p>
+                                    An example of this might be a recent post
+                                    listing like:
+                                </p>
+                                <div class="dean_ch" style="white-space: wrap">
+                                    <br />
+                                    &lt;ul&gt;<br />
+                                    &nbsp; <span class="kw1">for</span> post
+                                    <span class="kw1">in</span>
+                                    recent_posts:<br />
+                                    &nbsp; &nbsp; &lt;li&gt;<br />
+                                    &nbsp; &nbsp; &nbsp; &lt;a href=<span
+                                        class="st0"
+                                        >&quot;/post/{{post.year}}/{{post.month}}/{{post.slug}}&quot;</span
+                                    >&gt;<br />
+                                    &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span class="br0">&#123;</span
+                                    ><span class="br0">&#123;</span>post.<span
+                                        class="me1"
+                                        >title</span
+                                    ><span class="br0">&#125;</span
+                                    ><span class="br0">&#125;</span
+                                    >&lt;/a&gt;<br />
+                                    &nbsp; &nbsp; &lt;/li&gt;<br />
+                                    &lt;/ul&gt;<br />
+                                    &nbsp;
+                                </div>
+                                <p>
+                                    There&#8217;s clearly no room for exceptions
+                                    in this code. I am thus proposing that any
+                                    system like this should have the notion of a
+                                    &quot;link&quot; as a first-class object.
+                                    The code should look like this:
+                                </p>
+                                <div class="dean_ch" style="white-space: wrap">
+                                    <br />
+                                    &lt;ul&gt;<br />
+                                    &nbsp; <span class="kw1">for</span> post
+                                    <span class="kw1">in</span>
+                                    recent_posts:<br />
+                                    &nbsp; &nbsp; &lt;li&gt;<br />
+                                    &nbsp; &nbsp; &nbsp;
+                                    <span class="br0">&#123;</span
+                                    ><span class="br0">&#123;</span>post.<span
+                                        class="me1"
+                                        >link</span
+                                    ><span class="br0">&#40;</span
+                                    ><span class="br0">&#41;</span
+                                    ><span class="br0">&#125;</span
+                                    ><span class="br0">&#125;</span><br />
+                                    &nbsp; &nbsp; &lt;/li&gt;<br />
+                                    &lt;/ul&gt;<br />
+                                    &nbsp;
+                                </div>
+                                <p>
+                                    Just like with
+                                    <a
+                                        class="reference external"
+                                        href="../../../10/24/hypertext-driven-urls/index.html"
+                                        >changing IDs to links</a
+                                    >
+                                    in service documents, the template
+                                    doesn&#8217;t actually look any more
+                                    complicated than it did before (simpler,
+                                    even). But now we can use simple
+                                    object-oriented techniques to create
+                                    first-class links. The code might look like:
+                                </p>
+                                <div class="dean_ch" style="white-space: wrap">
+                                    <br />
+                                    <span class="kw1">class</span> Post<span
+                                        class="br0"
+                                        >&#40;</span
+                                    >SomeORM<span class="br0">&#41;</span
+                                    >:<br />
+                                    &nbsp; &nbsp;
+                                    <span class="kw1">def</span> url<span
+                                        class="br0"
+                                        >&#40;</span
+                                    ><span class="kw2">self</span
+                                    ><span class="br0">&#41;</span>:<br />
+                                    &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span class="kw1">if</span>
+                                    <span class="kw2">self</span>.<span
+                                        class="kw2"
+                                        >type</span
+                                    >
+                                    == <span class="st0">'link'</span>:<br />
+                                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span class="kw1">return</span>
+                                    <span class="kw2">self</span>.<span
+                                        class="me1"
+                                        >body</span
+                                    ><br />
+                                    &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span class="kw1">else</span>:<br />
+                                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                    base = get_request<span class="br0"
+                                        >&#40;</span
+                                    ><span class="br0">&#41;</span>.<span
+                                        class="me1"
+                                        >application_url</span
+                                    ><br />
+                                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span class="kw1">return</span>
+                                    <span class="st0">'%s/%s/%s/%s'</span> %
+                                    <span class="br0">&#40;</span><br />
+                                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                    &nbsp; &nbsp; base,
+                                    <span class="kw2">self</span>.<span
+                                        class="me1"
+                                        >year</span
+                                    >, <span class="kw2">self</span>.<span
+                                        class="me1"
+                                        >month</span
+                                    >, <span class="kw2">self</span>.<span
+                                        class="me1"
+                                        >slug</span
+                                    ><span class="br0">&#41;</span><br />
+                                    <br />
+                                    &nbsp; &nbsp;
+                                    <span class="kw1">def</span> link<span
+                                        class="br0"
+                                        >&#40;</span
+                                    ><span class="kw2">self</span
+                                    ><span class="br0">&#41;</span>:<br />
+                                    &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span class="kw1">return</span> html<span
+                                        class="br0"
+                                        >&#40;</span
+                                    ><span class="st0"
+                                        >'&lt;a
+                                        href=&quot;%s&quot;&gt;%s&lt;/a&gt;'</span
+                                    ><span class="br0">&#41;</span> %
+                                    <span class="br0">&#40;</span><br />
+                                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                    <span class="kw2">self</span>.<span
+                                        class="me1"
+                                        >url</span
+                                    ><span class="br0">&#40;</span
+                                    ><span class="br0">&#41;</span>,
+                                    <span class="kw2">self</span>.<span
+                                        class="me1"
+                                        >title</span
+                                    ><span class="br0">&#41;</span><br />
+                                    &nbsp;
+                                </div>
+                                <p>
+                                    The addition of the
+                                    <tt class="docutils literal"
+                                        ><span class="pre">.url()</span></tt
+                                    >
+                                    method has the obvious effect of making
+                                    these offsite links work. Using a
+                                    <tt class="docutils literal"
+                                        ><span class="pre">.link()</span></tt
+                                    >
+                                    method has the added advantage of allowing
+                                    things like HTML snippets to be inserted
+                                    into the system (even though that is not
+                                    implemented here). By allowing arbitrary
+                                    HTML in certain places you make it possible
+                                    for people to extend the site in little ways
+                                    &#8212; possibly adding markup to a title,
+                                    or allowing an item in the list that
+                                    actually contains two URLs (e.g.,
+                                    <tt class="docutils literal"
+                                        ><span class="pre">&lt;a</span>
+                                        <span class="pre"
+                                            >href=&quot;url1&quot;&gt;Some</span
+                                        >
+                                        <span class="pre">Item&lt;/a&gt;</span>
+                                        <span class="pre">(&lt;a</span>
+                                        <span class="pre"
+                                            >href=&quot;url2&quot;&gt;via&lt;/a&gt;)</span
+                                        ></tt
+                                    >).
+                                </p>
+                                <p>
+                                    In the context of Python I recommend making
+                                    these into methods, not properties, because
+                                    it allows you to later add keyword arguments
+                                    to specialize the markup (like
+                                    <tt class="docutils literal"
+                                        ><span class="pre"
+                                            >post.link(abbreviated=True)</span
+                                        ></tt
+                                    >).
+                                </p>
+                                <p>
+                                    One negative aspect of this is that you
+                                    cannot affect all the markup through the
+                                    template alone, you may have to go into the
+                                    Python code to change things. Anyone have
+                                    ideas for handling this problem?
+                                </p>
+                            </div>
+                            <p>
+                                Automatically generated list of related posts:
+                            </p>
+                            <ol>
+                                <li>
+                                    <a
+                                        href="../../../../2009/01/11/atompub-instead-o-webdav/index.html"
+                                        rel="bookmark"
+                                        title="Atompub as an alternative to WebDAV"
+                                        >Atompub as an alternative to WebDAV</a
+                                    >
+                                    <small
+                                        >I&#8217;ve been thinking about an
+                                        import/export API for PickyWiki;
+                                        I...</small
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="../../../10/24/hypertext-driven-urls/index.html"
+                                        rel="bookmark"
+                                        title="Hypertext-driven URLs"
+                                        >Hypertext-driven URLs</a
+                                    >
+                                    <small
+                                        >Roy T. Fielding, author of the REST
+                                        thesis wrote an...</small
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="../../../03/23/html-accessibility/index.html"
+                                        rel="bookmark"
+                                        title="HTML Accessibility"
+                                        >HTML Accessibility</a
+                                    >
+                                    <small
+                                        >So I gave a presentation at PyCon about
+                                        HTML, which...</small
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="../../10/lxml-an-underappreciated-web-scraping-library/index.html"
+                                        rel="bookmark"
+                                        title="lxml: an underappreciated web scraping library"
+                                        >lxml: an underappreciated web scraping
+                                        library</a
+                                    >
+                                    <small
+                                        >When people think about web scraping in
+                                        Python, they usually...</small
+                                    >
+                                </li>
+                            </ol>
+                        </div>
+                        <!-- END POST-ENTRY  -->
+                        <!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 			xmlns:dc="http://purl.org/dc/elements/1.1/"
 			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
-		<rdf:Description rdf:about="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/"
-    dc:identifier="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/"
+		<rdf:Description rdf:about="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/"
+    dc:identifier="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/"
     dc:title="Avoiding Silos: &#8220;link&#8221; as a first-class object"
-    trackback:ping="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/trackback/" />
+    trackback:ping="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/trackback/" />
 </rdf:RDF> -->
-			<div class="post-footer">
-				<p>Posted by Ian Bicking on Saturday, December 27th, 2008, at 1:09 pm, and filed under <a href="../../../../category/html/index.html" title="View all posts in HTML" rel="category tag">HTML</a>, <a href="../../../../category/programming/index.html" title="View all posts in Programming" rel="category tag">Programming</a>, <a href="../../../../category/python/index.html" title="View all posts in Python" rel="category tag">Python</a>, <a href="../../../../category/web/index.html" title="View all posts in Web" rel="category tag">Web</a>.</p>
-				<p>
-				Comments have a <a href='http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/feed/'>feed</a>.</p>
-			</div><!-- END POST-FOOTER -->
-		</div><!-- END POST -->
+                        <div class="post-footer">
+                            <p>
+                                Posted by Ian Bicking on Saturday, December
+                                27th, 2008, at 1:09 pm, and filed under
+                                <a
+                                    href="../../../../category/html/index.html"
+                                    title="View all posts in HTML"
+                                    rel="category tag"
+                                    >HTML</a
+                                >,
+                                <a
+                                    href="../../../../category/programming/index.html"
+                                    title="View all posts in Programming"
+                                    rel="category tag"
+                                    >Programming</a
+                                >,
+                                <a
+                                    href="../../../../category/python/index.html"
+                                    title="View all posts in Python"
+                                    rel="category tag"
+                                    >Python</a
+                                >,
+                                <a
+                                    href="../../../../category/web/index.html"
+                                    title="View all posts in Web"
+                                    rel="category tag"
+                                    >Web</a
+                                >.
+                            </p>
+                            <p>
+                                Comments have a
+                                <a
+                                    href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/feed/"
+                                    >feed</a
+                                >.
+                            </p>
+                        </div>
+                        <!-- END POST-FOOTER -->
+                    </div>
+                    <!-- END POST -->
 
-<div id="comments">
+                    <div id="comments">
+                        <h4 id="comments">13 Comments</h4>
+                        <ul class="commentlist">
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-66824"
+                            >
+                                <div
+                                    id="div-comment-66824"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/04d6b8e8d3c68899ac88eb8623392150?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://www.eflorenzano.com/"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Eric Florenzano</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66824"
+                                        >
+                                            December 27, 2008 at 1:40 pm</a
+                                        >
+                                    </div>
 
+                                    <p>
+                                        Interesting post! If you&#8217;re
+                                        interested in this concept, Adam Gomaa
+                                        has taken this basic idea, but in a
+                                        different direction by (ab?)using
+                                        Properties. It&#8217;s interesting to
+                                        look at both similar approaches, I
+                                        think.
+                                        <a
+                                            href="http://adam.gomaa.us/blog/the-python-property-builtin/"
+                                            rel="nofollow"
+                                            >http://adam.gomaa.us/blog/the-python-property-builtin/</a
+                                        >
+                                    </p>
 
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-66828"
+                            >
+                                <div
+                                    id="div-comment-66828"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/75ea46736d0f77920ead3f74d75ede75?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">Nick Murphy</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
-<h4 id="comments">13 Comments</h4>
- <ul class="commentlist">
-		<li class="comment even thread-even depth-1" id="comment-66824">
-				<div id="div-comment-66824" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/04d6b8e8d3c68899ac88eb8623392150?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.eflorenzano.com/' rel='external nofollow' class='url'>Eric Florenzano</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66828"
+                                        >
+                                            December 27, 2008 at 1:50 pm</a
+                                        >
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66824">
-			December 27, 2008 at 1:40 pm</a>		</div>
+                                    <p>
+                                        I prefer to configure my template engine
+                                        to render a link to an object simply by
+                                        naming it; in Mako for example, this can
+                                        be done by specifying a filter which
+                                        sniffs the class of whatever object is
+                                        being rendered, and converts it to a
+                                        properly formatted string. This approach
+                                        scales beyond simply linking to domain
+                                        objects &#8212; one might apply to every
+                                        <code>int</code> or <code>float</code> a
+                                        <code>span</code> of class
+                                        <code>number</code>, or something like
+                                        that. It also keeps such rendering logic
+                                        cleanly factored out of the domain
+                                        model.
+                                    </p>
 
-		<p>Interesting post!  If you&#8217;re interested in this concept, Adam Gomaa has taken this basic idea, but in a different direction by (ab?)using Properties.  It&#8217;s interesting to look at both similar approaches, I think. <a href="http://adam.gomaa.us/blog/the-python-property-builtin/" rel="nofollow">http://adam.gomaa.us/blog/the-python-property-builtin/</a></p>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-66831"
+                            >
+                                <div
+                                    id="div-comment-66831"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/ce4075e5634ffdde739b869c30abf5f8?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">Rudolph</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-66828">
-				<div id="div-comment-66828" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/75ea46736d0f77920ead3f74d75ede75?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Nick Murphy</cite> <span class="says">says:</span>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66831"
+                                        >
+                                            December 27, 2008 at 2:03 pm</a
+                                        >
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66828">
-			December 27, 2008 at 1:50 pm</a>		</div>
+                                    <p>
+                                        How about keeping the HTML in the
+                                        template with the same (or even more)
+                                        flexibility:
+                                        <code
+                                            >&lt;a href="{{post.url()}}"
+                                            rel="nofollow"&gt;{{post.title()}}&lt;/a&gt;</code
+                                        >.
+                                    </p>
 
-		<p>I prefer to configure my template engine to render a link to an object simply by naming it; in Mako for example, this can be done by specifying a filter which sniffs the class of whatever object is being rendered, and converts it to a properly formatted string.  This approach scales beyond simply linking to domain objects &#8212; one might apply to every <code>int</code> or <code>float</code> a <code>span</code> of class <code>number</code>, or something like that.  It also keeps such rendering logic cleanly factored out of the domain model.</p>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-66837"
+                            >
+                                <div
+                                    id="div-comment-66837"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/8eecbc4bcf54bc6a68a387d3ad6d2b2a?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://collectivesys.com"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Jerry</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-66831">
-				<div id="div-comment-66831" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/ce4075e5634ffdde739b869c30abf5f8?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Rudolph</cite> <span class="says">says:</span>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66837"
+                                        >
+                                            December 27, 2008 at 2:15 pm</a
+                                        >
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66831">
-			December 27, 2008 at 2:03 pm</a>		</div>
+                                    <p>Hi Ian,</p>
 
-		<p>How about keeping the HTML in the template with the same (or even more) flexibility: <code>&lt;a href="{{post.url()}}" rel="nofollow"&gt;{{post.title()}}&lt;/a&gt;</code>.</p>
+                                    <p>
+                                        I agree with the initial 40% of your
+                                        idea, the rest, I think, pushes too much
+                                        the View layer into the Control layer
+                                        &#8212; <code>post.link()</code> will
+                                        likely output links with classes and/or
+                                        ids (even when assuming inline
+                                        JavaScript is strictly forbidden), which
+                                        introduces a high dependency/risk of
+                                        keeping the Control code in sync with
+                                        the View whenever the web team
+                                        refactors/updates the design.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-66837">
-				<div id="div-comment-66837" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/8eecbc4bcf54bc6a68a387d3ad6d2b2a?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://collectivesys.com' rel='external nofollow' class='url'>Jerry</a></cite> <span class="says">says:</span>		</div>
+                                    <p>
+                                        I believe a balance can be achieved when
+                                        <code>post.link_href()</code> outputs
+                                        the content of href and nothing else,
+                                        while
+                                        <code>post.link_text()</code> returns
+                                        the a link text.
+                                    </p>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66837">
-			December 27, 2008 at 2:15 pm</a>		</div>
+                                    <p>Jerry</p>
 
-		<p>Hi Ian,</p>
+                                    <p>
+                                        P.S. How to disable/escape underscore
+                                        Markdown formating? [for cases like
+                                        these using backticks renders it as code
+                                        and no markup is not interpreted inside
+                                        the backticks -- Ian]
+                                    </p>
 
-<p>I agree with the initial 40% of your idea, the rest, I think, pushes too much the View layer into the Control layer &#8212; <code>post.link()</code> will likely output links with classes and/or ids (even when assuming inline JavaScript is strictly forbidden), which introduces a high dependency/risk of keeping the Control code in sync with the View whenever the web team refactors/updates the design.</p>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-66868"
+                            >
+                                <div
+                                    id="div-comment-66868"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/332b8e513222881d57f95a0e07f74ebd?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://marcuscavanaugh.com/"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Marcus Cavanaugh</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-<p>I believe a balance can be achieved when <code>post.link_href()</code> outputs the content of href and nothing else, while <code>post.link_text()</code> returns the a link text.</p>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66868"
+                                        >
+                                            December 27, 2008 at 3:52 pm</a
+                                        >
+                                    </div>
 
-<p>Jerry</p>
+                                    <p>
+                                        The URL approach seems sound, with the
+                                        primary issue being that web frameworks
+                                        like to abstract the URL away from the
+                                        object itself via routing. Most web
+                                        frameworks would rather see you grab the
+                                        url via a &#8220;reverse&#8221; method,
+                                        rather than hard-coded into the Model
+                                        itself:
+                                    </p>
 
-<p>P.S. How to disable/escape underscore Markdown formating? [for cases like these using backticks renders it as code and no markup is not interpreted inside the backticks -- Ian]</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-66868">
-				<div id="div-comment-66868" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/332b8e513222881d57f95a0e07f74ebd?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://marcuscavanaugh.com/' rel='external nofollow' class='url'>Marcus Cavanaugh</a></cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66868">
-			December 27, 2008 at 3:52 pm</a>		</div>
-
-		<p>The URL approach seems sound, with the primary issue being that web frameworks like to abstract the URL away from the object itself via routing. Most web frameworks would rather see you grab the url via a &#8220;reverse&#8221; method, rather than hard-coded into the Model itself:</p>
-
-<pre><code>class Post(SomeORM):
+                                    <pre><code>class Post(SomeORM):
     def url(self):
         if self.is_internal:
             return SomeRouting.reverse('view_post', id=4)
@@ -242,341 +955,1221 @@ what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap 
             return self.external_url
 </code></pre>
 
-<p>URI-aware objects provide consistency and extensibility.</p>
+                                    <p>
+                                        URI-aware objects provide consistency
+                                        and extensibility.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-66875">
-				<div id="div-comment-66875" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/0e4a313a845e7e83d8c9e5dd97f7d016?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.holovaty.com/' rel='external nofollow' class='url'>Adrian Holovaty</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-66875"
+                            >
+                                <div
+                                    id="div-comment-66875"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/0e4a313a845e7e83d8c9e5dd97f7d016?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://www.holovaty.com/"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Adrian Holovaty</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66875">
-			December 27, 2008 at 4:13 pm</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66875"
+                                        >
+                                            December 27, 2008 at 4:13 pm</a
+                                        >
+                                    </div>
 
-		<p>Yeah, I agree with Rudolph &#8212; why not give the model objects a <code>url()</code> method that simply outputs the URL itself? This lets the designer/template define custom classes for the link.</p>
+                                    <p>
+                                        Yeah, I agree with Rudolph &#8212; why
+                                        not give the model objects a
+                                        <code>url()</code> method that simply
+                                        outputs the URL itself? This lets the
+                                        designer/template define custom classes
+                                        for the link.
+                                    </p>
 
-<p>Regarding Marcus&#8217; point about relying on a framework&#8217;s reversing logic &#8212; IMHO, that&#8217;s going a bit too far, and I never use <code>reverse()</code> stuff in model URL methods. I tend to see this as an acceptable breach of the DRY principle, because it&#8217;s a lot more efficient just to hard-code the URL-generating logic directly in the <code>url()</code> method (as opposed to relying on the reverse logic).</p>
+                                    <p>
+                                        Regarding Marcus&#8217; point about
+                                        relying on a framework&#8217;s reversing
+                                        logic &#8212; IMHO, that&#8217;s going a
+                                        bit too far, and I never use
+                                        <code>reverse()</code> stuff in model
+                                        URL methods. I tend to see this as an
+                                        acceptable breach of the DRY principle,
+                                        because it&#8217;s a lot more efficient
+                                        just to hard-code the URL-generating
+                                        logic directly in the
+                                        <code>url()</code> method (as opposed to
+                                        relying on the reverse logic).
+                                    </p>
 
-<p>It&#8217;s sort of like denormalizing a database for performance. If you&#8217;re outputting a list of links and each one is calling <code>url()</code>, which in turn calls <code>reverse()</code>&#8230;whew! That&#8217;s a lot of unnecessary overhead.</p>
+                                    <p>
+                                        It&#8217;s sort of like denormalizing a
+                                        database for performance. If
+                                        you&#8217;re outputting a list of links
+                                        and each one is calling
+                                        <code>url()</code>, which in turn calls
+                                        <code>reverse()</code>&#8230;whew!
+                                        That&#8217;s a lot of unnecessary
+                                        overhead.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment byuser comment-author-ianb bypostauthor even thread-even depth-1" id="comment-66888">
-				<div id="div-comment-66888" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment byuser comment-author-ianb bypostauthor even thread-even depth-1"
+                                id="comment-66888"
+                            >
+                                <div
+                                    id="div-comment-66888"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="../../../../index.html"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Ian Bicking</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66888">
-			December 27, 2008 at 4:58 pm</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66888"
+                                        >
+                                            December 27, 2008 at 4:58 pm</a
+                                        >
+                                    </div>
 
-		<p>Sure, the <code>.link()</code> method (in my example) isn&#8217;t entirely necessary, far more important is the <code>.url()</code> method.  I wish, though, that there was a way of doing object-oriented display code that is also designer-friendly.  For example, if you do allow for something like a compound link (as with the via example), coding that into every template where you display a link is entirely infeasible.</p>
+                                    <p>
+                                        Sure, the <code>.link()</code> method
+                                        (in my example) isn&#8217;t entirely
+                                        necessary, far more important is the
+                                        <code>.url()</code> method. I wish,
+                                        though, that there was a way of doing
+                                        object-oriented display code that is
+                                        also designer-friendly. For example, if
+                                        you do allow for something like a
+                                        compound link (as with the via example),
+                                        coding that into every template where
+                                        you display a link is entirely
+                                        infeasible.
+                                    </p>
 
-<p>One way of handling this would be to use template functions or blocks.  Then you can centralize the logic of link display (making it easier to extend that logic) while still putting it somewhere a designer can find.  Backtracking rendered code to these template functions isn&#8217;t that easy, but that&#8217;s something that should be fixed &#8212; it <em>should</em> be much easier to see a bit of rendered code and backtrack to where that code was defined.</p>
+                                    <p>
+                                        One way of handling this would be to use
+                                        template functions or blocks. Then you
+                                        can centralize the logic of link display
+                                        (making it easier to extend that logic)
+                                        while still putting it somewhere a
+                                        designer can find. Backtracking rendered
+                                        code to these template functions
+                                        isn&#8217;t that easy, but that&#8217;s
+                                        something that should be fixed &#8212;
+                                        it <em>should</em> be much easier to see
+                                        a bit of rendered code and backtrack to
+                                        where that code was defined.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-66945">
-				<div id="div-comment-66945" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/424a8f03889e3ffbf9ed57adb1fc41cc?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://rhodesmill.org/brandon/' rel='external nofollow' class='url'>Brandon Craig Rhodes</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-66945"
+                            >
+                                <div
+                                    id="div-comment-66945"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/424a8f03889e3ffbf9ed57adb1fc41cc?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://rhodesmill.org/brandon/"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Brandon Craig Rhodes</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66945">
-			December 27, 2008 at 7:53 pm</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66945"
+                                        >
+                                            December 27, 2008 at 7:53 pm</a
+                                        >
+                                    </div>
 
-		<p>In Grok/Zope-land, I just create as many IAbsoluteURL adapters as I have object classes that I want to assign URLs to, and the component framework swings into action and invokes the right one when a view asks for some object&#8217;s URL.  That way my models do not accumulate interface-specific information about where they live, which would be deeply troubling, and yet I have a way to maintain the URL information <em>alongside</em> my models in a way that I find scalable.</p>
+                                    <p>
+                                        In Grok/Zope-land, I just create as many
+                                        IAbsoluteURL adapters as I have object
+                                        classes that I want to assign URLs to,
+                                        and the component framework swings into
+                                        action and invokes the right one when a
+                                        view asks for some object&#8217;s URL.
+                                        That way my models do not accumulate
+                                        interface-specific information about
+                                        where they live, which would be deeply
+                                        troubling, and yet I have a way to
+                                        maintain the URL information
+                                        <em>alongside</em> my models in a way
+                                        that I find scalable.
+                                    </p>
 
-<p>See slide 147 of [my NOLA Grok talk](<a href="http://rhodesmill.org/brandon/2008/nola-plone-symposium-talk/" rel="nofollow">http://rhodesmill.org/brandon/2008/nola-plone-symposium-talk/</a>) for an example of how a URL factory looks when you build it for one of your own types.  I should nudge the Grok folks to make that take less lines and look less grungy.  Like maybe three lines. Yeah, three lines.</p>
+                                    <p>
+                                        See slide 147 of [my NOLA Grok talk](<a
+                                            href="http://rhodesmill.org/brandon/2008/nola-plone-symposium-talk/"
+                                            rel="nofollow"
+                                            >http://rhodesmill.org/brandon/2008/nola-plone-symposium-talk/</a
+                                        >) for an example of how a URL factory
+                                        looks when you build it for one of your
+                                        own types. I should nudge the Grok folks
+                                        to make that take less lines and look
+                                        less grungy. Like maybe three lines.
+                                        Yeah, three lines.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment byuser comment-author-ianb bypostauthor even thread-even depth-1" id="comment-66957">
-				<div id="div-comment-66957" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment byuser comment-author-ianb bypostauthor even thread-even depth-1"
+                                id="comment-66957"
+                            >
+                                <div
+                                    id="div-comment-66957"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="../../../../index.html"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Ian Bicking</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66957">
-			December 27, 2008 at 8:40 pm</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66957"
+                                        >
+                                            December 27, 2008 at 8:40 pm</a
+                                        >
+                                    </div>
 
-		<p>In this case using interfaces is similar to generic functions (and has relatively little to do with an &#8220;interface&#8221;).  Using PyProtocols it might look like:</p>
+                                    <p>
+                                        In this case using interfaces is similar
+                                        to generic functions (and has relatively
+                                        little to do with an
+                                        &#8220;interface&#8221;). Using
+                                        PyProtocols it might look like:
+                                    </p>
 
-<pre><code>@link.when('isinstance(obj, Page) and obj.type == "link"')
+                                    <pre><code>@link.when('isinstance(obj, Page) and obj.type == "link"')
 def link(obj):
     return obj.body
 </code></pre>
 
-<p>Of course in Zope you&#8217;d probably have separate class types; outside of Zope it&#8217;s more common to use a single class that&#8217;s more connected to the storage type (e.g., a one-to-one mapping of class to database table).</p>
+                                    <p>
+                                        Of course in Zope you&#8217;d probably
+                                        have separate class types; outside of
+                                        Zope it&#8217;s more common to use a
+                                        single class that&#8217;s more connected
+                                        to the storage type (e.g., a one-to-one
+                                        mapping of class to database table).
+                                    </p>
 
-<p>Generally, I&#8217;m not sure the complexity of the indirection pays off much.  In theory there&#8217;s some important separation going on there, but in practice I&#8217;ve never seen it.  Given a RESTful approach, there actually isn&#8217;t a distinction at all &#8212; an object <em>is</em> at its URL, this is not just an implementation detail.  I don&#8217;t think of the web as an implementation detail, in my mind it is core to the application itself.</p>
+                                    <p>
+                                        Generally, I&#8217;m not sure the
+                                        complexity of the indirection pays off
+                                        much. In theory there&#8217;s some
+                                        important separation going on there, but
+                                        in practice I&#8217;ve never seen it.
+                                        Given a RESTful approach, there actually
+                                        isn&#8217;t a distinction at all &#8212;
+                                        an object <em>is</em> at its URL, this
+                                        is not just an implementation detail. I
+                                        don&#8217;t think of the web as an
+                                        implementation detail, in my mind it is
+                                        core to the application itself.
+                                    </p>
 
-<p>That said, creating URLs without some kind of helper is also a needless waste of time and causes bugs (e.g., not allowing for application path prefixes, not quoting segments properly, or spending an inordinate amount of time formatting query string parameters).  And once you have a helper, you&#8217;ve got at least <em>some</em> indirection happening.</p>
+                                    <p>
+                                        That said, creating URLs without some
+                                        kind of helper is also a needless waste
+                                        of time and causes bugs (e.g., not
+                                        allowing for application path prefixes,
+                                        not quoting segments properly, or
+                                        spending an inordinate amount of time
+                                        formatting query string parameters). And
+                                        once you have a helper, you&#8217;ve got
+                                        at least <em>some</em> indirection
+                                        happening.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-66961">
-				<div id="div-comment-66961" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/54b8a715c91a04db6080f1099cfa282d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.atnan.com' rel='external nofollow' class='url'>Nathan de Vries</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-66961"
+                            >
+                                <div
+                                    id="div-comment-66961"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/54b8a715c91a04db6080f1099cfa282d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://www.atnan.com"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Nathan de Vries</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66961">
-			December 27, 2008 at 8:51 pm</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-66961"
+                                        >
+                                            December 27, 2008 at 8:51 pm</a
+                                        >
+                                    </div>
 
-		<p>Not sure what you&#8217;re gaining by pushing your view helpers into the model layer. You&#8217;re concerned about your posts keeping the same URL/slug, but throwing link helpers into your models is going to hinder more than it will help.</p>
+                                    <p>
+                                        Not sure what you&#8217;re gaining by
+                                        pushing your view helpers into the model
+                                        layer. You&#8217;re concerned about your
+                                        posts keeping the same URL/slug, but
+                                        throwing link helpers into your models
+                                        is going to hinder more than it will
+                                        help.
+                                    </p>
 
-<p>This is how it would be done with Ruby/ERB:</p>
+                                    <p>
+                                        This is how it would be done with
+                                        Ruby/ERB:
+                                    </p>
 
-<pre><code>&lt;ul&gt;
+                                    <pre><code>&lt;ul&gt;
   &lt;% recent_posts.each do |post| %&gt;
     &lt;li&gt;&lt;%= link_tag h(post.title), post_url(post) %&gt;&lt;/li&gt;
   &lt;% end %&gt;
 &lt;/ul&gt;
 </code></pre>
 
-<p>Or perhaps if you find yourself creating links to posts often, use a template helper:</p>
+                                    <p>
+                                        Or perhaps if you find yourself creating
+                                        links to posts often, use a template
+                                        helper:
+                                    </p>
 
-<pre><code>&lt;ul&gt;
+                                    <pre><code>&lt;ul&gt;
   &lt;% recent_posts.each do |post| %&gt;
     &lt;li&gt;&lt;%= link_to_post(post) %&gt;&lt;/li&gt;
   &lt;% end %&gt;
 &lt;/ul&gt;
 </code></pre>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-67016">
-				<div id="div-comment-67016" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/7c63a03cc45f763a06149d6c99cef46c?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">mike bayer</cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-67016"
+                            >
+                                <div
+                                    id="div-comment-67016"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/7c63a03cc45f763a06149d6c99cef46c?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">mike bayer</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-67016">
-			December 28, 2008 at 1:11 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-67016"
+                                        >
+                                            December 28, 2008 at 1:11 am</a
+                                        >
+                                    </div>
 
-		<p>I just build some Mako defs that deal with URLs for certain types of objects.    The main point of the &#8220;def&#8221; in Mako is a place that you can put programmatic view logic.</p>
+                                    <p>
+                                        I just build some Mako defs that deal
+                                        with URLs for certain types of objects.
+                                        The main point of the &#8220;def&#8221;
+                                        in Mako is a place that you can put
+                                        programmatic view logic.
+                                    </p>
 
-<pre><code>def url(post)&amp;gt;
+                                    <pre><code>def url(post)&amp;gt;
   &lt;a href="/post/${post.year}/${post.month}/${post.slug}" rel="nofollow"&gt;
     ${post.title}&lt;/a&gt;
 /def&amp;gt;
 </code></pre>
 
-<p>(something is wrong with your markdown formatting, or I&#8217;ve just drank too much tonight)</p>
+                                    <p>
+                                        (something is wrong with your markdown
+                                        formatting, or I&#8217;ve just drank too
+                                        much tonight)
+                                    </p>
 
-<p>The filter method someone mentioned above can work with this, though I don&#8217;t use filters that way myself that often.</p>
+                                    <p>
+                                        The filter method someone mentioned
+                                        above can work with this, though I
+                                        don&#8217;t use filters that way myself
+                                        that often.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-67629">
-				<div id="div-comment-67629" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/630e114bb1f79c0924103b96921227c2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://agileweb.org' rel='external nofollow' class='url'>Ross Lawley</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-67629"
+                            >
+                                <div
+                                    id="div-comment-67629"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/630e114bb1f79c0924103b96921227c2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://agileweb.org"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Ross Lawley</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-67629">
-			December 29, 2008 at 10:36 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-67629"
+                                        >
+                                            December 29, 2008 at 10:36 am</a
+                                        >
+                                    </div>
 
-		<p>I think that template helpers / template tags and a url method achieves the desired effect.  The instance can return its url via a url() method and the template helpers can manage markup.</p>
+                                    <p>
+                                        I think that template helpers / template
+                                        tags and a url method achieves the
+                                        desired effect. The instance can return
+                                        its url via a url() method and the
+                                        template helpers can manage markup.
+                                    </p>
 
-<p>This keeps the separation of concern between the model and templates.  Also designers have specific areas in which they can manage / inspect templates should they want to extend or change markup.</p>
+                                    <p>
+                                        This keeps the separation of concern
+                                        between the model and templates. Also
+                                        designers have specific areas in which
+                                        they can manage / inspect templates
+                                        should they want to extend or change
+                                        markup.
+                                    </p>
 
-<p>How you handle template helpers is another area for debate &#8211; you could use template fragments in separate html files (keeping the designers away from code) or return strings from the helper methods &#8211; but then is that as bad as declaring them in the model?  Probably not, I&#8217;d say its still slightly better but its a matter of preference.  I&#8217;d choose the latter if my designers had a high level of competence with scripting languages i.e. frontend developers.</p>
+                                    <p>
+                                        How you handle template helpers is
+                                        another area for debate &#8211; you
+                                        could use template fragments in separate
+                                        html files (keeping the designers away
+                                        from code) or return strings from the
+                                        helper methods &#8211; but then is that
+                                        as bad as declaring them in the model?
+                                        Probably not, I&#8217;d say its still
+                                        slightly better but its a matter of
+                                        preference. I&#8217;d choose the latter
+                                        if my designers had a high level of
+                                        competence with scripting languages i.e.
+                                        frontend developers.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-67898">
-				<div id="div-comment-67898" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/342fe9f1a5666e1525713b13f8ef6c14?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://ionrock.org/blog/' rel='external nofollow' class='url'>Eric Larson</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-67898"
+                            >
+                                <div
+                                    id="div-comment-67898"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/342fe9f1a5666e1525713b13f8ef6c14?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://ionrock.org/blog/"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Eric Larson</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-67898">
-			December 30, 2008 at 10:22 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/12/27/avoiding-silos-link-as-a-first-class-object/comment-page-1/#comment-67898"
+                                        >
+                                            December 30, 2008 at 10:22 am</a
+                                        >
+                                    </div>
 
-		<p>My biggest issue in working with links has been how to handle transformations gracefully. For example, I would prefer my links to be absolute at all times. This reduces ambiguity between links generated from content and links within the actual application. Along the same lines, when the application is made of smaller microapps (as you&#8217;ve advocated), having an easy way of creating these links effectively can be difficult. </p>
+                                    <p>
+                                        My biggest issue in working with links
+                                        has been how to handle transformations
+                                        gracefully. For example, I would prefer
+                                        my links to be absolute at all times.
+                                        This reduces ambiguity between links
+                                        generated from content and links within
+                                        the actual application. Along the same
+                                        lines, when the application is made of
+                                        smaller microapps (as you&#8217;ve
+                                        advocated), having an easy way of
+                                        creating these links effectively can be
+                                        difficult.
+                                    </p>
 
-<p>One method I&#8217;ve used is the idea of a resolver. The application might keep the current pattern for a link generated from data, but the resolve allows for previous patterns to also be used. It also allows for a catalog of bases to be used (ie XML Catalog). This idea is based entirely on creating a custom URL resolver for XSLT, which most XSLT processing libraries support. </p>
+                                    <p>
+                                        One method I&#8217;ve used is the idea
+                                        of a resolver. The application might
+                                        keep the current pattern for a link
+                                        generated from data, but the resolve
+                                        allows for previous patterns to also be
+                                        used. It also allows for a catalog of
+                                        bases to be used (ie XML Catalog). This
+                                        idea is based entirely on creating a
+                                        custom URL resolver for XSLT, which most
+                                        XSLT processing libraries support.
+                                    </p>
 
-<p>The point here is that I agree links should be first class objects in addition to having a framework or controller in place for managing them that goes beyond simple parsing/routing.</p>
+                                    <p>
+                                        The point here is that I agree links
+                                        should be first class objects in
+                                        addition to having a framework or
+                                        controller in place for managing them
+                                        that goes beyond simple parsing/routing.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-</ul>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                        </ul>
 
-<div class="navigation">
-<div class="alignleft"></div>
-<div class="alignright"></div>
-</div>
+                        <div class="navigation">
+                            <div class="alignleft"></div>
+                            <div class="alignright"></div>
+                        </div>
+                    </div>
 
+                    <div class="navigation">
+                        <div class="nav-left">
+                            &laquo;
+                            <a
+                                href="../../17/javascript-status-message-display/index.html"
+                                rel="prev"
+                                >Javascript Status Message Display</a
+                            >
+                        </div>
+                        <div class="nav-right">
+                            <a
+                                href="../../../../2009/01/11/atompub-instead-o-webdav/index.html"
+                                rel="next"
+                                >Atompub as an alternative to WebDAV</a
+                            >
+                            &raquo;
+                        </div>
+                    </div>
+                    <!-- END NAVIGATION -->
+                </div>
+                <!-- END CONTENT -->
+            </div>
+            <!-- END CONTAINER  -->
 
+            <div id="sidebar">
+                <ul>
+                    <li id="home-link">
+                        <h2>
+                            <a
+                                href="../../../../index.html"
+                                title="Ian Bicking: a blog"
+                                >Home</a
+                            >
+                        </h2>
+                    </li>
+                    <li id="text-315934862" class="widget widget_text">
+                        <h2 class="widgettitle">About</h2>
+                        <div class="textwidget">
+                            Ian is a developer with Mozilla,
+                            <a href="http://ianbicking.appspot.com/projects"
+                                >Python open source developer</a
+                            >, actually uses
+                            <a
+                                href="https://plus.google.com/u/0/104537541227697934010/posts"
+                                >Google+</a
+                            >
+                            more than
+                            <a href="http://twitter.com/ianbicking">twitter</a>
+                            and lives in Minneapolis.<br />
+                            <span
+                                class="gittip-0001"
+                                gittip-username="ianbicking"
+                            ></span>
+                            <script
+                                id="gittip-0001"
+                                src="https://www.gittip.com/assets/widgets/0001.js"
+                            ></script>
+                        </div>
+                    </li>
+                    <li id="text-315934863" class="widget widget_text">
+                        <div class="textwidget">
+                            <!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> -->
+                        </div>
+                    </li>
+                    <li id="archives-2" class="widget widget_archive">
+                        <h2 class="widgettitle">Archives</h2>
+                        <ul>
+                            <li>
+                                <a
+                                    href="../../../../2012/10/index.html"
+                                    title="October 2012"
+                                    >October 2012</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2012/02/index.html"
+                                    title="February 2012"
+                                    >February 2012</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2011/04/index.html"
+                                    title="April 2011"
+                                    >April 2011</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2011/03/index.html"
+                                    title="March 2011"
+                                    >March 2011</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/09/index.html"
+                                    title="September 2010"
+                                    >September 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/08/index.html"
+                                    title="August 2010"
+                                    >August 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/05/index.html"
+                                    title="May 2010"
+                                    >May 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/04/index.html"
+                                    title="April 2010"
+                                    >April 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/03/index.html"
+                                    title="March 2010"
+                                    >March 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/02/index.html"
+                                    title="February 2010"
+                                    >February 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/01/index.html"
+                                    title="January 2010"
+                                    >January 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/09/index.html"
+                                    title="September 2009"
+                                    >September 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/05/index.html"
+                                    title="May 2009"
+                                    >May 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/04/index.html"
+                                    title="April 2009"
+                                    >April 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/01/index.html"
+                                    title="January 2009"
+                                    >January 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a href="../../index.html" title="December 2008"
+                                    >December 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../11/index.html"
+                                    title="November 2008"
+                                    >November 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../10/index.html"
+                                    title="October 2008"
+                                    >October 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../09/index.html"
+                                    title="September 2008"
+                                    >September 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../08/index.html"
+                                    title="August 2008"
+                                    >August 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../07/index.html"
+                                    title="July 2008"
+                                    >July 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../06/index.html"
+                                    title="June 2008"
+                                    >June 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../05/index.html"
+                                    title="May 2008"
+                                    >May 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../04/index.html"
+                                    title="April 2008"
+                                    >April 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../03/index.html"
+                                    title="March 2008"
+                                    >March 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../02/index.html"
+                                    title="February 2008"
+                                    >February 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../01/index.html"
+                                    title="January 2008"
+                                    >January 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/11/index.html"
+                                    title="November 2007"
+                                    >November 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/10/index.html"
+                                    title="October 2007"
+                                    >October 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/09/index.html"
+                                    title="September 2007"
+                                    >September 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/08/index.html"
+                                    title="August 2007"
+                                    >August 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/07/index.html"
+                                    title="July 2007"
+                                    >July 2007</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="text-315934861" class="widget widget_text">
+                        <div class="textwidget">
+                            <a href="../../../../archive/index.html"
+                                >The Older Archives</a
+                            >
+                        </div>
+                    </li>
+                    <li id="categories-1" class="widget widget_categories">
+                        <h2 class="widgettitle">Categories</h2>
+                        <ul>
+                            <li class="cat-item cat-item-12">
+                                <a
+                                    href="../../../../category/erlang/index.html"
+                                    title="View all posts filed under Erlang"
+                                    >Erlang</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-11">
+                                <a
+                                    href="../../../../category/html/index.html"
+                                    title="View all posts filed under HTML"
+                                    >HTML</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-8">
+                                <a
+                                    href="../../../../category/javascript/index.html"
+                                    title="View all posts filed under Javascript"
+                                    >Javascript</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-15">
+                                <a
+                                    href="../../../../category/licensing/index.html"
+                                    title="View all posts filed under Licensing"
+                                    >Licensing</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-18">
+                                <a
+                                    href="../../../../category/mozilla/index.html"
+                                    title="View all posts filed under Mozilla"
+                                    >Mozilla</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-5">
+                                <a
+                                    href="../../../../category/notech/index.html"
+                                    title="View all posts filed under Non-technical"
+                                    >Non-technical</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-6">
+                                <a
+                                    href="../../../../category/olpc/index.html"
+                                    title="View all posts filed under OLPC"
+                                    >OLPC</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-14">
+                                <a
+                                    href="../../../../category/packaging/index.html"
+                                    title="View all posts filed under Packaging"
+                                    >Packaging</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-4">
+                                <a
+                                    href="../../../../category/politics/index.html"
+                                    title="View all posts filed under Politics"
+                                    >Politics</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-3">
+                                <a
+                                    href="../../../../category/programming/index.html"
+                                    title="View all posts filed under Programming"
+                                    >Programming</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-7">
+                                <a
+                                    href="../../../../category/python/index.html"
+                                    title="View all posts filed under Python"
+                                    >Python</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-10">
+                                <a
+                                    href="../../../../category/ruby/index.html"
+                                    title="View all posts filed under Ruby"
+                                    >Ruby</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-19">
+                                <a
+                                    href="../../../../category/security/index.html"
+                                    title="View all posts filed under Security"
+                                    >Security</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-16">
+                                <a
+                                    href="../../../../category/silverlining.1"
+                                    title="View all posts filed under Silver Lining"
+                                    >Silver Lining</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-20">
+                                <a
+                                    href="../../../../category/programming/testing/index.html"
+                                    title="View all posts filed under Testing"
+                                    >Testing</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-9">
+                                <a
+                                    href="../../../../category/web/index.html"
+                                    title="View all posts filed under Web"
+                                    >Web</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-13">
+                                <a
+                                    href="../../../../category/zopeplone/index.html"
+                                    title="View all posts filed under Zope/Plone"
+                                    >Zope/Plone</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="search-2" class="widget widget_search">
+                        <form
+                            id="searchform"
+                            method="get"
+                            action="../../../../index.html"
+                        >
+                            <div>
+                                <input
+                                    id="s"
+                                    name="s"
+                                    type="text"
+                                    value=""
+                                    tabindex="1"
+                                    size="10"
+                                />
+                                <input
+                                    id="searchsubmit"
+                                    name="searchsubmit"
+                                    type="submit"
+                                    value="Find"
+                                    tabindex="2"
+                                />
+                            </div>
+                        </form>
+                    </li>
+                    <li
+                        id="recent-posts-2"
+                        class="widget widget_recent_entries"
+                    >
+                        <h2 class="widgettitle">Recent Posts</h2>
+                        <ul>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=291"
+                                    title="Why doctest.js is better than Python&#8217;s doctest"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=283"
+                                    title="Python Application Package"
+                                    >Python Application Package</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=277"
+                                    title="Git-as-sync, not source-control-as-deployment"
+                                    >Git-as-sync, not
+                                    source-control-as-deployment</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=253"
+                                    title="My Unsolicited Advice For PyPy"
+                                    >My Unsolicited Advice For PyPy</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=250"
+                                    title="A Python Web Application Package and Format (we should make one)"
+                                    >A Python Web Application Package and Format
+                                    (we should make one)</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li
+                        id="recent-comments-2"
+                        class="widget widget_recent_comments"
+                    >
+                        <h2 class="widgettitle">Recent Comments</h2>
+                        <ul id="recentcomments">
+                            <li class="recentcomments">
+                                <a
+                                    href="http://www.mirsa.com.tr"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >havalandırma</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                <a
+                                    href="http://redealmeidense.com.br/portalx/modules/"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >this website</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                Eric Pierce on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                Paul Brian on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                <a
+                                    href="http://benjiyork.com"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >Benji York</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
 
-
-</div>
-
-		<div class="navigation">
-			<div class="nav-left">&laquo; <a href="../../17/javascript-status-message-display/index.html" rel="prev">Javascript Status Message Display</a></div>
-			<div class="nav-right"><a href="../../../../2009/01/11/atompub-instead-o-webdav/index.html" rel="next">Atompub as an alternative to WebDAV</a> &raquo;</div>
-		</div><!-- END NAVIGATION -->
-
-
-	</div><!-- END CONTENT -->
-</div><!-- END CONTAINER  -->
-
-<div id="sidebar">
-	<ul>
-		<li id="home-link">
-			<h2><a href="../../../../index.html" title="Ian Bicking: a blog">Home</a></h2>
-		</li>
-<li id="text-315934862" class="widget widget_text"><h2 class="widgettitle">About</h2>
-			<div class="textwidget">Ian is a developer with Mozilla, <a href="http://ianbicking.appspot.com/projects">Python open source developer</a>, actually uses <a href="https://plus.google.com/u/0/104537541227697934010/posts">Google+</a> more than <a href="http://twitter.com/ianbicking">twitter</a> and lives in Minneapolis.<br>
-<span class="gittip-0001" gittip-username="ianbicking"></span>
-<script id="gittip-0001"
-  src="https://www.gittip.com/assets/widgets/0001.js"></script>
-</div>
-		</li>
-<li id="text-315934863" class="widget widget_text">			<div class="textwidget"><!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> --></div>
-		</li>
-<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
-		<ul>
-			<li><a href='../../../../2012/10/index.html' title='October 2012'>October 2012</a></li>
-	<li><a href='../../../../2012/02/index.html' title='February 2012'>February 2012</a></li>
-	<li><a href='../../../../2011/04/index.html' title='April 2011'>April 2011</a></li>
-	<li><a href='../../../../2011/03/index.html' title='March 2011'>March 2011</a></li>
-	<li><a href='../../../../2010/09/index.html' title='September 2010'>September 2010</a></li>
-	<li><a href='../../../../2010/08/index.html' title='August 2010'>August 2010</a></li>
-	<li><a href='../../../../2010/05/index.html' title='May 2010'>May 2010</a></li>
-	<li><a href='../../../../2010/04/index.html' title='April 2010'>April 2010</a></li>
-	<li><a href='../../../../2010/03/index.html' title='March 2010'>March 2010</a></li>
-	<li><a href='../../../../2010/02/index.html' title='February 2010'>February 2010</a></li>
-	<li><a href='../../../../2010/01/index.html' title='January 2010'>January 2010</a></li>
-	<li><a href='../../../../2009/09/index.html' title='September 2009'>September 2009</a></li>
-	<li><a href='../../../../2009/05/index.html' title='May 2009'>May 2009</a></li>
-	<li><a href='../../../../2009/04/index.html' title='April 2009'>April 2009</a></li>
-	<li><a href='../../../../2009/01/index.html' title='January 2009'>January 2009</a></li>
-	<li><a href='../../index.html' title='December 2008'>December 2008</a></li>
-	<li><a href='../../../11/index.html' title='November 2008'>November 2008</a></li>
-	<li><a href='../../../10/index.html' title='October 2008'>October 2008</a></li>
-	<li><a href='../../../09/index.html' title='September 2008'>September 2008</a></li>
-	<li><a href='../../../08/index.html' title='August 2008'>August 2008</a></li>
-	<li><a href='../../../07/index.html' title='July 2008'>July 2008</a></li>
-	<li><a href='../../../06/index.html' title='June 2008'>June 2008</a></li>
-	<li><a href='../../../05/index.html' title='May 2008'>May 2008</a></li>
-	<li><a href='../../../04/index.html' title='April 2008'>April 2008</a></li>
-	<li><a href='../../../03/index.html' title='March 2008'>March 2008</a></li>
-	<li><a href='../../../02/index.html' title='February 2008'>February 2008</a></li>
-	<li><a href='../../../01/index.html' title='January 2008'>January 2008</a></li>
-	<li><a href='../../../../2007/11/index.html' title='November 2007'>November 2007</a></li>
-	<li><a href='../../../../2007/10/index.html' title='October 2007'>October 2007</a></li>
-	<li><a href='../../../../2007/09/index.html' title='September 2007'>September 2007</a></li>
-	<li><a href='../../../../2007/08/index.html' title='August 2007'>August 2007</a></li>
-	<li><a href='../../../../2007/07/index.html' title='July 2007'>July 2007</a></li>
-		</ul>
-</li>
-<li id="text-315934861" class="widget widget_text">			<div class="textwidget"><a href="../../../../archive/index.html">The Older Archives</a></div>
-		</li>
-<li id="categories-1" class="widget widget_categories"><h2 class="widgettitle">Categories</h2>
-		<ul>
-	<li class="cat-item cat-item-12"><a href="../../../../category/erlang/index.html" title="View all posts filed under Erlang">Erlang</a>
-</li>
-	<li class="cat-item cat-item-11"><a href="../../../../category/html/index.html" title="View all posts filed under HTML">HTML</a>
-</li>
-	<li class="cat-item cat-item-8"><a href="../../../../category/javascript/index.html" title="View all posts filed under Javascript">Javascript</a>
-</li>
-	<li class="cat-item cat-item-15"><a href="../../../../category/licensing/index.html" title="View all posts filed under Licensing">Licensing</a>
-</li>
-	<li class="cat-item cat-item-18"><a href="../../../../category/mozilla/index.html" title="View all posts filed under Mozilla">Mozilla</a>
-</li>
-	<li class="cat-item cat-item-5"><a href="../../../../category/notech/index.html" title="View all posts filed under Non-technical">Non-technical</a>
-</li>
-	<li class="cat-item cat-item-6"><a href="../../../../category/olpc/index.html" title="View all posts filed under OLPC">OLPC</a>
-</li>
-	<li class="cat-item cat-item-14"><a href="../../../../category/packaging/index.html" title="View all posts filed under Packaging">Packaging</a>
-</li>
-	<li class="cat-item cat-item-4"><a href="../../../../category/politics/index.html" title="View all posts filed under Politics">Politics</a>
-</li>
-	<li class="cat-item cat-item-3"><a href="../../../../category/programming/index.html" title="View all posts filed under Programming">Programming</a>
-</li>
-	<li class="cat-item cat-item-7"><a href="../../../../category/python/index.html" title="View all posts filed under Python">Python</a>
-</li>
-	<li class="cat-item cat-item-10"><a href="../../../../category/ruby/index.html" title="View all posts filed under Ruby">Ruby</a>
-</li>
-	<li class="cat-item cat-item-19"><a href="../../../../category/security/index.html" title="View all posts filed under Security">Security</a>
-</li>
-	<li class="cat-item cat-item-16"><a href="../../../../category/silverlining.1" title="View all posts filed under Silver Lining">Silver Lining</a>
-</li>
-	<li class="cat-item cat-item-20"><a href="../../../../category/programming/testing/index.html" title="View all posts filed under Testing">Testing</a>
-</li>
-	<li class="cat-item cat-item-9"><a href="../../../../category/web/index.html" title="View all posts filed under Web">Web</a>
-</li>
-	<li class="cat-item cat-item-13"><a href="../../../../category/zopeplone/index.html" title="View all posts filed under Zope/Plone">Zope/Plone</a>
-</li>
-		</ul>
-</li>
-<li id="search-2" class="widget widget_search"><form id="searchform" method="get" action="../../../../index.html">
-	<div>
-		<input id="s" name="s" type="text" value="" tabindex="1" size="10" />
-		<input id="searchsubmit" name="searchsubmit" type="submit" value="Find" tabindex="2" />
-	</div>
-</form> </li>
-		<li id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widgettitle">Recent Posts</h2>
-		<ul>
-				<li><a href="../../../../index.html?p=291" title="Why doctest.js is better than Python&#8217;s doctest">Why doctest.js is better than Python&#8217;s doctest</a></li>
-				<li><a href="../../../../index.html?p=283" title="Python Application Package">Python Application Package</a></li>
-				<li><a href="../../../../index.html?p=277" title="Git-as-sync, not source-control-as-deployment">Git-as-sync, not source-control-as-deployment</a></li>
-				<li><a href="../../../../index.html?p=253" title="My Unsolicited Advice For PyPy">My Unsolicited Advice For PyPy</a></li>
-				<li><a href="../../../../index.html?p=250" title="A Python Web Application Package and Format (we should make one)">A Python Web Application Package and Format (we should make one)</a></li>
-				</ul>
-		</li>
-<li id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widgettitle">Recent Comments</h2>
-<ul id="recentcomments"><li class="recentcomments"><a href='http://www.mirsa.com.tr' rel='external nofollow' class='url'>havalandırma</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://redealmeidense.com.br/portalx/modules/' rel='external nofollow' class='url'>this website</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Eric Pierce on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Paul Brian on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://benjiyork.com' rel='external nofollow' class='url'>Benji York</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320">Why doctest.js is better than Python&#8217;s doctest</a></li></ul></li>
-	</ul>
-</div>
-
-	<div id="footer">
-		<p>
-			&copy; 2013 Ian Bicking<!--
+            <div id="footer">
+                <p>
+                    &copy; 2013 Ian Bicking<!--
 Does this commenting make me evil?
 			|
 			Thanks, <a href="http://wordpress.org/" title="WordPress">WordPress</a>
 			|
 			<a href="http://www.plaintxt.org/themes/barthelme/" title="Barthelme for WordPress" rel="follow">Barthelme</a> theme by <a href="http://scottwallick.com/" title="scottwallick.com" rel="follow">Scott</a>
 			| <!-- The following is a link to the theme author's sponsor. Please consider its smallness and that Scott was nice enough to make this theme publically available. -->
-			Sponsor: <a href="http://www.active-sandals.com/womreefsan.html" title="Support: Reef Sandals">Reef Sandals</a>
-			|
-			Valid <a href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1" title="Valid XHTML 1.0 Strict" rel="nofollow">XHTML</a> &amp; <a href="http://jigsaw.w3.org/css-validator/validator?uri=http://blog.ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no" title="Valid CSS" rel="nofollow">CSS</a>
-			|
-			-->
-			RSS: <a href="../../../../feed/rss/index.html" title="Ian Bicking: a blog RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Posts</a> &amp; <a href="../../../../comments/feed/index.html" title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Comments</a>
-		</p>
-	</div>
+                    Sponsor:
+                    <a
+                        href="http://www.active-sandals.com/womreefsan.html"
+                        title="Support: Reef Sandals"
+                        >Reef Sandals</a
+                    >
+                    | Valid
+                    <a
+                        href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1"
+                        title="Valid XHTML 1.0 Strict"
+                        rel="nofollow"
+                        >XHTML</a
+                    >
+                    &amp;
+                    <a
+                        href="http://jigsaw.w3.org/css-validator/validator?uri=https://ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no"
+                        title="Valid CSS"
+                        rel="nofollow"
+                        >CSS</a
+                    >
+                    | --> RSS:
+                    <a
+                        href="../../../../feed/rss/index.html"
+                        title="Ian Bicking: a blog RSS 2.0 (XML) Feed"
+                        rel="alternate"
+                        type="application/rss+xml"
+                        >Posts</a
+                    >
+                    &amp;
+                    <a
+                        href="../../../../comments/feed/index.html"
+                        title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed"
+                        rel="alternate"
+                        type="application/rss+xml"
+                        >Comments</a
+                    >
+                </p>
+            </div>
+        </div>
+        <!-- END WRAPPER -->
 
-</div><!-- END WRAPPER -->
+        <!-- Somehow 44 queries occured in 1.514 seconds. Magic! -->
+        <!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
+        <script
+            type="text/javascript"
+            src="../../../../wp-includes/js/comment-reply.js?ver=3.4.2"
+        ></script>
 
-	<!-- Somehow 44 queries occured in 1.514 seconds. Magic! -->
-	<!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
-	<script type='text/javascript' src='../../../../wp-includes/js/comment-reply.js?ver=3.4.2'></script>
-
-<!-- Google Analytics -->
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script>
-
-</body>
+        <!-- Google Analytics -->
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

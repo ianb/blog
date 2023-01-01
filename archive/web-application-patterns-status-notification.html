@@ -1,201 +1,266 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Web Application Patterns: Status Notification</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Web Application Patterns: Status Notification</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Web Application Patterns: Status Notification</h1>
+        <p style="text-align: center">
+            <span style="background-color: rgb(51, 102, 255)"
+                >(Were you looking for </span
+            ><a href="pylogo.html" style="background-color: rgb(51, 102, 255)"
+                >PyLogo</a
+            ><span style="background-color: rgb(51, 102, 255)">?)</span><br />
+        </p>
+        <p>
+            Here's a little pattern I use quite often in web applications. Like
+            a lot of patterns, it's not tied to any particular environment, or
+            even to any specific application. There's a lot of these kinds of
+            patterns out there that are specific to web applications (in
+            addition to the
+            <a href="http://c2.com/cgi/wiki?DesignPatterns">standard patterns</a
+            >), but they don't seem to be well collected, defined, or named...
+        </p>
+        <p>
+            Frequently you will need to present out-of-context information to
+            the user. For instance, in a webmail application when sending an
+            email. A page saying &quot;email successfully sent&quot; isn't very
+            interesting. Simply redirecting the user to the email index isn't
+            very friendly either: it's important to give some feedback when a
+            user performs a state-altering action. You want to predict what the
+            user is likely to be most interested in, and direct them there, but
+            you also want to put some notification about what just happened.
+        </p>
+        <p>
+            In whatever framework I am using (Webware, Zope, PHP), I'll usually
+            add something like this to the template header (<a
+                href="http://webware.sf.net"
+                >Webware</a
+            >
+            here):
+        </p>
+        <pre>class SitePage(Page):<br />    ....<br />    def writeMessage(self):<br />        if self.session().value('messages'):<br />            self.write('&lt;div class=&quot;alert&quot;&gt;%s&lt;/div&gt;' %<br />                       '&lt;br&gt;\n'.join(session.value('messages')))<br />            self.session.setValue('messages', [])<br />    def sendMessage(self, msg):<br />        self.session().setValue('messages',<br />            self.session().value('messages', []) + [msg])<br /></pre>
 
-<div style="float: right">
+        ... and calling <tt>writeMessage</tt> somewhere in the
+        <tt>SitePage</tt> header. In Zope (somewhere in
+        <tt>standard_template.pt</tt>):
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+        <pre>&lt;div tal:condition=&quot;request/SESSION/message | nothing&quot;<br />     style=&quot;border: thin black solid; background-color: #ddddff&quot;&gt;<br />  &lt;tal:block repeat=&quot;msg request/SESSION/message&quot;&gt;<br />    &lt;span tal:replace=&quot;msg&quot; /&gt;&lt;br&gt;<br />  &lt;/tal:block&gt;<br /> &lt;tal:block replace=&quot;python: request.SESSION.set('message', [])&quot; /&gt;<br />&lt;/div&gt;<br /></pre>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Web Application Patterns: Status Notification</h1>
- <p style="text-align: center;"><span style="background-color: rgb(51, 102, 255);">(Were you looking for </span><a href="pylogo.html" style="background-color: rgb(51, 102, 255);">PyLogo</a><span style="background-color: rgb(51, 102, 255);">?)</span><br /></p><p>Here's a little pattern I use quite often in web applications.  Like a
-lot of patterns, it's not tied to any particular environment, or even
-to any specific application.  There's a lot of these kinds of patterns
-out there that are specific to web applications (in addition to the <a href="http://c2.com/cgi/wiki?DesignPatterns">standard patterns</a>),
-but they don't seem to be well collected, defined, or named...
+        It's important to reset the <tt>messages</tt> session variable only when
+        you actually display it, as the user may get redirected before the
+        template is rendered (especially if you use redirect after POST --
+        another pattern -- which works well with this technique).
 
-</p><p>
+        <p>
+            If you haven't seen <tt>tal:block</tt> before, any tag prefixed with
+            <tt>tal:</tt> gets removed from the final ZPT output, and any
+            attributes of that tag are treated as TAL attributes. It saves a bit
+            of typing, and anyone using ZPT can use all the help they can get to
+            save typing.
+        </p>
+        <p>
+            People sometimes implement this in different ways. For instance,
+            they simply invoke the template passing in a message variable. So in
+            a webmail application, this might look like:
+        </p>
+        <pre># send mail action:<br />invalid_message = validate_email(request) # return None if valid<br />if invalid_message:<br />    return sendmail_form(message=invalid_message)<br />sendmail(user.email, request.to, request.subject, request.body)<br />return mail_index(message='Email to %s sent successfully' %<br />                  request.to)<br /></pre>
 
-Frequently you will need to present out-of-context information to the
-user.  For instance, in a webmail application when sending an email.
-A page saying &quot;email successfully sent&quot; isn't very interesting.
-Simply redirecting the user to the email index isn't very friendly
-either: it's important to give some feedback when a user performs a
-state-altering action.  You want to predict what the user is likely to
-be most interested in, and direct them there, but you also want to put
-some notification about what just happened.
+        Anyone who likes to use the back button knows what a pain this sort of
+        application is to use. A common navigation would be to arrive at the
+        index page after sending, view an email, and then you want to go back to
+        the index (using your back button). But you can't, because that index
+        was the result of a POST, and probably isn't cachable. To reload it
+        would resend the email. (In contrast: for the invalid case passing in a
+        variable works well)
 
-</p><p>
+        <p>
+            A solution to this is to redirect the user after sending their
+            email. There's a few gotchas here relating to exactly what result
+            code you use (there's a whole set of
+            <a
+                href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3"
+                >3xx</a
+            >
+            result codes), but that's another topic.
+        </p>
+        <p>
+            People sometimes start passing the messages in GET variables, e.g.
+            <tt>redirect('/index?message=Email+sent+successfully')</tt>. This is
+            terribly awkard, and it's not worth it to go down this path. Just
+            use sessions, which are perfectly suited for this task. The GET
+            variable is also flawed because that message is forever tied to that
+            page, even after a reload, and even after the message is no longer
+            timely.
+        </p>
+        <p>
+            Once you integrate this into your templates, you'll find yourself
+            using these messages all the time. You can use it to add quick error
+            messages, where before you might have been too lazy, or just have
+            used some sort of generic &quot;There was an error, hit the back
+            button on your browser and correct it&quot; page. You can notify the
+            user of all sorts of little events which you might otherwise simply
+            imply (e.g., &quot;item deleted from cart&quot;, &quot;edits
+            saved&quot;, and so on). These updates give the user a clear idea of
+            what they've done, what they need to do next (because they usually
+            are in the middle of some longer set of tasks only they understand),
+            and generally that their efforts are successful.
+        </p>
+        <div class="dates" align="right">
+            Created 18 Nov '03<br />
+            Modified 25 Jan '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            I very much liked the article.
+            <br />
 
-In whatever framework I am using (Webware, Zope, PHP), I'll usually
-add something like this to the template header (<a href="http://webware.sf.net">Webware</a> here):
+            <br />
+            I've started to use 300 codes in my applications so that I can
+            preserve the Back button, and so that I can use one set of URLs for
+            handling code, before redirecting to the correct page for fetching
+            the results.
+            <br />
 
-</p><pre>class SitePage(Page):<br />    ....<br />    def writeMessage(self):<br />        if self.session().value('messages'):<br />            self.write('&lt;div class=&quot;alert&quot;&gt;%s&lt;/div&gt;' %<br />                       '&lt;br&gt;\n'.join(session.value('messages')))<br />            self.session.setValue('messages', [])<br />    def sendMessage(self, msg):<br />        self.session().setValue('messages',<br />            self.session().value('messages', []) + [msg])<br /></pre>
+            <br />
+            I'm sure that there are many other patterns for web development, one
+            that comes to mind is a page which starts a long running search,
+            then reloads itself until it completes (like most travel sites).
+            <br />
 
-... and calling <tt>writeMessage</tt> somewhere in the
-<tt>SitePage</tt> header.  In Zope (somewhere in
-<tt>standard_template.pt</tt>):
+            <br />
+            Aaron
+            <div align="right">
+                <a href="https://ianbicking.org/comment614.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://insom.me.uk/blog/">Aaron Brady</a>
+            </div>
+            <hr noshade />
+            You have to be careful in Zope when redirecting and using sessions.
+            <br />
 
-<pre>&lt;div tal:condition=&quot;request/SESSION/message | nothing&quot;<br />     style=&quot;border: thin black solid; background-color: #ddddff&quot;&gt;<br />  &lt;tal:block repeat=&quot;msg request/SESSION/message&quot;&gt;<br />    &lt;span tal:replace=&quot;msg&quot; /&gt;&lt;br&gt;<br />  &lt;/tal:block&gt;<br /> &lt;tal:block replace=&quot;python: request.SESSION.set('message', [])&quot; /&gt;<br />&lt;/div&gt;<br /></pre>
+            <br />
+            If you raise the string 'Redirect' (capital R), it will cause Zope
+            to abort the transaction and thus, abort the session write. There
+            are cases when this is what you want - going along, coming across a
+            problem after some data has already been written, and wanting to
+            alert the user to this fact.
+            <br />
 
-It's important to reset the <tt>messages</tt> session variable only
-when you actually display it, as the user may get redirected before
-the template is rendered (especially if you use redirect after POST --
-another pattern -- which works well with this technique).
+            <br />
+            When you use the redirect method on Zope's RESPONSE object, the
+            transaction will commit and the session data will be retained.
+            <br />
 
-<p>
+            <br />
+            In cases like this, I've started using my own API calls such as
+            'returnWithMessage' which takes, among other parameters, a
+            'do_raise' argument. If 'do_raise' is true, the Redirect is raised
+            as an error. If false, a regular redirect occurs. I've just added
+            smarts into one of those calls to use a new 'page_messenger' service
+            I wrote, inspired by your post (it's a bit cleaner than calling
+            request.SESSION.set in a template, and has let me retain expections
+            from current code that passes the message in via the request or a
+            template call option).
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment615.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://toulouse.amber.org/">Jeffrey Shell</a>
+            </div>
+            <hr noshade />
+            it does not seems to be 'transactions-aware'. I mean if somebody
+            will request very fast 2 pages, where 1st returning a error, then
+            both of the pages will display same error. may be I am wrong, but it
+            seems to be so.
+            <br />
 
-If you haven't seen <tt>tal:block</tt> before, any tag prefixed with
-<tt>tal:</tt> gets removed from the final ZPT output, and any
-attributes of that tag are treated as TAL attributes.  It saves a bit
-of typing, and anyone using ZPT can use all the help they can get to
-save typing.
+            <br />
+            personally I prefer to drive template from a script in this case,
+            passing variables directly to template. its possible in php,
+            webware, and Zope. Last year I am working with Zope, here is example
+            in script:
+            <br />
 
-</p><p>
+            <br />
+            errors=[]
+            <br />
+            if username=='':
+            <br />
+            errors.append('Please enter your username')
+            <br />
+            if password=='':
+            <br />
+            errors.append('Please enter your password')
+            <br />
 
-People sometimes implement this in different ways.  For instance, they
-simply invoke the template passing in a message variable.  So in a
-webmail application, this might look like:
+            <br />
+            if len(errors)>0:
+            <br />
+            request.set('errors', eroors)
+            <br />
+            return getattr(context,'login.html)(container,request)
+            <br />
 
-</p><pre># send mail action:<br />invalid_message = validate_email(request) # return None if valid<br />if invalid_message:<br />    return sendmail_form(message=invalid_message)<br />sendmail(user.email, request.to, request.subject, request.body)<br />return mail_index(message='Email to %s sent successfully' %<br />                  request.to)<br /></pre>
+            <br />
+            so, in the page template I loop over the error list same way as
+            described in the Ian example above.
+            <br />
 
-Anyone who likes to use the back button knows what a pain this sort of
-application is to use.  A common navigation would be to arrive at the
-index page after sending, view an email, and then you want to go back
-to the index (using your back button).  But you can't, because that
-index was the result of a POST, and probably isn't cachable.  To
-reload it would resend the email. (In contrast: for the invalid case
-passing in a variable works well)
+            <br />
+            its also more secure, since 3rd party do not see any particular data
+            into URL GET requests, so both Session, and this example should be
+            good.
+            <br />
 
-<p>
-
-A solution to this is to redirect the user after sending their email.
-There's a few gotchas here relating to exactly what result code you
-use (there's a whole set of <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3">3xx</a>
-result codes), but that's another topic.
-
-</p><p>
-
-People sometimes start passing the messages in GET variables,
-e.g. <tt>redirect('/index?message=Email+sent+successfully')</tt>.
-This is terribly awkard, and it's not worth it to go down this path.
-Just use sessions, which are perfectly suited for this task.  The GET
-variable is also flawed because that message is forever tied to that
-page, even after a reload, and even after the message is no longer
-timely.
-
-
-</p><p>
-
-Once you integrate this into your templates, you'll find yourself
-using these messages all the time.  You can use it to add quick error
-messages, where before you might have been too lazy, or just have used
-some sort of generic &quot;There was an error, hit the back button on your
-browser and correct it&quot; page.  You can notify the user of all sorts of
-little events which you might otherwise simply imply (e.g., &quot;item
-deleted from cart&quot;, &quot;edits saved&quot;, and so on).  These updates give the
-user a clear idea of what they've done, what they need to do next
-(because they usually are in the middle of some longer set of tasks
-only they understand), and generally that their efforts are
-successful.
-</p>
- <div class="dates" align="right">
-Created 18 Nov '03<br>
-Modified 25 Jan '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- I very much liked the article. 
-<br />
-
-<br />
-I've started to use 300 codes in my applications so that I can preserve the Back button, and so that I can use one set of URLs for handling code, before redirecting to the correct page for fetching the results.
-<br />
-
-<br />
-I'm sure that there are many other patterns for web development, one that comes to mind is a page which starts a long running search, then reloads itself until it completes (like most travel sites).
-<br />
-
-<br />
-Aaron
- <div align="right"><a href="http://blog.ianbicking.org/comment614.html" rel="nofollow">#</a> <a href="http://insom.me.uk/blog/">Aaron Brady</a></div><hr noshade>
- You have to be careful in Zope when redirecting and using sessions.
-<br />
-
-<br />
-If you raise the string 'Redirect' (capital R), it will cause Zope to abort the transaction and thus, abort the session write.  There are cases when this is what you want - going along, coming across a problem after some data has already been written, and wanting to alert the user to this fact.
-<br />
-
-<br />
-When you use the redirect method on Zope's RESPONSE object, the transaction will commit and the session data will be retained. 
-<br />
-
-<br />
-In cases like this, I've started using my own API calls such as 'returnWithMessage' which takes, among other parameters, a 'do_raise' argument.  If 'do_raise' is true, the Redirect is raised as an error.  If false, a regular redirect occurs.  I've just added smarts into one of those calls to use a new 'page_messenger' service I wrote, inspired by your post (it's a bit cleaner than calling request.SESSION.set in a template, and has let me retain expections from current code that passes the message in via the request or a template call option).
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment615.html" rel="nofollow">#</a> <a href="http://toulouse.amber.org/">Jeffrey Shell</a></div><hr noshade>
- it does not seems to be 'transactions-aware'. I mean if somebody will request very fast 2 pages, where 1st returning a error, then both of the pages will display same error. may be I am wrong, but it seems to be so.
-<br />
-
-<br />
-personally I prefer to drive template from a script in this case, passing variables directly to template. its possible in php, webware, and Zope. Last year I am working with Zope, here is example in script:
-<br />
-
-<br />
-errors=[]
-<br />
-if username=='':
-<br />
-  errors.append('Please enter your username')
-<br />
-if password=='':
-<br />
-  errors.append('Please enter your password')
-<br />
-
-<br />
-if len(errors)>0:
-<br />
-  request.set('errors', eroors)
-<br />
-  return getattr(context,'login.html)(container,request)
-<br />
-
-<br />
-so, in the page template I loop over the error list same way as described in the Ian example above.
-<br />
-
-<br />
-its also more secure, since 3rd party do not see any particular data into URL GET requests, so both Session, and this example should be good.
-<br />
-
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment616.html" rel="nofollow">#</a> <a href="http://www.halogen-dg.com">Alex V. Koval</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment616.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.halogen-dg.com">Alex V. Koval</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

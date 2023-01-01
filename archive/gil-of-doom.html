@@ -1,438 +1,1281 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>GIL of Doom!</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>GIL of Doom!</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>GIL of Doom!</h1>
+        <div style="text-align: center">
+            <span style="background-color: rgb(51, 102, 255)"
+                >(Were you looking for </span
+            ><a
+                href="smart-vs-dumb-templates.html"
+                style="background-color: rgb(51, 102, 255)"
+                >Smart vs. Dumb Templates</a
+            ><span style="background-color: rgb(51, 102, 255)">?)</span><br />
+        </div>
+        <p>
+            Why do
+            <a
+                href="http://mail.python.org/pipermail/python-dev/2003-October/039787.html"
+                >people</a
+            >
+            <a href="http://skunkweb.sourceforge.net/FAQ.html#sec1">seem</a>
 
-<div style="float: right">
+            <a
+                href="http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&c2coff=1&safe=off&selm=3F9D77C4.A22FA169%40hotmail.com"
+                >to think</a
+            >
+            that the GIL (global interpreter lock) is such a big deal?
+        </p>
+        <p>
+            Are there more people out there than I realize who have applications
+            that fall in that multi-processor sweet spot? You need:
+        </p>
+        <ul>
+            <li>Enough money to buy a MP server.</li>
+            <li>A processor-bound application.</li>
+            <li>
+                Performance needs that excede the fastest (single) processors
+                reasonably available.
+            </li>
+            <li>
+                No other significant processes on the same server (e.g., a
+                database server, or Apache).
+            </li>
+            <li>
+                An application that cannot easily be factored into separate
+                processes.
+            </li>
+            <li>
+                Performance needs that won't excede an MP machine (because if
+                you need multiple servers you'll have to factor your application
+                into multiple processes, and you could just run two processes on
+                the same MP machine)
+            </li>
+        </ul>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+        Sure as heck doesn't describe any situation I've been in. And I haven't
+        actually heard anyone say, &quot;Python is great, but that GIL really
+        kicked my ass when I was working on a past project.&quot; No, it's all
+        just &quot;Python doesn't scale&quot; bullshit. The GIL keeps it from
+        scaling in one little corner case, boo hoo.
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>GIL of Doom!</h1>
- <div style="text-align: center;">
-<span style="background-color: rgb(51, 102, 255);">(Were you looking for </span><a href="smart-vs-dumb-templates.html" style="background-color: rgb(51, 102, 255);">Smart vs. Dumb Templates</a><span style="background-color: rgb(51, 102, 255);">?)</span><br /></div><p>Why do <a href="http://mail.python.org/pipermail/python-dev/2003-October/039787.html">people</a>
-<a href="http://skunkweb.sourceforge.net/FAQ.html#sec1">seem</a>
+        <p>
+            Does Python scale wonderfully to multiple processes? It's no
+            <a href="http://erlang.org/">Erlang</a>, and
+            <a href="http://blog.colorstudy.com/ianb/weblog/2003/10/21.html#P17"
+                >concurrency oriented programming</a
+            >
+            is not Python's strong point (not necessarily a weak point -- let's
+            just say it's not a point either way). But to me that's more of a
+            programming tool issue, not an interpreter issue.
+            <a href="http://poshmodule.sourceforge.net/">POSH</a> matters more
+            than the GIL, and I'm sure there's other ideas and programming
+            techniques which could matter even more than that. So let's just
+            forget about the GIL, there's far more interesting things to be
+            concerned with.
+        </p>
+        <div class="dates" align="right">
+            Created 31 Oct '03<br />
+            Modified 25 Jan '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            I can't tick off every item in your checklist, and maybe there's a
+            way around it, but the GIL does seem to get in the way of taking our
+            work on SCons to the next level of optimization.
+            <br />
 
-<a href="http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&c2coff=1&safe=off&selm=3F9D77C4.A22FA169%40hotmail.com">to think</a>
-that the GIL (global interpreter lock) is such a big deal?
+            <br />
+            We have a pretty good thread-pool architecture for controlling
+            builds, courtesy fine work by Anthony Roach and J.T. Conklin, and it
+            works great for the actual build portion: we start a pool with N
+            threads, each thread requests work from the central dependency tree
+            as needed and controls what it kicks off.
+            <br />
 
-</p><p>
+            <br />
+            We'd like to be able to use the same model for doing the dependency
+            analysis that creates the tree, which is largely regular expression
+            searches on the contents of source code files. Because we're using
+            Python code to do that dependency analysis, we can't use the same
+            model that serves us so well for controlling the build portion.
+            <br />
 
-Are there more people out there than I realize who have applications that fall in that multi-processor sweet spot?  You need:
-</p><ul>
-<li> Enough money to buy a MP server. 
-</li><li> A processor-bound application.
-</li><li> Performance needs that excede the fastest (single) processors reasonably available.
-</li><li> No other significant processes on the same server (e.g., a database server, or Apache).
-</li><li> An application that cannot easily be factored into separate processes.
-</li><li> Performance needs that won't excede an MP machine (because if you need multiple servers you'll have to factor your application into multiple processes, and you could just run two processes on the same MP machine)
-</li></ul>
+            <br />
+            On a big multi-processor dedicated build server, where we could
+            really use all the horsepower, during dependency analysis you can
+            see all of the threads and processors go silent except for one at a
+            time, which gets the GIL and calculates the dependencies. I'm told
+            that the GIL is the (or a) big stumbling block here--I'm not the
+            threading guru on our project--but if it's really not a big deal and
+            there's some other way we could structure things to make use of the
+            other processors, I'd love to hear about it...
+            <div align="right">
+                <a href="https://ianbicking.org/comment552.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.scons.org">Steven Knight</a>
+            </div>
+            <hr noshade />
+            While it's probably a little annoying, it seems straight-forward
+            enough to deal with: fork instead of using threads. You'll have to
+            pre-partition the workload, or use some sort of multi-process queue
+            (a database can be an easy way to do this communication, though I'm
+            sure there are other good techniques). Results can be passed back on
+            a socket, via shared memory (maybe POSH), or through files. Maybe
+            use Pyro or Twisted Broker. If you don't use shared memory then you
+            can probably scale this to separate machines fairly easily.
+            <br />
 
-Sure as heck doesn't describe any situation I've been in.  And I haven't actually heard anyone say, &quot;Python is great, but that GIL really kicked my ass when I was working on a past project.&quot;  No, it's all just &quot;Python doesn't scale&quot; bullshit.  The GIL keeps it from scaling in one little corner case, boo hoo.
+            <br />
+            If I was implementing it I'd probably use Pyro, exposing some
+            manager object that handed out jobs and collected results. Then you
+            just need some process manager that can spawn new processes and set
+            them on task (bonus points if it can spawn processes on other
+            machines).
+            <div align="right">
+                <a href="https://ianbicking.org/comment553.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            Sorry, forking is only available on UNIX; we're really looking for a
+            cross-platform solution. Threading would provide exactly the right
+            cross-platform model for this if it weren't for the GIL.
+            <div align="right">
+                <a href="https://ianbicking.org/comment554.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.scons.org">Steven Knight</a>
+            </div>
+            <hr noshade />
+            I was pondering my previous reply (<i>after</i> saving it, of
+            course) and thinking that in my haste to respond to the fork
+            suggestion, I might have started this thread down a path I didn't
+            intend.
+            <br />
 
-<p>
+            <br />
+            First, I'm not looking for you or anyone else to solve this
+            particular issue for us. We've spent a lot of time looking at a lot
+            of possible solutions, and unfortunately, this particular problem
+            <i>is</i> one that does not lend itself to refactoring into separate
+            process. (The cross-platform issue I mentioned is one reason, but
+            there are also performance issues with fork()ing large memory images
+            that chew up the anticipated benefit from calculating dependencies
+            in parallel.)
+            <br />
 
-Does Python scale wonderfully to multiple processes?  It's no <a href="http://erlang.org/">Erlang</a>, and <a href="http://blog.colorstudy.com/ianb/weblog/2003/10/21.html#P17">concurrency oriented programming</a> is not Python's strong point (not necessarily a weak point -- let's just say it's not a point either way).  But to me that's more of a programming tool issue, not an interpreter issue. <a href="http://poshmodule.sourceforge.net/">POSH</a> matters more than the GIL, and I'm sure there's other ideas and programming techniques which could matter even more than that.  So let's just forget about the GIL, there's far more interesting things to be concerned with.
-</p>
- <div class="dates" align="right">
-Created 31 Oct '03<br>
-Modified 25 Jan '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- I can't tick off every item in your checklist, and maybe there's a way around it, but the GIL does seem to get in the way of taking our work on SCons to the next level of optimization.
-<br />
+            <br />
+            Second, I'm much more in the middle of the larger GIL issue than my
+            previous two replies might imply. I'm perfectly willing to believe
+            that the GIL brings with it implementation efficiencies, and that if
+            Python threads were to be re-architected without a GIL, we might pay
+            for it in slower performance in other areas. So overall, the GIL is
+            what it is, and simply has to be accounted for or programmed around.
+            To that extent, I agree with your sentiment that people who cast it
+            as the root of all evil are probably inflating the problem.
+            <br />
 
-<br />
-We have a pretty good thread-pool architecture for controlling builds, courtesy fine work by Anthony Roach and J.T. Conklin, and it works great for the actual build portion:  we start a pool with N threads, each thread requests work from the central dependency tree as needed and controls what it kicks off.
-<br />
+            <br />
+            That having been said, it would be really handy in our case to not
+            have to program around the GIL, because our architecture already
+            provides a huge, proven performance boost <i>except</i> when we want
+            to do multiple things in Python. Can we program around that? Sure,
+            probably. And we'll have to, if we want to speed up this part of
+            SCons. But that doesn't change the fact that if I could wave a magic
+            wand and create a Python without a GIL (and assume no side effects
+            from that change), we'd get a huge performance win, with virtually
+            no programming effort at all.
+            <br />
 
-<br />
-We'd like to be able to use the same model for doing the dependency analysis that creates the tree, which is largely regular expression searches on the contents of source code files.  Because we're using Python code to do that dependency analysis, we can't use the same model that serves us so well for controlling the build portion.
-<br />
+            <br />
+            So the larger point I want to make here is simply that the fact that
+            you personally haven't run into the situations described in your
+            criteria doesn't mean that there aren't compelling, real-world
+            counter-examples to your assertion that the GIL is only a problem in
+            "one little corner case, boo hoo." Of course, you're free to decide
+            that this is just an example of your "corner case," but I can tell
+            you that we have a significant and growing user community that would
+            benefit hugely if we can speed up our dependency analysis, and that
+            at a minimum the presence of the GIL means that it'll be more work
+            than I'd like it to be...
+            <br />
 
-<br />
-On a big multi-processor dedicated build server, where we could really use all the horsepower, during dependency analysis you can see all of the threads and processors go silent except for one at a time, which gets the GIL and calculates the dependencies.  I'm told that the GIL is the (or a) big stumbling block here--I'm not the threading guru on our project--but if it's really not a big deal and there's some other way we could structure things to make use of the other processors, I'd love to hear about it...
- <div align="right"><a href="http://blog.ianbicking.org/comment552.html" rel="nofollow">#</a> <a href="http://www.scons.org">Steven Knight</a></div><hr noshade>
- While it's probably a little annoying, it seems straight-forward enough to deal with: fork instead of using threads.  You'll have to pre-partition the workload, or use some sort of multi-process queue (a database can be an easy way to do this communication, though I'm sure there are other good techniques).  Results can be passed back on a socket, via shared memory (maybe POSH), or through files.  Maybe use Pyro or Twisted Broker.  If you don't use shared memory then you can probably scale this to separate machines fairly easily.
-<br />
+            <br />
+            In any event, thanks for a thought-provoking blog entry.
+            <div align="right">
+                <a href="https://ianbicking.org/comment555.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.scons.org">Steven Knight</a>
+            </div>
+            <hr noshade />
+            The GIL is a problem for exactly two (real) reasons:
+            <br />
 
-<br />
-If I was implementing it I'd probably use Pyro, exposing some manager object that handed out jobs and collected results.  Then you just need some process manager that can spawn new processes and set them on task (bonus points if it can spawn processes on other machines).
- <div align="right"><a href="http://blog.ianbicking.org/comment553.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- Sorry, forking is only available on UNIX; we're really looking for a cross-platform solution.  Threading would provide exactly the right cross-platform model for this if it weren't for the GIL.
- <div align="right"><a href="http://blog.ianbicking.org/comment554.html" rel="nofollow">#</a> <a href="http://www.scons.org">Steven Knight</a></div><hr noshade>
- I was pondering my previous reply (<i>after</i> saving it, of course) and thinking that in my haste to respond to the fork suggestion, I might have started this thread down a path I didn't intend.
-<br />
+            <br />
+            1) Some external system mandates the use of threads. This can be the
+            operating system which requires threads for certain types of I/O. Or
+            it can be other applications that are naturally multi-threaded, and
+            want Python to work seamlessly without clear thead-locality of data.
+            <br />
 
-<br />
-First, I'm not looking for you or anyone else to solve this particular issue for us.  We've spent a lot of time looking at a lot of possible solutions, and unfortunately, this particular problem <i>is</i> one that does not lend itself to refactoring into separate process.  (The cross-platform issue I mentioned is one reason, but there are also performance issues with fork()ing large memory images that chew up the anticipated benefit from calculating dependencies in parallel.)
-<br />
+            <br />
+            2) The other group is populated by people who need threads because
+            they do not understand state-machines. So threads become the
+            one-stop-shop for all forms of programmatic concurrency, without
+            regard for the overhead they involve.
+            <br />
 
-<br />
-Second, I'm much more in the middle of the larger GIL issue than my previous two replies might imply.  I'm perfectly willing to believe that the GIL brings with it implementation efficiencies, and that if Python threads were to be re-architected without a GIL, we might pay for it in slower performance in other areas.  So overall, the GIL is what it is, and simply has to be accounted for or programmed around.  To that extent, I agree with your sentiment that people who cast it as the root of all evil are probably inflating the problem.
-<br />
+            <br />
+            If I am right in my thinking, this refutes the argument that the GIL
+            is only a concern for those with multiprocessor systems. Of course
+            the MP argument is raised all of the time, but only because it is
+            easy to spout on about requirements instead of features.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment556.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.theopalgroup.com/">Kevin Jacobs</a>
+            </div>
+            <hr noshade />
+            Kevin: I don't see how state machines will help. Without threads the
+            GIL doesn't matter, but you'll still be wasting that second
+            processor. Removing the GIL is about making threads utilize the
+            second processor, where the only other way is to use multiple
+            processes.
+            <br />
 
-<br />
-That having been said, it would be really handy in our case to not have to program around the GIL, because our architecture already provides a huge, proven performance boost <i>except</i> when we want to do multiple things in Python.  Can we program around that?  Sure, probably.  And we'll have to, if we want to speed up this part of SCons.  But that doesn't change the fact that if I could wave a magic wand and create a Python without a GIL (and assume no side effects from that change), we'd get a huge performance win, with virtually no programming effort at all.
-<br />
+            <br />
+            Steven: I don't really know what your data set looks like -- if
+            there's a large piece of data that your worker threads/processes
+            need access to, then I imagine it could be a problem. But I'd expect
+            there isn't a big data set, you simply need the worker
+            threads/processes to search for dependencies, which you do by
+            searching for specific patterns. The actual communication of data
+            isn't too great -- filenames for the workers to process, returning
+            lists of files they depend on.
+            <br />
 
-<br />
-So the larger point I want to make here is simply that the fact that you personally haven't run into the situations described in your criteria doesn't mean that there aren't compelling, real-world counter-examples to your assertion that the GIL is only a problem in "one little corner case, boo hoo."  Of course, you're free to decide that this is just an example of your "corner case," but I can tell you that we have a significant and growing user community that would benefit hugely if we can speed up our dependency analysis, and that at a minimum the presence of the GIL means that it'll be more work than I'd like it to be...
-<br />
+            <br />
+            And even if you can't use fork, you can still spawn new processes
+            (if not as quickly). Like a thread pool, you then use a process
+            pool, where worker processes wait around for something to do. If you
+            have a persistent server of some sort, this shouldn't be a problem.
+            <br />
 
-<br />
-In any event, thanks for a thought-provoking blog entry.
- <div align="right"><a href="http://blog.ianbicking.org/comment555.html" rel="nofollow">#</a> <a href="http://www.scons.org">Steven Knight</a></div><hr noshade>
- The GIL is a problem for exactly two (real) reasons:
-<br />
+            <br />
+            But the problem persists if you want the entire process to start up
+            quickly. Python isn't a quick startup, and the harder you work the
+            longer it takes -- building up process pools and the like only make
+            it worse. And since you're probably concerned about latency, not
+            throughput, to a degree this may describe SCons'... anyway, I
+            suppose my <i>boo hoo</i> comment was a little callous ;) But
+            there's always a clever solution, and it's easier to implement those
+            solutions in Python than in the interpreter (and probably every C
+            extension for Python).
+            <div align="right">
+                <a href="https://ianbicking.org/comment557.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            Ian, I contend that the GIL issue has nothing to do with a second,
+            third, or tenth processor. Anyone who claims otherwise isn't serious
+            about high-performance computing.
+            <br />
 
-<br />
-1) Some external system mandates the use of threads.  This can be the operating system which requires threads for certain types of I/O.  Or it can be other applications that are naturally multi-threaded, and want Python to work seamlessly without clear thead-locality of data.
-<br />
+            <br />
+            Let's face it -- there is enough innate parallelism is virtually all
+            common computing tasks that there is no reason why we should accept
+            the overhead of a freely threaded interpreter, just to be able to
+            perform ad-hoc task partitioning. It is a lose-lose solution -- you
+            lose in the single-threaded case because everything is much slower,
+            and you lose in the multi-threaded (multi-processor) case because of
+            the unnecessary complexity introduced by sharing the same address
+            space.
+            <br />
 
-<br />
-2) The other group is populated by people who need threads because they do not understand state-machines.  So threads become the one-stop-shop for all forms of programmatic concurrency, without regard for the overhead they involve.
-<br />
+            <br />
+            So it does all come down to state machines -- if one understands
+            that a multi-threaded program is just an abstraction of a
+            state-machine, and that many better and more efficient relizations
+            of that same state-machine are possible, then people would stop
+            trying to use threads in places where they are not the best
+            solution.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment558.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.theopalgroup.com/">Kevin Jacobs</a>
+            </div>
+            <hr noshade />
+            Interesting blog!
+            <br />
 
-<br />
-If I am right in my thinking, this refutes the argument that the GIL is only a concern for those with multiprocessor systems.  Of course the MP argument is raised all of the time, but only because it is easy to spout on about requirements instead of features.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment556.html" rel="nofollow">#</a> <a href="http://www.theopalgroup.com/">Kevin Jacobs</a></div><hr noshade>
- Kevin: I don't see how state machines will help.  Without threads the GIL doesn't matter, but you'll still be wasting that second processor.  Removing the GIL is about making threads utilize the second processor, where the only other way is to use multiple processes. 
-<br />
+            <br />
+            In my experience SMP is something that people need when they really
+            need it. And for those who really need it, GIL is a problem. :-)
+            <div align="right">
+                <a href="https://ianbicking.org/comment559.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.ispol.com/home/grisha/"
+                    >Grisha Trubetskoy</a
+                >
+            </div>
+            <hr noshade />
+            It's also important to realize that although MP machines are rare
+            now, multithreading processors (like the latest Pentium 4) are
+            becoming more and more prevalent. Thread switching is seen as the
+            easiest way to keep the processor fed, and taking advantage of it
+            will be more and more important as time goes on. It seems like every
+            processor company has a multithreading or mp processor coming out in
+            the future, and I'd hate to see python lose out on that wave. And
+            since it seems like half of tech success is marketing, just losing
+            the marketing point could be a loss. I'd love to see Python succeed
+            everywhere in the future, but I'm a little worried.
+            <div align="right">
+                <a href="https://ianbicking.org/comment560.html" rel="nofollow"
+                    >#</a
+                >
+                Corey Coughlin
+            </div>
+            <hr noshade />
+            Kevin-- Re: your comment:
+            <br />
 
-<br />
-Steven: I don't really know what your data set looks like -- if there's a large piece of data that your worker threads/processes need access to, then I imagine it could be a problem.  But I'd expect there isn't a big data set, you simply need the worker threads/processes to search for dependencies, which you do by searching for specific patterns.  The actual communication of data isn't too great -- filenames for the workers to process, returning lists of files they depend on. 
-<br />
+            <br />
+            <i
+                >So it does all come down to state machines -- if one
+                understands that a multi-threaded program is just an abstraction
+                of a state-machine, and that many better and more efficient
+                relizations of that same state-machine are possible, then people
+                would stop trying to use threads in places where they are not
+                the best solution.</i
+            >
+            <br />
 
-<br />
-And even if you can't use fork, you can still spawn new processes (if not as quickly).  Like a thread pool, you then use a process pool, where worker processes wait around for something to do.  If you have a persistent server of some sort, this shouldn't be a problem. 
-<br />
+            <br />
+            Can you point those of us who aren't concurrency/thread gurus to
+            resources that would help get a grasp on the issues involved, and
+            figure out how we might break down a threaded abstraction into a
+            more efficient state machine?
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment561.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.scons.org/">Steven Knight</a>
+            </div>
+            <hr noshade />
+            I couldn't agree with Corey more. Muthithreaded processors or
+            multiprocessors on a chip will become common place soon. I love
+            Python but I am also worried that many Python developers do not seem
+            to care about this problem.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment562.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.ece.utexas.edu/~luo">Yue Luo</a>
+            </div>
+            <hr noshade />
+            MP machines are <i>not</i> rare in corporate projects -- it has been
+            many, many years that I've worked on a project that didn't run on MP
+            servers.
+            <br />
 
-<br />
-But the problem persists if you want the entire process to start up quickly.  Python isn't a quick startup, and the harder you work the longer it takes -- building up process pools and the like only make it worse.  And since you're probably concerned about latency, not throughput, to a degree this may describe SCons'...  anyway, I suppose my <i>boo hoo</i> comment was a little callous ;)  But there's always a clever solution, and it's easier to implement those solutions in Python than in the interpreter (and probably every C extension for Python).
- <div align="right"><a href="http://blog.ianbicking.org/comment557.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- Ian, I contend that the GIL issue has nothing to do with a second, third, or tenth processor.  Anyone who claims otherwise isn't serious about high-performance computing.
-<br />
+            <br />
+            One of the big reasons that decision makers like Java is that it
+            <i>is</i> true that a little extra money can boost performance of a
+            well-threaded program. Whether you agree or not, this is what is
+            commonly believed and past experience does seem to bear this out for
+            me.
+            <br />
 
-<br />
-Let's face it -- there is enough innate parallelism is virtually all common computing tasks that there is no reason why we should accept the overhead of a freely threaded interpreter, just to be able to perform ad-hoc task partitioning.  It is a lose-lose solution -- you lose in the single-threaded case because everything is much slower, and you lose in the multi-threaded (multi-processor) case because of the unnecessary complexity introduced by sharing the same address space.
-<br />
+            <br />
+            Also note that it is usually easier to design failsafe features into
+            a monolithic program than a grid design. Most of the problems I
+            encounter on my current project are due to failure handling between
+            the multiple applications (~7 programs for one "app"). We have one
+            large open source project saying threads are for weenies (Python,
+            GVR) and another saying monolithic is the only way to go (Linux
+            kernel, LT). Discounting the performance argument, what other design
+            arguments have been made in favor of the Linux kernel over Minix,
+            etc.
+            <br />
 
-<br />
-So it does all come down to state machines -- if one understands that a multi-threaded program is just an abstraction of a state-machine, and that many better and more efficient relizations of that same state-machine are possible, then people would stop  trying to use threads in places where they are not the best solution.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment558.html" rel="nofollow">#</a> <a href="http://www.theopalgroup.com/">Kevin Jacobs</a></div><hr noshade>
- Interesting blog!
-<br />
+            <br />
+            Jython, however, was used in one project to great success, but there
+            is a feeling among management that it is not a "real" project and it
+            may fall by the wayside.
+            <div align="right">
+                <a href="https://ianbicking.org/comment563.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+            >And I haven't actually heard anyone >say, "Python is great, but
+            that GIL >really kicked my ass when I was working >on a past
+            project."
+            <br />
 
-<br />
-In my experience SMP is something that people need when they really need it. And for those who really need it, GIL is a problem. :-)
- <div align="right"><a href="http://blog.ianbicking.org/comment559.html" rel="nofollow">#</a> <a href="http://www.ispol.com/home/grisha/">Grisha Trubetskoy</a></div><hr noshade>
- It's also important to realize that although MP machines are rare now, multithreading processors (like the latest Pentium 4) are becoming more and more prevalent.  Thread switching is seen as the easiest way to keep the processor fed, and taking advantage of it will be more and more important as time goes on.    It seems like every processor company has a multithreading or mp processor coming out in the future, and I'd hate to see python lose out on that wave.  And since it seems like half of tech success is marketing, just losing the marketing point could be a loss.  I'd love to see Python succeed everywhere in the future, but I'm a little worried.
- <div align="right"><a href="http://blog.ianbicking.org/comment560.html" rel="nofollow">#</a> Corey Coughlin</div><hr noshade>
- Kevin--  Re: your comment:
-<br />
+            <br />
+            Of course not, because they didn't consider using Python in the
+            first place because of the GIL limitation.
+            <div align="right">
+                <a href="https://ianbicking.org/comment564.html" rel="nofollow"
+                    >#</a
+                >
+                Anonymous Coward
+            </div>
+            <hr noshade />
+            Even if the GIL is not a big deal in many cases, it remains a factor
+            worth considering in designing and deploying applications. If I were
+            running a single instance of a multithreaded application on an SMP
+            box and had limited hardware resources, I'd want to be aware that
+            one CPU would be underutilized and think about what else I should
+            run on it, too. And if I were writing a Python application to run on
+            a mosix cluster, the GIL would force me away from a threaded
+            architecture, because Python threads won't migrate. But the fact
+            that the GIL matters in some situations doesn't mean that Python
+            sucks, or that applications that don't scale to SMP suck. It isn't
+            unheard of for OSes -- damned good OSes, like Linux -- to have
+            difficulty with SMP, too.
+            <div align="right">
+                <a href="https://ianbicking.org/comment565.html" rel="nofollow"
+                    >#</a
+                >
+                Jacob Smullyan
+            </div>
+            <hr noshade />
+            I take issue with the "it doesn't matter to me, therefore it isn't
+            important" attitude of the original post, that smacks of denial. If
+            I had to make a list of things I would like fixed in Python, the GIL
+            would top that list. Sure, it can be worked around. But the fact
+            that there are work-arounds does not make it any less a wart on an
+            otherwise fine language. On some platforms, notably Win32, multiple
+            processes incur a significantly higher overhead than threading, and
+            pushing towards multiprocessing reduces overall system capacity, and
+            the GIL acts as a kind of glass ceiling on performance.
+            <br />
 
-<br />
-<i>So it does all come down to state machines -- if one understands that a multi-threaded program is just an abstraction of a state-machine, and that many better and more efficient relizations of that same state-machine are possible, then people would stop trying to use threads in places where they are not the best solution.</i>
-<br />
+            <br />
+            We use Corba servers (via omniORB) at my company and had to develop
+            all sorts of ugly load-balancing hacks to get around the concurrency
+            issues. Multi-threading a single process is the way the standard
+            works. There are many applications that maintain caches, and
+            splitting them into multiple processes loses cache hit ratios. We
+            also have to maintain multiple Corba connection pools, which reduces
+            efficiency over a single pool due to queueing theory effects. Sure,
+            the caches can be maintained in shared memory, but I don't think
+            anybody can maintain with a straight face Python handles objects in
+            shared memory particularly elegantly or well.
+            <br />
 
-<br />
-Can you point those of us who aren't concurrency/thread gurus to resources that would help get a grasp on the issues involved, and figure out how we might break down a threaded abstraction into a more efficient state machine?
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment561.html" rel="nofollow">#</a> <a href="http://www.scons.org/">Steven Knight</a></div><hr noshade>
- I couldn't agree with Corey more.  Muthithreaded processors or multiprocessors on a chip will become common place soon.  I love Python but I am also worried that many Python developers do not seem to care about this problem. 
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment562.html" rel="nofollow">#</a> <a href="http://www.ece.utexas.edu/~luo">Yue Luo</a></div><hr noshade>
- MP machines are <i>not</i> rare in corporate projects -- it has been many, many years that I've worked on a project that didn't run on MP servers.
-<br />
+            <br />
+            Finally, multiprocessors are far from exotic, and with
+            hyperthreading, they are actually becoming the rule rather than the
+            exception.
+            <div align="right">
+                <a href="https://ianbicking.org/comment566.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.majid.info/">Fazal Majid</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        FWIW, you can resolve many of the performance issues you
+                        are running into with your partitioned workload by
+                        assigning work to idle engines in LIFO order. This will
+                        ensure that the idle engines at the most common workload
+                        levels end up paged out, and not detracting from the
+                        processes which you are actually keeping loaded.
+                    </p>
+                    <p>
+                        This technique is called &quot;hot engine
+                        scheduling&quot;.
+                    </p>
+                    <p>--Terry</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/-comment-853.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Terry Lambert
+                </div>
+                <hr noshade />
+            </blockquote>
+            An example of where the GIL gets in Python's way:
+            <br />
 
-<br />
-One of the big reasons that decision makers like Java is that it <i>is</i> true that a little extra money can boost performance of a well-threaded program.  Whether you agree or not, this is what is commonly believed and past experience does seem to bear this out for me.
-<br />
+            <br />
+            In the finance world, companies need to tie their systems into
+            news/data feeds. And I'm not talking just one feed. More like 20-50
+            different feeds, all with differing formats (various dialects of
+            FIX, etc). Python is nearly ideal for this application: you can
+            build a nice OO framework, but also hack in little ad-hoc chunks as
+            necessary.
+            <br />
 
-<br />
-Also note that it is usually easier to design failsafe features into a monolithic program than a grid design.  Most of the problems I encounter on my current project are due to failure handling between the multiple applications (~7 programs for one "app").  We have one large open source project saying threads are for weenies (Python, GVR) and another saying monolithic is the only way to go (Linux kernel, LT).  Discounting the performance argument, what other design arguments have been made in favor of the Linux kernel over Minix, etc.
-<br />
+            <br />
+            Python could *own* this space, save for two little problems.
+            <br />
 
-<br />
-Jython, however, was used in one project to great success, but there is a feeling among management that it is not a "real" project and it may fall by the wayside.
- <div align="right"><a href="http://blog.ianbicking.org/comment563.html" rel="nofollow">#</a></div><hr noshade>
- >And I haven't actually heard anyone >say, "Python is great, but that GIL >really kicked my ass when I was working >on a past project." 
-<br />
+            <br />
+            Problem #1: those 20-50 feeds flow continuously. Traffic is very
+            bursty, and often you have only a small window of time to process a
+            given message.
+            <br />
 
-<br />
-Of course not, because they didn't consider using Python in the first place because of the GIL limitation.
- <div align="right"><a href="http://blog.ianbicking.org/comment564.html" rel="nofollow">#</a> Anonymous Coward</div><hr noshade>
- Even if the GIL is not a big deal in many cases, it remains a factor worth considering in designing and deploying applications.  If I were running a single instance of a multithreaded application on an SMP box and had limited hardware resources, I'd want to be aware that one CPU would be underutilized and think about what else I should run on it, too.  And if I were writing a Python application to run on a mosix cluster, the GIL would force me away from a threaded architecture, because Python threads won't migrate.  But the fact that the GIL matters in some situations doesn't mean that Python sucks, or that applications that don't scale to SMP suck.  It isn't unheard of for OSes -- damned good OSes, like Linux -- to have difficulty with SMP, too.
- <div align="right"><a href="http://blog.ianbicking.org/comment565.html" rel="nofollow">#</a> Jacob Smullyan</div><hr noshade>
- I take issue with the "it doesn't matter to me, therefore it isn't important" attitude of the original post, that smacks of denial. If I had to make a list of things I would like fixed in Python, the GIL would top that list. Sure, it can be worked around. But the fact that there are work-arounds does not make it any less a wart on an otherwise fine language. On some platforms, notably Win32, multiple processes incur a significantly higher overhead than threading, and pushing towards multiprocessing reduces overall system capacity, and the GIL acts as a kind of glass ceiling on performance.
-<br />
+            <br />
+            Problem #2: finance companies are not very tolerant of application
+            failure. Apps & servers need to be (triply) overbuilt to withstand
+            Murphy's Law.
+            <br />
 
-<br />
-We use Corba servers (via omniORB) at my company and had to develop all sorts of ugly load-balancing hacks to get around the concurrency issues. Multi-threading a single process is the way the standard works. There are many applications that maintain caches, and splitting them into multiple processes loses cache hit ratios. We also have to maintain multiple Corba connection pools, which reduces efficiency over a single pool due to queueing theory effects. Sure, the caches can be maintained in shared memory, but I don't think anybody can maintain with a straight face Python handles objects in shared memory particularly elegantly or well.
-<br />
+            <br />
+            SMP hardware is cheap insurance for those days when messages get
+            delayed upstream for hours on end, then come blasting down the pipe
+            right before market close. And you do want that insurance, or you
+            will be out of a job when Murphy strikes.
+            <br />
 
-<br />
-Finally, multiprocessors are far from exotic, and with hyperthreading, they are actually becoming the rule rather than the exception.
- <div align="right"><a href="http://blog.ianbicking.org/comment566.html" rel="nofollow">#</a> <a href="http://www.majid.info/">Fazal Majid</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>FWIW, you can resolve many of the performance issues you are running into with your partitioned workload by assigning work to idle engines in LIFO order.  This will ensure that the idle engines at the most common workload levels end up paged out, and not detracting from the processes which you are actually keeping loaded.</p>
-<p>This technique is called &quot;hot engine scheduling&quot;.</p>
-<p>--Terry</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/-comment-853.html" rel="nofollow">#</a> Terry Lambert</div><hr noshade>
-</blockquote>
- An example of where the GIL gets in Python's way:
-<br />
+            <br />
+            It's all about providing a palette of options for scaling. If you
+            need to scale up, you typically need to do it pronto. And if you
+            need to completely re-architect your application, you're out of the
+            game.
+            <br />
 
-<br />
-In the finance world, companies need to tie their systems into news/data feeds. And I'm not talking just one feed. More like 20-50 different feeds, all with differing formats (various dialects of FIX, etc). Python is nearly ideal for this application: you can build a nice OO framework, but also hack in little ad-hoc chunks as necessary.
-<br />
+            <br />
+            FYI, I know a company that was using CPython for exactly this
+            application. They have since switched to a Java core for the app
+            plus JPython for scripting, specifically to get away from the GIL.
+            <div align="right">
+                <a href="https://ianbicking.org/comment567.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.kangas.org">Matt Kangas</a>
+            </div>
+            <hr noshade />
+            I have a little image processing app. It wants to display the
+            processed version of a group of images. I have had to bend over
+            backwards in the worst way in order to allow it to do the image
+            transformations in the background and still get reasonable
+            performance. Even after all my machinations it is still performing
+            at 25% of what it's ideal performance would be. It's not that any of
+            this is impossible to surmount but that it takes so much work to go
+            past the "toy" stage to the "tool" stage for any processor intensive
+            GUI app.
+            <br />
 
-<br />
-Python could *own* this space, save for two little problems.
-<br />
+            <br />
+            I've done enough threaded C++ code in my life to know that it's not
+            trivial to make this fit into a powerful, late-binding language.
+            Certainly there are no other equivalently powerful languages with
+            the sort of concurrency I would like (e.g. Lisp, Ruby, Perl,
+            etc...). It seems like a problem that ought to be solveable
+            eventually though, and I think it is quite important. The GIL has to
+            go.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment568.html" rel="nofollow"
+                    >#</a
+                >
+                Jeff
+            </div>
+            <hr noshade />
 
-<br />
-Problem #1: those 20-50 feeds flow continuously. Traffic is very bursty, and often you have only a small window of time to  process a given message.
-<br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment569.html" rel="nofollow"
+                    >#</a
+                >
+                John Costello
+            </div>
+            <hr noshade />
+            Argh.
+            <br />
 
-<br />
-Problem #2: finance companies are not very tolerant of application failure. Apps & servers need to be (triply) overbuilt to withstand Murphy's Law.
-<br />
+            <br />
+            As a computational scientist interested in using Python for
+            high-performance fluid dynamics simulations, I'm in another
+            constituency where the GIL is a pain in the ass.
+            <br />
 
-<br />
-SMP hardware is cheap insurance for those days when messages get delayed upstream for hours on end, then come blasting down the pipe right before market close. And you do want that insurance, or you will be out of a job when Murphy strikes.
-<br />
+            <br />
+            Of course, if Python had a full-featured MPI implementation, this
+            wouldn't be so much of a problem. I'm working on it!
+            <div align="right">
+                <a href="https://ianbicking.org/comment570.html" rel="nofollow"
+                    >#</a
+                >
+                John Costello
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I'm a student at the College of Wooster in Ohio, and I'm
+                        having trouble with Python threading and MPI, as well.
+                        Specifically I'm using the Pypar MPI module, and when
+                        one of my threads blocks on a send/receive, my whole
+                        program blocks. I'm a Python beginner starting with this
+                        project, and needless to say, I was quite irritated when
+                        I discovered the all-important GIL and the role it
+                        plays. Does anyone have any good suggestions to overcome
+                        this limitation?
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/-comment-871.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Joel Wietelmann
+                </div>
+                <hr noshade />
+            </blockquote>
 
-<br />
-It's all about providing a palette of options for scaling. If you need to scale up, you typically need to do it pronto. And if you need to completely re-architect your application, you're out of the game.
-<br />
+            <div class="document">
+                I tried out the posh module, and have found that at least on
+                Python 2.3.5, it's quite unreliable. For example, sharing an
+                empty list or popping from a shared list results in segfaults.
+                Has anyone been using posh extensibly with a recent version of
+                Python?
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/gil-of-doom-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.kenkinder.com/">Ken Kinder</a>
+            </div>
+            <hr noshade />
 
-<br />
-FYI, I know a company that was using CPython for exactly this application. They have since switched to a Java core for the app plus JPython for scripting, specifically to get away from the GIL.
- <div align="right"><a href="http://blog.ianbicking.org/comment567.html" rel="nofollow">#</a> <a href="http://www.kangas.org">Matt Kangas</a></div><hr noshade>
- I have a little image processing app.  It wants to display the processed version of a group of images.  I have had to bend over backwards in the worst way in order to allow it to do the image transformations in the background and still get reasonable performance.  Even after all my machinations it is still performing at 25% of what it's ideal performance would be.  It's not that any of this is impossible to surmount but that it takes so much work to go past the "toy" stage to the "tool" stage for any processor intensive GUI app.
-<br />
+            <div class="document">
+                <p>
+                    Good. More spin surrounding the GIL. If there's one way to
+                    identify a serious design defect it's as simple as measuring
+                    how much after market documentation is devoted to explaining
+                    and justifying the issue. The GIL has got to be right up
+                    there with lamba and long fought battle to get the +=
+                    operator.
+                </p>
+                <p>
+                    So, now I've heard several tacks for discounting the
+                    seriousness of the GIL limitation.
+                </p>
+                <ul class="simple">
+                    <li>
+                        I don't has multiple processors because I'm too poor,
+                        boo hoo. :( Yes, hardware costs are dropping. But I'm
+                        getting poorer (cheaper) at an even faster rate. Snif!
+                    </li>
+                    <li>
+                        I tried thread programming once, ran into a deadlock (I
+                        think) and determined the problem could best be solved
+                        by demonizing all thread programming as unnecessary and
+                        EVIL. Whew!
+                    </li>
+                    <li>What's a GIL??</li>
+                    <li>
+                        I'd fix the GIL tomorrow but my ego says I'll get more
+                        credit if I code yet another GUI or web interface. Hmmm,
+                        or maybe a screen saver!
+                    </li>
+                    <li>
+                        If we allowed programmers around the GIL restrictions
+                        then there'd be no reason for Java to exist.
+                    </li>
+                    <li>
+                        If we fix the GIL then we'd have to admit it was a short
+                        sighted idea in the first place. After all of these
+                        years. While we harped about it's
+                        &quot;importance&quot;.
+                    </li>
+                    <li>
+                        Tried to fix the GIL once. Can't be done. End of story.
+                    </li>
+                    <li>Cause Guido told me so.</li>
+                </ul>
+                <p>Sigh.</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/gil-of-doom-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                John Mudd
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I don't care about the GIL because I care about
+                        <em>real</em> performance problems I encounter, and I
+                        have never, ever encountered a performance problem
+                        because of the GIL. It's a theoretical problem, not a
+                        real problem that programmers encounter, except in a
+                        very small number of cases for a very small number of
+                        programmers.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/gil-of-doom-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            FYI: The May issue of Dr, Dobb's is available now.
+                            There's an article in it entitled
+                            &quot;Multi-threaded Technology &amp; Dual-Core
+                            Processors&quot;. Not sure if this is significant
+                            though. The author is an engineer at Intel, not
+                            exactly a mainstream company.
+                        </p>
+                        <p>
+                            Oh, but it's not a total waste. The same issue
+                            contains another article &quot;Python 2.4
+                            Decorators&quot;. Now THAT's definitely not a case
+                            of a solution in search of a problem.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/gil-of-doom-comment-4.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">John Mudd</a>
+                    </div>
+                    <hr noshade />
 
-<br />
-I've done enough threaded C++ code in my life to know that it's not trivial to make this fit into a powerful, late-binding language.  Certainly there are no other equivalently powerful languages with the sort of concurrency I would like (e.g. Lisp, Ruby, Perl, etc...).  It seems like a problem that ought to be solveable eventually though, and I think it is quite important.  The GIL has to go.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment568.html" rel="nofollow">#</a> Jeff</div><hr noshade>
- 
- <div align="right"><a href="http://blog.ianbicking.org/comment569.html" rel="nofollow">#</a> John Costello</div><hr noshade>
- Argh.
-<br />
+                    <div class="document">
+                        <p>
+                            The GIL may not be the worst thing in the world but
+                            why are you defending it? It doesn't deserve it.
+                        </p>
+                        <p>
+                            Ironically, the GIL is functionally almost
+                            equivalent to the Linux kernel's BKL (Big Kernel
+                            Lock). Now that it's virtually gone, no one would
+                            put it back right now. Few would claim that removing
+                            it was a bad idea. Speed gains were concrete.
+                            Considering that Python is anecdotally 30 times
+                            slower than straight C, if we can get a 10% speed
+                            increase, isn't that worthwhile?
+                        </p>
+                        <p>
+                            I have had issues with the GIL in real projects. The
+                            most vexing was having my GUI fight with my XML
+                            processor over the GIL. Both shouldn't affect each
+                            other. It's not good, and it's not defensible. I
+                            ended up solving it by forking, but it generated
+                            over 400 lines of very touchy code that I have to
+                            maintain. Is it that unreasonable that I don't like
+                            Python getting in my way? That's why I use it in the
+                            first place.
+                        </p>
+                        <p>
+                            Apart from my app, how many real projects need to
+                            put up a GUI and chew lots of XML? How about a web
+                            browser? Is that not a &quot;real&quot; project? I
+                            don't know what kind of projects you deal with on a
+                            daily basis. I do know that you are a proponent of
+                            WSGI. Can you really stand behind providing a
+                            world-class web standards kit that can't run in
+                            highly parallel applications? Isn't that what makes
+                            web-applications fly?
+                        </p>
+                        <p>
+                            This is one of the major issues still remaining in
+                            Python.
+                        </p>
+                        <p>
+                            While I'm at it, a lack of good memory management is
+                            another. I don't mean garbage collection SUX0RZ, I
+                            mean hogging megabytes of extra memory per process
+                            because Python doesn't like giving it back (and
+                            shared memory support too please). This is another
+                            problem that WSGI inadvertently addresses and that
+                            can complicate the &quot;Use The Fork, Luke,&quot;
+                            suggestion above. It's difficult to run many Python
+                            processes on because they don't give memory back
+                            readily. Try cyclically generating a 250MB report
+                            once per day. You'll find that your server process
+                            will inflate and never deflate.
+                        </p>
+                        <p>
+                            At any rate, having structure-granular ILs (or even
+                            memory-region-granular ILs) would be a godsend for
+                            some of us.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/gil-of-doom-comment-5.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Jayson Vantuyl
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                Returning memory to the OS during runtime is
+                                very rare among UNIX programs in general. I
+                                would support the creation of some function
+                                (perhaps in the sys module) that would cause
+                                Python to do this (perhaps sys.free()? or
+                                sys.sbrk(-1) or something like that).
+                            </p>
+                            <p>
+                                However, the saner answer for a daemon process
+                                that's about to generate a 250MB report (or
+                                otherwise use a tremendous amount of memory)
+                                would be to fork(), generate the report, and
+                                exit(). The memory allocations will all happen
+                                in the child and it's memory will be freed back
+                                to the OS when the child process dies.
+                            </p>
+                            <p>JimD</p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/gil-of-doom-comment-7.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="http://www.starshine.org/sysadmoin/JimD"
+                                >Jim Dennis</a
+                            >
+                        </div>
+                        <hr noshade />
 
-<br />
-As a computational scientist interested in using Python for high-performance fluid dynamics simulations, I'm in another constituency where the GIL is a pain in the ass.
-<br />
+                        <div class="document">
+                            <p>
+                                &gt; The GIL may not be the worst thing in the
+                                world but why are you defending it?
+                            </p>
+                            <p>
+                                It has a cost, but it also has benefits -- there
+                                are an awful lot of threading-related bugs that
+                                just don't happen because of the GIL. If the
+                                cost isn't so very high (and maybe even if it
+                                is), then that is a good tradeoff.
+                            </p>
+                            <p>
+                                &gt; Apart from my app, how many real projects
+                                need to put up a GUI and chew lots of XML?
+                            </p>
+                            <p>
+                                If the XML is a chokepoint, it might be worth
+                                using an extension module -- which can release
+                                the GIL.
+                            </p>
+                            <p>
+                                &gt; This is one of the major issues still
+                                remaining in Python.
+                            </p>
+                            <p>
+                                Brett Cannon's thesis will work on sandboxing,
+                                so that you can run multiple interpreters. Since
+                                they'll have separate object spaces, the GIL
+                                contention should be greatly reduced.
+                            </p>
+                            <p>
+                                &gt; hogging megabytes of extra memory per
+                                process because Python doesn't like giving it
+                                back
+                            </p>
+                            <p>
+                                I believe 2.5 includes a patch to change this. I
+                                don't know whether or not it is the default.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/gil-of-doom-comment-9.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            JimJJewett
+                        </div>
+                        <hr noshade />
 
-<br />
-Of course, if Python had a full-featured MPI implementation, this wouldn't be so much of a problem.  I'm working on it!
- <div align="right"><a href="http://blog.ianbicking.org/comment570.html" rel="nofollow">#</a> John Costello</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>I'm a student at the College of Wooster in Ohio, and I'm having trouble with Python threading and MPI, as well.  Specifically I'm using the Pypar MPI module, and when one of my threads blocks on a send/receive, my whole program blocks.  I'm a Python beginner starting with this project, and needless to say, I was quite irritated when I discovered the all-important GIL and the role it plays.  Does anyone have any good suggestions to overcome this limitation?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/-comment-871.html" rel="nofollow">#</a> Joel Wietelmann</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-I tried out the posh module, and have found that at least on Python 2.3.5, it's quite unreliable. For example, sharing an empty list or popping from a shared list results in segfaults. Has anyone been using posh extensibly with a recent version of Python?</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-1.html" rel="nofollow">#</a> <a href="http://www.kenkinder.com/">Ken Kinder</a></div><hr noshade>
- 
-<div class="document">
-<p>Good.  More spin surrounding the GIL.  If there's one way to identify a serious design defect it's as simple as measuring how much after market documentation is devoted to explaining and justifying the issue.  The GIL has got to be right up there with lamba and long fought battle to get the += operator.</p>
-<p>So, now I've heard several tacks for discounting the seriousness of the GIL limitation.</p>
-<ul class="simple">
-<li>I don't has multiple processors because I'm too poor, boo hoo. :(   Yes, hardware costs are dropping.  But I'm getting poorer (cheaper) at an even faster rate.  Snif!</li>
-<li>I tried thread programming once, ran into a deadlock (I think) and determined the problem could best be solved by demonizing all thread programming as unnecessary and EVIL.  Whew!</li>
-<li>What's a GIL??</li>
-<li>I'd fix the GIL tomorrow but my ego says I'll get more credit if I code yet another GUI or web interface.  Hmmm, or maybe a screen saver!</li>
-<li>If we allowed programmers around the GIL restrictions then there'd be no reason for Java to exist.</li>
-<li>If we fix the GIL then we'd have to admit it was a short sighted idea in the first place.  After all of these years.  While we harped about it's &quot;importance&quot;.</li>
-<li>Tried to fix the GIL once.  Can't be done.  End of story.</li>
-<li>Cause Guido told me so.</li>
-</ul>
-<p>Sigh.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-2.html" rel="nofollow">#</a> John Mudd</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>I don't care about the GIL because I care about <em>real</em> performance problems I encounter, and I have never, ever encountered a performance problem because of the GIL.  It's a theoretical problem, not a real problem that programmers encounter, except in a very small number of cases for a very small number of programmers.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-3.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>FYI:  The May issue of Dr, Dobb's is available now.  There's an article in it entitled &quot;Multi-threaded Technology &amp; Dual-Core Processors&quot;.  Not sure if this is significant though.  The author is an engineer at Intel, not exactly a mainstream company.</p>
-<p>Oh, but it's not a total waste.  The same issue contains another article &quot;Python 2.4 Decorators&quot;.  Now THAT's definitely not a case of a solution in search of a problem.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-4.html" rel="nofollow">#</a> <a href="http://">John Mudd</a></div><hr noshade>
- 
-<div class="document">
-<p>The GIL may not be the worst thing in the world but why are you defending it?  It doesn't deserve it.</p>
-<p>Ironically, the GIL is functionally almost equivalent to the Linux kernel's BKL (Big Kernel Lock).  Now that it's virtually gone, no one would put it back right now.  Few would claim that removing it was a bad idea.  Speed gains were concrete.  Considering that Python is anecdotally 30 times slower than straight C, if we can get a 10% speed increase, isn't that worthwhile?</p>
-<p>I have had issues with the GIL in real projects.  The most vexing was having my GUI fight with my XML processor over the GIL.  Both shouldn't affect each other.  It's not good, and it's not defensible.  I ended up solving it by forking, but it generated over 400 lines of very touchy code that I have to maintain.  Is it that unreasonable that I don't like Python getting in my way?  That's why I use it in the first place.</p>
-<p>Apart from my app, how many real projects need to put up a GUI and chew lots of XML?  How about a web browser?  Is that not a &quot;real&quot; project?  I don't know what kind of projects you deal with on a daily basis.  I do know that you are a proponent of WSGI.  Can you really stand behind providing a world-class web standards kit that can't run in highly parallel applications?  Isn't that what makes web-applications fly?</p>
-<p>This is one of the major issues still remaining in Python.</p>
-<p>While I'm at it, a lack of good memory management is another.  I don't mean garbage collection SUX0RZ, I mean hogging megabytes of extra memory per process because Python doesn't like giving it back (and shared memory support too please).  This is another problem that WSGI inadvertently addresses and that can complicate the &quot;Use The Fork, Luke,&quot; suggestion above.  It's difficult to run many Python processes on because they don't give memory back readily.  Try cyclically generating a 250MB report once per day.  You'll find that your server process will inflate and never deflate.</p>
-<p>At any rate, having structure-granular ILs (or even memory-region-granular ILs) would be a godsend for some of us.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-5.html" rel="nofollow">#</a> Jayson Vantuyl</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Returning memory to the OS during runtime is very rare among UNIX programs in general. I would support the creation of some function (perhaps in the sys module) that would cause Python to do this (perhaps sys.free()? or sys.sbrk(-1) or something like that).</p>
-<p>However, the saner answer for a daemon process that's about to generate a 250MB report (or otherwise use a tremendous amount of memory) would be to fork(), generate the report, and exit().  The memory allocations will all happen in the child and it's memory will be freed back to the OS when the child process dies.</p>
-<p>JimD</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-7.html" rel="nofollow">#</a> <a href="http://www.starshine.org/sysadmoin/JimD">Jim Dennis</a></div><hr noshade>
- 
-<div class="document">
-<p>&gt; The GIL may not be the worst thing in the world but why are you defending it?</p>
-<p>It has a cost, but it also has benefits -- there are an awful lot of threading-related bugs that just don't happen because of the GIL.  If the cost isn't so very high (and maybe even if it is), then that is a good tradeoff.</p>
-<p>&gt; Apart from my app, how many real projects need to put up a GUI and chew lots of XML?</p>
-<p>If the XML is a chokepoint, it might be worth using an extension module -- which can release the GIL.</p>
-<p>&gt; This is one of the major issues still remaining in Python.</p>
-<p>Brett Cannon's thesis will work on sandboxing, so that you can run multiple interpreters.  Since they'll have separate object spaces, the GIL contention should be greatly reduced.</p>
-<p>&gt; hogging megabytes of extra memory per process because Python doesn't like giving it back</p>
-<p>I believe 2.5 includes a patch to change this.  I don't know whether or not it is the default.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-9.html" rel="nofollow">#</a> JimJJewett</div><hr noshade>
- 
-<div class="document">
-<p>.... why are you defending [the GIL]?</p>
-<p>It has a cost, but it also has benefits -- there are an awful lot of threading-related bugs that just don't happen because of the GIL.  If the cost isn't so very high (and maybe even if it is), then that is a good tradeoff.</p>
-<p>.... many real projects need to put up a GUI and chew lots of XML</p>
-<p>If the XML is a chokepoint, it might be worth using an extension module -- which can release the GIL.</p>
-<p>Also note that Brett Cannon's thesis will work on sandboxing, so that you can run multiple interpreters.  Since they'll have separate object spaces, the GIL contention should be greatly reduced.</p>
-<p>... [and also] hogging megabytes of extra memory per process because Python doesn't like giving it back</p>
-<p>I believe 2.5 includes a patch to change this.  I don't know whether or not it is the default.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-10.html" rel="nofollow">#</a> JimJJewett</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<blockquote>
-e2vesc4q-800229030</blockquote>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-40.html" rel="nofollow">#</a> anonymous</div><hr noshade>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-<p>Wouldn't it be possible to use an external threading library bypassing the GIL limitation?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-6.html" rel="nofollow">#</a> Marc</div><hr noshade>
- 
-<div class="document">
-<p>Read it and weep, GIL lovers.</p>
-<p>Why Events Are A Bad Idea
-<a class="reference" href="http://www.usenix.org/events/hotos03/tech/vonbehren.html">http://www.usenix.org/events/hotos03/tech/vonbehren.html</a></p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-8.html" rel="nofollow">#</a> John Mudd</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Did you actually read that paper?  The proposed alternative to events is a custom, user-space thread implementation with tight compiler integration.  It has absolutely nothing whatsoever to do with the kind of threading supported in any mainstream language today.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-11.html" rel="nofollow">#</a> <a href="http://twistedmatrix.com/">Jean-Paul Calderone</a></div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>I used to be a serious python 'head'.. (pythonista, whateva).. now I still appreciate python,
-but this 'defending the GIL' and 'just fork' business is a load of crap and continually makes me -not-
-want to use python, although I still find it's minimalism, clarity, and large availability of
-extensions wonderful.</p>
-<p>first of all- as to the question of 'who needs threads' - I hope this is a joke.</p>
-<p>If you need performance, which some people do, and threading helps them achieve performance and clear
-programming abstractions which it would, and it wouldn't hurt non-threading too much, which it wouldn't
-if designed properly, and these people would use your language and would remove barriers to people
-considering the languages seriously, then why would you -not- want it?</p>
-<p>There are at least 2 interpreted (or should I say incrementally compiled) lisp/scheme interpreters
-that exist, for real, today.. chez scheme and SBCL on x86. And then of course, there is java's bytcoded
-VM which is threaded in some cases as well.. as far as I can remember perl threads are native as well
-(when they work).. and parrot definately has an interpreter framework for multithreading -
-if python ever moves in that direction instead of towards PyPy 'language feature obsession' like I
-hope it would.</p>
-<p>R.Kent Dyvbig, the author of chez scheme has a wonderfully detailed paper  (<a class="reference" href="http://www.cs.indiana.edu/~dyb/pubs/hocs.pdf">http://www.cs.indiana.edu/~dyb/pubs/hocs.pdf</a>)
-about the development of chez scheme over the past 20+! years with plenty of technical details (conceptually anyway, it's still a closed-source scheme implementation) about VM and RTTI in dynamic languages. The section on the implementation of version 7 deals specifically with adding threading to the system - not trivial, but
-managable if you <em>want</em> to do it. This article took me many passes to even comprehend - so don't be afraid :)</p>
-<p>As for the 'it might have a performance hit' or 'what about the broken extension modules' crowd,
-even if this were true (if designed properly, the performance hit could be designed around and would be minimal, and you could always lock around all entry to broken threaded modules) there's nothing saying that true
-threads could not be a compile-time option to building the interpreter with or without native threads for
-those that prefer the single threaded approach &quot;with less overhead&quot; (or even have it determined at start-up-time via some kind of system check)</p>
-<p>Not to mention all the argument to the negative about MP locking in the FreeBSD world (that lead to Dfly breaking off) and as mentioned by this thread in the NPTL-implementing-Linux world - all of which
-states that 'locking with too much underneath the lock' is bad.</p>
-<p>Big locks are bad long-term design decisions (e.g. it would be a hack for the case of broken modules as I mentioned it above), working around them is very difficult, but is not impossible,
-and defending bad design decisions is simply an excuse, not a reason.</p>
-<p>For those that say 'just fork' I pose the simple question :</p>
-<p>&quot;If threads are unecessary when fork() exists, why were they invented for unix in the first place?&quot;</p>
-<p>which is a unix-specific argument, but its a good example where fork wasn't good enough and threading
-was added to overcome it's limitations. It doesn't necissarily answer the question of threading being</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">&lt;string&gt;</tt>, line 42)</p>
-Unexpected indentation.</div>
-<blockquote>
-necessary, but noone is arguing that 'real threads' shouldn't exist in Unix or Unix-Like systems</blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 43)</p>
-Block quote ends without a blank line; unexpected unindent.</div>
-<p>on this thread.. and probably wouldn't dare.</p>
-<p>I do understand that a big locking strategy is often a good first step towards a better implementation,
-but sometimes it's time to take a -second- step.. (and a third, etc) to get an even better implementation.</p>
-<p>And I don't want it bad enough to code it - even if that makes me a whiner.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-12.html" rel="nofollow">#</a> C Turner</div><hr noshade>
- 
-<div class="document">
-<p>There are ways to overcome GIL limitations in python.</p>
-<p>One of them is to use ppsmp module: <a class="reference" href="http://www.parallelpython.com">http://www.parallelpython.com</a></p>
-<p>It allows to execute python code in parallel on SMP computers (both multicore and multiprocessor)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-14.html" rel="nofollow">#</a> <a href="http://www.parallelpython.com">Parallel Python</a></div><hr noshade>
- 
-<div class="document">
-<p>There are numerous applications that satisfy your criteria, you have just written them to sound daunting.  Just about any image processing application (photoshop, gimp) or video or audio application is a candidate.  If you don't have needs for real multi-threading, then lucky you, but many people do.</p>
-<p>The GIL is a huge wart of the side of an otherwise attrective language.</p>
-<p>This needs to be fixed for the language to be taken seriously.   Otherwise Python will be consigned to the scrap heap of toy languages like Pascal.  It's not even worth debating it. Don't rationalize this wart, think about how it could be fixed.</p>
-<p>I came to love python and teach classes in it. Now, due to frustration over the GIL (i.e. the fact I could double or octuple) the speed of the compute-bound processing I do, I may switch back to C or Java for my own work.</p>
-<p>To call this a &quot;corner case&quot; is just silly.  The popularity of multi-core systems is not just for running multiple process.  Multi-threading is often much easier to implement for a computationally intensive task.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/gil-of-doom-comment-17.html" rel="nofollow">#</a> Greg</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+                        <div class="document">
+                            <p>.... why are you defending [the GIL]?</p>
+                            <p>
+                                It has a cost, but it also has benefits -- there
+                                are an awful lot of threading-related bugs that
+                                just don't happen because of the GIL. If the
+                                cost isn't so very high (and maybe even if it
+                                is), then that is a good tradeoff.
+                            </p>
+                            <p>
+                                .... many real projects need to put up a GUI and
+                                chew lots of XML
+                            </p>
+                            <p>
+                                If the XML is a chokepoint, it might be worth
+                                using an extension module -- which can release
+                                the GIL.
+                            </p>
+                            <p>
+                                Also note that Brett Cannon's thesis will work
+                                on sandboxing, so that you can run multiple
+                                interpreters. Since they'll have separate object
+                                spaces, the GIL contention should be greatly
+                                reduced.
+                            </p>
+                            <p>
+                                ... [and also] hogging megabytes of extra memory
+                                per process because Python doesn't like giving
+                                it back
+                            </p>
+                            <p>
+                                I believe 2.5 includes a patch to change this. I
+                                don't know whether or not it is the default.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/gil-of-doom-comment-10.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            JimJJewett
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+
+                    <div class="document">
+                        <blockquote>e2vesc4q-800229030</blockquote>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/gil-of-doom-comment-40.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        anonymous
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Wouldn't it be possible to use an external threading library
+                    bypassing the GIL limitation?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/gil-of-doom-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Marc
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>Read it and weep, GIL lovers.</p>
+                <p>
+                    Why Events Are A Bad Idea
+                    <a
+                        class="reference"
+                        href="http://www.usenix.org/events/hotos03/tech/vonbehren.html"
+                        >http://www.usenix.org/events/hotos03/tech/vonbehren.html</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/gil-of-doom-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                John Mudd
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Did you actually read that paper? The proposed
+                        alternative to events is a custom, user-space thread
+                        implementation with tight compiler integration. It has
+                        absolutely nothing whatsoever to do with the kind of
+                        threading supported in any mainstream language today.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/gil-of-doom-comment-11.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://twistedmatrix.com/">Jean-Paul Calderone</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I used to be a serious python 'head'.. (pythonista,
+                    whateva).. now I still appreciate python, but this
+                    'defending the GIL' and 'just fork' business is a load of
+                    crap and continually makes me -not- want to use python,
+                    although I still find it's minimalism, clarity, and large
+                    availability of extensions wonderful.
+                </p>
+                <p>
+                    first of all- as to the question of 'who needs threads' - I
+                    hope this is a joke.
+                </p>
+                <p>
+                    If you need performance, which some people do, and threading
+                    helps them achieve performance and clear programming
+                    abstractions which it would, and it wouldn't hurt
+                    non-threading too much, which it wouldn't if designed
+                    properly, and these people would use your language and would
+                    remove barriers to people considering the languages
+                    seriously, then why would you -not- want it?
+                </p>
+                <p>
+                    There are at least 2 interpreted (or should I say
+                    incrementally compiled) lisp/scheme interpreters that exist,
+                    for real, today.. chez scheme and SBCL on x86. And then of
+                    course, there is java's bytcoded VM which is threaded in
+                    some cases as well.. as far as I can remember perl threads
+                    are native as well (when they work).. and parrot definately
+                    has an interpreter framework for multithreading - if python
+                    ever moves in that direction instead of towards PyPy
+                    'language feature obsession' like I hope it would.
+                </p>
+                <p>
+                    R.Kent Dyvbig, the author of chez scheme has a wonderfully
+                    detailed paper (<a
+                        class="reference"
+                        href="http://www.cs.indiana.edu/~dyb/pubs/hocs.pdf"
+                        >http://www.cs.indiana.edu/~dyb/pubs/hocs.pdf</a
+                    >) about the development of chez scheme over the past 20+!
+                    years with plenty of technical details (conceptually anyway,
+                    it's still a closed-source scheme implementation) about VM
+                    and RTTI in dynamic languages. The section on the
+                    implementation of version 7 deals specifically with adding
+                    threading to the system - not trivial, but managable if you
+                    <em>want</em> to do it. This article took me many passes to
+                    even comprehend - so don't be afraid :)
+                </p>
+                <p>
+                    As for the 'it might have a performance hit' or 'what about
+                    the broken extension modules' crowd, even if this were true
+                    (if designed properly, the performance hit could be designed
+                    around and would be minimal, and you could always lock
+                    around all entry to broken threaded modules) there's nothing
+                    saying that true threads could not be a compile-time option
+                    to building the interpreter with or without native threads
+                    for those that prefer the single threaded approach
+                    &quot;with less overhead&quot; (or even have it determined
+                    at start-up-time via some kind of system check)
+                </p>
+                <p>
+                    Not to mention all the argument to the negative about MP
+                    locking in the FreeBSD world (that lead to Dfly breaking
+                    off) and as mentioned by this thread in the
+                    NPTL-implementing-Linux world - all of which states that
+                    'locking with too much underneath the lock' is bad.
+                </p>
+                <p>
+                    Big locks are bad long-term design decisions (e.g. it would
+                    be a hack for the case of broken modules as I mentioned it
+                    above), working around them is very difficult, but is not
+                    impossible, and defending bad design decisions is simply an
+                    excuse, not a reason.
+                </p>
+                <p>
+                    For those that say 'just fork' I pose the simple question :
+                </p>
+                <p>
+                    &quot;If threads are unecessary when fork() exists, why were
+                    they invented for unix in the first place?&quot;
+                </p>
+                <p>
+                    which is a unix-specific argument, but its a good example
+                    where fork wasn't good enough and threading was added to
+                    overcome it's limitations. It doesn't necissarily answer the
+                    question of threading being
+                </p>
+                <div class="system-message">
+                    <p class="system-message-title">
+                        System Message: ERROR/3 (<tt class="docutils"
+                            >&lt;string&gt;</tt
+                        >, line 42)
+                    </p>
+                    Unexpected indentation.
+                </div>
+                <blockquote>
+                    necessary, but noone is arguing that 'real threads'
+                    shouldn't exist in Unix or Unix-Like systems
+                </blockquote>
+                <div class="system-message">
+                    <p class="system-message-title">
+                        System Message: WARNING/2 (<tt class="docutils"
+                            >&lt;string&gt;</tt
+                        >, line 43)
+                    </p>
+                    Block quote ends without a blank line; unexpected unindent.
+                </div>
+                <p>on this thread.. and probably wouldn't dare.</p>
+                <p>
+                    I do understand that a big locking strategy is often a good
+                    first step towards a better implementation, but sometimes
+                    it's time to take a -second- step.. (and a third, etc) to
+                    get an even better implementation.
+                </p>
+                <p>
+                    And I don't want it bad enough to code it - even if that
+                    makes me a whiner.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/gil-of-doom-comment-12.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                C Turner
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>There are ways to overcome GIL limitations in python.</p>
+                <p>
+                    One of them is to use ppsmp module:
+                    <a class="reference" href="http://www.parallelpython.com"
+                        >http://www.parallelpython.com</a
+                    >
+                </p>
+                <p>
+                    It allows to execute python code in parallel on SMP
+                    computers (both multicore and multiprocessor)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/gil-of-doom-comment-14.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.parallelpython.com">Parallel Python</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    There are numerous applications that satisfy your criteria,
+                    you have just written them to sound daunting. Just about any
+                    image processing application (photoshop, gimp) or video or
+                    audio application is a candidate. If you don't have needs
+                    for real multi-threading, then lucky you, but many people
+                    do.
+                </p>
+                <p>
+                    The GIL is a huge wart of the side of an otherwise
+                    attrective language.
+                </p>
+                <p>
+                    This needs to be fixed for the language to be taken
+                    seriously. Otherwise Python will be consigned to the scrap
+                    heap of toy languages like Pascal. It's not even worth
+                    debating it. Don't rationalize this wart, think about how it
+                    could be fixed.
+                </p>
+                <p>
+                    I came to love python and teach classes in it. Now, due to
+                    frustration over the GIL (i.e. the fact I could double or
+                    octuple) the speed of the compute-bound processing I do, I
+                    may switch back to C or Java for my own work.
+                </p>
+                <p>
+                    To call this a &quot;corner case&quot; is just silly. The
+                    popularity of multi-core systems is not just for running
+                    multiple process. Multi-threading is often much easier to
+                    implement for a computationally intensive task.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/gil-of-doom-comment-17.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Greg
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

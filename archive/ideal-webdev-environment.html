@@ -1,275 +1,725 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>An Ideal Web Development Environment</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>An Ideal Web Development Environment</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>An Ideal Web Development Environment</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                I wanted to list a bunch of features of an ideal environment for
+                web development. Well, here's some features, in no particular
+                order. This only covers a few aspects, sometimes at a high level
+                and sometimes at a fairly low level. Whether I intended it or
+                not -- I actually forget -- Little of it is Python specific. It
+                could apply just as well to Perl, Ruby, or Lisp as it would to
+                Python (PHP, Java, and .NET/ASP already have a slightly
+                different take on many of these issues, and in various ways I
+                suspect many of these things wouldn't be applicable --
+                Smalltalk, except perhaps for
+                <a
+                    class="reference"
+                    href="http://www.gnu.org/software/smalltalk/smalltalk.html"
+                    >GNU</a
+                >, is so far out of the norm that it's hard to usefully
+                include). These are mostly focused on the development tools and
+                conventions, not such petty things as <em>code</em> (silly
+                human, code is for monkeys!)
+            </p>
+            <p>
+                I plan to expand this list as I think of more things; maybe I'll
+                store it someplace more permanent. I'm sure I've left out large
+                areas that are important aspects to development.
+            </p>
+            <ol class="arabic simple">
+                <li>
+                    It should be easy to figure out where things in the rendered
+                    HTML come from. This could probably be handled with
+                    comments. Of course, they could only be inserted in a
+                    debugging mode. They should be automatic, not just
+                    conventions the template writers use.
+                </li>
+                <li>
+                    Templates should have a search path, where typically the
+                    first paths on the path are specific to the installation or
+                    site.
+                </li>
+                <li>
+                    There should be an easy way to clone the
+                    application-installed template into that site directory.
+                    There should be 3-way merges so you can integrate changes to
+                    the application templates into your customized templates.
+                    Obviously source control should be applied here too. Maybe
+                    all this happens through a web interface, maybe not.
+                </li>
+                <li>
+                    Internationalization files go through the same process, as
+                    well as CSS. I don't see a good reason for Javascript,
+                    though. CSS should not be rendered unless there is a very
+                    good reason, it should be a static file directly served.
+                    DItto Javascript. This way there is a direct mapping from
+                    these files to files on disk.
+                </li>
+                <li>
+                    Everything should be refreshed immediately (i.e., changes
+                    are viewed on next reload). Syntax errors should produce
+                    useful messages (including syntax errors in Python that
+                    might make the application unloadable).
+                </li>
+                <li>Session information should never be lost on reloads.</li>
+                <li>
+                    Runtime errors should show tracebacks that include any and
+                    all template contexts.
+                </li>
+                <li>
+                    They should show other context as well, insofar as it is
+                    possible. More information accumulated statically is better,
+                    since it can be viewed post-mortem.
+                </li>
+                <li>
+                    Output should be verified in debugging mode, like HTML
+                    validity, Javascript linting, CSS checking, etc.
+                </li>
+                <li>
+                    I don't like hiding HTML from people, but including
+                    Javascript and CSS files is boring. Javascript package
+                    management sucks. The framework should help here (just a
+                    little). Also, when not in debugging mode, it could
+                    potentially do things like combine/compress the Javascript.
+                </li>
+                <li>
+                    Breakpoints? I'm not sure that's the easiest way to go about
+                    things; nice, sure. But I think it may be sufficient (maybe
+                    even better) if you could get the same kind of traceback you
+                    get on an error by putting in a breakpoint-like statement.
+                </li>
+                <li>
+                    Log messages should viewable in the context of the page.
+                </li>
+                <li>
+                    It should be really easy and compelling to run the
+                    application in a branched form in a testing environment, and
+                    to synchronize these changes. Obviously this requires
+                    version control. Maybe it requires decentalized version
+                    control, or maybe just something like svn with a
+                    <tt class="docutils literal"
+                        ><span class="pre">file:</span></tt
+                    >
+                    scheme. There should be a variety of tools to make the
+                    specific process in relation to this environment and
+                    applicaition easy and well directed. (Which might mean, for
+                    instance, not worrying about log messages and just
+                    committing on behalf of the user)
+                </li>
+                <li>
+                    Though it's not as important as templates, obviously
+                    backtracking to the Python code/controller is important.
+                </li>
+                <li>Lots of testing support...</li>
+                <li>Easy collection of unit tests and doctests.</li>
+                <li>
+                    Any external state -- databases in particular, but could
+                    also include filesystem or other state -- should be easy to
+                    set up for tests, and easy to maintain.
+                </li>
+                <li>
+                    Consider all the various categories of tests that are
+                    useful. There's lots of them, with vague distinctions, but
+                    I'll say: stateless programmer tests (unit and doctests),
+                    stateful programmer tests, acceptance tests, tests to
+                    confirm an installation is correct, general lint/style
+                    tests, acceptance tests, UI tests, Javascript/in-browser
+                    tests, externally-applied tests that an application is alive
+                    and working, load tests. There's frequently overlap, and
+                    large pieces can be shared between these categories of
+                    tests, but often a category or two of tests is left out.
+                </li>
+                <li>
+                    Some way to act on some of these tests, particularly
+                    operational tests.
+                </li>
+                <li>Reports on these tests.</li>
+                <li>
+                    Javascript tests should be available in some standard
+                    fashion, or linked in from somewhere.
+                </li>
+                <li>
+                    Easy setup of a test environment. This might often rely on
+                    sqlite or other easy-to-set-up pieces of code.
+                </li>
+                <li>
+                    Every application should have a URL that, when fetched, will
+                    do some non-destructive self-test. This is really enough for
+                    an operational test. This opens up the app to DoS, so it
+                    should probably be protected in some way.
+                </li>
+                <li>
+                    Every app installation should get a secret. Multiple
+                    instances of a single installation (e.g., when balanced) all
+                    get the same secret. The framework should make sure this is
+                    available -- managing this on a per-application or
+                    per-component basis is annoying.
+                </li>
+                <li>
+                    Things should generally be idempotent. When you do things,
+                    if they are wrong or broken or whatever, you should just be
+                    able to undo them and/or do them again without problem. And
+                    if you do something <em>right</em>, then do it again, the
+                    second invocation should have no effect (or warn, or provide
+                    options -- <em>first do no harm</em>). This isn't a specific
+                    feature, but generally it's just good UI for nearly
+                    anything.
+                </li>
+            </ol>
+        </div>
+        <div class="dates" align="right">Created 04 Jan '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <ol class="arabic simple" start="26">
+                    <li>A pony</li>
+                </ol>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ideal-webdev-environment-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://turbogears.org">TG</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I now believe that to make a truly next-gen framework
+                        you need to be
+                        <a
+                            class="reference"
+                            href="http://trac.turbogears.org/turbogears/ticket/338"
+                            >unicorn powered</a
+                        >.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/ideal-webdev-environment-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+            <div class="document">
+                <p>
+                    It looks to me that lot's of things you listed here should
+                    be easily added on top of framework instead of being
+                    provided by it. Here's the things i really care about web
+                    frameworks:
+                </p>
+                <ol class="arabic simple">
+                    <li>Docs !!</li>
+                    <li>Tutorials.</li>
+                    <li>
+                        Database support (not only MySQL, or only Postgress) All
+                        3 big vendors (Oracle, IBM, MSSQL)
+                    </li>
+                    <li>Templates</li>
+                    <li>
+                        I do not care about ORM, but it should be easy to plug
+                        one. Not bad if one is presented.
+                    </li>
+                </ol>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ideal-webdev-environment-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Vagif Verdi
+            </div>
+            <hr noshade />
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>An Ideal Web Development Environment</h1>
- 
-<div class="document">
-<p>I wanted to list a bunch of features of an ideal environment for web
-development.  Well, here's some features, in no particular order.
-This only covers a few aspects, sometimes at a high level and
-sometimes at a fairly low level.  Whether I intended it or not -- I
-actually forget -- Little of it is Python specific.  It could apply
-just as well to Perl, Ruby, or Lisp as it would to Python (PHP, Java,
-and .NET/ASP already have a slightly different take on many of these
-issues, and in various ways I suspect many of these things wouldn't be
-applicable -- Smalltalk, except perhaps for <a class="reference" href="http://www.gnu.org/software/smalltalk/smalltalk.html">GNU</a>, is so far
-out of the norm that it's hard to usefully include).  These are mostly
-focused on the development tools and conventions, not such petty things as <em>code</em>
-(silly human, code is for monkeys!)</p>
-<p>I plan to expand this list as I think of more things; maybe I'll store
-it someplace more permanent.  I'm sure I've left out large areas that
-are important aspects to development.</p>
-<ol class="arabic simple">
-<li>It should be easy to figure out where things in the rendered HTML
-come from.  This could probably be handled with comments.  Of
-course, they could only be inserted in a debugging mode.  They
-should be automatic, not just conventions the template writers use.</li>
-<li>Templates should have a search path, where typically the first paths
-on the path are specific to the installation or site.</li>
-<li>There should be an easy way to clone the application-installed
-template into that site directory.  There should be 3-way merges so
-you can integrate changes to the application templates into your
-customized templates.  Obviously source control should be applied
-here too.  Maybe all this happens through a web interface, maybe not.</li>
-<li>Internationalization files go through the same process, as well as
-CSS.  I don't see a good reason for Javascript, though.  CSS should
-not be rendered unless there is a very good reason, it should be a
-static file directly served.  DItto Javascript.  This way there is a
-direct mapping from these files to files on disk.</li>
-<li>Everything should be refreshed immediately (i.e., changes are viewed
-on next reload).  Syntax errors should produce useful messages
-(including syntax errors in Python that might make the application
-unloadable).</li>
-<li>Session information should never be lost on reloads.</li>
-<li>Runtime errors should show tracebacks that include any and all
-template contexts.</li>
-<li>They should show other context as well, insofar as it is possible.
-More information accumulated statically is better, since it can be
-viewed post-mortem.</li>
-<li>Output should be verified in debugging mode, like HTML validity,
-Javascript linting, CSS checking, etc.</li>
-<li>I don't like hiding HTML from people, but including Javascript and
-CSS files is boring.  Javascript package management sucks.  The
-framework should help here (just a little).  Also, when not in
-debugging mode, it could potentially do things like combine/compress
-the Javascript.</li>
-<li>Breakpoints?  I'm not sure that's the easiest way to go about
-things; nice, sure.  But I think it may be sufficient (maybe even
-better) if you could get the same kind of traceback you get on an
-error by putting in a breakpoint-like statement.</li>
-<li>Log messages should viewable in the context of the page.</li>
-<li>It should be really easy and compelling to run the application in a
-branched form in a testing environment, and to synchronize these
-changes.  Obviously this requires version control.  Maybe it
-requires decentalized version control, or maybe just something like
-svn with a <tt class="docutils literal"><span class="pre">file:</span></tt> scheme.  There should be a variety of tools to
-make the specific process in relation to this environment and
-applicaition easy and well directed.  (Which might mean, for
-instance, not worrying about log messages and just committing on
-behalf of the user)</li>
-<li>Though it's not as important as templates, obviously backtracking
-to the Python code/controller is important.</li>
-<li>Lots of testing support...</li>
-<li>Easy collection of unit tests and doctests.</li>
-<li>Any external state -- databases in particular, but could also include
-filesystem or other state -- should be easy to set up for tests, and easy
-to maintain.</li>
-<li>Consider all the various categories of tests that are useful.  There's
-lots of them, with vague distinctions, but I'll say: stateless programmer
-tests (unit and doctests), stateful programmer tests, acceptance tests,
-tests to confirm an installation is correct, general lint/style tests,
-acceptance tests, UI tests, Javascript/in-browser tests,
-externally-applied tests that an application is alive and working, load
-tests.  There's frequently overlap, and large pieces can be shared between
-these categories of tests, but often a category or two of tests is left
-out.</li>
-<li>Some way to act on some of these tests, particularly operational tests.</li>
-<li>Reports on these tests.</li>
-<li>Javascript tests should be available in some standard fashion, or linked
-in from somewhere.</li>
-<li>Easy setup of a test environment.  This might often rely on sqlite or
-other easy-to-set-up pieces of code.</li>
-<li>Every application should have a URL that, when fetched, will do some
-non-destructive self-test.  This is really enough for an operational
-test.  This opens up the app to DoS, so it should probably be protected in
-some way.</li>
-<li>Every app installation should get a secret.  Multiple instances of a
-single installation (e.g., when balanced) all get the same secret.  The
-framework should make sure this is available -- managing this on a
-per-application or per-component basis is annoying.</li>
-<li>Things should generally be idempotent.  When you do things, if
-they are wrong or broken or whatever, you should just be able to
-undo them and/or do them again without problem.  And if you do
-something <em>right</em>, then do it again, the second invocation should
-have no effect (or warn, or provide options -- <em>first do no harm</em>).
-This isn't a specific feature, but generally it's just good UI for
-nearly anything.</li>
-</ol>
-</div>
- <div class="dates" align="right">
-Created 04 Jan '06</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<ol class="arabic simple" start="26">
-<li>A pony</li>
-</ol>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-1.html" rel="nofollow">#</a> <a href="http://turbogears.org">TG</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>I now believe that to make a truly next-gen framework you need to be <a class="reference" href="http://trac.turbogears.org/turbogears/ticket/338">unicorn powered</a>.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-6.html" rel="nofollow">#</a> <a href="http://">Ian Bicking</a></div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>It looks to me that lot's of things you listed here should be easily added on top of framework instead of being provided by it.
-Here's the things i really care about web frameworks:</p>
-<ol class="arabic simple">
-<li>Docs !!</li>
-<li>Tutorials.</li>
-<li>Database support (not only MySQL, or only Postgress) All 3 big vendors (Oracle, IBM, MSSQL)</li>
-<li>Templates</li>
-<li>I do not care about ORM, but it should be easy to plug one. Not bad if one is presented.</li>
-</ol>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-2.html" rel="nofollow">#</a> Vagif Verdi</div><hr noshade>
- 
-<div class="document">
-<ul class="simple">
-<li>Encourage the use of something like a &quot;stylesheet&quot; as they call it in print (but which isn't what we web people think of as a stylesheet).  This would be a sample page that shows all the visual styles that should be used.  CSS addresses how tags should look, but doesn't provide very good suggestions for what tags (and classes) you are supposed to use when generating content.  The best way to describe these is with sample content, with inline commentary.</li>
-</ul>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-3.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- 
-<div class="document">
-<p>This sounds like a nice list for things to have. Some of these are currently missing in Rails and would really improve the experience.</p>
-<p>Oh, and as the author of ruby-breakpoint I am wondering:</p>
-<blockquote>
-<ol class="arabic simple" start="11">
-<li>Breakpoints? I'm not sure that's the easiest way to go about things; nice, sure. But I think it may be sufficient (maybe even better) if you could get the same kind of traceback you get on an error by putting in a breakpoint-like statement.</li>
-</ol>
-</blockquote>
-<p>I think the good thing about breakpoints (if you are refering to the ones offered by ruby-breakpoint) is that you will be able to talk to the objects that are around at the exact point where the error occurs.</p>
-<p>Just because you know where an error ultimately causes an exception to be raised doesn't mean you understand where it comes from. This is what ruby-breakpoint is there for. You can investigate, try out and even fix at run time.</p>
-<p>Oh, and for Ruby it would be nice if the backtraces were as detailed as the Python ones. Having arguments in there can help a lot. But even with that I still think being able to investigate more details can be of help.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-4.html" rel="nofollow">#</a> <a href="http://flgr.0x42.net/">Florian Gross</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>I admit I couldn't figure out how to work with the breakpoints in Rails when I tried using them (some time ago now).  I should try them again some time.</p>
-<p>In Python I was <a class="reference" href="ajaxy-exception-catching.html">able to implement</a> interactivity without &quot;breakpoints&quot; per se.  You can inspect the environment at the time of error, you just can't continue the request.  But web request are so easy to restart that it didn't seem like a problem.  Well, it <em>is</em> somewhat of a problem, because in the (fairly common) case where there is, say, a loop, and you know something is weird <em>part way</em> through the loop, it gets hard.  With both Python (using that exception catcher) and ruby-breakpoint, you can put in something that gives you interactivity at some point in the code.  In Python that is <tt class="docutils literal"><span class="pre">assert</span> <span class="pre">0</span></tt>.  But with ruby-breakpoint you can (I presume) continue from the breakpoint until you see the wonky situation.  In Python you would have to, oh, put in an assert that identifies the situation (which, depending on how far into the looping it is, might be necessary anyway, as continuing over and over can be tedious).  But even then, if you are just <em>guessing</em> that something is weird, it doesn't work well, because each guess is a different iteration of putting in a failing assert.</p>
-<p>So, instead of breakpoints I think this can be resolved reasonably in Python with a capture-state call.  This would capture the entire stack trace with all local variables and save it in a rendered form, and at the end of the request would display all those captured stacks at the bottom of the page.  This gives you a complete view at multiple points during the request, but without interactivity.  There are pluses and minuses to this.  Anyway, I think it can give the same experience through a somewhat different path.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-5.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>At work, I've been doing a thrice-perverse thing:  using MS Access/VBA to prototype applications for SQLServer/VBScript.
-There is a Publish routine within Access that pushes out all of the code, with one hideously evil nested regex replacement function that papers-over a few irreconcilable differences between VBA/VBScript.
-One nice aspect of this approach is that I can run my library code within Access/VBA and leverage the IDE for all the usual reasons.
-Why I clutter your blog with this talk, though, is to pose the following question:  can we factor the data, logic, and presentation of the idea web solution such that we can develop perfectly testable pieces using whatever we already use, then push out to a web server?
-Stated another way:  why not just mock all of the web server objects, and factor out the network protocols, and see if changing how we think about the problem provides swell insights?
-Once all the technical hurdles are surmounted, we can figure out what to do about my company's cranial rectalitis.  T-SQL has all the ugliness of Perl, without any power, to charm.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-7.html" rel="nofollow">#</a> <a href="http://">Chris Smith</a></div><hr noshade>
- 
-<div class="document">
-<p>Wow, that's pretty cool.</p>
-<p>Just wondering about how this works. In ruby-breakpoint I also define a special assert() statement that basically will just call breakpoint() when the specified condition isn't met.</p>
-<p>Does this solution work on any kind of exception? How do you know at the point where the exception is raised that it will not be catched? (Or can you completely capture the environment in Python? I could try to manually grab information, but it would be no 100% solution.)</p>
-<p>For Rails I also had a solution that would remember the location where an exception was caused. You could then click &quot;Retry with Breakpoint&quot; and the web page would be reloaded, but with a breakpoint placed just before the point where the exception occured before.</p>
-<p>This only worked for some cases, of course, so I am wondering if there is something in Python that makes doing this easier.</p>
-<p>ruby-breakpoint has similar trouble, by the way. There is no stepping in there.</p>
-<p>In your sample things are still reasonable well (you will get an interactive session and when you're done with it you'll get the next one until the loop is exhausted), but there's still room of improvement there.</p>
-<p>Adding stepping is on my list for the next significant release (as well as a GUI debugger client), but for now there is no really good way.</p>
-<p>And wow, your Ajax client is very cool. All I have is a terminal one. Great work. :)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-9.html" rel="nofollow">#</a> <a href="http://flgr.0x42.net/">Florian Gross</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>How it works: in Python you can do:</p>
-<pre class="literal-block">
+            <div class="document">
+                <ul class="simple">
+                    <li>
+                        Encourage the use of something like a
+                        &quot;stylesheet&quot; as they call it in print (but
+                        which isn't what we web people think of as a
+                        stylesheet). This would be a sample page that shows all
+                        the visual styles that should be used. CSS addresses how
+                        tags should look, but doesn't provide very good
+                        suggestions for what tags (and classes) you are supposed
+                        to use when generating content. The best way to describe
+                        these is with sample content, with inline commentary.
+                    </li>
+                </ul>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ideal-webdev-environment-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    This sounds like a nice list for things to have. Some of
+                    these are currently missing in Rails and would really
+                    improve the experience.
+                </p>
+                <p>Oh, and as the author of ruby-breakpoint I am wondering:</p>
+                <blockquote>
+                    <ol class="arabic simple" start="11">
+                        <li>
+                            Breakpoints? I'm not sure that's the easiest way to
+                            go about things; nice, sure. But I think it may be
+                            sufficient (maybe even better) if you could get the
+                            same kind of traceback you get on an error by
+                            putting in a breakpoint-like statement.
+                        </li>
+                    </ol>
+                </blockquote>
+                <p>
+                    I think the good thing about breakpoints (if you are
+                    refering to the ones offered by ruby-breakpoint) is that you
+                    will be able to talk to the objects that are around at the
+                    exact point where the error occurs.
+                </p>
+                <p>
+                    Just because you know where an error ultimately causes an
+                    exception to be raised doesn't mean you understand where it
+                    comes from. This is what ruby-breakpoint is there for. You
+                    can investigate, try out and even fix at run time.
+                </p>
+                <p>
+                    Oh, and for Ruby it would be nice if the backtraces were as
+                    detailed as the Python ones. Having arguments in there can
+                    help a lot. But even with that I still think being able to
+                    investigate more details can be of help.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ideal-webdev-environment-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://flgr.0x42.net/">Florian Gross</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I admit I couldn't figure out how to work with the
+                        breakpoints in Rails when I tried using them (some time
+                        ago now). I should try them again some time.
+                    </p>
+                    <p>
+                        In Python I was
+                        <a
+                            class="reference"
+                            href="ajaxy-exception-catching.html"
+                            >able to implement</a
+                        >
+                        interactivity without &quot;breakpoints&quot; per se.
+                        You can inspect the environment at the time of error,
+                        you just can't continue the request. But web request are
+                        so easy to restart that it didn't seem like a problem.
+                        Well, it <em>is</em> somewhat of a problem, because in
+                        the (fairly common) case where there is, say, a loop,
+                        and you know something is weird
+                        <em>part way</em> through the loop, it gets hard. With
+                        both Python (using that exception catcher) and
+                        ruby-breakpoint, you can put in something that gives you
+                        interactivity at some point in the code. In Python that
+                        is
+                        <tt class="docutils literal"
+                            ><span class="pre">assert</span>
+                            <span class="pre">0</span></tt
+                        >. But with ruby-breakpoint you can (I presume) continue
+                        from the breakpoint until you see the wonky situation.
+                        In Python you would have to, oh, put in an assert that
+                        identifies the situation (which, depending on how far
+                        into the looping it is, might be necessary anyway, as
+                        continuing over and over can be tedious). But even then,
+                        if you are just <em>guessing</em> that something is
+                        weird, it doesn't work well, because each guess is a
+                        different iteration of putting in a failing assert.
+                    </p>
+                    <p>
+                        So, instead of breakpoints I think this can be resolved
+                        reasonably in Python with a capture-state call. This
+                        would capture the entire stack trace with all local
+                        variables and save it in a rendered form, and at the end
+                        of the request would display all those captured stacks
+                        at the bottom of the page. This gives you a complete
+                        view at multiple points during the request, but without
+                        interactivity. There are pluses and minuses to this.
+                        Anyway, I think it can give the same experience through
+                        a somewhat different path.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/ideal-webdev-environment-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            At work, I've been doing a thrice-perverse thing:
+                            using MS Access/VBA to prototype applications for
+                            SQLServer/VBScript. There is a Publish routine
+                            within Access that pushes out all of the code, with
+                            one hideously evil nested regex replacement function
+                            that papers-over a few irreconcilable differences
+                            between VBA/VBScript. One nice aspect of this
+                            approach is that I can run my library code within
+                            Access/VBA and leverage the IDE for all the usual
+                            reasons. Why I clutter your blog with this talk,
+                            though, is to pose the following question: can we
+                            factor the data, logic, and presentation of the idea
+                            web solution such that we can develop perfectly
+                            testable pieces using whatever we already use, then
+                            push out to a web server? Stated another way: why
+                            not just mock all of the web server objects, and
+                            factor out the network protocols, and see if
+                            changing how we think about the problem provides
+                            swell insights? Once all the technical hurdles are
+                            surmounted, we can figure out what to do about my
+                            company's cranial rectalitis. T-SQL has all the
+                            ugliness of Perl, without any power, to charm.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/ideal-webdev-environment-comment-7.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">Chris Smith</a>
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        <p>Wow, that's pretty cool.</p>
+                        <p>
+                            Just wondering about how this works. In
+                            ruby-breakpoint I also define a special assert()
+                            statement that basically will just call breakpoint()
+                            when the specified condition isn't met.
+                        </p>
+                        <p>
+                            Does this solution work on any kind of exception?
+                            How do you know at the point where the exception is
+                            raised that it will not be catched? (Or can you
+                            completely capture the environment in Python? I
+                            could try to manually grab information, but it would
+                            be no 100% solution.)
+                        </p>
+                        <p>
+                            For Rails I also had a solution that would remember
+                            the location where an exception was caused. You
+                            could then click &quot;Retry with Breakpoint&quot;
+                            and the web page would be reloaded, but with a
+                            breakpoint placed just before the point where the
+                            exception occured before.
+                        </p>
+                        <p>
+                            This only worked for some cases, of course, so I am
+                            wondering if there is something in Python that makes
+                            doing this easier.
+                        </p>
+                        <p>
+                            ruby-breakpoint has similar trouble, by the way.
+                            There is no stepping in there.
+                        </p>
+                        <p>
+                            In your sample things are still reasonable well (you
+                            will get an interactive session and when you're done
+                            with it you'll get the next one until the loop is
+                            exhausted), but there's still room of improvement
+                            there.
+                        </p>
+                        <p>
+                            Adding stepping is on my list for the next
+                            significant release (as well as a GUI debugger
+                            client), but for now there is no really good way.
+                        </p>
+                        <p>
+                            And wow, your Ajax client is very cool. All I have
+                            is a terminal one. Great work. :)
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/ideal-webdev-environment-comment-9.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://flgr.0x42.net/">Florian Gross</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>How it works: in Python you can do:</p>
+                            <pre class="literal-block">
 try:
     do stuff
 except:
     exc_type, exc, tb = sys.exc_info()
-</pre>
-<p>That <tt class="docutils literal"><span class="pre">tb</span></tt> object is basically one line in the traceback, linked to the previous line by <tt class="docutils literal"><span class="pre">tb.tb_next</span></tt>.  The <tt class="docutils literal"><span class="pre">tb</span></tt> object is pretty boring, but it has a link to the frame (<tt class="docutils literal"><span class="pre">tb.tb_frame</span></tt>).  The frame object contains the local and global variables, so you can evaluate expressions in the context of those variables.  I stuff the entire set of frames into a module-global variable, so that it doesn't disappear as long as you don't restart the server (this in effect leaks substantial memory, but this should only be enabled for debugging), and all the interaction is keyed off where I put the frames (each set gets an id) and the specific frame (each frame gets an id).  The interpreter is a basic Ajax interpreter, nothing too fancy.</p>
-<p>The system also includes a way to annotate tracebacks, which was taken from Zope (written by Shane Hathaway I think), which uses magic local variables and the same introspection to find the annotations.  So if you just define a local variable like <tt class="docutils literal"><span class="pre">__traceback_info__</span> <span class="pre">=</span> <span class="pre">'index.html</span> <span class="pre">line</span> <span class="pre">10'</span></tt> then that will show up in the traceback.  Currently that is just used for templating languages, where there's typically a disconnect between the template source code and the code being run (both in the case of interpreters and compilers).  Currently only ZPT uses this (and I guess DTML) but it would be good if more did -- hopefully Kid will soon too.</p>
-<p>With all of these, all the work is done only when an exception goes all the way up to the exception catcher (which is an application wrapper, aka middleware).  So there's no real overhead to using these either.  And they are complimentary to the normal way exceptions work, so show a very accurate indication of the state and real context of the exception -- a lot of other attempts to make exceptions better for template code covers up errors above or below the template.</p>
-<p>Anyway, that's how it works.  There's also lots of people that have run their applications under <a class="reference" href="http://python.org/doc/current/lib/module-pdb.html">pdb</a>, which may be more similar to how ruby-breakpoint works.  Pdb is a traditional debugger and uses a special mode of the Python interpreter to do its thing (<tt class="docutils literal"><span class="pre">sys.settrace()</span></tt>).  I've used pdb here and there, but somehow it could never catch for me; <a class="reference" href="http://www.digitalpeers.com/pythondebugger/">winpdb</a> looks considerably easier to use, but I haven't tried it.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-10.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Ah, Ruby doesn't have a way of going from an exception to the frames it passed through (called bindings in Ruby).</p>
-<p>Having that makes all this quite straightforward. Still quite cool stuff.</p>
-<p>What ruby-breakpoint uses is a hackish way of getting the breakpoint() caller's binding which will then be used for the debugging session.</p>
-<p>pdb seems similar to debug.rb that comes with Ruby. It's more of a traditional debugger, but I found an interactive environment very natural to do this kind of thing.</p>
-<p>Currently ruby-breakpoint doesn't require a permanent global trace function which is a good thing because those are quite slow in Ruby.</p>
-<p>WinPDB looks nice. Already has some of the features I would like my GUI client to have.</p>
-<p>Thanks for all the information. This has been very insightful!</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-11.html" rel="nofollow">#</a> <a href="http://flgr.0x42.net/">Florian Gross</a></div><hr noshade>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-<p>WSGI is pretty cool. It took me only about 300 Lines of code to write a standalone wsgi server. But i had to notice that there isn't a single WSGI Tutorial beside pep333.</p>
-<p>So: Someone has to write documentations ;-)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-8.html" rel="nofollow">#</a> <a href="http://www.active-4.com">Armin Ronacher</a></div><hr noshade>
- 
-<div class="document">
-<p>i'm developer and Your information strongly has helped me...Thanks</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-12.html" rel="nofollow">#</a> <a href="http://jrpu.com">Ontolog</a></div><hr noshade>
- 
-<div class="document">
-<p>i's great, thnx</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/ideal-webdev-environment-comment-13.html" rel="nofollow">#</a> <a href="http://jy81.com">Ringtone</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                            >
+                            <p>
+                                That
+                                <tt class="docutils literal"
+                                    ><span class="pre">tb</span></tt
+                                >
+                                object is basically one line in the traceback,
+                                linked to the previous line by
+                                <tt class="docutils literal"
+                                    ><span class="pre">tb.tb_next</span></tt
+                                >. The
+                                <tt class="docutils literal"
+                                    ><span class="pre">tb</span></tt
+                                >
+                                object is pretty boring, but it has a link to
+                                the frame (<tt class="docutils literal"
+                                    ><span class="pre">tb.tb_frame</span></tt
+                                >). The frame object contains the local and
+                                global variables, so you can evaluate
+                                expressions in the context of those variables. I
+                                stuff the entire set of frames into a
+                                module-global variable, so that it doesn't
+                                disappear as long as you don't restart the
+                                server (this in effect leaks substantial memory,
+                                but this should only be enabled for debugging),
+                                and all the interaction is keyed off where I put
+                                the frames (each set gets an id) and the
+                                specific frame (each frame gets an id). The
+                                interpreter is a basic Ajax interpreter, nothing
+                                too fancy.
+                            </p>
+                            <p>
+                                The system also includes a way to annotate
+                                tracebacks, which was taken from Zope (written
+                                by Shane Hathaway I think), which uses magic
+                                local variables and the same introspection to
+                                find the annotations. So if you just define a
+                                local variable like
+                                <tt class="docutils literal"
+                                    ><span class="pre">__traceback_info__</span>
+                                    <span class="pre">=</span>
+                                    <span class="pre">'index.html</span>
+                                    <span class="pre">line</span>
+                                    <span class="pre">10'</span></tt
+                                >
+                                then that will show up in the traceback.
+                                Currently that is just used for templating
+                                languages, where there's typically a disconnect
+                                between the template source code and the code
+                                being run (both in the case of interpreters and
+                                compilers). Currently only ZPT uses this (and I
+                                guess DTML) but it would be good if more did --
+                                hopefully Kid will soon too.
+                            </p>
+                            <p>
+                                With all of these, all the work is done only
+                                when an exception goes all the way up to the
+                                exception catcher (which is an application
+                                wrapper, aka middleware). So there's no real
+                                overhead to using these either. And they are
+                                complimentary to the normal way exceptions work,
+                                so show a very accurate indication of the state
+                                and real context of the exception -- a lot of
+                                other attempts to make exceptions better for
+                                template code covers up errors above or below
+                                the template.
+                            </p>
+                            <p>
+                                Anyway, that's how it works. There's also lots
+                                of people that have run their applications under
+                                <a
+                                    class="reference"
+                                    href="http://python.org/doc/current/lib/module-pdb.html"
+                                    >pdb</a
+                                >, which may be more similar to how
+                                ruby-breakpoint works. Pdb is a traditional
+                                debugger and uses a special mode of the Python
+                                interpreter to do its thing (<tt
+                                    class="docutils literal"
+                                    ><span class="pre">sys.settrace()</span></tt
+                                >). I've used pdb here and there, but somehow it
+                                could never catch for me;
+                                <a
+                                    class="reference"
+                                    href="http://www.digitalpeers.com/pythondebugger/"
+                                    >winpdb</a
+                                >
+                                looks considerably easier to use, but I haven't
+                                tried it.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/ideal-webdev-environment-comment-10.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Ian Bicking
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    Ah, Ruby doesn't have a way of going from an
+                                    exception to the frames it passed through
+                                    (called bindings in Ruby).
+                                </p>
+                                <p>
+                                    Having that makes all this quite
+                                    straightforward. Still quite cool stuff.
+                                </p>
+                                <p>
+                                    What ruby-breakpoint uses is a hackish way
+                                    of getting the breakpoint() caller's binding
+                                    which will then be used for the debugging
+                                    session.
+                                </p>
+                                <p>
+                                    pdb seems similar to debug.rb that comes
+                                    with Ruby. It's more of a traditional
+                                    debugger, but I found an interactive
+                                    environment very natural to do this kind of
+                                    thing.
+                                </p>
+                                <p>
+                                    Currently ruby-breakpoint doesn't require a
+                                    permanent global trace function which is a
+                                    good thing because those are quite slow in
+                                    Ruby.
+                                </p>
+                                <p>
+                                    WinPDB looks nice. Already has some of the
+                                    features I would like my GUI client to have.
+                                </p>
+                                <p>
+                                    Thanks for all the information. This has
+                                    been very insightful!
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/ideal-webdev-environment-comment-11.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://flgr.0x42.net/"
+                                    >Florian Gross</a
+                                >
+                            </div>
+                            <hr noshade />
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    WSGI is pretty cool. It took me only about 300 Lines of code
+                    to write a standalone wsgi server. But i had to notice that
+                    there isn't a single WSGI Tutorial beside pep333.
+                </p>
+                <p>So: Someone has to write documentations ;-)</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ideal-webdev-environment-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.active-4.com">Armin Ronacher</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    i'm developer and Your information strongly has helped
+                    me...Thanks
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ideal-webdev-environment-comment-12.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://jrpu.com">Ontolog</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>i's great, thnx</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ideal-webdev-environment-comment-13.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://jy81.com">Ringtone</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

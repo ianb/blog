@@ -1,235 +1,859 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>More Small Apps</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>More Small Apps</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>More Small Apps</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                So
+                <a
+                    class="reference"
+                    href="http://thraxil.org/users/anders/posts/2005/12/12/tasty/"
+                    >Anders Pearson</a
+                >
+                made a very small application called
+                <a class="reference" href="http://tasty.python-hosting.com/"
+                    >Tasty</a
+                >
+                that does tagging. Well, I don't <em>know</em> how small it is,
+                but it's a kind of partial application, in that the application
+                alone speaks only JSON; it's only interesting when coupled with
+                other applications. Which (as he actually mentions) is just the
+                kind of application I was talking about in my
+                <a
+                    class="reference"
+                    href="little-apps-instead-of-little-frameworks.html"
+                    >post on little apps</a
+                >.
+            </p>
+            <p>
+                It also brings up the issue: how do you make a system of little
+                applications workable? From a SQLObject search RSS feed I came
+                upon
+                <a
+                    class="reference"
+                    href="http://permalink.gmane.org/gmane.comp.web.zope.plone.devel/10080"
+                    >this Plone post</a
+                >
+                where Tasty is mentioned, and the idea of porting it to an
+                alternate backend to make it easier for Zope/Plone people to use
+                (it's currently a TurboGears app).
+            </p>
+            <p>
+                I, of course, would propose that instead they (for some vague
+                definition of &quot;they&quot; that could include any number of
+                people) should make it easy to embed the application into Zope.
+                I don't think it needs to be a lot of work:
+            </p>
+            <ul class="simple">
+                <li>
+                    Make CherryPy applications well behaved WSGI applications,
+                    so that multiple such applications can easily live in the
+                    same process, and so that programmatic configuration is
+                    easy. This requires changes to CherryPy itself, so this is
+                    perhaps the hardest step.
+                </li>
+                <li>
+                    Make a Zope WSGI Server Product (it's a server because it
+                    makes Zope a server/container for other WSGI applications).
+                    This shouldn't be hard programming. The only hard part that
+                    I see is how to specify what Python function (or instance)
+                    to call.
+                    <a class="reference" href="http://pythonpaste.org/deploy/"
+                        >Paste Deploy</a
+                    >
+                    is one way to do that; other ways are possible, maybe just
+                    adding a set of key/value pairs to the product instance's
+                    properties, which would actually be nicely complimentary to
+                    Paste Deploy configuration files, which are just the same
+                    thing in a text file.
+                </li>
+                <li>
+                    After those are done everything should work, but to clean it
+                    up make it easy to build specialized Products that build on
+                    the WSGI Product, so that a Tasty Product will have its own
+                    name and constrained configuration. I bet you could make
+                    this doable with like one text file and one update to the
+                    <tt class="docutils literal"
+                        ><span class="pre">setup.py</span></tt
+                    >
+                    file. Maybe one other Python file is required, but only
+                    maybe.
+                </li>
+                <li>
+                    Use
+                    <a
+                        class="reference"
+                        href="http://www.plope.com/software/Basket/Basket"
+                        >Zope Basket</a
+                    >
+                    for all the products, since TurboGears and Tasty are already
+                    eggs, and entry points are a nice way for the WSGI Product
+                    to find applications. It's an easy fit.
+                </li>
+            </ul>
+            <p>
+                With these things in place it could be possible for every
+                TurboGears application -- and Wareweb, Pylons, and other
+                frameworks -- to be instantly available to all Zope users, only
+                an
+                <tt class="docutils literal"
+                    ><span class="pre">easy_install</span></tt
+                >
+                away. And none of what I've described requires radical
+                rethinking or rewriting of anything.
+            </p>
+            <p>
+                I think that's a whole lot more interesting and useful than
+                reimplementing and forking a working application in order to
+                change frameworks and backends.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 15 Dec '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    It sounds like it might be useful to have an entry point
+                    group for objects that describe a simple set of
+                    configuration options for an application. Then, you could
+                    have the WSGI Server product have a class for application
+                    instances, that would have a dropdown list to select the
+                    entry point and display a form to do the configuration. You
+                    could basically have a Zope item that wraps the WSGI
+                    application with a check for some &quot;manage&quot; URLs
+                    that would go to the item, and the rest of the URLs would
+                    belong to the wrapped entry point.
+                </p>
+                <p>
+                    More precisely, the entry points would be factories with
+                    some metadata on 'em, and you could just throw away and
+                    recreate the application objects when the configuration was
+                    changed. It sounds like something worth growing a spec for,
+                    so that you can create automatically-generated GUIs for app
+                    instance configuration and deployment.
+                </p>
+                <p>
+                    On the other hand, maybe applications should just provide
+                    their own configuration interfaces, in which case the
+                    meta-spec could be a lot simpler... more like &quot;pick the
+                    entry point and create an instance&quot;. In which case we
+                    would more want to have an ability for an app to
+                    <em>store</em> some configuration data, perhaps via a
+                    service in the environ.
+                </p>
+                <p>
+                    So, you'd have something like this: define a factory entry
+                    point. The factory gets called with some opaque
+                    configuration data, or None if it's a new application. When
+                    the app runs, if it wants to update its configuration, it
+                    calls something in its environ, to ensure that the next time
+                    it's created, the factory will be passed the saved
+                    configuration.
+                </p>
+                <p>
+                    Voila, instant &quot;container&quot; support, as long as the
+                    application can provide some kind of configuration UI of its
+                    own. It's not really useful for creating middleware stacks
+                    directly, but the container's UI might be able to do that.
+                    Anyway. It's an interesting thought which I unfortunately
+                    have no time to try implementing right now. :)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-small-apps-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://dirtSimple.org">Phillip J. Eby</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Incidentally, Ben Bangert was just talking about the
+                        exact same thing on IRC today.
+                    </p>
+                    <blockquote>
+                        On the other hand, maybe applications should just
+                        provide their own configuration interfaces, in which
+                        case the meta-spec could be a lot simpler... more like
+                        &quot;pick the entry point and create an instance&quot;.
+                    </blockquote>
+                    <p>
+                        That seems more reasonable to me. Of course,
+                        bootstrapping is also a bit complex; but in this case I
+                        <em>assume</em> the interface would be a web interface.
+                        Any other interface doesn't seem quite reasonable. The
+                        other idea I had was a command to write out a basic
+                        configuration file -- potentially drawing from some
+                        &quot;global&quot; options, though defining what those
+                        might be would be a rather organic process. Anyway,
+                        given the basic configuration file, you just edit it,
+                        and then probably do a final installation stage.
+                    </p>
+                    <p>
+                        The difficult part is that the environment the
+                        application runs in is often not a proper environment
+                        for the application to be set up in. Permission issues
+                        being the most immediate issue -- the app might have to
+                        run as root to create the right directories or whatnot.
+                        But I simply have no web environment that I typically
+                        run as root. And though I could install to a remote host
+                        that way, it's a little suspect.
+                    </p>
+                    <p>
+                        That said, I certainly can appreciate the idea of a nice
+                        web UI for installation. It could lead fairly quickly to
+                        a installation process like:
+                    </p>
+                    <ul class="simple">
+                        <li>
+                            Download
+                            <tt class="docutils literal"
+                                ><span class="pre">ez_web.py</span></tt
+                            >
+                        </li>
+                        <li>
+                            Run
+                            <tt class="docutils literal"
+                                ><span class="pre">python</span>
+                                <span class="pre">ez_web.py</span></tt
+                            >
+                            (which is basically
+                            <tt class="docutils literal"
+                                ><span class="pre">ez_setup.py</span></tt
+                            >
+                            plus installation of a few base packages that will
+                            be used in the next step)
+                        </li>
+                        <li>
+                            Run... something.
+                            <tt class="docutils literal"
+                                ><span class="pre">ez_web.py</span></tt
+                            >
+                            would install something that was a combination of
+                            <tt class="docutils literal"
+                                ><span class="pre">easy_install</span></tt
+                            >
+                            and then a post-install process that runs the
+                            application installer.
+                            <tt class="docutils literal"
+                                ><span class="pre">easy_web</span></tt
+                            >
+                            perhaps.
+                        </li>
+                        <li>
+                            Open the URL it tells you to open, and configure
+                        </li>
+                    </ul>
+                    <p>
+                        That doesn't really handle the issue of a long-running
+                        process. There's no easy way to figure that out, really.
+                        You could configure <em>that</em> too when you set it
+                        up, but it's so bound to the environment you are running
+                        in that it's hard. And it will fail in all sorts of ways
+                        that will keep you from the configuration screen itself.
+                    </p>
+                    <p>
+                        But, Wise Web Hosts would have
+                        <tt class="docutils literal"
+                            ><span class="pre">easy_web</span></tt
+                        >
+                        already installed and configured for the environment.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-small-apps-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+            <div class="document">
+                <p>
+                    Why do you think a small web application is (sometimes)
+                    better suited towards reusability than writing a library or
+                    framework? Or if reusability is not the main reason why you
+                    are advocating such an approach, what is?
+                </p>
+                <p>
+                    There is a lot of knowledge about how to reuse libraries and
+                    frameworks. Writing a reusable library is <em>hard</em>. But
+                    writing a reusable web application seems harder -- you have
+                    to worry about the way it's going to be exposed in another
+                    environment, namely HTTP. And then using a reusable web
+                    application seems harder; suddenly you have to have your
+                    application communicate with it over HTTP. One is tempted to
+                    cover that up with a nice Python API, and in the end you may
+                    end up with the situation you'd have reached if you'd gone
+                    and written a library in the first place.
+                </p>
+                <p>
+                    Now I can see some scenarios where indeed a separate helper
+                    application is useful. For instance, perhaps the only thing
+                    calling into your standalone app will be Javascript from
+                    another web app's UI. I can also see an argument that since
+                    one has to think harder about the interface to the outside
+                    world, a web application forms a more strict component than
+                    something written in Python does, which might increase its
+                    reusability. Perhaps you can write an article one day
+                    describing which factors are involved in the decision to
+                    create a standalone web application as opposed to creating a
+                    library.
+                </p>
+                <p>
+                    Possibly, if your argument is not reusability, it is an
+                    argument to encourage people to work together, no matter
+                    which Python web framework they are familiar with. I support
+                    strongly the goal of having the different web framework
+                    communicaties in the Python world work together more. What
+                    are the factors where cooperating web applications are the
+                    best fit for such cooperation, as opposed to encouraging
+                    sharing Python libraries?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-small-apps-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Martijn Faassen
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        Why do you think a small web application is (sometimes)
+                        better suited towards reusability than writing a library
+                        or framework? Or if reusability is not the main reason
+                        why you are advocating such an approach, what is?
+                    </blockquote>
+                    <p>
+                        Mostly applications appeal to me because they are so
+                        strictly encapsulated. Reuse can continue to happen on
+                        different levels, but when actually constructing a
+                        working and integrated site, by using the application
+                        level you encourage strong decoupling. Even if you also
+                        reuse other levels of the system -- which is highly
+                        likely -- you can maintain those pieces separately and
+                        at separate versions. You can probably move them around
+                        to different servers, and so on. You typically aren't
+                        <em>forced</em> to reuse anything either; you
+                        <em>choose</em> to reuse things with multiple
+                        applications. In a framework you often have to struggle
+                        <em>not</em> to reuse things.
+                    </p>
+                    <p>
+                        The other aspect is the long term maintenance and growth
+                        of a site. On the application level there's a whole slew
+                        of things you can do as new things come up, you aren't
+                        tied to a language or environment, you are just tied to
+                        things like HTTP, maybe to some CGI conventions, etc.
+                        It's much easier to swap out pieces, or incrementally
+                        upgrade them. Even if all your applications are using
+                        the same framework and the same libraries, I think
+                        there's real benefit to decoupling on this level.
+                    </p>
+                    <blockquote>
+                        What are the factors where cooperating web applications
+                        are the best fit for such cooperation, as opposed to
+                        encouraging sharing Python libraries?
+                    </blockquote>
+                    <p>
+                        I think places where the functionality extends into the
+                        browser are good examples. Single-signon logins are a
+                        good example there; the interaction with the browser is
+                        fairly complex (with a number of redirects involved).
+                        You can implement bits of it as a library, and you can
+                        document the interaction, but you can't encapsulate that
+                        process without an application -- something that talks
+                        directly to the browser.
+                    </p>
+                    <p>
+                        Tasty isn't like that -- you could implement it just as
+                        well as a Python library (and probably much more
+                        easily). But in this case it means that the application
+                        can be used across environments, and probably across
+                        domains if you want (perhaps with
+                        <a
+                            class="reference"
+                            href="http://bob.pythonmac.org/archives/2005/12/05/remote-json-jsonp/"
+                            >JSONP</a
+                        >). It's just as usable from PHP as Python. It probably
+                        wouldn't be that hard to use it from statically
+                        published pages as well (with the integration fully
+                        implemented in Javascript).
+                    </p>
+                    <p>
+                        So, after reading your reply I wasn't 100% sure how to
+                        justify this, but by the end of this reply at least I've
+                        talked <em>myself</em> into it pretty well ;)
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-small-apps-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>Thanks for being so honest:</p>
+                        <blockquote>
+                            So, after reading your reply I wasn't 100% sure how
+                            to justify this, but by the end of this reply at
+                            least I've talked myself into it pretty well ;)
+                        </blockquote>
+                        <p>
+                            I do share your interest in cooperating small
+                            applications. Infrae's Railroad is quite a bit like
+                            it; provide a WebDAV repository that multiple
+                            front-end CMSes can share, while it turns around to
+                            ask the CMSes (through HTTP) whether someone is
+                            actually allowed to do an upload or download.
+                            Tramline is also a bit like it; it's application
+                            functionality that sits within Apache and handles
+                            things on the request level, but gives functionality
+                            to backends which might be written with any
+                            framework or language.
+                        </p>
+                        <p>
+                            Since you're advocating it so persistently I figured
+                            you'd have more wisdom on where one makes the
+                            decision to use an independent application versus a
+                            library. Language independence, something you
+                            mentioned, may give rise to more widespread and
+                            long-term reuse of code. This is quite interesting.
+                            You pay for a deeper investment than with a library,
+                            but the gain may, potentially, be a bigger community
+                            of users. It's a bit like the benefits one can get
+                            from using standards, except that the investment is
+                            far less than in creating a new standard altogether.
+                        </p>
+                        <p>
+                            Obviously you also write reusable
+                            libraries/frameworks; something like SQLObject for
+                            instance I can't imagine as a standalone web
+                            application. Perhaps you can. :) The question when
+                            one would make such a decision to go for a separate
+                            application is an interesting one. Making the answer
+                            more explicit sounds valuable, so we'll see where
+                            the thinking brings us.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/more-small-apps-comment-9.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Martijn Faassen
+                    </div>
+                    <hr noshade />
+                </blockquote>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>More Small Apps</h1>
- 
-<div class="document">
-<p>So <a class="reference" href="http://thraxil.org/users/anders/posts/2005/12/12/tasty/">Anders Pearson</a> made a
-very small application called <a class="reference" href="http://tasty.python-hosting.com/">Tasty</a> that does tagging.  Well, I don't
-<em>know</em> how small it is, but it's a kind of partial application, in
-that the application alone speaks only JSON; it's only interesting
-when coupled with other applications.  Which (as he actually mentions)
-is just the kind of application I was talking about in my <a class="reference" href="little-apps-instead-of-little-frameworks.html">post on
-little apps</a>.</p>
-<p>It also brings up the issue: how do you make a system of little
-applications workable?  From a SQLObject search RSS feed I came upon
-<a class="reference" href="http://permalink.gmane.org/gmane.comp.web.zope.plone.devel/10080">this Plone post</a>
-where Tasty is mentioned, and the idea of porting it to an alternate
-backend to make it easier for Zope/Plone people to use (it's currently
-a TurboGears app).</p>
-<p>I, of course, would propose that instead they (for some vague
-definition of &quot;they&quot; that could include any number of people) should
-make it easy to embed the application into Zope.  I don't think it
-needs to be a lot of work:</p>
-<ul class="simple">
-<li>Make CherryPy applications well behaved WSGI applications, so that
-multiple such applications can easily live in the same process, and
-so that programmatic configuration is easy.  This requires changes
-to CherryPy itself, so this is perhaps the hardest step.</li>
-<li>Make a Zope WSGI Server Product (it's a server because it makes Zope
-a server/container for other WSGI applications).  This shouldn't be
-hard programming.  The only hard part that I see is how to specify
-what Python function (or instance) to call.  <a class="reference" href="http://pythonpaste.org/deploy/">Paste Deploy</a> is one way to do that; other ways
-are possible, maybe just adding a set of key/value pairs to the
-product instance's properties, which would actually be nicely
-complimentary to Paste Deploy configuration files, which are just
-the same thing in a text file.</li>
-<li>After those are done everything should work, but to clean it up make
-it easy to build specialized Products that build on the WSGI
-Product, so that a Tasty Product will have its own name and
-constrained configuration.  I bet you could make this doable with
-like one text file and one update to the <tt class="docutils literal"><span class="pre">setup.py</span></tt> file.  Maybe
-one other Python file is required, but only maybe.</li>
-<li>Use <a class="reference" href="http://www.plope.com/software/Basket/Basket">Zope Basket</a> for
-all the products, since TurboGears and Tasty are already eggs, and
-entry points are a nice way for the WSGI Product to find
-applications.  It's an easy fit.</li>
-</ul>
-<p>With these things in place it could be possible for every TurboGears
-application -- and Wareweb, Pylons, and other frameworks -- to be
-instantly available to all Zope users, only an <tt class="docutils literal"><span class="pre">easy_install</span></tt> away.
-And none of what I've described requires radical rethinking or
-rewriting of anything.</p>
-<p>I think that's a whole lot more interesting and useful than
-reimplementing and forking a working application in order to change
-frameworks and backends.</p>
-</div>
- <div class="dates" align="right">
-Created 15 Dec '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>It sounds like it might be useful to have an entry point group for objects that describe a simple set of configuration options for an application.  Then, you could have the WSGI Server product have a class for application instances, that would have a dropdown list to select the entry point and display a form to do the configuration.  You could basically have a Zope item that wraps the WSGI application with a check for some &quot;manage&quot; URLs that would go to the item, and the rest of the URLs would belong to the wrapped entry point.</p>
-<p>More precisely, the entry points would be factories with some metadata on 'em, and you could just throw away and recreate the application objects when the configuration was changed.  It sounds like something worth growing a spec for, so that you can create automatically-generated GUIs for app instance configuration and deployment.</p>
-<p>On the other hand, maybe applications should just provide their own configuration interfaces, in which case the meta-spec could be a lot simpler...  more like &quot;pick the entry point and create an instance&quot;.  In which case we would more want to have an ability for an app to <em>store</em> some configuration data, perhaps via a service in the environ.</p>
-<p>So, you'd have something like this: define a factory entry point.  The factory gets called with some opaque configuration
-data, or None if it's a new application.  When the app runs, if it wants to update its configuration, it calls something in its environ, to ensure that the next time it's created, the factory will be passed the saved configuration.</p>
-<p>Voila, instant &quot;container&quot; support, as long as the application can provide some kind of configuration UI of its own.  It's not really useful for creating middleware stacks directly, but the container's UI might be able to do that.  Anyway.  It's an interesting thought which I unfortunately have no time to try implementing right now.  :)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-1.html" rel="nofollow">#</a> <a href="http://dirtSimple.org">Phillip J. Eby</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Incidentally, Ben Bangert was just talking about the exact same thing on IRC today.</p>
-<blockquote>
-On the other hand, maybe applications should just provide their own configuration interfaces, in which case the meta-spec could be a lot simpler... more like &quot;pick the entry point and create an instance&quot;.</blockquote>
-<p>That seems more reasonable to me.  Of course, bootstrapping is also a bit complex; but in this case I <em>assume</em> the interface would be a web interface.  Any other interface doesn't seem quite reasonable.  The other idea I had was a command to write out a basic configuration file -- potentially drawing from some &quot;global&quot; options, though defining what those might be would be a rather organic process.  Anyway, given the basic configuration file, you just edit it, and then probably do a final installation stage.</p>
-<p>The difficult part is that the environment the application runs in is often not a proper environment for the application to be set up in.  Permission issues being the most immediate issue -- the app might have to run as root to create the right directories or whatnot.  But I simply have no web environment that I typically run as root.  And though I could install to a remote host that way, it's a little suspect.</p>
-<p>That said, I certainly can appreciate the idea of a nice web UI for installation.  It could lead fairly quickly to a installation process like:</p>
-<ul class="simple">
-<li>Download <tt class="docutils literal"><span class="pre">ez_web.py</span></tt></li>
-<li>Run <tt class="docutils literal"><span class="pre">python</span> <span class="pre">ez_web.py</span></tt> (which is basically <tt class="docutils literal"><span class="pre">ez_setup.py</span></tt> plus installation of a few base packages that will be used in the next step)</li>
-<li>Run... something.  <tt class="docutils literal"><span class="pre">ez_web.py</span></tt> would install something that was a combination of <tt class="docutils literal"><span class="pre">easy_install</span></tt> and then a post-install process that runs the application installer.  <tt class="docutils literal"><span class="pre">easy_web</span></tt> perhaps.</li>
-<li>Open the URL it tells you to open, and configure</li>
-</ul>
-<p>That doesn't really handle the issue of a long-running process.  There's no easy way to figure that out, really.  You could configure <em>that</em> too when you set it up, but it's so bound to the environment you are running in that it's hard.  And it will fail in all sorts of ways that will keep you from the configuration screen itself.</p>
-<p>But, Wise Web Hosts would have <tt class="docutils literal"><span class="pre">easy_web</span></tt> already installed and configured for the environment.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Why do you think a small web application is (sometimes) better suited towards reusability than writing a library or framework? Or if reusability is not the main reason why you are advocating such an approach, what is?</p>
-<p>There is a lot of knowledge about how to reuse libraries and frameworks. Writing a reusable library is <em>hard</em>. But writing a reusable web application seems
-harder -- you have to worry about the way it's going to be exposed in another environment, namely HTTP. And then using a reusable web application seems harder;
-suddenly you have to have your application communicate with it over HTTP. One is tempted to cover that up with a nice Python API, and
-in the end you may end up with the situation you'd have reached if you'd gone and written a library in the first place.</p>
-<p>Now I can see some scenarios where indeed a separate helper application is useful. For instance, perhaps the only thing calling into your standalone app will be Javascript from another web app's UI. I can also see an argument that since one has to think harder about the interface to the outside world, a web application forms a more strict component than something written in Python does, which might increase its reusability. Perhaps you can write an article one day describing which factors are involved in the decision to create a standalone web application as opposed to creating a library.</p>
-<p>Possibly, if your argument is not reusability, it is an argument to encourage people to work together, no matter which Python web framework they are familiar with. I support strongly the goal of having the different web framework communicaties in the Python world work together more. What are the factors where cooperating web applications are the best fit for such cooperation, as opposed to encouraging sharing Python libraries?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-3.html" rel="nofollow">#</a> Martijn Faassen</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<blockquote>
-Why do you think a small web application is (sometimes) better suited towards reusability than writing a library or framework? Or if reusability is not the main reason why you are advocating such an approach, what is?</blockquote>
-<p>Mostly applications appeal to me because they are so strictly encapsulated.  Reuse can continue to happen on different levels, but when actually constructing a working and integrated site, by using the application level you encourage strong decoupling.  Even if you also reuse other levels of the system -- which is highly likely -- you can maintain those pieces separately and at separate versions.  You can probably move them around to different servers, and so on.  You typically aren't <em>forced</em> to reuse anything either; you <em>choose</em> to reuse things with multiple applications.  In a framework you often have to struggle <em>not</em> to reuse things.</p>
-<p>The other aspect is the long term maintenance and growth of a site.  On the application level there's a whole slew of things you can do as new things come up, you aren't tied to a language or environment, you are just tied to things like HTTP, maybe to some CGI conventions, etc.  It's much easier to swap out pieces, or incrementally upgrade them.  Even if all your applications are using the same framework and the same libraries, I think there's real benefit to decoupling on this level.</p>
-<blockquote>
-What are the factors where cooperating web applications are the best fit for such cooperation, as opposed to encouraging sharing Python libraries?</blockquote>
-<p>I think places where the functionality extends into the browser are good examples.  Single-signon logins are a good example there; the interaction with the browser is fairly complex (with a number of redirects involved).  You can implement bits of it as a library, and you can document the interaction, but you can't encapsulate that process without an application -- something that talks directly to the browser.</p>
-<p>Tasty isn't like that -- you could implement it just as well as a Python library (and probably much more easily).  But in this case it means that the application can be used across environments, and probably across domains if you want (perhaps with <a class="reference" href="http://bob.pythonmac.org/archives/2005/12/05/remote-json-jsonp/">JSONP</a>).  It's just as usable from PHP as Python.  It probably wouldn't be that hard to use it from statically published pages as well (with the integration fully implemented in Javascript).</p>
-<p>So, after reading your reply I wasn't 100% sure how to justify this, but by the end of this reply at least I've talked <em>myself</em> into it pretty well ;)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-7.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Thanks for being so honest:</p>
-<blockquote>
-So, after reading your reply I wasn't 100% sure how to justify this, but by the end of this reply at least I've talked myself into it pretty
-well   ;)</blockquote>
-<p>I do share your interest in cooperating small applications. Infrae's Railroad is quite a bit like it; provide a WebDAV repository that
-multiple front-end CMSes can share, while it turns around to ask the CMSes (through HTTP) whether someone is actually allowed to
-do an upload or download. Tramline is also a bit like it; it's application functionality that sits within Apache and handles things on the request level, but gives functionality to backends which might be written with any framework or language.</p>
-<p>Since you're advocating it so persistently I figured you'd have more wisdom on where one makes the decision to use an independent application versus a library. Language independence, something you mentioned, may give rise to more widespread and long-term reuse of code. This is quite interesting. You pay for a deeper investment than with a library, but the gain may, potentially, be a bigger community of users. It's a bit like the benefits one can get from using standards, except that the investment is far less than in creating a new standard altogether.</p>
-<p>Obviously you also write reusable libraries/frameworks; something like SQLObject for instance I can't imagine as a standalone web application. Perhaps you can. :) The question when one would make such a decision to go for a separate application is an interesting one. Making the answer more explicit sounds valuable, so we'll see where the thinking brings us.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-9.html" rel="nofollow">#</a> Martijn Faassen</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Yes, I would say that writing reusable web applications is harder than writing a library or framework.</p>
-<p>With Tasty, the motivation for doing it that way is that we need to be able to use it from other languages and platforms. In particular, we have a Java course management framework that my coworkers are building an application on top of. They brought me in to help figure out tagging stuff and I really did not want to deal with all the JSF, Maven, and J2EE crap. Currently we have tasty clients in python, perl, and javascript and will soon have java and possibly cold fusion apps that use it. We'll definitely be connecting it to a plone product. I'm even tempted to integrate it with GNUS so I can tag my mail :)</p>
-<p>I still have to maintain all the old perl code that I wrote before moving to python. I sure wish I'd been developing small apps back then instead of libraries. It would make it much more manageable to convert it little by little to python. In the future, if I decide that I like a different language even more, I can start building new applications in that language and still use the small apps like Tasty without having to completely re-write them.</p>
-<p>There's also a decent scalability argument. These seperate, small applications scale out really easily. You can start with everything running on one server and then, if the load gets too high, start moving each mini-application out to its own server with load balancing and caching layers between everything. No additional code has to be written; just some config tweaks.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-8.html" rel="nofollow">#</a> <a href="http://www.columbia.edu/~anders/">anders</a></div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Oh, a small note in addition: I think it's too easy to put that any TurboGears application becomes simply available to Zope users once all the WSGI glue is in place. Even forgetting the need for integration that still occurs and is more complicated than a simple module import, TurboGears has a relational database backend requirement. I worry about such requirements when I think about deployment of my applications, especially when such a deployment happens at customer sites. easy_install gives me hope that I'll have to worry less in the future, but that doesn't mean I can stop worrying altogether.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-4.html" rel="nofollow">#</a> <a href="http://">Martijn Faassen</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>There is a database setup procedure, in this case mostly specific to SQLObject.  There's no specific protocol for how you set up an application or its database, so this remains an issue.  I'd like for there to be a parrallel setup procedure, so that after configuring the application you could explicitly set it up, including having it tell you what it is going to do (without doing it).</p>
-<p>There are other kinds of integration that are harder, of course, like permission controls, or other user data.  But these are points for future consideration; even if it initially means duplication in some places, having access to a larger set of software is still useful.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-5.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- 
-<div class="document">
-<p>Strictly speaking, Turbogears doesn't actually have a RDBMS requirement. 99% of applications that are written for TG will use one and it's geared towards that kind of development, but you don't have to have one installed. It would actually be possible to use a ZODB backend with turbogears. If a ZODB backend were written for SQLObject (if that's even possible), it could make integration even easier.</p>
-<p>There are already Plone products that require an RDBMS though (eg, KNotes) so it wouldn't be a totally new thing.</p>
-<p>But yeah, in general, any kind of heterogenous deployment is going to be more of a hassle than something totally self-contained.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-6.html" rel="nofollow">#</a> <a href="http://www.columbia.edu/~anders/">anders</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<blockquote>
-But yeah, in general, any kind of heterogenous deployment is going to be more of a hassle than something totally self-contained.</blockquote>
-<p>But only for the initial deployment.  At least in my experience, heterogeneous deployment is a lot easier to maintain, because there's fewer dependencies all around.  Well, <em>good</em> heterogeneous deployment of course; an ad hoc variety of deployments is no fun.</p>
-<p>This might not be true for a very small user, for whom <em>everything</em> seems ad hoc because they do so few installations and never become familiar with any particular process.  But that same user probably is less attached to a framework and to integration than a larger user might be, so some of the downsides to heterogeneous environments aren't as much of an issue.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-10.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-<blockquote>
-Make CherryPy applications well behaved WSGI applications, so that multiple such applications can easily live in the same process, and so that programmatic configuration is easy. This requires changes to CherryPy itself, so this is perhaps the hardest step.</blockquote>
-<p>Is <a class="reference" href="http://www.cherrypy.org/wiki/WSGIServers">this</a> what you're after?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-11.html" rel="nofollow">#</a> Ben Finney</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>No, not really.  CherryPy has a few issues with how it implements WSGI.  There's been some progress on this in the last few months, so some issues might be fixed.  Anyway, initially it only allowed a single CherryPy application in a process.  So basically you had to use CherryPy as an entry point, then mount applications there; you couldn't use WSGI to compose your applications.  I think there's been some progress on this, but I don't know that it is complete.  This is the most major issue.</p>
-<p>Another issue is how the paths are interpreted, and I've heard CherryPy doesn't respect <tt class="docutils literal"><span class="pre">SCRIPT_NAME</span></tt> and <tt class="docutils literal"><span class="pre">PATH_INFO</span></tt> like it should.  This is what keeps the URLs sane in a WSGI application.  In other contexts the URL prefixes are often configured, but this is a point of frequent complexity and confusion.  WSGI, in comparison, is very clear on the matter.  IMHO, traversal URL parsing like CherryPy or Zope add a lot of complexity to composing applications, and those algorithms should be kept strictly internal.</p>
-<p>I feel like there's something else I'm also forgetting, but those are the basic issues.  Also, making programmatic configuration easy; but at least in the past this seemed pretty straight-forward in CherryPy, so it's probably as much documentation as anything.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-13.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Just to clarify, when I wrote in my post that I wanted to &quot;port&quot; the tasty backend, I fully intended to provoke a conversation about the laziest, err, most efficient, way to do that.</p>
-<p>One of the promises of z3 as I understood it was the ability to import pure python modules and libraries and make productive use of them within Zope. I had read about basket, and was hopeful that might play a role.</p>
-<p>One thing I don't understand about these WSGI entry points is which app controls the url mapping. Tasty uses the <a class="reference" href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/444766">RestResource</a> cherrypy filter to map urls to objects, and I have no idea how that would mesh with Zope's publisher. Then there is the SQLObject/ZODB issue - I don't yet understand how to efficiently model the <a class="reference" href="http://tagschema.com/blogs/tagschema/2005/06/slicing-and-dicing-data-20-part-2.html">User-Tag-Object model</a> inside the zodb, and I also know many Plone developers, who work exclusively on that stack, are reluctant to deploy a relational database.</p>
-<p>Beyond that, a full integration layer would do a little bit more within zope than plain tasty.  It could integrate w/ Plone's search, expose vocabulary managers within Plone (with configurable policy, such as shared vocabs, private vocabs, folksonomic vocabs) etc, etc.</p>
-<p>I do think that &quot;little-apps&quot; is a pattern that offers incredible promise for stitching the web together, and realizing the hype of the web 2.0, the web as a platform. We are hoping to demonstrate ways in which this strategy will keep us from becoming trapped in a silo (any silo), and become more capable of treating <a class="reference" href="http://www.oreillynet.com/pub/a/oreilly/tim/news/2005/09/30/what-is-web-20.html?page=4">software as a service</a> - where we continue to develop custom applications composed of lots of little ones. And the prospect of tag-enabling a legacy app without touching a line of bit-rotten code, or even a static html resource, is incredibly alluring.</p>
-<p>I also think that porting backends to alternate backends isn't tragic, if the api, and the corresponding <a class="reference" href="http://www.microformats.org/">microformat</a> become somewhat standard. Not terribly different than alternate implementations of an interface w/in a particular environment.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-12.html" rel="nofollow">#</a> <a href="http://alchemicalmusings.blogspot.com/">Jonah</a></div><hr noshade>
- 
-<div class="document">
-<p>Beyond that, a full integration layer would do a little bit more within zope than plain tasty. It could integrate w/ Plone's search, expose vocabulary managers within Plone (with configurable policy, such as shared vocabs, private vocabs, folksonomic vocabs) etc, etc.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-small-apps-comment-14.html" rel="nofollow">#</a> <a href="http://red-wine.fcpages.com">David Jilek</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+                <div class="document">
+                    <p>
+                        Yes, I would say that writing reusable web applications
+                        is harder than writing a library or framework.
+                    </p>
+                    <p>
+                        With Tasty, the motivation for doing it that way is that
+                        we need to be able to use it from other languages and
+                        platforms. In particular, we have a Java course
+                        management framework that my coworkers are building an
+                        application on top of. They brought me in to help figure
+                        out tagging stuff and I really did not want to deal with
+                        all the JSF, Maven, and J2EE crap. Currently we have
+                        tasty clients in python, perl, and javascript and will
+                        soon have java and possibly cold fusion apps that use
+                        it. We'll definitely be connecting it to a plone
+                        product. I'm even tempted to integrate it with GNUS so I
+                        can tag my mail :)
+                    </p>
+                    <p>
+                        I still have to maintain all the old perl code that I
+                        wrote before moving to python. I sure wish I'd been
+                        developing small apps back then instead of libraries. It
+                        would make it much more manageable to convert it little
+                        by little to python. In the future, if I decide that I
+                        like a different language even more, I can start
+                        building new applications in that language and still use
+                        the small apps like Tasty without having to completely
+                        re-write them.
+                    </p>
+                    <p>
+                        There's also a decent scalability argument. These
+                        seperate, small applications scale out really easily.
+                        You can start with everything running on one server and
+                        then, if the load gets too high, start moving each
+                        mini-application out to its own server with load
+                        balancing and caching layers between everything. No
+                        additional code has to be written; just some config
+                        tweaks.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-small-apps-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.columbia.edu/~anders/">anders</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Oh, a small note in addition: I think it's too easy to put
+                    that any TurboGears application becomes simply available to
+                    Zope users once all the WSGI glue is in place. Even
+                    forgetting the need for integration that still occurs and is
+                    more complicated than a simple module import, TurboGears has
+                    a relational database backend requirement. I worry about
+                    such requirements when I think about deployment of my
+                    applications, especially when such a deployment happens at
+                    customer sites. easy_install gives me hope that I'll have to
+                    worry less in the future, but that doesn't mean I can stop
+                    worrying altogether.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-small-apps-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Martijn Faassen</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        There is a database setup procedure, in this case mostly
+                        specific to SQLObject. There's no specific protocol for
+                        how you set up an application or its database, so this
+                        remains an issue. I'd like for there to be a parrallel
+                        setup procedure, so that after configuring the
+                        application you could explicitly set it up, including
+                        having it tell you what it is going to do (without doing
+                        it).
+                    </p>
+                    <p>
+                        There are other kinds of integration that are harder, of
+                        course, like permission controls, or other user data.
+                        But these are points for future consideration; even if
+                        it initially means duplication in some places, having
+                        access to a larger set of software is still useful.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-small-apps-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        Strictly speaking, Turbogears doesn't actually have a
+                        RDBMS requirement. 99% of applications that are written
+                        for TG will use one and it's geared towards that kind of
+                        development, but you don't have to have one installed.
+                        It would actually be possible to use a ZODB backend with
+                        turbogears. If a ZODB backend were written for SQLObject
+                        (if that's even possible), it could make integration
+                        even easier.
+                    </p>
+                    <p>
+                        There are already Plone products that require an RDBMS
+                        though (eg, KNotes) so it wouldn't be a totally new
+                        thing.
+                    </p>
+                    <p>
+                        But yeah, in general, any kind of heterogenous
+                        deployment is going to be more of a hassle than
+                        something totally self-contained.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-small-apps-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.columbia.edu/~anders/">anders</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <blockquote>
+                            But yeah, in general, any kind of heterogenous
+                            deployment is going to be more of a hassle than
+                            something totally self-contained.
+                        </blockquote>
+                        <p>
+                            But only for the initial deployment. At least in my
+                            experience, heterogeneous deployment is a lot easier
+                            to maintain, because there's fewer dependencies all
+                            around. Well, <em>good</em> heterogeneous deployment
+                            of course; an ad hoc variety of deployments is no
+                            fun.
+                        </p>
+                        <p>
+                            This might not be true for a very small user, for
+                            whom <em>everything</em> seems ad hoc because they
+                            do so few installations and never become familiar
+                            with any particular process. But that same user
+                            probably is less attached to a framework and to
+                            integration than a larger user might be, so some of
+                            the downsides to heterogeneous environments aren't
+                            as much of an issue.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/more-small-apps-comment-10.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Ian Bicking
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <blockquote>
+                    Make CherryPy applications well behaved WSGI applications,
+                    so that multiple such applications can easily live in the
+                    same process, and so that programmatic configuration is
+                    easy. This requires changes to CherryPy itself, so this is
+                    perhaps the hardest step.
+                </blockquote>
+                <p>
+                    Is
+                    <a
+                        class="reference"
+                        href="http://www.cherrypy.org/wiki/WSGIServers"
+                        >this</a
+                    >
+                    what you're after?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-small-apps-comment-11.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Ben Finney
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        No, not really. CherryPy has a few issues with how it
+                        implements WSGI. There's been some progress on this in
+                        the last few months, so some issues might be fixed.
+                        Anyway, initially it only allowed a single CherryPy
+                        application in a process. So basically you had to use
+                        CherryPy as an entry point, then mount applications
+                        there; you couldn't use WSGI to compose your
+                        applications. I think there's been some progress on
+                        this, but I don't know that it is complete. This is the
+                        most major issue.
+                    </p>
+                    <p>
+                        Another issue is how the paths are interpreted, and I've
+                        heard CherryPy doesn't respect
+                        <tt class="docutils literal"
+                            ><span class="pre">SCRIPT_NAME</span></tt
+                        >
+                        and
+                        <tt class="docutils literal"
+                            ><span class="pre">PATH_INFO</span></tt
+                        >
+                        like it should. This is what keeps the URLs sane in a
+                        WSGI application. In other contexts the URL prefixes are
+                        often configured, but this is a point of frequent
+                        complexity and confusion. WSGI, in comparison, is very
+                        clear on the matter. IMHO, traversal URL parsing like
+                        CherryPy or Zope add a lot of complexity to composing
+                        applications, and those algorithms should be kept
+                        strictly internal.
+                    </p>
+                    <p>
+                        I feel like there's something else I'm also forgetting,
+                        but those are the basic issues. Also, making
+                        programmatic configuration easy; but at least in the
+                        past this seemed pretty straight-forward in CherryPy, so
+                        it's probably as much documentation as anything.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-small-apps-comment-13.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Just to clarify, when I wrote in my post that I wanted to
+                    &quot;port&quot; the tasty backend, I fully intended to
+                    provoke a conversation about the laziest, err, most
+                    efficient, way to do that.
+                </p>
+                <p>
+                    One of the promises of z3 as I understood it was the ability
+                    to import pure python modules and libraries and make
+                    productive use of them within Zope. I had read about basket,
+                    and was hopeful that might play a role.
+                </p>
+                <p>
+                    One thing I don't understand about these WSGI entry points
+                    is which app controls the url mapping. Tasty uses the
+                    <a
+                        class="reference"
+                        href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/444766"
+                        >RestResource</a
+                    >
+                    cherrypy filter to map urls to objects, and I have no idea
+                    how that would mesh with Zope's publisher. Then there is the
+                    SQLObject/ZODB issue - I don't yet understand how to
+                    efficiently model the
+                    <a
+                        class="reference"
+                        href="http://tagschema.com/blogs/tagschema/2005/06/slicing-and-dicing-data-20-part-2.html"
+                        >User-Tag-Object model</a
+                    >
+                    inside the zodb, and I also know many Plone developers, who
+                    work exclusively on that stack, are reluctant to deploy a
+                    relational database.
+                </p>
+                <p>
+                    Beyond that, a full integration layer would do a little bit
+                    more within zope than plain tasty. It could integrate w/
+                    Plone's search, expose vocabulary managers within Plone
+                    (with configurable policy, such as shared vocabs, private
+                    vocabs, folksonomic vocabs) etc, etc.
+                </p>
+                <p>
+                    I do think that &quot;little-apps&quot; is a pattern that
+                    offers incredible promise for stitching the web together,
+                    and realizing the hype of the web 2.0, the web as a
+                    platform. We are hoping to demonstrate ways in which this
+                    strategy will keep us from becoming trapped in a silo (any
+                    silo), and become more capable of treating
+                    <a
+                        class="reference"
+                        href="http://www.oreillynet.com/pub/a/oreilly/tim/news/2005/09/30/what-is-web-20.html?page=4"
+                        >software as a service</a
+                    >
+                    - where we continue to develop custom applications composed
+                    of lots of little ones. And the prospect of tag-enabling a
+                    legacy app without touching a line of bit-rotten code, or
+                    even a static html resource, is incredibly alluring.
+                </p>
+                <p>
+                    I also think that porting backends to alternate backends
+                    isn't tragic, if the api, and the corresponding
+                    <a class="reference" href="http://www.microformats.org/"
+                        >microformat</a
+                    >
+                    become somewhat standard. Not terribly different than
+                    alternate implementations of an interface w/in a particular
+                    environment.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-small-apps-comment-12.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://alchemicalmusings.blogspot.com/">Jonah</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Beyond that, a full integration layer would do a little bit
+                    more within zope than plain tasty. It could integrate w/
+                    Plone's search, expose vocabulary managers within Plone
+                    (with configurable policy, such as shared vocabs, private
+                    vocabs, folksonomic vocabs) etc, etc.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-small-apps-comment-14.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://red-wine.fcpages.com">David Jilek</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

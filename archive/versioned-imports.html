@@ -3,10 +3,8 @@
 <head>
 	<title>Versioned Imports</title>
 <link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="https://ianbicking.org/feeds/new_pages.xml">
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
 
 </head>
 <body color="black" bgcolor="white">
@@ -171,12 +169,12 @@ except ImportError:
   def thingy():
 <br />
      return frobnicate(thing1(),thing2())
- <div align="right"><a href="http://blog.ianbicking.org/comment387.html" rel="nofollow">#</a> <a href="http://www.livejournal.com/users/glyf">Glyph Lefkowitz</a></div><hr noshade>
+ <div align="right"><a href="https://ianbicking.org/comment387.html" rel="nofollow">#</a> <a href="http://www.livejournal.com/users/glyf">Glyph Lefkowitz</a></div><hr noshade>
  Sorry, but I think the "import foo == 2.0" is possibly the ugliest idea I've ever seen.  Should I parse that as (import (foo == 2.0)) or ((import foo) == 2.0)? One way, you should be getting a NameError, and even if you didn't, now modules evaluate to FLOATS? The other way, 'import' becomes some new half-statement-half-expression monster that should be frankly be drowned at birth.
 <br />
 
 <br />
-One of the real problems, I think, is exactly how the module versioning would work.  Are we importing each possible matching modules one at a time until we find the one with the right version?  That could get expensive, and lord help us if any of those modules have complicated initialization code. 
+One of the real problems, I think, is exactly how the module versioning would work.  Are we importing each possible matching modules one at a time until we find the one with the right version?  That could get expensive, and lord help us if any of those modules have complicated initialization code.
 <br />
 
 <br />
@@ -184,7 +182,7 @@ Maybe we'd be better off extending the bytecode to make it easier to pull out a 
 <br />
 
 <br />
- <div align="right"><a href="http://blog.ianbicking.org/comment388.html" rel="nofollow">#</a> <a href="http://introvert.net/">t e whalen</a></div><hr noshade>
+ <div align="right"><a href="https://ianbicking.org/comment388.html" rel="nofollow">#</a> <a href="http://introvert.net/">t e whalen</a></div><hr noshade>
  I am in favor of versioned imports. I do not have a problem with a directive with "==" or any other boolean operator. I somehow think an 'if' needs to be in there as well as some try/catch mechanism. Maybe all built in to some easy to understand/read syntax.
 <br />
 
@@ -205,21 +203,21 @@ or just:
 <br />
 </tt>
 <br />
- <div align="right"><a href="http://blog.ianbicking.org/comment389.html" rel="nofollow">#</a> <a href="http://www.chipy.org/brianray.html">Brian Ray</a></div><hr noshade>
- Glyph: But there's no way to apply package naming to the standard library, which has no packages (mostly), only modules.  I think the standard library needs versioning just as much as other packages... well, it doesn't need it <i>now</i>, but if the standard library is ever going to grow in a way that isn't strictly backward compatible then it will. 
+ <div align="right"><a href="https://ianbicking.org/comment389.html" rel="nofollow">#</a> <a href="http://www.chipy.org/brianray.html">Brian Ray</a></div><hr noshade>
+ Glyph: But there's no way to apply package naming to the standard library, which has no packages (mostly), only modules.  I think the standard library needs versioning just as much as other packages... well, it doesn't need it <i>now</i>, but if the standard library is ever going to grow in a way that isn't strictly backward compatible then it will.
 <br />
 
 <br />
-Using comparison operators is a little fishy, though I think there's a case for at least an operator for "provides a version", and one for "is a version".  Code that is tightly coupled to an implementation (not an interface) is, IMHO, sometimes justified.  It's just what happens when you are trying to get stuff done, not necessarily get stuff done the right way.  So version requirements don't belong entirely to either the importer or the importee -- it's an agreement, where either side can be more or less strict about it.  E.g., a critical bug or security fix should probably be possible to install even when the module is tightly coupled to another module.  Or, the importer might determine that one of several versions of the imported package will work, but doesn't respect the imported package's assertion that it provides a certain interface.  
+Using comparison operators is a little fishy, though I think there's a case for at least an operator for "provides a version", and one for "is a version".  Code that is tightly coupled to an implementation (not an interface) is, IMHO, sometimes justified.  It's just what happens when you are trying to get stuff done, not necessarily get stuff done the right way.  So version requirements don't belong entirely to either the importer or the importee -- it's an agreement, where either side can be more or less strict about it.  E.g., a critical bug or security fix should probably be possible to install even when the module is tightly coupled to another module.  Or, the importer might determine that one of several versions of the imported package will work, but doesn't respect the imported package's assertion that it provides a certain interface.
 <br />
 
 <br />
-So I guess I don't trust simply using conventions, I'd like more than that.  Formal interfaces are a good way to think about this, but the reality is that versioning needs to apply to all packages, not just the ones that think about this situation formally.  It needs to apply to packages and modules we have right now -- because practically, we will continue to have modules produced in the current style for several years, despite any new conventions that are added.  I think we need <i>tools</i>, not just conventions -- a good tool can get stuff done even when other parts of the system aren't assisting it. 
+So I guess I don't trust simply using conventions, I'd like more than that.  Formal interfaces are a good way to think about this, but the reality is that versioning needs to apply to all packages, not just the ones that think about this situation formally.  It needs to apply to packages and modules we have right now -- because practically, we will continue to have modules produced in the current style for several years, despite any new conventions that are added.  I think we need <i>tools</i>, not just conventions -- a good tool can get stuff done even when other parts of the system aren't assisting it.
 <br />
 
 <br />
 TE Whalen: Hopefully we could use the metadata in the directory to get the import right on the first try, most times.  A clearer kind of metadata might also be called for -- right now filenames are the only metadata we have short of importing the module and looking for magic variables.  This can be problematic; maybe we need a real index of what packages and what versions are installed, and where they are installed.  Right now distutils setups are pretty much write-only, they don't seem to keep track of what they've done.  I think there would be a number of things to be gained from changing that.
- <div align="right"><a href="http://blog.ianbicking.org/comment390.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
+ <div align="right"><a href="https://ianbicking.org/comment390.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
  > Thoughts?
 <br />
 
@@ -295,7 +293,7 @@ BTW, regarding metadata: Python's module system just plain sucks at it. As T E W
 
 <br />
 Regards
- <div align="right"><a href="http://blog.ianbicking.org/comment391.html" rel="nofollow">#</a> <a href="http://freespace.virgin.net/hamish.sanderson/">has</a></div><hr noshade>
+ <div align="right"><a href="https://ianbicking.org/comment391.html" rel="nofollow">#</a> <a href="http://freespace.virgin.net/hamish.sanderson/">has</a></div><hr noshade>
  <a href="http://claytonbrown.com/cbwiki/ModuleVersioning" target="_blank">http://claytonbrown.com/cbwiki/ModuleVersioning</a>
 <br />
 
@@ -328,7 +326,7 @@ import foo.xzy
 <br />
 
 <br />
-I solved this in the few incidents I had of this by adjusting the code to 
+I solved this in the few incidents I had of this by adjusting the code to
 <br />
 
 <br />
@@ -340,19 +338,19 @@ import xyz
 <br />
 8<------8<------8<------8<------8<------
 <br />
- <div align="right"><a href="http://blog.ianbicking.org/comment392.html" rel="nofollow">#</a> Clayton Brown</div><hr noshade>
+ <div align="right"><a href="https://ianbicking.org/comment392.html" rel="nofollow">#</a> Clayton Brown</div><hr noshade>
  An extra 2 cents, I might add,
 <br />
 
 <br />
-I feel the biggest problem is establishing a CPAN (or PyPi if you like) repository that allows such versioning, as well as binary compatability issues, and implementing this logic in pythons core through a PEP so that python inately asses which versions are specified/available/downbloadable etc. 
+I feel the biggest problem is establishing a CPAN (or PyPi if you like) repository that allows such versioning, as well as binary compatability issues, and implementing this logic in pythons core through a PEP so that python inately asses which versions are specified/available/downbloadable etc.
 <br />
 
 <br />
 This could allow python to satisify its import dependencies on the fly in future.
 <br />
 Along with move forward to newer versions automatically, with the ability to stop at any level, warn, halt, etc.
- <div align="right"><a href="http://blog.ianbicking.org/comment393.html" rel="nofollow">#</a> <a href="http://claytonbrown.com/cbwiki/ModuleVersioning">Clayton Brown</a></div><hr noshade>
+ <div align="right"><a href="https://ianbicking.org/comment393.html" rel="nofollow">#</a> <a href="http://claytonbrown.com/cbwiki/ModuleVersioning">Clayton Brown</a></div><hr noshade>
  Oy yeah, and wrapp this all up nicely in the PEP for importing python modules in zipfiles was the last logical step i thought which would add to this solution.
 <br />
 
@@ -362,15 +360,15 @@ Ok so its been a while since I thought about this problem.... im a bit rusty.
 
 <br />
 Clay
- <div align="right"><a href="http://blog.ianbicking.org/comment394.html" rel="nofollow">#</a> <a href="http://claytonbrown.com/cbwiki/ModuleVersioning">Clayton Brown</a></div><hr noshade>
+ <div align="right"><a href="https://ianbicking.org/comment394.html" rel="nofollow">#</a> <a href="http://claytonbrown.com/cbwiki/ModuleVersioning">Clayton Brown</a></div><hr noshade>
  On a related note, I like the idea of a 'v' prefix for strings, such that v'1.0_a2' would return either a tuple (1, 0, 'a2') as exemplified in your post, or a value of type 'version'. I think this is a cute, concise way to support arbitrary version formats, but not generally useful enough to warrant the effort. There's also the problem of combinations with the existing string prefixes (do you just disallow them, or do 'vr', 'rv', 'vu', 'uv', 'uvr', 'urv', 'ruv', 'rvu', 'vur', and 'vru' become builtin identifiers).
 <br />
 
 <br />
 Another option would be a builtin 'version' method (or type). version('1.0_a2') is quite clear, and probably not too verbose. Again, this could return either a tuple, or a value of type 'version'.
- <div align="right"><a href="http://blog.ianbicking.org/comment395.html" rel="nofollow">#</a> ajrw</div><hr noshade>
+ <div align="right"><a href="https://ianbicking.org/comment395.html" rel="nofollow">#</a> ajrw</div><hr noshade>
  I really like the perl syntax: require :)
- <div align="right"><a href="http://blog.ianbicking.org/comment396.html" rel="nofollow">#</a> Jkx</div><hr noshade>
+ <div align="right"><a href="https://ianbicking.org/comment396.html" rel="nofollow">#</a> Jkx</div><hr noshade>
 </blockquote>
 <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
 </script>

@@ -1,111 +1,135 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Python, metaprogramming, and macros</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Python, metaprogramming, and macros</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Python, metaprogramming, and macros</h1>
+        <p>
+            I was looking at Phillip's
+            <abbr title="Common Lisp Object System">CLOS</abbr>-style
+            <a
+                href="http://dirtsimple.org/2004/11/generic-functions-have-landed.html"
+                >generic functions</a
+            >
+            recently, and it got me thinking about metaprogramming in Python. If
+            you haven't looked at those generic functions, it's a very neat idea
+            and implementation, and can be expressed quite elegantly in Python
+            (at least after adding 2.4's <code>@</code> decorator syntax). (<a
+                href="http://patricklogan.blogspot.com/2004/11/more-problems-with-rigid-languages.html"
+                >This post</a
+            >
+            is another recent item that got me thinking about metaprogramming.)
+        </p>
 
-<div style="float: right">
+        <p>
+            Python doesn't have much of anything like macros (which CLOS generic
+            methods are implemented with, I believe), but it doesn't seem like a
+            big impediment. And there's a lot of metaprogramming that is done in
+            Python, without a macro in sight. By metaprogramming I mean
+            programming structures that operate on other programming structures.
+            Every decorator is a case of metaprogramming; the decorator is a
+            function that takes a function as an argument, and returns a
+            function (or function-like) object.
+        </p>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+        <p>
+            There's a lot of ways you can do metaprogramming in Python.
+            Decorators are one way, and
+            <a href="http://blog.colorstudy.com/ianb/weblog/2004/11/18.html"
+                >metaclasses</a
+            >
+            are another. But it can be easier than that; you can modify classes
+            on the fly, you can you can do all sorts of things with higher-order
+            functions (i.e., functions that take functions as arguments), and
+            even do funny sorts of things with import hooks, the
+            <a href="http://python.org/doc/current/lib/module-new.html">new</a>
+            module, etc.
+        </p>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Python, metaprogramming, and macros</h1>
- <p>
+        <p>
+            What makes this possible is the fact Python is a scripting language.
+            I know some people hate that term; but I think it means something
+            very specific, not merely derogatory. A Python module is a
+            <i>script</i>; when Python loads a module, it reads the file,
+            evaluates the first line, the second line, etc., until it's done.
+            Functions aren't declared; rather <code>def</code> creates a
+            function on the spot; you can redefine the function later, or define
+            it inside another scope, or delete it, or whatever. This causes
+            problems (like the problem of changing code in long-running
+            processes, or circular references); but it also has some advantages.
+        </p>
 
-I was looking at Phillip's <abbr title="Common Lisp Object System">CLOS</abbr>-style <a href="http://dirtsimple.org/2004/11/generic-functions-have-landed.html">generic
-functions</a> recently, and it got me thinking about metaprogramming
-in Python.  If you haven't looked at those generic functions, it's a
-very neat idea and implementation, and can be expressed quite
-elegantly in Python (at least after adding 2.4's <code>@</code>
-decorator syntax).  (<a href="http://patricklogan.blogspot.com/2004/11/more-problems-with-rigid-languages.html">This
-post</a> is another recent item that got me thinking about
-metaprogramming.)
+        <p>
+            When we use a module, we can forget that we aren't using the source
+            we see in its <tt>.py</tt> file. We're using the objects that are
+            created <i>by</i> that source. When loading a module, we're running
+            a bunch of statements; some statements are rather benign with few
+            side effects (mostly <code>def</code>); others are somewhere in
+            between (like <code>class</code>); and others are executed
+            immediately, and we only have access to their effects. Decorators
+            and metaclasses are two instances; but you can put any statements in
+            a module, and any of them can modify what's in the module. You can
+            even modify modules after they are loaded (a
+            <a href="http://www.zopezen.org/Members/zopista/1023162757/view"
+                >monkey patch</a
+            >).
+        </p>
 
-<p>
+        <p>
+            There are some problems. You can't look inside code programmitically
+            (or at least it isn't easy), and lazy evaluation is fairly limited.
+            The generics package is forced to use strings for its expressions,
+            then compile and execute them in a closed environment. SQLObject
+            uses
+            <a href="http://sqlobject.org/docs/SQLBuilder.html">SQLBuilder</a>
+            which uses Python's magic methods, but is limited;
+            <a href="http://www.pfdubois.com/numpy/">Numeric</a> uses something
+            similar. Still, there's a huge amount you can do, and all without
+            any macros, all simply due to the highly imperative nature of Python
+            source.
+        </p>
 
-Python doesn't have much of anything like macros (which CLOS generic
-methods are implemented with, I believe), but it doesn't seem like a
-big impediment.  And there's a lot of metaprogramming that is done in
-Python, without a macro in sight.  By metaprogramming I mean
-programming structures that operate on other programming structures.
-Every decorator is a case of metaprogramming; the decorator is a
-function that takes a function as an argument, and returns a function
-(or function-like) object.
-
-<p>
-
-There's a lot of ways you can do metaprogramming in Python.
-Decorators are one way, and <a href="http://blog.colorstudy.com/ianb/weblog/2004/11/18.html">metaclasses</a>
-are another.  But it can be easier than that; you can modify classes
-on the fly, you can you can do all sorts of things with higher-order
-functions (i.e., functions that take functions as arguments), and even
-do funny sorts of things with import hooks, the <a href="http://python.org/doc/current/lib/module-new.html">new</a>
-module, etc.
-
-<p>
-
-What makes this possible is the fact Python is a scripting language.
-I know some people hate that term; but I think it means something very
-specific, not merely derogatory.  A Python module is a <i>script</i>;
-when Python loads a module, it reads the file, evaluates the first
-line, the second line, etc., until it's done.  Functions aren't
-declared; rather <code>def</code> creates a function on the spot; you
-can redefine the function later, or define it inside another scope, or
-delete it, or whatever.  This causes problems (like the problem of
-changing code in long-running processes, or circular references); but
-it also has some advantages.
-
-<p>
-
-When we use a module, we can forget that we aren't using the source we
-see in its <tt>.py</tt> file.  We're using the objects that are
-created <i>by</i> that source.  When loading a module, we're running a
-bunch of statements; some statements are rather benign with few side
-effects (mostly <code>def</code>); others are somewhere in between
-(like <code>class</code>); and others are executed immediately, and we
-only have access to their effects.  Decorators and metaclasses are two
-instances; but you can put any statements in a module, and any of them
-can modify what's in the module.  You can even modify modules after
-they are loaded (a <a href="http://www.zopezen.org/Members/zopista/1023162757/view">monkey
-patch</a>).
-
-<p>
-
-There are some problems.  You can't look inside code programmitically
-(or at least it isn't easy), and lazy evaluation is fairly limited.
-The generics package is forced to use strings for its expressions,
-then compile and execute them in a closed environment.  SQLObject uses
-<a href="http://sqlobject.org/docs/SQLBuilder.html">SQLBuilder</a>
-which uses Python's magic methods, but is limited; <a href="http://www.pfdubois.com/numpy/">Numeric</a> uses something
-similar.  Still, there's a huge amount you can do, and all without any
-macros, all simply due to the highly imperative nature of Python
-source.
- <div class="dates" align="right">
-Created 21 Nov '04<br>
-Modified 14 Dec '04</div>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+        <div class="dates" align="right">
+            Created 21 Nov '04<br />
+            Modified 14 Dec '04
+        </div>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

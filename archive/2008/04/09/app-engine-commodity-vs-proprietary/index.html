@@ -1,472 +1,1943 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
-<script type="text/javascript">/*<![CDATA[*/(function(a){function b(a,b){if(+a)return~a||(d.cookie=h+"=; path=/");j=d.createElement(e),k=d.getElementsByTagName(e)[0],j.src=a,b&&(j.onload=j.onerror=b),k.parentNode.insertBefore(j,k)}function c(){n.api||b(l.shift()||-1,c)}if(this.Mobify)return;var d=document,e="script",f="mobify",g="."+f+".com/",h=f+"-path",i=g+"un"+f+".js",j,k,l=[!1,1],m,n=this.Mobify={points:[+(new Date)],tagVersion:[6,0]},o=/(; |#|&|^)mobify-path=([^&;]*)/g.exec(location.hash+"; "+d.cookie);o?(m=o[2])&&!+(m=sessionStorage[h]||m)&&(l=[!0,"//preview"+g+escape(m)]):(l=a()||l,l[0]&&l.push("//cdn"+i,"//files01"+i)),l.shift()?(d.write('<plaintext style="display:none;">'),setTimeout(c)):b(l[0])})(function(){if(/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)){return[1,"//cdn.mobify.com/sites/ians-blog/production/mobify.js"]}})/*]]>*/</script>
-<!-- END MOBIFY -->
-	<title>Ian Bicking: a blog   ::  App Engine: Commodity vs. Proprietary</title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<meta name="generator" content="WordPress 3.4.2" /><!-- LEAVE FOR STATS -->
-	<meta name="description" content="" />
-	<link rel="stylesheet" title="plaintxtSimpler" href="../../../../wp-content/themes/Barthelme-ianb/style.css" type="text/css" media="all" />
-	<link rel="start" href="../../../../index.html" title="Ian Bicking: a blog" />
-	<link rel="alternate" type="application/atom+xml" title="Ian Bicking: a blog Atom Feed" href="../../../../feed/atom/index.html" />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog RSS 2.0 Feed" href="../../../../feed/rss/index.html" />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog Comments RSS 2.0 Feed" href="../../../../comments/feed/index.html" />
-	<link rel="alternate" type="application/rdf+xml" title="Ian Bicking: a blog RSS 1.0" href="../../../../feed/rdf/index.html" />
-	<link rel="alternate" type="text/xml" title="Ian Bicking: a blog RSS 0.92 Feed" href="../../../../feed/rss/index.html" />
-	<link rel="pingback" href="../../../../xmlrpc.php" />
-	<link rel="openid.server" href="http://www.myopenid.com/server" />
-	<link rel="openid.delegate" href="http://ianb.myopenid.com" />
-        <link rel="me" type="text/html" href="http://www.google.com/profiles/ianbicking"/>
-		<link rel='archives' title='October 2012' href='../../../../2012/10/index.html' />
-	<link rel='archives' title='February 2012' href='../../../../2012/02/index.html' />
-	<link rel='archives' title='April 2011' href='../../../../2011/04/index.html' />
-	<link rel='archives' title='March 2011' href='../../../../2011/03/index.html' />
-	<link rel='archives' title='September 2010' href='../../../../2010/09/index.html' />
-	<link rel='archives' title='August 2010' href='../../../../2010/08/index.html' />
-	<link rel='archives' title='May 2010' href='../../../../2010/05/index.html' />
-	<link rel='archives' title='April 2010' href='../../../../2010/04/index.html' />
-	<link rel='archives' title='March 2010' href='../../../../2010/03/index.html' />
-	<link rel='archives' title='February 2010' href='../../../../2010/02/index.html' />
-	<link rel='archives' title='January 2010' href='../../../../2010/01/index.html' />
-	<link rel='archives' title='September 2009' href='../../../../2009/09/index.html' />
-	<link rel='archives' title='May 2009' href='../../../../2009/05/index.html' />
-	<link rel='archives' title='April 2009' href='../../../../2009/04/index.html' />
-	<link rel='archives' title='January 2009' href='../../../../2009/01/index.html' />
-	<link rel='archives' title='December 2008' href='../../../12/index.html' />
-	<link rel='archives' title='November 2008' href='../../../11/index.html' />
-	<link rel='archives' title='October 2008' href='../../../10/index.html' />
-	<link rel='archives' title='September 2008' href='../../../09/index.html' />
-	<link rel='archives' title='August 2008' href='../../../08/index.html' />
-	<link rel='archives' title='July 2008' href='../../../07/index.html' />
-	<link rel='archives' title='June 2008' href='../../../06/index.html' />
-	<link rel='archives' title='May 2008' href='../../../05/index.html' />
-	<link rel='archives' title='April 2008' href='../../index.html' />
-	<link rel='archives' title='March 2008' href='../../../03/index.html' />
-	<link rel='archives' title='February 2008' href='../../../02/index.html' />
-	<link rel='archives' title='January 2008' href='../../../01/index.html' />
-	<link rel='archives' title='November 2007' href='../../../../2007/11/index.html' />
-	<link rel='archives' title='October 2007' href='../../../../2007/10/index.html' />
-	<link rel='archives' title='September 2007' href='../../../../2007/09/index.html' />
-	<link rel='archives' title='August 2007' href='../../../../2007/08/index.html' />
-	<link rel='archives' title='July 2007' href='../../../../2007/07/index.html' />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog &raquo; App Engine: Commodity vs. Proprietary Comments Feed" href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/feed/" />
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="../../../../xmlrpc.php?rsd" />
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="../../../../wp-includes/wlwmanifest.xml" /> 
-<link rel='prev' title='App Engine and Open Source' href='../app-engine-and-open-source/index.html' />
-<link rel='next' title='The Mundane Nature Of Programming' href='../../11/the-mundane-nature-of-programming/index.html' />
-<meta name="generator" content="WordPress 3.4.2" />
-<link rel='canonical' href='index.html' />
-<link rel='shortlink' href='http://blog.ianbicking.org/?p=54' />
-<link rel="stylesheet" href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"  type="text/css" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+    <head>
+        <!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
+        <script type="text/javascript">
+            /*<![CDATA[*/ (function (a) {
+                function b(a, b) {
+                    if (+a) return ~a || (d.cookie = h + "=; path=/");
+                    (j = d.createElement(e)),
+                        (k = d.getElementsByTagName(e)[0]),
+                        (j.src = a),
+                        b && (j.onload = j.onerror = b),
+                        k.parentNode.insertBefore(j, k);
+                }
+                function c() {
+                    n.api || b(l.shift() || -1, c);
+                }
+                if (this.Mobify) return;
+                var d = document,
+                    e = "script",
+                    f = "mobify",
+                    g = "." + f + ".com/",
+                    h = f + "-path",
+                    i = g + "un" + f + ".js",
+                    j,
+                    k,
+                    l = [!1, 1],
+                    m,
+                    n = (this.Mobify = {
+                        points: [+new Date()],
+                        tagVersion: [6, 0],
+                    }),
+                    o = /(; |#|&|^)mobify-path=([^&;]*)/g.exec(
+                        location.hash + "; " + d.cookie
+                    );
+                o
+                    ? (m = o[2]) &&
+                      !+(m = sessionStorage[h] || m) &&
+                      (l = [!0, "//preview" + g + escape(m)])
+                    : ((l = a() || l),
+                      l[0] && l.push("//cdn" + i, "//files01" + i)),
+                    l.shift()
+                        ? (d.write('<plaintext style="display:none;">'),
+                          setTimeout(c))
+                        : b(l[0]);
+            })(function () {
+                if (
+                    /ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(
+                        navigator.userAgent
+                    )
+                ) {
+                    return [
+                        1,
+                        "//cdn.mobify.com/sites/ians-blog/production/mobify.js",
+                    ];
+                }
+            }); /*]]>*/
+        </script>
+        <!-- END MOBIFY -->
+        <title>
+            Ian Bicking: a blog :: App Engine: Commodity vs. Proprietary
+        </title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta name="generator" content="WordPress 3.4.2" />
+        <!-- LEAVE FOR STATS -->
+        <meta name="description" content="" />
+        <link
+            rel="stylesheet"
+            title="plaintxtSimpler"
+            href="../../../../wp-content/themes/Barthelme-ianb/style.css"
+            type="text/css"
+            media="all"
+        />
+        <link
+            rel="start"
+            href="../../../../index.html"
+            title="Ian Bicking: a blog"
+        />
+        <link
+            rel="alternate"
+            type="application/atom+xml"
+            title="Ian Bicking: a blog Atom Feed"
+            href="../../../../feed/atom/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog RSS 2.0 Feed"
+            href="../../../../feed/rss/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog Comments RSS 2.0 Feed"
+            href="../../../../comments/feed/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rdf+xml"
+            title="Ian Bicking: a blog RSS 1.0"
+            href="../../../../feed/rdf/index.html"
+        />
+        <link
+            rel="alternate"
+            type="text/xml"
+            title="Ian Bicking: a blog RSS 0.92 Feed"
+            href="../../../../feed/rss/index.html"
+        />
+
+        <link
+            rel="archives"
+            title="October 2012"
+            href="../../../../2012/10/index.html"
+        />
+        <link
+            rel="archives"
+            title="February 2012"
+            href="../../../../2012/02/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2011"
+            href="../../../../2011/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="March 2011"
+            href="../../../../2011/03/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2010"
+            href="../../../../2010/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2010"
+            href="../../../../2010/08/index.html"
+        />
+        <link
+            rel="archives"
+            title="May 2010"
+            href="../../../../2010/05/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2010"
+            href="../../../../2010/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="March 2010"
+            href="../../../../2010/03/index.html"
+        />
+        <link
+            rel="archives"
+            title="February 2010"
+            href="../../../../2010/02/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2010"
+            href="../../../../2010/01/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2009"
+            href="../../../../2009/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="May 2009"
+            href="../../../../2009/05/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2009"
+            href="../../../../2009/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2009"
+            href="../../../../2009/01/index.html"
+        />
+        <link
+            rel="archives"
+            title="December 2008"
+            href="../../../12/index.html"
+        />
+        <link
+            rel="archives"
+            title="November 2008"
+            href="../../../11/index.html"
+        />
+        <link
+            rel="archives"
+            title="October 2008"
+            href="../../../10/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2008"
+            href="../../../09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2008"
+            href="../../../08/index.html"
+        />
+        <link rel="archives" title="July 2008" href="../../../07/index.html" />
+        <link rel="archives" title="June 2008" href="../../../06/index.html" />
+        <link rel="archives" title="May 2008" href="../../../05/index.html" />
+        <link rel="archives" title="April 2008" href="../../index.html" />
+        <link rel="archives" title="March 2008" href="../../../03/index.html" />
+        <link
+            rel="archives"
+            title="February 2008"
+            href="../../../02/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2008"
+            href="../../../01/index.html"
+        />
+        <link
+            rel="archives"
+            title="November 2007"
+            href="../../../../2007/11/index.html"
+        />
+        <link
+            rel="archives"
+            title="October 2007"
+            href="../../../../2007/10/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2007"
+            href="../../../../2007/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2007"
+            href="../../../../2007/08/index.html"
+        />
+        <link
+            rel="archives"
+            title="July 2007"
+            href="../../../../2007/07/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog &raquo; App Engine: Commodity vs. Proprietary Comments Feed"
+            href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/feed/"
+        />
+        <link
+            rel="EditURI"
+            type="application/rsd+xml"
+            title="RSD"
+            href="../../../../xmlrpc.php?rsd"
+        />
+        <link
+            rel="wlwmanifest"
+            type="application/wlwmanifest+xml"
+            href="../../../../wp-includes/wlwmanifest.xml"
+        />
+        <link
+            rel="prev"
+            title="App Engine and Open Source"
+            href="../app-engine-and-open-source/index.html"
+        />
+        <link
+            rel="next"
+            title="The Mundane Nature Of Programming"
+            href="../../11/the-mundane-nature-of-programming/index.html"
+        />
+        <meta name="generator" content="WordPress 3.4.2" />
+        <link rel="canonical" href="index.html" />
+        <link rel="shortlink" href="https://ianbicking.org/?p=54" />
+        <link
+            rel="stylesheet"
+            href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"
+            type="text/css"
+        />
+        <style type="text/css">
+            .recentcomments a {
+                display: inline !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        </style>
         <style type="text/css" media="all">
-/*<![CDATA[*/
-body { font-size: 100%; }
-body { font-family: tahoma, geneva, sans-serif; }
-div.post-header, h2.post-title, p.post-date-single, h2.post-title-single, div.post-entry h1, div.post-entry h2, div.post-entry h3, div.post-entry h4, div.post-entry h5, div.post-entry h6, div.post-entry blockquote, div.post-footer, h3#comment-count, h4#comment-header, div#comments ol li p.comment-metadata, h4#respond { font-family: verdana, geneva, sans-serif; }
-div.post-entry p { text-align: left; }
-div#wrapper { width: 100%; }
+            /*<![CDATA[*/
+            body {
+                font-size: 100%;
+            }
+            body {
+                font-family: tahoma, geneva, sans-serif;
+            }
+            div.post-header,
+            h2.post-title,
+            p.post-date-single,
+            h2.post-title-single,
+            div.post-entry h1,
+            div.post-entry h2,
+            div.post-entry h3,
+            div.post-entry h4,
+            div.post-entry h5,
+            div.post-entry h6,
+            div.post-entry blockquote,
+            div.post-footer,
+            h3#comment-count,
+            h4#comment-header,
+            div#comments ol li p.comment-metadata,
+            h4#respond {
+                font-family: verdana, geneva, sans-serif;
+            }
+            div.post-entry p {
+                text-align: left;
+            }
+            div#wrapper {
+                width: 100%;
+            }
 
-/*]]>*/
-</style>
-</head>
-<body>
-
-<div id="wrapper">
-
-	<div id="header" onclick="location.href='http://blog.ianbicking.org/';" style="cursor:pointer;">
-		<h1 id="title"><a href="../../../../index.html" title="Ian Bicking: a blog">Ian Bicking: a blog</a></h1>
-		<p id="description"></p>
-	</div>
-<!-- WP Theme Credits -->
-<div style="display: none;">We can answer on question <a href="http://www.olnevhost.net/vps-hosting.html">what is VPS</a>? and
-what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap dedicated servers</strong></a>?</div>
-<!-- END HEADER -->
-<div id="container">
-	<div id="content" class="widecolumn">
-
-
-		<div id="post-54" class="post single-post">
-			<p class="post-date-single">{ 2008 04 09 }</p>
-			<h2 class="post-title-single">App Engine: Commodity vs. Proprietary</h2>
-			<div class="post-entry">
-				<div class="document">
-<p>I like this phrasing of the debate about App Engine&#8217;s role, from Doug Cutting: <a class="reference external" href="http://blog.lucene.com/2008/04/09/cloud-commodity-or-proprietary/">Cloud: commodity or proprietary?</a> (<a class="reference external" href="http://www.tbray.org/ongoing/When/200x/2008/04/09/Google-Users-API#c1207762074.3850">via</a>).  (Well, I like it more than the sharecropping phrasing referenced in <a class="reference external" href="../app-engine-and-open-source/index.html">my last post</a>.)  I guess I&#8217;m excited about this because like Doug I do want a &quot;cloud&quot; of sorts, and this is a move towards that in a way that makes sense to me.  Maybe to state my motivations more clearly: I hate computers.  I really hate them a lot.  I dream of some world of Platonic ideals where software just <em>exists</em>, and existence  that state it works.  App Engine feels like a strong move in the direction of computers-not-mattering.  What does App Engine run on?  I don&#8217;t care!  Where is the server located?  I don&#8217;t care!  What is BigTable?  I am comfortable thinking of it only in its abstract sense, an API that works, and I don&#8217;t know how, nor do I need to know how.  I don&#8217;t need to know these things if they just work.  Always.  Totally reliably.  I&#8217;m not shy about digging into code.  I tend to be light on my reading of documentation, because I&#8217;d much rather open up source code and poke around.  But when something <em>can</em> work so reliably that I can treat it as completely opaque then it&#8217;s a blessing, because I can start to forget about it and think about bigger goals.</p>
-<p>There was a time when people were concerned about Big <a class="reference external" href="http://en.wikipedia.org/wiki/Endianness">Endian</a> vs. Little Endian in computers.  You had to think about this sort of little detail when programming.  People formed actual <em>opinions</em> on which way was best.  To think!  Similarly XML has removed a large number of fairly pointless format decisions people might make.  There is progress.  Commodity hosting (reliable, consistent hosting, better than what we have now) feels like similar progress.</p>
-<p>Unlike Doug I&#8217;m optimistic that App Engine is a move in the direction of a commodity cloud.  The APIs seem to lack the stench of proprietary APIs.  They are based on Google services, but they reasonably abstract and reasonably minimal.  This does not seem like some kind of &quot;play&quot; (and the <a class="reference external" href="http://www.tbray.org/ongoing/When/200x/2008/04/09/Google-Users-API#c1207763078.459405">developers&#8217; seem to be reassuring about their intentions</a>).  There&#8217;s a tendency to be cynical about any company&#8217;s work, that it has underlying intentions that are at odds with any competitor (present or future), that anything good is just a loss leader meant to hook you in so they can squeeze you later.  Some companies deserve such cynicism.  I don&#8217;t know that this company, or this team, deserves that.</p>
-<p>Mind you, I don&#8217;t say this from a Best-Tool-For-The-Job perspective.  I believe in the <a class="reference external" href="http://www.gnu.org/gnu/manifesto.html">moral foundations</a> of Free Software, not just the technical advantages of its development process.  But I&#8217;m a <a class="reference external" href="http://en.wikipedia.org/wiki/Utilitarianism">Utilitarian</a>, and it doesn&#8217;t make me uncomfortable that not everything is Free if I think it&#8217;s a step forward for overall freedom.  I think App Engine has the potential to be a very powerful tool for enabling people to create and use web applications.  If it was great, but still a dead end, then maybe that wouldn&#8217;t be good enough.  But I don&#8217;t think this is a dead end.</p>
-<p><strong>Update:</strong> Indeed people are reimplementing the interface: see the <a class="reference external" href="http://appdrop.com/">appdrop.com</a> <a class="reference external" href="http://jchris.mfdz.com/code/2008/4/announcing_appdrop_com__host_go">announcement</a></p>
-</div>
-<p>Automatically generated list of related posts:</p><ol>
-<li><a href='../../13/app-engine-and-pylons/index.html' rel='bookmark' title='App Engine and Pylons'>App Engine and Pylons</a> <small>So I promised some more technical discussion of App Engine...</small></li>
-<li><a href='../app-engine-and-open-source/index.html' rel='bookmark' title='App Engine and Open Source'>App Engine and Open Source</a> <small>This is about Google App Engine which probably everyone has...</small></li>
-<li><a href='../../../../2010/03/12/a-webob-app-example/index.html' rel='bookmark' title='What Does A WebOb App Look Like?'>What Does A WebOb App Look Like?</a> <small>Lately I&#8217;ve been writing code using WebOb and just a...</small></li>
-</ol>											</div><!-- END POST-ENTRY  -->
-			<!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            /*]]>*/
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div
+                id="header"
+                onclick="location.href='https://ianbicking.org/';"
+                style="cursor: pointer"
+            >
+                <h1 id="title">
+                    <a href="../../../../index.html" title="Ian Bicking: a blog"
+                        >Ian Bicking: a blog</a
+                    >
+                </h1>
+                <p id="description"></p>
+            </div>
+            <!-- WP Theme Credits -->
+            <div style="display: none">
+                We can answer on question
+                <a href="http://www.olnevhost.net/vps-hosting.html"
+                    >what is VPS</a
+                >? and what is
+                <a href="http://www.olnevhost.net/dedicated-servers.html"
+                    ><strong>cheap dedicated servers</strong></a
+                >?
+            </div>
+            <!-- END HEADER -->
+            <div id="container">
+                <div id="content" class="widecolumn">
+                    <div id="post-54" class="post single-post">
+                        <p class="post-date-single">{ 2008 04 09 }</p>
+                        <h2 class="post-title-single">
+                            App Engine: Commodity vs. Proprietary
+                        </h2>
+                        <div class="post-entry">
+                            <div class="document">
+                                <p>
+                                    I like this phrasing of the debate about App
+                                    Engine&#8217;s role, from Doug Cutting:
+                                    <a
+                                        class="reference external"
+                                        href="http://blog.lucene.com/2008/04/09/cloud-commodity-or-proprietary/"
+                                        >Cloud: commodity or proprietary?</a
+                                    >
+                                    (<a
+                                        class="reference external"
+                                        href="http://www.tbray.org/ongoing/When/200x/2008/04/09/Google-Users-API#c1207762074.3850"
+                                        >via</a
+                                    >). (Well, I like it more than the
+                                    sharecropping phrasing referenced in
+                                    <a
+                                        class="reference external"
+                                        href="../app-engine-and-open-source/index.html"
+                                        >my last post</a
+                                    >.) I guess I&#8217;m excited about this
+                                    because like Doug I do want a
+                                    &quot;cloud&quot; of sorts, and this is a
+                                    move towards that in a way that makes sense
+                                    to me. Maybe to state my motivations more
+                                    clearly: I hate computers. I really hate
+                                    them a lot. I dream of some world of
+                                    Platonic ideals where software just
+                                    <em>exists</em>, and existence that state it
+                                    works. App Engine feels like a strong move
+                                    in the direction of computers-not-mattering.
+                                    What does App Engine run on? I don&#8217;t
+                                    care! Where is the server located? I
+                                    don&#8217;t care! What is BigTable? I am
+                                    comfortable thinking of it only in its
+                                    abstract sense, an API that works, and I
+                                    don&#8217;t know how, nor do I need to know
+                                    how. I don&#8217;t need to know these things
+                                    if they just work. Always. Totally reliably.
+                                    I&#8217;m not shy about digging into code. I
+                                    tend to be light on my reading of
+                                    documentation, because I&#8217;d much rather
+                                    open up source code and poke around. But
+                                    when something <em>can</em> work so reliably
+                                    that I can treat it as completely opaque
+                                    then it&#8217;s a blessing, because I can
+                                    start to forget about it and think about
+                                    bigger goals.
+                                </p>
+                                <p>
+                                    There was a time when people were concerned
+                                    about Big
+                                    <a
+                                        class="reference external"
+                                        href="http://en.wikipedia.org/wiki/Endianness"
+                                        >Endian</a
+                                    >
+                                    vs. Little Endian in computers. You had to
+                                    think about this sort of little detail when
+                                    programming. People formed actual
+                                    <em>opinions</em> on which way was best. To
+                                    think! Similarly XML has removed a large
+                                    number of fairly pointless format decisions
+                                    people might make. There is progress.
+                                    Commodity hosting (reliable, consistent
+                                    hosting, better than what we have now) feels
+                                    like similar progress.
+                                </p>
+                                <p>
+                                    Unlike Doug I&#8217;m optimistic that App
+                                    Engine is a move in the direction of a
+                                    commodity cloud. The APIs seem to lack the
+                                    stench of proprietary APIs. They are based
+                                    on Google services, but they reasonably
+                                    abstract and reasonably minimal. This does
+                                    not seem like some kind of &quot;play&quot;
+                                    (and the
+                                    <a
+                                        class="reference external"
+                                        href="http://www.tbray.org/ongoing/When/200x/2008/04/09/Google-Users-API#c1207763078.459405"
+                                        >developers&#8217; seem to be reassuring
+                                        about their intentions</a
+                                    >). There&#8217;s a tendency to be cynical
+                                    about any company&#8217;s work, that it has
+                                    underlying intentions that are at odds with
+                                    any competitor (present or future), that
+                                    anything good is just a loss leader meant to
+                                    hook you in so they can squeeze you later.
+                                    Some companies deserve such cynicism. I
+                                    don&#8217;t know that this company, or this
+                                    team, deserves that.
+                                </p>
+                                <p>
+                                    Mind you, I don&#8217;t say this from a
+                                    Best-Tool-For-The-Job perspective. I believe
+                                    in the
+                                    <a
+                                        class="reference external"
+                                        href="http://www.gnu.org/gnu/manifesto.html"
+                                        >moral foundations</a
+                                    >
+                                    of Free Software, not just the technical
+                                    advantages of its development process. But
+                                    I&#8217;m a
+                                    <a
+                                        class="reference external"
+                                        href="http://en.wikipedia.org/wiki/Utilitarianism"
+                                        >Utilitarian</a
+                                    >, and it doesn&#8217;t make me
+                                    uncomfortable that not everything is Free if
+                                    I think it&#8217;s a step forward for
+                                    overall freedom. I think App Engine has the
+                                    potential to be a very powerful tool for
+                                    enabling people to create and use web
+                                    applications. If it was great, but still a
+                                    dead end, then maybe that wouldn&#8217;t be
+                                    good enough. But I don&#8217;t think this is
+                                    a dead end.
+                                </p>
+                                <p>
+                                    <strong>Update:</strong> Indeed people are
+                                    reimplementing the interface: see the
+                                    <a
+                                        class="reference external"
+                                        href="http://appdrop.com/"
+                                        >appdrop.com</a
+                                    >
+                                    <a
+                                        class="reference external"
+                                        href="http://jchris.mfdz.com/code/2008/4/announcing_appdrop_com__host_go"
+                                        >announcement</a
+                                    >
+                                </p>
+                            </div>
+                            <p>
+                                Automatically generated list of related posts:
+                            </p>
+                            <ol>
+                                <li>
+                                    <a
+                                        href="../../13/app-engine-and-pylons/index.html"
+                                        rel="bookmark"
+                                        title="App Engine and Pylons"
+                                        >App Engine and Pylons</a
+                                    >
+                                    <small
+                                        >So I promised some more technical
+                                        discussion of App Engine...</small
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="../app-engine-and-open-source/index.html"
+                                        rel="bookmark"
+                                        title="App Engine and Open Source"
+                                        >App Engine and Open Source</a
+                                    >
+                                    <small
+                                        >This is about Google App Engine which
+                                        probably everyone has...</small
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="../../../../2010/03/12/a-webob-app-example/index.html"
+                                        rel="bookmark"
+                                        title="What Does A WebOb App Look Like?"
+                                        >What Does A WebOb App Look Like?</a
+                                    >
+                                    <small
+                                        >Lately I&#8217;ve been writing code
+                                        using WebOb and just a...</small
+                                    >
+                                </li>
+                            </ol>
+                        </div>
+                        <!-- END POST-ENTRY  -->
+                        <!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 			xmlns:dc="http://purl.org/dc/elements/1.1/"
 			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
-		<rdf:Description rdf:about="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/"
-    dc:identifier="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/"
+		<rdf:Description rdf:about="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/"
+    dc:identifier="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/"
     dc:title="App Engine: Commodity vs. Proprietary"
-    trackback:ping="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/trackback/" />
+    trackback:ping="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/trackback/" />
 </rdf:RDF> -->
-			<div class="post-footer">
-				<p>Posted by Ian Bicking on Wednesday, April 9th, 2008, at 5:34 pm, and filed under <a href="../../../../category/programming/index.html" title="View all posts in Programming" rel="category tag">Programming</a>, <a href="../../../../category/python/index.html" title="View all posts in Python" rel="category tag">Python</a>, <a href="../../../../category/web/index.html" title="View all posts in Web" rel="category tag">Web</a>.</p>
-				<p>
-				Comments have a <a href='http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/feed/'>feed</a>.</p>
-			</div><!-- END POST-FOOTER -->
-		</div><!-- END POST -->
-
-<div id="comments">
-
-
-
-
-<h4 id="comments">10 Comments</h4>
- <ul class="commentlist">
-		<li class="comment even thread-even depth-1" id="comment-16633">
-				<div id="div-comment-16633" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/e6f29decaab60020e626d44f79cb9018?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.geekzone.co.nz/foobar' rel='external nofollow' class='url'>foobar</a></cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16633">
-			April 9, 2008 at 7:30 pm</a>		</div>
-
-		<p>Every publicly traded company has only one purpose in life: Maximize shareholder value. There is no other purpose for their existence anymore.</p>
-
-<p>I don&#8217;t fault them for this. I would be happy if I could run a publicly traded company (that does well). There&#8217;s nothing wrong with it, it&#8217;s just something they have to do.</p>
-
-<p>But I don&#8217;t believe for a second that Google does this out of the pure goodness of their hearts. Every last one of their management team is, after all, accountable to their share holders.</p>
-
-<p>Sometimes they will do something that benefits many people. Maybe App Engine is one such thing. Maybe they won&#8217;t increase their hosting prices. Maybe they won&#8217;t make you buy an expensive SLA when your site has finally become successful and you need decent service levels the most. Maybe they won&#8217;t look into your traffic stats and know more about your visitors and your site traffic than you yourself do, before they approach you with an offer.</p>
-
-<p>Maybe they won&#8217;t do any of this, in which case it would be wonderful.</p>
-
-<p>But even then they would do this at least as a sort of PR thing, something that helps them with mind-share, brand awareness, brand ubiquity, etc. They are a publicly traded company. They can&#8217;t do anything without shareholder value in mind.</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1" id="comment-16635">
-				<div id="div-comment-16635" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16635">
-			April 9, 2008 at 8:17 pm</a>		</div>
-
-		<p>Publicly traded companies are supposed to maximize shareholder value.  Publicly traded companies don&#8217;t <em>do</em> anything.  Individuals do things.  Management is accountable to shareholders.  Management is <em>not</em> subservient to shareholders.  Employees are not subservient to management.  Companies can provide incentives to get their employees to maximize shareholder value.  If the company feels an employee isn&#8217;t doing enough, they can fire that employee.  But they can&#8217;t magically turn employees into moles, embedded in other communities just so they can fuck them over later.  Employees can volunteer for that role, but it&#8217;s not exactly a popular choice.</p>
-
-<p>Some corporations actually seem to have a fuck-people-over culture.  It seems to be cultivated in the executive class.  It isn&#8217;t cultivated in the programmer class.  In corporations where programmers are subservient to executives, I think bad things can happen.  This usually requires the underlings to feel desperate or ignorant or disinterested.  </p>
-
-<p>Or, sometimes, the underlings buy into this maximize-shareholder-value bullshit.  But it&#8217;s just bullshit, and it demeans the individual&#8217;s ability to make choices.</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-16636">
-				<div id="div-comment-16636" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/bc82a2a4e326d273322d9606e323a244?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://rascunhosrotos.blogspot.com' rel='external nofollow' class='url'>Carlos Ribeiro</a></cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16636">
-			April 9, 2008 at 9:25 pm</a>		</div>
-
-		<p>For some reason your post made me remember the SETI project, which probably was the oldest example of &#8220;cloud&#8221; on a global scale. When the Internet was young and everyone using it were a nerd (for better or worse), lots of people did devote computing time to SETI. For some reasons it never got beyond a mere curiosity. Perhaps the application itself was at fault &#8211; had we discovered alien life as a result of SETI, who knows what effect would it have.</p>
-
-<p>We now have Amazon and Google offering cloud services. Microsoft is seemingly absent, it&#8217;s clear that don&#8217;t have any idea about what to do (besides buying Yahoo hoping that they will know what to do). But, I&#8217;m tempted to ask: is there anything that requires the cloud to run in a proprietary environment? Of course, there&#8217;s a huge investment, and management, but it should be possible to implement something like this to run in an open environment.</p>
-
-<p>Maybe someone will come up with a open source implementation, or some company will launch a product that allows people to implement their own &#8220;mini-clouds&#8221;, in such a way that these mini-clouds can discover and connect to each other, forming a bigger cloud where computing resources can be allocated and shared between applications. I don&#8217;t know. I think that&#8217;s a matter of time before someone does something like that.</p>
-
-<p>I believe that the idea is important not because this &#8220;open cloud&#8221; may kill Google or Amazon. I don&#8217;t believe it will get to this point. But the existence of an open implementation creates more competition, lower the entry cost, and raise awareness in the market. It also allows people to experiment and create new business model. It&#8217;s good for everyone, and it&#8217;s kind of a proof that the market is mature.</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-16641">
-				<div id="div-comment-16641" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/b9b2548af72d0a9e86a2bfe9df6ad1d2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Raphael</cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16641">
-			April 10, 2008 at 4:16 am</a>		</div>
-
-		<p>@Carlos: in some way I see the Apache Hadoop project <a href="http://hadoop.apache.org/" rel="nofollow">http://hadoop.apache.org/</a> going in the direction of an open-source alternative. You may compare their HBase <a href="http://hadoop.apache.org/hbase/" rel="nofollow">http://hadoop.apache.org/hbase/</a> to BigTable and HDFS <a href="http://hadoop.apache.org/core/docs/current/hdfs&#95;design.html" rel="nofollow">http://hadoop.apache.org/core/docs/current/hdfs_design.html</a> to GFS if you want.</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1 parent" id="comment-16644">
-				<div id="div-comment-16644" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/62a1b1c36476b1e10dcf8f334b5df53e?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.projectlocker.com' rel='external nofollow' class='url'>C. G. Brown</a></cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16644">
-			April 10, 2008 at 6:37 am</a>		</div>
-
-		<p>Thanks for your insightful post on these issues.  I myself hadn&#8217;t thought about the potential implications of being locked into a particular cloud.</p>
-
-<p>The AppEngine solves a general problem of running Web applications.  I often see Subversion or Trac mentioned in blogs and articles as applications that can now be run more conveniently using virtual machines or computing clouds.  My company, ProjectLocker (<a href="http://www.projectlocker.com" rel="nofollow">http://www.projectlocker.com</a>), and some of our competitors, have been running these specific applications for years in a straightforward ASP model.  Clouds or virtual machines still leave you with installation and configuration headaches and costs, while ProjectLocker and companies like us take all the pain out of configuring, administering, and backing up your source code, bug, and Wiki data.  We already support continuous integration and are working on more value-added tools as well.  And since we&#8217;re based on open source tools with standard data formats, it&#8217;s easy to pick up and move to us or from us if you don&#8217;t like where you are.</p>
-
-<p>You do acknowledge that reliable, consistent hosting is a step in the right direction.  The good old ASP model, when implemented properly, is less sexy than clouds and virtual machines but still provides a lot of value.</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		<ul class='children'>
-		<li class="comment odd alt depth-2" id="comment-179639">
-				<div id="div-comment-179639" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/4d01cef554cce52e57301f74bcac6a07?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">nafg</cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-179639">
-			October 27, 2010 at 7:40 pm</a>		</div>
-
-		<p>Except with ProjectLocker, you are locked in. Unless you have a paid account, there&#8217;s no way to take your trac instance somewhere else, apparently.</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-</ul>
-</li>
-		<li class="comment even thread-odd thread-alt depth-1" id="comment-16646">
-				<div id="div-comment-16646" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/a50b8f78e98cbb38d721bea9a6ff02d2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Michael</cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16646">
-			April 10, 2008 at 10:10 am</a>		</div>
-
-		<p>In response to comment 3: Microsoft is not completely absent in this concept. They are just more focused on providing cloud [services](<a href="http://www.microsoft.com/sql/dataservices/default.mspx" rel="nofollow">http://www.microsoft.com/sql/dataservices/default.mspx</a>) to their corporate customers.</p>
-
-<p>[The Semantic Web](<a href="http://www.w3.org/2001/sw/" rel="nofollow">http://www.w3.org/2001/sw/</a>) is an idea whose time has come. AppEngine, EC2, et. al. will help to enable this framework of data sharing.</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-even depth-1" id="comment-16651">
-				<div id="div-comment-16651" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/1e59eddcbc19e7d424686e0644db65de?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://groovie.org/' rel='external nofollow' class='url'>Ben Bangert</a></cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16651">
-			April 10, 2008 at 4:47 pm</a>		</div>
-
-		<p>&gt; What does App Engine run on? I don’t care! </p>
-
-<p>Until something about how it runs randomly makes your code take longer than 3 seconds to run, at which point Google kills the request.</p>
-
-<p>&gt; What is BigTable? I am comfortable thinking of it only in its abstract sense, an API that works, and I don’t know how, nor do I need to know how.</p>
-
-<p>Until the way you&#8217;re using it causes it to take more than a few seconds to run, at which point Google kills the request.</p>
-
-<p>There&#8217;s always reasons to care about how your app is run. Since Google will kill requests that take too long, and so far have zero tools for profiling why it was killed, what part of it was taking too long, why did it take too long, etc. this could become rather important. I&#8217;d think a tool for gauging how long DataStore requests take would be important since many people will be unfamiliar with changes to how they should think about their data when its not in a RDBMS.</p>
-
-<p>I&#8217;m sure they&#8217;ll provide some tools at some point, but the fact is, for awhile yet, yes, we will probably still need to care about those things. </p>
-
-<p>I&#8217;m still waiting for a App Engine like thing that gives me the freedom to move to another provider when I either outgrow one (maybe Google&#8217;s way of scaling doesn&#8217;t meet my needs), or when the price of staying there gets too high (whether monetary, or privacy policy, etc.). Lock-in is no fun, no matter how awesome the service might be. At least Google&#8217;s lock-in is probably somewhat minimal as their API&#8217;s are rather abstract, and its just as trivial to run most of an App Engine app elsewhere.</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-odd thread-alt depth-1" id="comment-16652">
-				<div id="div-comment-16652" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/e6f29decaab60020e626d44f79cb9018?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.geekzone.co.nz/foobar' rel='external nofollow' class='url'>foobar</a></cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16652">
-			April 10, 2008 at 4:58 pm</a>		</div>
-
-		<p>In the end, would one be better off just running a VM with Apache/lighttpd/etc, a real Django and whatever else you need on Amazon&#8217;s EC2? There you get cloud computing with all its advantages, but you are determining your own software/language/server settings. And if you want to move to another provider, or start running your stuff on its own dedicated box&#8230; well, all you need is to find a RedHat host somewhere (I think Amazon EC2 uses RedHat for its server images, right?) and off you go. Moving to a different provider therefore should be quite straight forward in that case. Certainly more so than in the case where you develop your app specifically towards a Google API.</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-even depth-1" id="comment-16655">
-				<div id="div-comment-16655" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/bc82a2a4e326d273322d9606e323a244?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://rascunhosrotos.blogspot.com' rel='external nofollow' class='url'>Carlos Ribeiro</a></cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16655">
-			April 10, 2008 at 6:59 pm</a>		</div>
-
-		<p>@Raphael: thanks for the pointers. I assume that these projects are focused on building &#8220;private clouds&#8221;. That&#8217;s great, but I wonder if it will be possible to do it in a much larger scale, a &#8220;peer to peer&#8221; global cloud. But that&#8217;s just a dream, I don&#8217;t know if it&#8217;s practical or feasible &#8211; only that it seems interesting.</p>
-
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-</ul>
-
-<div class="navigation">
-<div class="alignleft"></div>
-<div class="alignright"></div>
-</div>
-
-
-
-
-</div>
-
-		<div class="navigation">
-			<div class="nav-left">&laquo; <a href="../app-engine-and-open-source/index.html" rel="prev">App Engine and Open Source</a></div>
-			<div class="nav-right"><a href="../../11/the-mundane-nature-of-programming/index.html" rel="next">The Mundane Nature Of Programming</a> &raquo;</div>
-		</div><!-- END NAVIGATION -->
-
-
-	</div><!-- END CONTENT -->
-</div><!-- END CONTAINER  -->
-
-<div id="sidebar">
-	<ul>
-		<li id="home-link">
-			<h2><a href="../../../../index.html" title="Ian Bicking: a blog">Home</a></h2>
-		</li>
-<li id="text-315934862" class="widget widget_text"><h2 class="widgettitle">About</h2>
-			<div class="textwidget">Ian is a developer with Mozilla, <a href="http://ianbicking.appspot.com/projects">Python open source developer</a>, actually uses <a href="https://plus.google.com/u/0/104537541227697934010/posts">Google+</a> more than <a href="http://twitter.com/ianbicking">twitter</a> and lives in Minneapolis.<br>
-<span class="gittip-0001" gittip-username="ianbicking"></span>
-<script id="gittip-0001"
-  src="https://www.gittip.com/assets/widgets/0001.js"></script>
-</div>
-		</li>
-<li id="text-315934863" class="widget widget_text">			<div class="textwidget"><!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> --></div>
-		</li>
-<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
-		<ul>
-			<li><a href='../../../../2012/10/index.html' title='October 2012'>October 2012</a></li>
-	<li><a href='../../../../2012/02/index.html' title='February 2012'>February 2012</a></li>
-	<li><a href='../../../../2011/04/index.html' title='April 2011'>April 2011</a></li>
-	<li><a href='../../../../2011/03/index.html' title='March 2011'>March 2011</a></li>
-	<li><a href='../../../../2010/09/index.html' title='September 2010'>September 2010</a></li>
-	<li><a href='../../../../2010/08/index.html' title='August 2010'>August 2010</a></li>
-	<li><a href='../../../../2010/05/index.html' title='May 2010'>May 2010</a></li>
-	<li><a href='../../../../2010/04/index.html' title='April 2010'>April 2010</a></li>
-	<li><a href='../../../../2010/03/index.html' title='March 2010'>March 2010</a></li>
-	<li><a href='../../../../2010/02/index.html' title='February 2010'>February 2010</a></li>
-	<li><a href='../../../../2010/01/index.html' title='January 2010'>January 2010</a></li>
-	<li><a href='../../../../2009/09/index.html' title='September 2009'>September 2009</a></li>
-	<li><a href='../../../../2009/05/index.html' title='May 2009'>May 2009</a></li>
-	<li><a href='../../../../2009/04/index.html' title='April 2009'>April 2009</a></li>
-	<li><a href='../../../../2009/01/index.html' title='January 2009'>January 2009</a></li>
-	<li><a href='../../../12/index.html' title='December 2008'>December 2008</a></li>
-	<li><a href='../../../11/index.html' title='November 2008'>November 2008</a></li>
-	<li><a href='../../../10/index.html' title='October 2008'>October 2008</a></li>
-	<li><a href='../../../09/index.html' title='September 2008'>September 2008</a></li>
-	<li><a href='../../../08/index.html' title='August 2008'>August 2008</a></li>
-	<li><a href='../../../07/index.html' title='July 2008'>July 2008</a></li>
-	<li><a href='../../../06/index.html' title='June 2008'>June 2008</a></li>
-	<li><a href='../../../05/index.html' title='May 2008'>May 2008</a></li>
-	<li><a href='../../index.html' title='April 2008'>April 2008</a></li>
-	<li><a href='../../../03/index.html' title='March 2008'>March 2008</a></li>
-	<li><a href='../../../02/index.html' title='February 2008'>February 2008</a></li>
-	<li><a href='../../../01/index.html' title='January 2008'>January 2008</a></li>
-	<li><a href='../../../../2007/11/index.html' title='November 2007'>November 2007</a></li>
-	<li><a href='../../../../2007/10/index.html' title='October 2007'>October 2007</a></li>
-	<li><a href='../../../../2007/09/index.html' title='September 2007'>September 2007</a></li>
-	<li><a href='../../../../2007/08/index.html' title='August 2007'>August 2007</a></li>
-	<li><a href='../../../../2007/07/index.html' title='July 2007'>July 2007</a></li>
-		</ul>
-</li>
-<li id="text-315934861" class="widget widget_text">			<div class="textwidget"><a href="../../../../archive/index.html">The Older Archives</a></div>
-		</li>
-<li id="categories-1" class="widget widget_categories"><h2 class="widgettitle">Categories</h2>
-		<ul>
-	<li class="cat-item cat-item-12"><a href="../../../../category/erlang/index.html" title="View all posts filed under Erlang">Erlang</a>
-</li>
-	<li class="cat-item cat-item-11"><a href="../../../../category/html/index.html" title="View all posts filed under HTML">HTML</a>
-</li>
-	<li class="cat-item cat-item-8"><a href="../../../../category/javascript/index.html" title="View all posts filed under Javascript">Javascript</a>
-</li>
-	<li class="cat-item cat-item-15"><a href="../../../../category/licensing/index.html" title="View all posts filed under Licensing">Licensing</a>
-</li>
-	<li class="cat-item cat-item-18"><a href="../../../../category/mozilla/index.html" title="View all posts filed under Mozilla">Mozilla</a>
-</li>
-	<li class="cat-item cat-item-5"><a href="../../../../category/notech/index.html" title="View all posts filed under Non-technical">Non-technical</a>
-</li>
-	<li class="cat-item cat-item-6"><a href="../../../../category/olpc/index.html" title="View all posts filed under OLPC">OLPC</a>
-</li>
-	<li class="cat-item cat-item-14"><a href="../../../../category/packaging/index.html" title="View all posts filed under Packaging">Packaging</a>
-</li>
-	<li class="cat-item cat-item-4"><a href="../../../../category/politics/index.html" title="View all posts filed under Politics">Politics</a>
-</li>
-	<li class="cat-item cat-item-3"><a href="../../../../category/programming/index.html" title="View all posts filed under Programming">Programming</a>
-</li>
-	<li class="cat-item cat-item-7"><a href="../../../../category/python/index.html" title="View all posts filed under Python">Python</a>
-</li>
-	<li class="cat-item cat-item-10"><a href="../../../../category/ruby/index.html" title="View all posts filed under Ruby">Ruby</a>
-</li>
-	<li class="cat-item cat-item-19"><a href="../../../../category/security/index.html" title="View all posts filed under Security">Security</a>
-</li>
-	<li class="cat-item cat-item-16"><a href="../../../../category/silverlining.1" title="View all posts filed under Silver Lining">Silver Lining</a>
-</li>
-	<li class="cat-item cat-item-20"><a href="../../../../category/programming/testing/index.html" title="View all posts filed under Testing">Testing</a>
-</li>
-	<li class="cat-item cat-item-9"><a href="../../../../category/web/index.html" title="View all posts filed under Web">Web</a>
-</li>
-	<li class="cat-item cat-item-13"><a href="../../../../category/zopeplone/index.html" title="View all posts filed under Zope/Plone">Zope/Plone</a>
-</li>
-		</ul>
-</li>
-<li id="search-2" class="widget widget_search"><form id="searchform" method="get" action="../../../../index.html">
-	<div>
-		<input id="s" name="s" type="text" value="" tabindex="1" size="10" />
-		<input id="searchsubmit" name="searchsubmit" type="submit" value="Find" tabindex="2" />
-	</div>
-</form> </li>
-		<li id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widgettitle">Recent Posts</h2>
-		<ul>
-				<li><a href="../../../../index.html?p=291" title="Why doctest.js is better than Python&#8217;s doctest">Why doctest.js is better than Python&#8217;s doctest</a></li>
-				<li><a href="../../../../index.html?p=283" title="Python Application Package">Python Application Package</a></li>
-				<li><a href="../../../../index.html?p=277" title="Git-as-sync, not source-control-as-deployment">Git-as-sync, not source-control-as-deployment</a></li>
-				<li><a href="../../../../index.html?p=253" title="My Unsolicited Advice For PyPy">My Unsolicited Advice For PyPy</a></li>
-				<li><a href="../../../../index.html?p=250" title="A Python Web Application Package and Format (we should make one)">A Python Web Application Package and Format (we should make one)</a></li>
-				</ul>
-		</li>
-<li id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widgettitle">Recent Comments</h2>
-<ul id="recentcomments"><li class="recentcomments"><a href='http://www.mirsa.com.tr' rel='external nofollow' class='url'>havalandırma</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://redealmeidense.com.br/portalx/modules/' rel='external nofollow' class='url'>this website</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Eric Pierce on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Paul Brian on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://benjiyork.com' rel='external nofollow' class='url'>Benji York</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320">Why doctest.js is better than Python&#8217;s doctest</a></li></ul></li>
-	</ul>
-</div>
-
-	<div id="footer">
-		<p>
-			&copy; 2013 Ian Bicking<!--
+                        <div class="post-footer">
+                            <p>
+                                Posted by Ian Bicking on Wednesday, April 9th,
+                                2008, at 5:34 pm, and filed under
+                                <a
+                                    href="../../../../category/programming/index.html"
+                                    title="View all posts in Programming"
+                                    rel="category tag"
+                                    >Programming</a
+                                >,
+                                <a
+                                    href="../../../../category/python/index.html"
+                                    title="View all posts in Python"
+                                    rel="category tag"
+                                    >Python</a
+                                >,
+                                <a
+                                    href="../../../../category/web/index.html"
+                                    title="View all posts in Web"
+                                    rel="category tag"
+                                    >Web</a
+                                >.
+                            </p>
+                            <p>
+                                Comments have a
+                                <a
+                                    href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/feed/"
+                                    >feed</a
+                                >.
+                            </p>
+                        </div>
+                        <!-- END POST-FOOTER -->
+                    </div>
+                    <!-- END POST -->
+
+                    <div id="comments">
+                        <h4 id="comments">10 Comments</h4>
+                        <ul class="commentlist">
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-16633"
+                            >
+                                <div
+                                    id="div-comment-16633"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/e6f29decaab60020e626d44f79cb9018?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://www.geekzone.co.nz/foobar"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >foobar</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
+
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16633"
+                                        >
+                                            April 9, 2008 at 7:30 pm</a
+                                        >
+                                    </div>
+
+                                    <p>
+                                        Every publicly traded company has only
+                                        one purpose in life: Maximize
+                                        shareholder value. There is no other
+                                        purpose for their existence anymore.
+                                    </p>
+
+                                    <p>
+                                        I don&#8217;t fault them for this. I
+                                        would be happy if I could run a publicly
+                                        traded company (that does well).
+                                        There&#8217;s nothing wrong with it,
+                                        it&#8217;s just something they have to
+                                        do.
+                                    </p>
+
+                                    <p>
+                                        But I don&#8217;t believe for a second
+                                        that Google does this out of the pure
+                                        goodness of their hearts. Every last one
+                                        of their management team is, after all,
+                                        accountable to their share holders.
+                                    </p>
+
+                                    <p>
+                                        Sometimes they will do something that
+                                        benefits many people. Maybe App Engine
+                                        is one such thing. Maybe they
+                                        won&#8217;t increase their hosting
+                                        prices. Maybe they won&#8217;t make you
+                                        buy an expensive SLA when your site has
+                                        finally become successful and you need
+                                        decent service levels the most. Maybe
+                                        they won&#8217;t look into your traffic
+                                        stats and know more about your visitors
+                                        and your site traffic than you yourself
+                                        do, before they approach you with an
+                                        offer.
+                                    </p>
+
+                                    <p>
+                                        Maybe they won&#8217;t do any of this,
+                                        in which case it would be wonderful.
+                                    </p>
+
+                                    <p>
+                                        But even then they would do this at
+                                        least as a sort of PR thing, something
+                                        that helps them with mind-share, brand
+                                        awareness, brand ubiquity, etc. They are
+                                        a publicly traded company. They
+                                        can&#8217;t do anything without
+                                        shareholder value in mind.
+                                    </p>
+
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1"
+                                id="comment-16635"
+                            >
+                                <div
+                                    id="div-comment-16635"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="../../../../index.html"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Ian Bicking</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
+
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16635"
+                                        >
+                                            April 9, 2008 at 8:17 pm</a
+                                        >
+                                    </div>
+
+                                    <p>
+                                        Publicly traded companies are supposed
+                                        to maximize shareholder value. Publicly
+                                        traded companies don&#8217;t
+                                        <em>do</em> anything. Individuals do
+                                        things. Management is accountable to
+                                        shareholders. Management is
+                                        <em>not</em> subservient to
+                                        shareholders. Employees are not
+                                        subservient to management. Companies can
+                                        provide incentives to get their
+                                        employees to maximize shareholder value.
+                                        If the company feels an employee
+                                        isn&#8217;t doing enough, they can fire
+                                        that employee. But they can&#8217;t
+                                        magically turn employees into moles,
+                                        embedded in other communities just so
+                                        they can fuck them over later. Employees
+                                        can volunteer for that role, but
+                                        it&#8217;s not exactly a popular choice.
+                                    </p>
+
+                                    <p>
+                                        Some corporations actually seem to have
+                                        a fuck-people-over culture. It seems to
+                                        be cultivated in the executive class. It
+                                        isn&#8217;t cultivated in the programmer
+                                        class. In corporations where programmers
+                                        are subservient to executives, I think
+                                        bad things can happen. This usually
+                                        requires the underlings to feel
+                                        desperate or ignorant or disinterested.
+                                    </p>
+
+                                    <p>
+                                        Or, sometimes, the underlings buy into
+                                        this maximize-shareholder-value
+                                        bullshit. But it&#8217;s just bullshit,
+                                        and it demeans the individual&#8217;s
+                                        ability to make choices.
+                                    </p>
+
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-16636"
+                            >
+                                <div
+                                    id="div-comment-16636"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/bc82a2a4e326d273322d9606e323a244?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://rascunhosrotos.blogspot.com"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Carlos Ribeiro</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
+
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16636"
+                                        >
+                                            April 9, 2008 at 9:25 pm</a
+                                        >
+                                    </div>
+
+                                    <p>
+                                        For some reason your post made me
+                                        remember the SETI project, which
+                                        probably was the oldest example of
+                                        &#8220;cloud&#8221; on a global scale.
+                                        When the Internet was young and everyone
+                                        using it were a nerd (for better or
+                                        worse), lots of people did devote
+                                        computing time to SETI. For some reasons
+                                        it never got beyond a mere curiosity.
+                                        Perhaps the application itself was at
+                                        fault &#8211; had we discovered alien
+                                        life as a result of SETI, who knows what
+                                        effect would it have.
+                                    </p>
+
+                                    <p>
+                                        We now have Amazon and Google offering
+                                        cloud services. Microsoft is seemingly
+                                        absent, it&#8217;s clear that
+                                        don&#8217;t have any idea about what to
+                                        do (besides buying Yahoo hoping that
+                                        they will know what to do). But,
+                                        I&#8217;m tempted to ask: is there
+                                        anything that requires the cloud to run
+                                        in a proprietary environment? Of course,
+                                        there&#8217;s a huge investment, and
+                                        management, but it should be possible to
+                                        implement something like this to run in
+                                        an open environment.
+                                    </p>
+
+                                    <p>
+                                        Maybe someone will come up with a open
+                                        source implementation, or some company
+                                        will launch a product that allows people
+                                        to implement their own
+                                        &#8220;mini-clouds&#8221;, in such a way
+                                        that these mini-clouds can discover and
+                                        connect to each other, forming a bigger
+                                        cloud where computing resources can be
+                                        allocated and shared between
+                                        applications. I don&#8217;t know. I
+                                        think that&#8217;s a matter of time
+                                        before someone does something like that.
+                                    </p>
+
+                                    <p>
+                                        I believe that the idea is important not
+                                        because this &#8220;open cloud&#8221;
+                                        may kill Google or Amazon. I don&#8217;t
+                                        believe it will get to this point. But
+                                        the existence of an open implementation
+                                        creates more competition, lower the
+                                        entry cost, and raise awareness in the
+                                        market. It also allows people to
+                                        experiment and create new business
+                                        model. It&#8217;s good for everyone, and
+                                        it&#8217;s kind of a proof that the
+                                        market is mature.
+                                    </p>
+
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-16641"
+                            >
+                                <div
+                                    id="div-comment-16641"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/b9b2548af72d0a9e86a2bfe9df6ad1d2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">Raphael</cite>
+                                        <span class="says">says:</span>
+                                    </div>
+
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16641"
+                                        >
+                                            April 10, 2008 at 4:16 am</a
+                                        >
+                                    </div>
+
+                                    <p>
+                                        @Carlos: in some way I see the Apache
+                                        Hadoop project
+                                        <a
+                                            href="http://hadoop.apache.org/"
+                                            rel="nofollow"
+                                            >http://hadoop.apache.org/</a
+                                        >
+                                        going in the direction of an open-source
+                                        alternative. You may compare their HBase
+                                        <a
+                                            href="http://hadoop.apache.org/hbase/"
+                                            rel="nofollow"
+                                            >http://hadoop.apache.org/hbase/</a
+                                        >
+                                        to BigTable and HDFS
+                                        <a
+                                            href="http://hadoop.apache.org/core/docs/current/hdfs&#95;design.html"
+                                            rel="nofollow"
+                                            >http://hadoop.apache.org/core/docs/current/hdfs_design.html</a
+                                        >
+                                        to GFS if you want.
+                                    </p>
+
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1 parent"
+                                id="comment-16644"
+                            >
+                                <div
+                                    id="div-comment-16644"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/62a1b1c36476b1e10dcf8f334b5df53e?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://www.projectlocker.com"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >C. G. Brown</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
+
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16644"
+                                        >
+                                            April 10, 2008 at 6:37 am</a
+                                        >
+                                    </div>
+
+                                    <p>
+                                        Thanks for your insightful post on these
+                                        issues. I myself hadn&#8217;t thought
+                                        about the potential implications of
+                                        being locked into a particular cloud.
+                                    </p>
+
+                                    <p>
+                                        The AppEngine solves a general problem
+                                        of running Web applications. I often see
+                                        Subversion or Trac mentioned in blogs
+                                        and articles as applications that can
+                                        now be run more conveniently using
+                                        virtual machines or computing clouds. My
+                                        company, ProjectLocker (<a
+                                            href="http://www.projectlocker.com"
+                                            rel="nofollow"
+                                            >http://www.projectlocker.com</a
+                                        >), and some of our competitors, have
+                                        been running these specific applications
+                                        for years in a straightforward ASP
+                                        model. Clouds or virtual machines still
+                                        leave you with installation and
+                                        configuration headaches and costs, while
+                                        ProjectLocker and companies like us take
+                                        all the pain out of configuring,
+                                        administering, and backing up your
+                                        source code, bug, and Wiki data. We
+                                        already support continuous integration
+                                        and are working on more value-added
+                                        tools as well. And since we&#8217;re
+                                        based on open source tools with standard
+                                        data formats, it&#8217;s easy to pick up
+                                        and move to us or from us if you
+                                        don&#8217;t like where you are.
+                                    </p>
+
+                                    <p>
+                                        You do acknowledge that reliable,
+                                        consistent hosting is a step in the
+                                        right direction. The good old ASP model,
+                                        when implemented properly, is less sexy
+                                        than clouds and virtual machines but
+                                        still provides a lot of value.
+                                    </p>
+
+                                    <div class="reply"></div>
+                                </div>
+                                <ul class="children">
+                                    <li
+                                        class="comment odd alt depth-2"
+                                        id="comment-179639"
+                                    >
+                                        <div
+                                            id="div-comment-179639"
+                                            class="comment-body"
+                                        >
+                                            <div class="comment-author vcard">
+                                                <img
+                                                    alt=""
+                                                    src="http://0.gravatar.com/avatar/4d01cef554cce52e57301f74bcac6a07?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                                    class="avatar avatar-32 photo"
+                                                    height="32"
+                                                    width="32"
+                                                />
+                                                <cite class="fn">nafg</cite>
+                                                <span class="says">says:</span>
+                                            </div>
+
+                                            <div
+                                                class="comment-meta commentmetadata"
+                                            >
+                                                <a
+                                                    href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-179639"
+                                                >
+                                                    October 27, 2010 at 7:40
+                                                    pm</a
+                                                >
+                                            </div>
+
+                                            <p>
+                                                Except with ProjectLocker, you
+                                                are locked in. Unless you have a
+                                                paid account, there&#8217;s no
+                                                way to take your trac instance
+                                                somewhere else, apparently.
+                                            </p>
+
+                                            <div class="reply"></div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li
+                                class="comment even thread-odd thread-alt depth-1"
+                                id="comment-16646"
+                            >
+                                <div
+                                    id="div-comment-16646"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/a50b8f78e98cbb38d721bea9a6ff02d2?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">Michael</cite>
+                                        <span class="says">says:</span>
+                                    </div>
+
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16646"
+                                        >
+                                            April 10, 2008 at 10:10 am</a
+                                        >
+                                    </div>
+
+                                    <p>
+                                        In response to comment 3: Microsoft is
+                                        not completely absent in this concept.
+                                        They are just more focused on providing
+                                        cloud [services](<a
+                                            href="http://www.microsoft.com/sql/dataservices/default.mspx"
+                                            rel="nofollow"
+                                            >http://www.microsoft.com/sql/dataservices/default.mspx</a
+                                        >) to their corporate customers.
+                                    </p>
+
+                                    <p>
+                                        [The Semantic Web](<a
+                                            href="http://www.w3.org/2001/sw/"
+                                            rel="nofollow"
+                                            >http://www.w3.org/2001/sw/</a
+                                        >) is an idea whose time has come.
+                                        AppEngine, EC2, et. al. will help to
+                                        enable this framework of data sharing.
+                                    </p>
+
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-even depth-1"
+                                id="comment-16651"
+                            >
+                                <div
+                                    id="div-comment-16651"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/1e59eddcbc19e7d424686e0644db65de?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://groovie.org/"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Ben Bangert</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
+
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16651"
+                                        >
+                                            April 10, 2008 at 4:47 pm</a
+                                        >
+                                    </div>
+
+                                    <p>
+                                        &gt; What does App Engine run on? I
+                                        don’t care!
+                                    </p>
+
+                                    <p>
+                                        Until something about how it runs
+                                        randomly makes your code take longer
+                                        than 3 seconds to run, at which point
+                                        Google kills the request.
+                                    </p>
+
+                                    <p>
+                                        &gt; What is BigTable? I am comfortable
+                                        thinking of it only in its abstract
+                                        sense, an API that works, and I don’t
+                                        know how, nor do I need to know how.
+                                    </p>
+
+                                    <p>
+                                        Until the way you&#8217;re using it
+                                        causes it to take more than a few
+                                        seconds to run, at which point Google
+                                        kills the request.
+                                    </p>
+
+                                    <p>
+                                        There&#8217;s always reasons to care
+                                        about how your app is run. Since Google
+                                        will kill requests that take too long,
+                                        and so far have zero tools for profiling
+                                        why it was killed, what part of it was
+                                        taking too long, why did it take too
+                                        long, etc. this could become rather
+                                        important. I&#8217;d think a tool for
+                                        gauging how long DataStore requests take
+                                        would be important since many people
+                                        will be unfamiliar with changes to how
+                                        they should think about their data when
+                                        its not in a RDBMS.
+                                    </p>
+
+                                    <p>
+                                        I&#8217;m sure they&#8217;ll provide
+                                        some tools at some point, but the fact
+                                        is, for awhile yet, yes, we will
+                                        probably still need to care about those
+                                        things.
+                                    </p>
+
+                                    <p>
+                                        I&#8217;m still waiting for a App Engine
+                                        like thing that gives me the freedom to
+                                        move to another provider when I either
+                                        outgrow one (maybe Google&#8217;s way of
+                                        scaling doesn&#8217;t meet my needs), or
+                                        when the price of staying there gets too
+                                        high (whether monetary, or privacy
+                                        policy, etc.). Lock-in is no fun, no
+                                        matter how awesome the service might be.
+                                        At least Google&#8217;s lock-in is
+                                        probably somewhat minimal as their
+                                        API&#8217;s are rather abstract, and its
+                                        just as trivial to run most of an App
+                                        Engine app elsewhere.
+                                    </p>
+
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-odd thread-alt depth-1"
+                                id="comment-16652"
+                            >
+                                <div
+                                    id="div-comment-16652"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/e6f29decaab60020e626d44f79cb9018?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://www.geekzone.co.nz/foobar"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >foobar</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
+
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16652"
+                                        >
+                                            April 10, 2008 at 4:58 pm</a
+                                        >
+                                    </div>
+
+                                    <p>
+                                        In the end, would one be better off just
+                                        running a VM with Apache/lighttpd/etc, a
+                                        real Django and whatever else you need
+                                        on Amazon&#8217;s EC2? There you get
+                                        cloud computing with all its advantages,
+                                        but you are determining your own
+                                        software/language/server settings. And
+                                        if you want to move to another provider,
+                                        or start running your stuff on its own
+                                        dedicated box&#8230; well, all you need
+                                        is to find a RedHat host somewhere (I
+                                        think Amazon EC2 uses RedHat for its
+                                        server images, right?) and off you go.
+                                        Moving to a different provider therefore
+                                        should be quite straight forward in that
+                                        case. Certainly more so than in the case
+                                        where you develop your app specifically
+                                        towards a Google API.
+                                    </p>
+
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-even depth-1"
+                                id="comment-16655"
+                            >
+                                <div
+                                    id="div-comment-16655"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/bc82a2a4e326d273322d9606e323a244?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://rascunhosrotos.blogspot.com"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Carlos Ribeiro</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
+
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary/comment-page-1/#comment-16655"
+                                        >
+                                            April 10, 2008 at 6:59 pm</a
+                                        >
+                                    </div>
+
+                                    <p>
+                                        @Raphael: thanks for the pointers. I
+                                        assume that these projects are focused
+                                        on building &#8220;private
+                                        clouds&#8221;. That&#8217;s great, but I
+                                        wonder if it will be possible to do it
+                                        in a much larger scale, a &#8220;peer to
+                                        peer&#8221; global cloud. But
+                                        that&#8217;s just a dream, I don&#8217;t
+                                        know if it&#8217;s practical or feasible
+                                        &#8211; only that it seems interesting.
+                                    </p>
+
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="navigation">
+                            <div class="alignleft"></div>
+                            <div class="alignright"></div>
+                        </div>
+                    </div>
+
+                    <div class="navigation">
+                        <div class="nav-left">
+                            &laquo;
+                            <a
+                                href="../app-engine-and-open-source/index.html"
+                                rel="prev"
+                                >App Engine and Open Source</a
+                            >
+                        </div>
+                        <div class="nav-right">
+                            <a
+                                href="../../11/the-mundane-nature-of-programming/index.html"
+                                rel="next"
+                                >The Mundane Nature Of Programming</a
+                            >
+                            &raquo;
+                        </div>
+                    </div>
+                    <!-- END NAVIGATION -->
+                </div>
+                <!-- END CONTENT -->
+            </div>
+            <!-- END CONTAINER  -->
+
+            <div id="sidebar">
+                <ul>
+                    <li id="home-link">
+                        <h2>
+                            <a
+                                href="../../../../index.html"
+                                title="Ian Bicking: a blog"
+                                >Home</a
+                            >
+                        </h2>
+                    </li>
+                    <li id="text-315934862" class="widget widget_text">
+                        <h2 class="widgettitle">About</h2>
+                        <div class="textwidget">
+                            Ian is a developer with Mozilla,
+                            <a href="http://ianbicking.appspot.com/projects"
+                                >Python open source developer</a
+                            >, actually uses
+                            <a
+                                href="https://plus.google.com/u/0/104537541227697934010/posts"
+                                >Google+</a
+                            >
+                            more than
+                            <a href="http://twitter.com/ianbicking">twitter</a>
+                            and lives in Minneapolis.<br />
+                            <span
+                                class="gittip-0001"
+                                gittip-username="ianbicking"
+                            ></span>
+                            <script
+                                id="gittip-0001"
+                                src="https://www.gittip.com/assets/widgets/0001.js"
+                            ></script>
+                        </div>
+                    </li>
+                    <li id="text-315934863" class="widget widget_text">
+                        <div class="textwidget">
+                            <!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> -->
+                        </div>
+                    </li>
+                    <li id="archives-2" class="widget widget_archive">
+                        <h2 class="widgettitle">Archives</h2>
+                        <ul>
+                            <li>
+                                <a
+                                    href="../../../../2012/10/index.html"
+                                    title="October 2012"
+                                    >October 2012</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2012/02/index.html"
+                                    title="February 2012"
+                                    >February 2012</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2011/04/index.html"
+                                    title="April 2011"
+                                    >April 2011</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2011/03/index.html"
+                                    title="March 2011"
+                                    >March 2011</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/09/index.html"
+                                    title="September 2010"
+                                    >September 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/08/index.html"
+                                    title="August 2010"
+                                    >August 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/05/index.html"
+                                    title="May 2010"
+                                    >May 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/04/index.html"
+                                    title="April 2010"
+                                    >April 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/03/index.html"
+                                    title="March 2010"
+                                    >March 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/02/index.html"
+                                    title="February 2010"
+                                    >February 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/01/index.html"
+                                    title="January 2010"
+                                    >January 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/09/index.html"
+                                    title="September 2009"
+                                    >September 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/05/index.html"
+                                    title="May 2009"
+                                    >May 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/04/index.html"
+                                    title="April 2009"
+                                    >April 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/01/index.html"
+                                    title="January 2009"
+                                    >January 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../12/index.html"
+                                    title="December 2008"
+                                    >December 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../11/index.html"
+                                    title="November 2008"
+                                    >November 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../10/index.html"
+                                    title="October 2008"
+                                    >October 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../09/index.html"
+                                    title="September 2008"
+                                    >September 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../08/index.html"
+                                    title="August 2008"
+                                    >August 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../07/index.html"
+                                    title="July 2008"
+                                    >July 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../06/index.html"
+                                    title="June 2008"
+                                    >June 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../05/index.html"
+                                    title="May 2008"
+                                    >May 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a href="../../index.html" title="April 2008"
+                                    >April 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../03/index.html"
+                                    title="March 2008"
+                                    >March 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../02/index.html"
+                                    title="February 2008"
+                                    >February 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../01/index.html"
+                                    title="January 2008"
+                                    >January 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/11/index.html"
+                                    title="November 2007"
+                                    >November 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/10/index.html"
+                                    title="October 2007"
+                                    >October 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/09/index.html"
+                                    title="September 2007"
+                                    >September 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/08/index.html"
+                                    title="August 2007"
+                                    >August 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/07/index.html"
+                                    title="July 2007"
+                                    >July 2007</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="text-315934861" class="widget widget_text">
+                        <div class="textwidget">
+                            <a href="../../../../archive/index.html"
+                                >The Older Archives</a
+                            >
+                        </div>
+                    </li>
+                    <li id="categories-1" class="widget widget_categories">
+                        <h2 class="widgettitle">Categories</h2>
+                        <ul>
+                            <li class="cat-item cat-item-12">
+                                <a
+                                    href="../../../../category/erlang/index.html"
+                                    title="View all posts filed under Erlang"
+                                    >Erlang</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-11">
+                                <a
+                                    href="../../../../category/html/index.html"
+                                    title="View all posts filed under HTML"
+                                    >HTML</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-8">
+                                <a
+                                    href="../../../../category/javascript/index.html"
+                                    title="View all posts filed under Javascript"
+                                    >Javascript</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-15">
+                                <a
+                                    href="../../../../category/licensing/index.html"
+                                    title="View all posts filed under Licensing"
+                                    >Licensing</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-18">
+                                <a
+                                    href="../../../../category/mozilla/index.html"
+                                    title="View all posts filed under Mozilla"
+                                    >Mozilla</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-5">
+                                <a
+                                    href="../../../../category/notech/index.html"
+                                    title="View all posts filed under Non-technical"
+                                    >Non-technical</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-6">
+                                <a
+                                    href="../../../../category/olpc/index.html"
+                                    title="View all posts filed under OLPC"
+                                    >OLPC</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-14">
+                                <a
+                                    href="../../../../category/packaging/index.html"
+                                    title="View all posts filed under Packaging"
+                                    >Packaging</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-4">
+                                <a
+                                    href="../../../../category/politics/index.html"
+                                    title="View all posts filed under Politics"
+                                    >Politics</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-3">
+                                <a
+                                    href="../../../../category/programming/index.html"
+                                    title="View all posts filed under Programming"
+                                    >Programming</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-7">
+                                <a
+                                    href="../../../../category/python/index.html"
+                                    title="View all posts filed under Python"
+                                    >Python</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-10">
+                                <a
+                                    href="../../../../category/ruby/index.html"
+                                    title="View all posts filed under Ruby"
+                                    >Ruby</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-19">
+                                <a
+                                    href="../../../../category/security/index.html"
+                                    title="View all posts filed under Security"
+                                    >Security</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-16">
+                                <a
+                                    href="../../../../category/silverlining.1"
+                                    title="View all posts filed under Silver Lining"
+                                    >Silver Lining</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-20">
+                                <a
+                                    href="../../../../category/programming/testing/index.html"
+                                    title="View all posts filed under Testing"
+                                    >Testing</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-9">
+                                <a
+                                    href="../../../../category/web/index.html"
+                                    title="View all posts filed under Web"
+                                    >Web</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-13">
+                                <a
+                                    href="../../../../category/zopeplone/index.html"
+                                    title="View all posts filed under Zope/Plone"
+                                    >Zope/Plone</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="search-2" class="widget widget_search">
+                        <form
+                            id="searchform"
+                            method="get"
+                            action="../../../../index.html"
+                        >
+                            <div>
+                                <input
+                                    id="s"
+                                    name="s"
+                                    type="text"
+                                    value=""
+                                    tabindex="1"
+                                    size="10"
+                                />
+                                <input
+                                    id="searchsubmit"
+                                    name="searchsubmit"
+                                    type="submit"
+                                    value="Find"
+                                    tabindex="2"
+                                />
+                            </div>
+                        </form>
+                    </li>
+                    <li
+                        id="recent-posts-2"
+                        class="widget widget_recent_entries"
+                    >
+                        <h2 class="widgettitle">Recent Posts</h2>
+                        <ul>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=291"
+                                    title="Why doctest.js is better than Python&#8217;s doctest"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=283"
+                                    title="Python Application Package"
+                                    >Python Application Package</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=277"
+                                    title="Git-as-sync, not source-control-as-deployment"
+                                    >Git-as-sync, not
+                                    source-control-as-deployment</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=253"
+                                    title="My Unsolicited Advice For PyPy"
+                                    >My Unsolicited Advice For PyPy</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=250"
+                                    title="A Python Web Application Package and Format (we should make one)"
+                                    >A Python Web Application Package and Format
+                                    (we should make one)</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li
+                        id="recent-comments-2"
+                        class="widget widget_recent_comments"
+                    >
+                        <h2 class="widgettitle">Recent Comments</h2>
+                        <ul id="recentcomments">
+                            <li class="recentcomments">
+                                <a
+                                    href="http://www.mirsa.com.tr"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >havalandırma</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                <a
+                                    href="http://redealmeidense.com.br/portalx/modules/"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >this website</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                Eric Pierce on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                Paul Brian on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                <a
+                                    href="http://benjiyork.com"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >Benji York</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="footer">
+                <p>
+                    &copy; 2013 Ian Bicking<!--
 Does this commenting make me evil?
 			|
 			Thanks, <a href="http://wordpress.org/" title="WordPress">WordPress</a>
 			|
 			<a href="http://www.plaintxt.org/themes/barthelme/" title="Barthelme for WordPress" rel="follow">Barthelme</a> theme by <a href="http://scottwallick.com/" title="scottwallick.com" rel="follow">Scott</a>
 			| <!-- The following is a link to the theme author's sponsor. Please consider its smallness and that Scott was nice enough to make this theme publically available. -->
-			Sponsor: <a href="http://www.active-sandals.com/womreefsan.html" title="Support: Reef Sandals">Reef Sandals</a>
-			|
-			Valid <a href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1" title="Valid XHTML 1.0 Strict" rel="nofollow">XHTML</a> &amp; <a href="http://jigsaw.w3.org/css-validator/validator?uri=http://blog.ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no" title="Valid CSS" rel="nofollow">CSS</a>
-			|
-			-->
-			RSS: <a href="../../../../feed/rss/index.html" title="Ian Bicking: a blog RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Posts</a> &amp; <a href="../../../../comments/feed/index.html" title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Comments</a>
-		</p>
-	</div>
+                    Sponsor:
+                    <a
+                        href="http://www.active-sandals.com/womreefsan.html"
+                        title="Support: Reef Sandals"
+                        >Reef Sandals</a
+                    >
+                    | Valid
+                    <a
+                        href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1"
+                        title="Valid XHTML 1.0 Strict"
+                        rel="nofollow"
+                        >XHTML</a
+                    >
+                    &amp;
+                    <a
+                        href="http://jigsaw.w3.org/css-validator/validator?uri=https://ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no"
+                        title="Valid CSS"
+                        rel="nofollow"
+                        >CSS</a
+                    >
+                    | --> RSS:
+                    <a
+                        href="../../../../feed/rss/index.html"
+                        title="Ian Bicking: a blog RSS 2.0 (XML) Feed"
+                        rel="alternate"
+                        type="application/rss+xml"
+                        >Posts</a
+                    >
+                    &amp;
+                    <a
+                        href="../../../../comments/feed/index.html"
+                        title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed"
+                        rel="alternate"
+                        type="application/rss+xml"
+                        >Comments</a
+                    >
+                </p>
+            </div>
+        </div>
+        <!-- END WRAPPER -->
 
-</div><!-- END WRAPPER -->
+        <!-- Somehow 44 queries occured in 1.300 seconds. Magic! -->
+        <!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
+        <script
+            type="text/javascript"
+            src="../../../../wp-includes/js/comment-reply.js?ver=3.4.2"
+        ></script>
 
-	<!-- Somehow 44 queries occured in 1.300 seconds. Magic! -->
-	<!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
-	<script type='text/javascript' src='../../../../wp-includes/js/comment-reply.js?ver=3.4.2'></script>
-
-<!-- Google Analytics -->
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script>
-
-</body>
+        <!-- Google Analytics -->
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

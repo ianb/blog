@@ -1,291 +1,586 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>A theory on form toolkits</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>A theory on form toolkits</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>A theory on form toolkits</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                error messages should go. (It now occurs to me that maybe the
+                form generation should get the errors from the validation
+                instead of htmlfill). The form generator might be a person
+                (totally customized and easily tweakable), or a template (e.g.,
+                made with Cheetah or ZPT), or an HTML-generating model. All that
+                matters is that it creates a form; and you can change the
+                technique without changing the rest of the system.
+            </p>
+            <p>
+                Then htmlfill takes it all and with its knowledge of HTML forms
+                puts it together. Note that this is different from most
+                templating languages. Some languages know about XML or HTML
+                (e.g.,
+                <a
+                    class="reference"
+                    href="http://dev.zope.org/Wikis/DevSite/Projects/ZPT/FrontPage"
+                    >ZPT</a
+                >) and some know only about text (e.g.,
+                <a class="reference" href="http://www.cheetahtemplate.org/"
+                    >Cheetah</a
+                >); in this case we are very specifically looking for
+                <tt class="docutils literal"><span class="pre">input</span></tt>
+                elements (and other similar elements), and saving all the extra
+                annotation that might be necessary.
+            </p>
+            <p>
+                (Note that I have a validation package, and I have htmlfill, but
+                a form generator is left up to the reader.)
+            </p>
+            <p>
+                The contrasting technique (the one that
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/trunk/FormEncode/src/htmlview.py"
+                    >formencode.htmlview</a
+                >
+                uses) is to do all of these at once -- you prepare the model,
+                the defaults, maybe a previous request, the errors and pass them
+                all in. Then you go through the widgets and they each render
+                themselves, enclosed in some wrapper. I won't argue for why this
+                doesn't work well -- if you've tried it (I have, a
+                <a class="reference" href="http://funformkit.sourceforge.net/"
+                    >couple times</a
+                >) you probably know its limitations and complexities. This
+                constrasting design doesn't even have &quot;widgets&quot;, just
+                plain old HTML. Good riddance!
+            </p>
+        </div>
+        <div class="dates" align="right">Created 05 Feb '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>Very cool.</p>
+                <p>
+                    Subway should really use it, it is the cleanest form toolkit
+                    approach ever...
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/a-theory-on-form-toolkits-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Ksenia
+            </div>
+            <hr noshade />
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>A theory on form toolkits</h1>
- 
-<div class="document">
-<p>error messages should go.  (It now occurs to me that
-maybe the form generation should get the errors from the validation
-instead of htmlfill).  The form generator might be a person (totally
-customized and easily tweakable), or a template (e.g., made with
-Cheetah or ZPT), or an HTML-generating model.  All that matters is
-that it creates a form; and you can change the technique without
-changing the rest of the system.</p>
-<p>Then htmlfill takes it all and with its knowledge of HTML forms puts
-it together.  Note that this is different from most templating
-languages.  Some languages know about XML or HTML (e.g., <a class="reference" href="http://dev.zope.org/Wikis/DevSite/Projects/ZPT/FrontPage">ZPT</a>) and
-some know only about text (e.g., <a class="reference" href="http://www.cheetahtemplate.org/">Cheetah</a>); in this case we are very
-specifically looking for <tt class="docutils literal"><span class="pre">input</span></tt> elements (and other similar
-elements), and saving all the extra annotation that might be necessary.</p>
-<p>(Note that I have a validation package, and I have htmlfill, but a
-form generator is left up to the reader.)</p>
-<p>The contrasting technique (the one that <a class="reference" href="http://svn.colorstudy.com/trunk/FormEncode/src/htmlview.py">formencode.htmlview</a> uses) is
-to do all of these at once -- you prepare the model, the defaults,
-maybe a previous request, the errors and pass them all in.  Then you
-go through the widgets and they each render themselves, enclosed in
-some wrapper.  I won't argue for why this doesn't work well -- if
-you've tried it (I have, a <a class="reference" href="http://funformkit.sourceforge.net/">couple times</a>) you probably know its
-limitations and complexities.  This constrasting design doesn't even
-have &quot;widgets&quot;, just plain old HTML.  Good riddance!</p>
-</div>
- <div class="dates" align="right">
-Created 05 Feb '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>Very cool.</p>
-<p>Subway should really use it,  it is the cleanest form toolkit approach ever...</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/a-theory-on-form-toolkits-comment-1.html" rel="nofollow">#</a> Ksenia</div><hr noshade>
- 
-<div class="document">
-<p>Hi Ian</p>
-<p>This is an interesting little problem that i had to face also
-a few weeks ago when I wrote part of a web application
-framework.  I took a really simple approach which works well
-with my framework (I like simple things, this is one of the
-reasons I like Python) and I will describe it below.</p>
-<p>BTW, I find your log entry a little bit difficult to
-understand for someone that is not familiar with your formkit
-code, and I think the problem is interesting enough that it
-deserves more details.  It would be great if you could write
-your thoughts in a self-contained document with clearer
-definitions of the problem to be solved, etc.  i.e. not just a
-blog entry, but a design doc.  Just an idea.</p>
-<p>Here is how I solved it in my framework (this is tested code
-and running in a web app).</p>
-<div class="section" id="components">
-<h1><a name="components">Components</a></h1>
-<p>In summary, this problem can consists of separate components
-which interact in well-defined ways, here are the definitions
-of my components:</p>
-<ol class="arabic simple">
-<li><em>form definition</em>: listing the names, types, constraints
-and labels of the forms;</li>
-<li><em>rendering a form</em>: this involves taking the form
-definition, a set of initial values and generating an
-output that represents the corresponding HTML (or directly
-outputting HTML text);</li>
-<li><em>error markup</em>: taking potential errors from a previous
-request adding markup to indicate errors near the
-corresponding input fields;</li>
-<li><em>validation</em>: taking the values sent from the submit of a
-form and validating the constraints on the widgets,
-potentially returning the user to the form if there are
-errors;</li>
-<li><em>conversion</em>: converting the string values from the form
-submit to Python data types.</li>
-</ol>
-</div>
-<div class="section" id="rendering-html">
-<h1><a name="rendering-html">Rendering HTML</a></h1>
-<p>Before I go on, I must mention that in my framework I do not
-output HTML as I go.  Instead, I build a tree of HTML tags in
-memory (using a special, really really simple library that I
-built for this purpose (<tt class="literal"><span class="pre">htmlout</span></tt>), I can provide it if you
-want); this allows me to manipulate various parts of my
-document in any order before rendering it, remove stuff,
-change attributes, classes, etc.</p>
-<p>Using this method, I build a custom Python class to define a
-template for each of my page layouts.  These classes have
-methods for each layout component,
-e.g. <tt class="literal"><span class="pre">add_sidebar_paragraph(text)</span></tt>. This is a good way to
-force yourself to &quot;design&quot; most of the layout upfront.</p>
-<p>I very much prefer this approach to any of the billion text
-templating systems because I can change parts of my documents
-in any order, and I can add many &quot;smarts&quot; to my template
-layouts.  It's code, it's dynamic, rather than blobs of text
-to be pasted together.  Note that this can only work out if I
-don't collaborate with artists (which is my case at the
-moment), i.e. you have to write Python code to generate the
-HTML.  I suppose if I did work with designers I would have to
-hook a templating system in.</p>
-<p>This might have had an impact on the design of my system, but
-I think most of the ideas below still apply with a usual
-templating system.</p>
-</div>
-<div class="section" id="form-definition">
-<h1><a name="form-definition">Form definition</a></h1>
-<p>I defined a library with a &quot;widget&quot; object for each type of
-entry (string, multi-line text, menus, radiobuttons, file
-upload, date, etc.).  In that library, there is a &quot;form&quot; class
-that acts as a container of these widgets.  It can return the
-list of labels, names, widgets, and can parse a dict with data
-coming in from a request.  If some validation fails it raises
-an exception.  After parsing, a new dict is returned with the
-string input values converted into Python native values
-(e.g. a datetime object, a unicode string, a file buffer,
-etc.).  This library contains no rendering code.</p>
-</div>
-<div class="section" id="validation-conversion-and-signaling-errors-to-the-user">
-<h1><a name="validation-conversion-and-signaling-errors-to-the-user">Validation, Conversion and Signaling Errors To The User</a></h1>
-<p>I wrote a simple convenience method that calls the form
-parsing and catches the form error exception; if an exception
-is raised, it sets a status message (in per-session dat) for
-the next request to render (a message to be written to the
-user), and serializes the parsed input values (a dict) AND a
-list of error fieldnames and error messages (a dict also) into
-per-session data in a database.  Then I redirect to the render
-request(*).</p>
-<p>Conversion occurs at the same time as validation.  This is for
-efficiency: oftentimes validation requires conversion.  I have
-not seen any problem with this approach yet, since converting
-is always done at the same time as validation.  This is the
-first thing I do in a form handler method (after
-authentication checks).</p>
-<dl>
-<dt>(*) Note: the redirect is not really necessary, I suppose I</dt>
-<dd>could save a request by calling the handler directly with
-the values dict and error dict.</dd>
-</dl>
-</div>
-<div class="section" id="rendering-a-form">
-<h1><a name="rendering-a-form">Rendering a form</a></h1>
-<p>I have separate renderer objects that implement rendering
-using single-dispatch on the form widgets (i.e. <tt class="literal"><span class="pre">def</span>
-<span class="pre">render_StringField</span></tt>, <tt class="literal"><span class="pre">def</span> <span class="pre">render_FileUpload</span></tt>, etc.).  I
-have three:</p>
-<ol class="arabic">
-<li><p class="first">one renderer that can generate an entire form generically;
-useful for debugging, but if you build fancy website you
-almost always need to organize the inputs nicely and
-customize in a way that usually cannot be figured out
-generically; so most of the time I use...</p>
-</li>
-<li><p class="first">another renderer that generate mini-tables for a sublist of
-widgets that are defined in the form.  I call something
-like:</p>
-<pre class="literal-block">
+            <div class="document">
+                <p>Hi Ian</p>
+                <p>
+                    This is an interesting little problem that i had to face
+                    also a few weeks ago when I wrote part of a web application
+                    framework. I took a really simple approach which works well
+                    with my framework (I like simple things, this is one of the
+                    reasons I like Python) and I will describe it below.
+                </p>
+                <p>
+                    BTW, I find your log entry a little bit difficult to
+                    understand for someone that is not familiar with your
+                    formkit code, and I think the problem is interesting enough
+                    that it deserves more details. It would be great if you
+                    could write your thoughts in a self-contained document with
+                    clearer definitions of the problem to be solved, etc. i.e.
+                    not just a blog entry, but a design doc. Just an idea.
+                </p>
+                <p>
+                    Here is how I solved it in my framework (this is tested code
+                    and running in a web app).
+                </p>
+                <div class="section" id="components">
+                    <h1><a name="components">Components</a></h1>
+                    <p>
+                        In summary, this problem can consists of separate
+                        components which interact in well-defined ways, here are
+                        the definitions of my components:
+                    </p>
+                    <ol class="arabic simple">
+                        <li>
+                            <em>form definition</em>: listing the names, types,
+                            constraints and labels of the forms;
+                        </li>
+                        <li>
+                            <em>rendering a form</em>: this involves taking the
+                            form definition, a set of initial values and
+                            generating an output that represents the
+                            corresponding HTML (or directly outputting HTML
+                            text);
+                        </li>
+                        <li>
+                            <em>error markup</em>: taking potential errors from
+                            a previous request adding markup to indicate errors
+                            near the corresponding input fields;
+                        </li>
+                        <li>
+                            <em>validation</em>: taking the values sent from the
+                            submit of a form and validating the constraints on
+                            the widgets, potentially returning the user to the
+                            form if there are errors;
+                        </li>
+                        <li>
+                            <em>conversion</em>: converting the string values
+                            from the form submit to Python data types.
+                        </li>
+                    </ol>
+                </div>
+                <div class="section" id="rendering-html">
+                    <h1><a name="rendering-html">Rendering HTML</a></h1>
+                    <p>
+                        Before I go on, I must mention that in my framework I do
+                        not output HTML as I go. Instead, I build a tree of HTML
+                        tags in memory (using a special, really really simple
+                        library that I built for this purpose (<tt
+                            class="literal"
+                            ><span class="pre">htmlout</span></tt
+                        >), I can provide it if you want); this allows me to
+                        manipulate various parts of my document in any order
+                        before rendering it, remove stuff, change attributes,
+                        classes, etc.
+                    </p>
+                    <p>
+                        Using this method, I build a custom Python class to
+                        define a template for each of my page layouts. These
+                        classes have methods for each layout component, e.g.
+                        <tt class="literal"
+                            ><span class="pre"
+                                >add_sidebar_paragraph(text)</span
+                            ></tt
+                        >. This is a good way to force yourself to
+                        &quot;design&quot; most of the layout upfront.
+                    </p>
+                    <p>
+                        I very much prefer this approach to any of the billion
+                        text templating systems because I can change parts of my
+                        documents in any order, and I can add many
+                        &quot;smarts&quot; to my template layouts. It's code,
+                        it's dynamic, rather than blobs of text to be pasted
+                        together. Note that this can only work out if I don't
+                        collaborate with artists (which is my case at the
+                        moment), i.e. you have to write Python code to generate
+                        the HTML. I suppose if I did work with designers I would
+                        have to hook a templating system in.
+                    </p>
+                    <p>
+                        This might have had an impact on the design of my
+                        system, but I think most of the ideas below still apply
+                        with a usual templating system.
+                    </p>
+                </div>
+                <div class="section" id="form-definition">
+                    <h1><a name="form-definition">Form definition</a></h1>
+                    <p>
+                        I defined a library with a &quot;widget&quot; object for
+                        each type of entry (string, multi-line text, menus,
+                        radiobuttons, file upload, date, etc.). In that library,
+                        there is a &quot;form&quot; class that acts as a
+                        container of these widgets. It can return the list of
+                        labels, names, widgets, and can parse a dict with data
+                        coming in from a request. If some validation fails it
+                        raises an exception. After parsing, a new dict is
+                        returned with the string input values converted into
+                        Python native values (e.g. a datetime object, a unicode
+                        string, a file buffer, etc.). This library contains no
+                        rendering code.
+                    </p>
+                </div>
+                <div
+                    class="section"
+                    id="validation-conversion-and-signaling-errors-to-the-user"
+                >
+                    <h1>
+                        <a
+                            name="validation-conversion-and-signaling-errors-to-the-user"
+                            >Validation, Conversion and Signaling Errors To The
+                            User</a
+                        >
+                    </h1>
+                    <p>
+                        I wrote a simple convenience method that calls the form
+                        parsing and catches the form error exception; if an
+                        exception is raised, it sets a status message (in
+                        per-session dat) for the next request to render (a
+                        message to be written to the user), and serializes the
+                        parsed input values (a dict) AND a list of error
+                        fieldnames and error messages (a dict also) into
+                        per-session data in a database. Then I redirect to the
+                        render request(*).
+                    </p>
+                    <p>
+                        Conversion occurs at the same time as validation. This
+                        is for efficiency: oftentimes validation requires
+                        conversion. I have not seen any problem with this
+                        approach yet, since converting is always done at the
+                        same time as validation. This is the first thing I do in
+                        a form handler method (after authentication checks).
+                    </p>
+                    <dl>
+                        <dt>
+                            (*) Note: the redirect is not really necessary, I
+                            suppose I
+                        </dt>
+                        <dd>
+                            could save a request by calling the handler directly
+                            with the values dict and error dict.
+                        </dd>
+                    </dl>
+                </div>
+                <div class="section" id="rendering-a-form">
+                    <h1><a name="rendering-a-form">Rendering a form</a></h1>
+                    <p>
+                        I have separate renderer objects that implement
+                        rendering using single-dispatch on the form widgets
+                        (i.e.
+                        <tt class="literal"
+                            ><span class="pre">def</span>
+                            <span class="pre">render_StringField</span></tt
+                        >,
+                        <tt class="literal"
+                            ><span class="pre">def</span>
+                            <span class="pre">render_FileUpload</span></tt
+                        >, etc.). I have three:
+                    </p>
+                    <ol class="arabic">
+                        <li>
+                            <p class="first">
+                                one renderer that can generate an entire form
+                                generically; useful for debugging, but if you
+                                build fancy website you almost always need to
+                                organize the inputs nicely and customize in a
+                                way that usually cannot be figured out
+                                generically; so most of the time I use...
+                            </p>
+                        </li>
+                        <li>
+                            <p class="first">
+                                another renderer that generate mini-tables for a
+                                sublist of widgets that are defined in the form.
+                                I call something like:
+                            </p>
+                            <pre class="literal-block">
 section.append(
      H3(_(&quot;Travel Parameters&quot;)),
      form_renderer.rendertable(
          form, values, fields=['departure', 'passengers']
      )
   )
-</pre>
-</li>
-<li><p class="first">a &quot;display&quot; renderer that generates tables for display
-purposes only, using the form definition, and using again a
-sublist of widgets/values to render.  This is useful
-because oftentimes you want to display the data and much of
-the information about how to display it is already
-encapsulated in the form.</p>
-<p>And since the renderers and the form definitions are not
-dependent on each other, it is easy to do that.  I suppose
-I could add other types of renderer if I can find other
-uses for the form definition.</p>
-</li>
-</ol>
-<p>In all cases, I pass in the values dict that is read from the
-per-session data and the renderer code knows how to undo the
-conversion and fill in the values.  There is also a phase for
-the widgets to &quot;prepare&quot; the input values before the renderer
-uses them. I use this to undo some of the conversion.</p>
-<p>A note about internationalization: if the form definition
-occurs when loading the modules, the renderer has to know to
-<tt class="literal"><span class="pre">gettext()</span></tt> the labels before rendering them.</p>
-</div>
-<div class="section" id="error-markup">
-<h1><a name="error-markup">Error Markup</a></h1>
-<p>When I want to &quot;render&quot; errors, the handler code passes the
-HTML form tree generated by the code above (including custom
-HTML formatting that is added to make the form look good,
-sectioning, fieldsets, etc) to an error renderer method.</p>
-<p>That renderer runs down the tree and finds the first input
-that corresponds to an error field and inserts appropriate
-marker HTML to indicate to the user where the errors are
-located and adds some CSS classes to the HTML inputs.  I think
-this is equivalent to the <tt class="literal"><span class="pre">htmlfill</span></tt> library, but it might
-be more efficient because I don't need to &quot;parse&quot; the text.
-This happens before flattening the form into text.</p>
-</div>
-<div class="section" id="conclusion">
-<h1><a name="conclusion">Conclusion</a></h1>
-<p>I agree with you that implementing these different components
-separately is much better than a fully integrated approach.
-It is also true that they pretty much always interact in the
-same way.</p>
-<p>Any comments welcome!</p>
-<p>cheers,</p>
-<p>--
-Martin Blais &lt;<a class="reference" href="mailto:blais&#64;furius.ca">blais&#64;furius.ca</a>&gt;</p>
-</div>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/a-theory-on-form-toolkits-comment-2.html" rel="nofollow">#</a> <a href="http://furius.ca">Martin Blais</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Thanks for the (very extensive!) comment.</p>
-<p>This sounds a lot like FunFormKit, which was an earlier library I wrote; maybe it's a natural progression.  In that library the components were largely how you describe, though error markup happened at the same time as rendering.  One major issue was how to deal with dynamic forms.  FFK had ways to do this, but it was complex and non-intuitive, even for very straight-forward forms of dynamicism (like dynamic select boxes).</p>
-<p>I wrote a small library to generate HTML, mostly for me so I could get rid of a lot of HTML-related logic.  The layout was done similarly, but I now feel it's not sufficient -- not just when you are working with a designer, but for that last 10% of a project where you start caring about the little things.  I would feel a need to make changes to the layout system for every new form once I got to the last 10%, and that's no good -- the form library should be stable.</p>
-<p>For signaling errors to a user, you definitely shouldn't do a redirect or store the errors in a session object.  It's easier just to redisplay the form with the errors inline, and make them re-POST the data.  One trap to avoid that FunFormKit fell into is overdesigning this process -- let the application call into your library and do the basic control, don't try to hijack the request when an error occurs.  That gets way to complicated for no real gain.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/a-theory-on-form-toolkits-comment-3.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Interesting. Could you write a short architectural overview of the new system?  I'm really interested to find out about the differences in high-level design.</p>
-<p>About the HTML generation library: the lib I wrote is a simple mapping to xhtml, i.e. it can generate any xhtml code that you could write in text, I don't find any limitations.  It's really just like an XML tree but the various tags are defined as classes themselves, that's all.</p>
-<p>For errors: you're right, and indeed I'm not &quot;keeping&quot; the form data in the session, just using the session as a temporary storage to communicate it to the render request for re-rendering the form (since they are separate requests, different children might handle it).  The user does re-post all the data.</p>
-<p>Oh, I think I get the misunderstanding, I think I forgot to mention that I wrote my code so that requests &quot;just render&quot; and &quot;just handle&quot; are separate urls. i.e. /contact_edit renders the form, /contact_edit_hndl handlers the submit data, and then either redirects back to /contact_edit or to some other page (in case of success).  I was debating for a while whether this was a good approach (my background is in desktop apps) and I pretty much like the separation.  I don't like for the requests that &quot;just render&quot; to check and &quot;maybe&quot; handle the submit data.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/a-theory-on-form-toolkits-comment-4.html" rel="nofollow">#</a> <a href="http://furius.ca">Martin Blais</a></div><hr noshade>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-<p>I love FormEncode--it's be best concept of a form validation tookit I've ever seen. However, in all of the tutorials and examples I've seen the actual form markup is maintained as a string that is not part of the page template (it gets inserted into the template later). I don't like that. I want to have all my form markup reside in the template (I'm using SimpleTAL), and process the template with htmlfill after the template is expanded. I realize that there may be a limitation of one form per page (or at least every input tag must be uniquely named on each page).</p>
-<p>Comment: htmlfill must happen after the template is expanded because sometimes input tags are generated by the templating system. If htmlfill happened first these tags would not exist.</p>
-<p>Bottom line: I'm running into problems with SimpleTAL stripping the markup out of my &lt;form:error name=&quot;fieldName&quot; /&gt; tags--after SimpleTAL expansion they look like this: &lt;form&gt;. That won't do. Is there a workaround or planned solution to this problem?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/a-theory-on-form-toolkits-comment-6.html" rel="nofollow">#</a> anonymous</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Sorry, forgot to include my name...</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/a-theory-on-form-toolkits-comment-7.html" rel="nofollow">#</a> <a href="http://www.openpolitics.com/pieces/">Daniel Miller</a></div><hr noshade>
- 
-<div class="document">
-<p>OK. I found the solution. Duh ... declare &quot;form&quot; as an XML namespace. Like this:</p>
-<p>&lt;html xmlns=&quot;<a class="reference" href="http://www.w3.org/1999/xhtml">http://www.w3.org/1999/xhtml</a>&quot; xmlns:form=&quot;http://www.formencode.org&quot;&gt;</p>
-<p>That's all it took. Thanks for providing a space for me to think out loud Ian.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/a-theory-on-form-toolkits-comment-8.html" rel="nofollow">#</a> <a href="http://www.openpolitics.com/pieces/">Daniel</a></div><hr noshade>
-</blockquote>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                            >
+                        </li>
+                        <li>
+                            <p class="first">
+                                a &quot;display&quot; renderer that generates
+                                tables for display purposes only, using the form
+                                definition, and using again a sublist of
+                                widgets/values to render. This is useful because
+                                oftentimes you want to display the data and much
+                                of the information about how to display it is
+                                already encapsulated in the form.
+                            </p>
+                            <p>
+                                And since the renderers and the form definitions
+                                are not dependent on each other, it is easy to
+                                do that. I suppose I could add other types of
+                                renderer if I can find other uses for the form
+                                definition.
+                            </p>
+                        </li>
+                    </ol>
+                    <p>
+                        In all cases, I pass in the values dict that is read
+                        from the per-session data and the renderer code knows
+                        how to undo the conversion and fill in the values. There
+                        is also a phase for the widgets to &quot;prepare&quot;
+                        the input values before the renderer uses them. I use
+                        this to undo some of the conversion.
+                    </p>
+                    <p>
+                        A note about internationalization: if the form
+                        definition occurs when loading the modules, the renderer
+                        has to know to
+                        <tt class="literal"
+                            ><span class="pre">gettext()</span></tt
+                        >
+                        the labels before rendering them.
+                    </p>
+                </div>
+                <div class="section" id="error-markup">
+                    <h1><a name="error-markup">Error Markup</a></h1>
+                    <p>
+                        When I want to &quot;render&quot; errors, the handler
+                        code passes the HTML form tree generated by the code
+                        above (including custom HTML formatting that is added to
+                        make the form look good, sectioning, fieldsets, etc) to
+                        an error renderer method.
+                    </p>
+                    <p>
+                        That renderer runs down the tree and finds the first
+                        input that corresponds to an error field and inserts
+                        appropriate marker HTML to indicate to the user where
+                        the errors are located and adds some CSS classes to the
+                        HTML inputs. I think this is equivalent to the
+                        <tt class="literal"
+                            ><span class="pre">htmlfill</span></tt
+                        >
+                        library, but it might be more efficient because I don't
+                        need to &quot;parse&quot; the text. This happens before
+                        flattening the form into text.
+                    </p>
+                </div>
+                <div class="section" id="conclusion">
+                    <h1><a name="conclusion">Conclusion</a></h1>
+                    <p>
+                        I agree with you that implementing these different
+                        components separately is much better than a fully
+                        integrated approach. It is also true that they pretty
+                        much always interact in the same way.
+                    </p>
+                    <p>Any comments welcome!</p>
+                    <p>cheers,</p>
+                    <p>
+                        -- Martin Blais &lt;<a
+                            class="reference"
+                            href="mailto:blais&#64;furius.ca"
+                            >blais&#64;furius.ca</a
+                        >&gt;
+                    </p>
+                </div>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/a-theory-on-form-toolkits-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://furius.ca">Martin Blais</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>Thanks for the (very extensive!) comment.</p>
+                    <p>
+                        This sounds a lot like FunFormKit, which was an earlier
+                        library I wrote; maybe it's a natural progression. In
+                        that library the components were largely how you
+                        describe, though error markup happened at the same time
+                        as rendering. One major issue was how to deal with
+                        dynamic forms. FFK had ways to do this, but it was
+                        complex and non-intuitive, even for very
+                        straight-forward forms of dynamicism (like dynamic
+                        select boxes).
+                    </p>
+                    <p>
+                        I wrote a small library to generate HTML, mostly for me
+                        so I could get rid of a lot of HTML-related logic. The
+                        layout was done similarly, but I now feel it's not
+                        sufficient -- not just when you are working with a
+                        designer, but for that last 10% of a project where you
+                        start caring about the little things. I would feel a
+                        need to make changes to the layout system for every new
+                        form once I got to the last 10%, and that's no good --
+                        the form library should be stable.
+                    </p>
+                    <p>
+                        For signaling errors to a user, you definitely shouldn't
+                        do a redirect or store the errors in a session object.
+                        It's easier just to redisplay the form with the errors
+                        inline, and make them re-POST the data. One trap to
+                        avoid that FunFormKit fell into is overdesigning this
+                        process -- let the application call into your library
+                        and do the basic control, don't try to hijack the
+                        request when an error occurs. That gets way to
+                        complicated for no real gain.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/a-theory-on-form-toolkits-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Interesting. Could you write a short architectural
+                            overview of the new system? I'm really interested to
+                            find out about the differences in high-level design.
+                        </p>
+                        <p>
+                            About the HTML generation library: the lib I wrote
+                            is a simple mapping to xhtml, i.e. it can generate
+                            any xhtml code that you could write in text, I don't
+                            find any limitations. It's really just like an XML
+                            tree but the various tags are defined as classes
+                            themselves, that's all.
+                        </p>
+                        <p>
+                            For errors: you're right, and indeed I'm not
+                            &quot;keeping&quot; the form data in the session,
+                            just using the session as a temporary storage to
+                            communicate it to the render request for
+                            re-rendering the form (since they are separate
+                            requests, different children might handle it). The
+                            user does re-post all the data.
+                        </p>
+                        <p>
+                            Oh, I think I get the misunderstanding, I think I
+                            forgot to mention that I wrote my code so that
+                            requests &quot;just render&quot; and &quot;just
+                            handle&quot; are separate urls. i.e. /contact_edit
+                            renders the form, /contact_edit_hndl handlers the
+                            submit data, and then either redirects back to
+                            /contact_edit or to some other page (in case of
+                            success). I was debating for a while whether this
+                            was a good approach (my background is in desktop
+                            apps) and I pretty much like the separation. I don't
+                            like for the requests that &quot;just render&quot;
+                            to check and &quot;maybe&quot; handle the submit
+                            data.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/a-theory-on-form-toolkits-comment-4.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://furius.ca">Martin Blais</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I love FormEncode--it's be best concept of a form validation
+                    tookit I've ever seen. However, in all of the tutorials and
+                    examples I've seen the actual form markup is maintained as a
+                    string that is not part of the page template (it gets
+                    inserted into the template later). I don't like that. I want
+                    to have all my form markup reside in the template (I'm using
+                    SimpleTAL), and process the template with htmlfill after the
+                    template is expanded. I realize that there may be a
+                    limitation of one form per page (or at least every input tag
+                    must be uniquely named on each page).
+                </p>
+                <p>
+                    Comment: htmlfill must happen after the template is expanded
+                    because sometimes input tags are generated by the templating
+                    system. If htmlfill happened first these tags would not
+                    exist.
+                </p>
+                <p>
+                    Bottom line: I'm running into problems with SimpleTAL
+                    stripping the markup out of my &lt;form:error
+                    name=&quot;fieldName&quot; /&gt; tags--after SimpleTAL
+                    expansion they look like this: &lt;form&gt;. That won't do.
+                    Is there a workaround or planned solution to this problem?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/a-theory-on-form-toolkits-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                anonymous
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>Sorry, forgot to include my name...</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/a-theory-on-form-toolkits-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.openpolitics.com/pieces/"
+                        >Daniel Miller</a
+                    >
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        OK. I found the solution. Duh ... declare
+                        &quot;form&quot; as an XML namespace. Like this:
+                    </p>
+                    <p>
+                        &lt;html xmlns=&quot;<a
+                            class="reference"
+                            href="http://www.w3.org/1999/xhtml"
+                            >http://www.w3.org/1999/xhtml</a
+                        >&quot;
+                        xmlns:form=&quot;http://www.formencode.org&quot;&gt;
+                    </p>
+                    <p>
+                        That's all it took. Thanks for providing a space for me
+                        to think out loud Ian.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/a-theory-on-form-toolkits-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.openpolitics.com/pieces/">Daniel</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

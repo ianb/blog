@@ -1,129 +1,205 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Successful ORM use</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Successful ORM use</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Successful ORM use</h1>
+        <p>
+            Ted Neward describes some<a
+                href="http://www.cincomsmalltalk.com/blog/blogView?showComments=true&entry=3268052004"
+                >some negative experiences with object-relational mappers</a
+            >
+            (quoted via James Robertson, as Ted's blog seems to be down at the
+            moment).
+        </p>
 
-<div style="float: right">
+        <blockquote>
+            With object-relational technologies, products begin by flirting with
+            simple mappings: single class to single table, building simple
+            Proxies that do some Lazy Loading, and so on. "Advisers" are sent in
+            to the various project teams that use the initial O-R layer, but
+            before long, those "advisers" are engaging in front-line coding,
+            wrestling with ways to bring object inheritance to the relational
+            database.
+        </blockquote>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+        I think some of the problems with ORMs are due to being too Object, and
+        not enough Relational. It's entirely appropriate -- obvious, even --
+        that the database should be represented through objects. It is nice if
+        the structure of the database is also represented through objects,
+        hopefully at a fine level of detail. When you create SQL strings, you
+        are hiding the structure in relatively opaque strings. When you have
+        query results that are just lists of lists, or lists of dictionaries,
+        you have lost a lot of information.
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Successful ORM use</h1>
- <p>
+        <p>
+            So, you want good objects. The problems I see is when you try to
+            represent <i>classes</i> through the ORM, or relatedly when you do
+            modeling and then apply the ORM after. Objects are fine and well,
+            but it's still an RDBMS you are dealing with. Concepts like
+            subclassing just don't make sense. <i>Is-a</i> is not a term you
+            should be thinking about. And when you are using your objects, you
+            shouldn't expect to forget what they really are -- connectors to the
+            database.
+        </p>
 
-Ted Neward describes some<a href="http://www.cincomsmalltalk.com/blog/blogView?showComments=true&entry=3268052004">some
-negative experiences with object-relational mappers</a> (quoted via
-James Robertson, as Ted's blog seems to be down at the moment).
+        <p>
+            I think a good ORM needs to be simple and transparent in the way it
+            deals with the database, so you don't forget what you are dealing
+            with. But I <i>don't</i> think it needs to represent every
+            relational programming concept natively. Just as an object
+            programmer needs to think about relations, a relational programmer
+            needs to think about objects, and the ORM should be the intersection
+            of those two, not the union.
+        </p>
 
-<blockquote>
+        <div class="dates" align="right">
+            Created 24 Jul '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            "Objects are fine and well, but it's still an RDBMS you are dealing
+            with."
+            <br />
 
-With object-relational technologies, products begin by flirting with
-simple mappings: single class to single table, building simple Proxies
-that do some Lazy Loading, and so on. "Advisers" are sent in to the
-various project teams that use the initial O-R layer, but before long,
-those "advisers" are engaging in front-line coding, wrestling with
-ways to bring object inheritance to the relational database.
+            <br />
+            Unless, of course, it isn't. Part of the appeal of an ORM in my
+            experience is the ability to also transparently persist objects in
+            containers which are not RDBMS's. My current example: a biz app
+            which has two storage mechanisms; one is a relational DB--the kind
+            of thing SQLObject would work perfectly with. But half the data is
+            stored in a third-party container, which provides SQL for reading,
+            but a proprietary API for writing, which models objects completely
+            differently.
+            <br />
 
-</blockquote>
+            <br />
+            "...And when you are using your objects, you shouldn't expect to
+            forget what they really are -- connectors to the database."
+            <br />
 
-I think some of the problems with ORMs are due to being too Object,
-and not enough Relational.  It's entirely appropriate -- obvious, even
--- that the database should be represented through objects.  It is
-nice if the structure of the database is also represented through
-objects, hopefully at a fine level of detail.  When you create SQL
-strings, you are hiding the structure in relatively opaque strings.
-When you have query results that are just lists of lists, or lists of
-dictionaries, you have lost a lot of information.
+            <br />
+            Sorry, I don't buy it. Abstraction is forgetfulness, IMO.
+            <div align="right">
+                <a href="https://ianbicking.org/comment215.html" rel="nofollow"
+                    >#</a
+                >
+                Robert Brewer
+            </div>
+            <hr noshade />
+            I'm with Ian here, the nail has been firmly hit on the head. Every
+            time I've come across object relational mapping it's OO programmers
+            trying to persist an object model in a database. Its all in the
+            compromise, and using the strengths of both approaches rather than
+            sticking only to one.
+            <br />
 
-<p>
+            <br />
+            V.S. Babu had an interesting point;
+            <br />
+            <a
+                href="http://vsbabu.org/mt/archives/2004/01/18/quick_links.html"
+                target="_blank"
+                >http://vsbabu.org/mt/archives/2004/01/18/quick_links.html</a
+            >
+            <br />
 
-So, you want good objects.  The problems I see is when you try to
-represent <i>classes</i> through the ORM, or relatedly when you do
-modeling and then apply the ORM after.  Objects are fine and well, but
-it's still an RDBMS you are dealing with.  Concepts like subclassing
-just don't make sense.  <i>Is-a</i> is not a term you should be
-thinking about.  And when you are using your objects, you shouldn't
-expect to forget what they really are -- connectors to the
-database.
+            <br />
+            Which I followed up;
+            <br />
+            <a
+                href="http://www.halfcooked.com/mt/archives/000685.html"
+                target="_blank"
+                >http://www.halfcooked.com/mt/archives/000685.html</a
+            >
+            <div align="right">
+                <a href="https://ianbicking.org/comment216.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.halfcooked.com/">Andy Todd</a>
+            </div>
+            <hr noshade />
+            ORM tools have two different jobs depending on what comes first in
+            the design: with objects first there is persistence, portable to
+            different datastores because the objects remain the same and as
+            transparent as possible because one only needs to write objects and
+            get them back; with database first there is a struggle to perform
+            database operations and present data as objects in the context of a
+            certain program: the transparency and portability are turned around
+            (any program can use the OO view of a certain database provided by
+            the tool and all database clients are the same).
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment217.html" rel="nofollow"
+                    >#</a
+                >
+                Lorenzo Gatti
+            </div>
+            <hr noshade />
 
-<p>
-
-I think a good ORM needs to be simple and transparent in the way it
-deals with the database, so you don't forget what you are dealing
-with.  But I <i>don't</i> think it needs to represent every relational
-programming concept natively.  Just as an object programmer needs to
-think about relations, a relational programmer needs to think about
-objects, and the ORM should be the intersection of those two, not the
-union.
- <div class="dates" align="right">
-Created 24 Jul '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- "Objects are fine and well, but it's still an RDBMS you are dealing with."
-<br />
-
-<br />
-Unless, of course, it isn't. Part of the appeal of an ORM in my experience is the ability to also transparently persist objects in containers which are not RDBMS's. My current example: a biz app which has two storage mechanisms; one is a relational DB--the kind of thing SQLObject would work perfectly with. But half the data is stored in a third-party container, which provides SQL for reading, but a proprietary API for writing, which models objects completely differently.
-<br />
-
-<br />
-"...And when you are using your objects, you shouldn't expect to forget what they really are -- connectors to the database."
-<br />
-
-<br />
-Sorry, I don't buy it. Abstraction is forgetfulness, IMO.
- <div align="right"><a href="http://blog.ianbicking.org/comment215.html" rel="nofollow">#</a> Robert Brewer</div><hr noshade>
- I'm with Ian here, the nail has been firmly hit on the head. Every time I've come across object relational mapping it's OO programmers trying to persist an object model in a database. Its all in the compromise, and using the strengths of both approaches rather than sticking only to one. 
-<br />
-
-<br />
-V.S. Babu had an interesting point;
-<br />
-<a href="http://vsbabu.org/mt/archives/2004/01/18/quick_links.html" target="_blank">http://vsbabu.org/mt/archives/2004/01/18/quick_links.html</a>
-<br />
-
-<br />
-Which I followed up;
-<br />
- <a href="http://www.halfcooked.com/mt/archives/000685.html" target="_blank">http://www.halfcooked.com/mt/archives/000685.html</a>
- <div align="right"><a href="http://blog.ianbicking.org/comment216.html" rel="nofollow">#</a> <a href="http://www.halfcooked.com/">Andy Todd</a></div><hr noshade>
- ORM tools have two different jobs depending on what comes first in the design: with objects first there is persistence, portable to different datastores because the objects remain the same and as transparent as possible because one only needs to write objects and get them back; with database first there is a struggle to perform database operations and present data as objects in the context of a certain program: the transparency and portability are turned around (any program can use the OO view of a certain database provided by the tool and all database clients are the same).
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment217.html" rel="nofollow">#</a> Lorenzo Gatti</div><hr noshade>
- 
-<div class="document">
-<p>I partly agree with you. But after the class generation, then those classes are saved in the persistance layer and the mapping files are also generated.After that you can perform the operation on xml.
-ORM is very powerful tool because it provide database independence.
-If you have any objection, you can mail me at <a class="reference" href="mailto:adeelcap15&#64;gmail.com">adeelcap15&#64;gmail.com</a></p>
-<p>Adeel Hussain</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/successful-orm-use-comment-1.html" rel="nofollow">#</a> Adeel Hussain</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <div class="document">
+                <p>
+                    I partly agree with you. But after the class generation,
+                    then those classes are saved in the persistance layer and
+                    the mapping files are also generated.After that you can
+                    perform the operation on xml. ORM is very powerful tool
+                    because it provide database independence. If you have any
+                    objection, you can mail me at
+                    <a class="reference" href="mailto:adeelcap15&#64;gmail.com"
+                        >adeelcap15&#64;gmail.com</a
+                    >
+                </p>
+                <p>Adeel Hussain</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/successful-orm-use-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Adeel Hussain
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

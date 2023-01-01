@@ -1,156 +1,308 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>An Easier Legacy</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>An Easier Legacy</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>An Easier Legacy</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                Changing blog software can be hard, as many of us now doubt
+                know. In a
+                <a
+                    class="reference"
+                    href="http://www.dehora.net/journal/2007/02/journal_migration_i_export_entries_from_1.html"
+                    >recent post</a
+                >
+                Bill de hÓra discusses some of the issues exporting his existing
+                blog to a new blog system. I know both the difficulty doing this
+                sort of thing, the difficulties implementing it, and all the
+                broken links left behind because of it. And it's all stupid. We
+                can make things <em>much easier</em> if the people writing the
+                software would just <em>let go</em> a little more and stop
+                demanding that all the information go in some opaque (to the
+                web) backend data silo (i.e., a database).
+            </p>
+            <p>
+                For blogs the transition story <em>should</em> be much easier.
+                When you want to retire your blogging software you should rip
+                your site. Spider the whole thing down. It's not that much
+                space, even when you have lots of redundant files.
+            </p>
+            <p>
+                Of course, you probably can't serve the results up with Apache.
+                Apache just... isn't good enough. For instance, your files may
+                not have extensions; you have to keep some of the metadata, at
+                least content type, and there's no clear way to do that in
+                Apache. (There might be tricks or modules to do this in Apache,
+                I'm not sure.) Also, the page names might be awkward, like
+                <tt class="docutils literal"
+                    ><span class="pre">/blog/?p=45</span></tt
+                >
+                -- Apache <em>interprets</em> that sort of stuff, and we don't
+                want to interpret it, we spidered it as a page (irregardless of
+                what <em>implements</em> that page), and we just want to serve
+                it up as a page. That's it.
+            </p>
+            <p>
+                But ignore the server portion for now -- we know we can build it
+                if we want to. You now have an archive you can keep around
+                forever and move to different hosts, and it doesn't rely on a
+                software stack or any data formats except the one that matters
+                most: the HTML that people read.
+            </p>
+            <p>
+                But it's not perfect. You have a link like
+                <tt class="docutils literal"
+                    ><span class="pre">/blog/2005/07/my-post</span></tt
+                >, or even
+                <tt class="docutils literal"
+                    ><span class="pre">/blog/?p=45</span></tt
+                >. You new system has a link like
+                <tt class="docutils literal"
+                    ><span class="pre"
+                        >/blog/2007/01/another-post.html</span
+                    ></tt
+                >. They both share
+                <tt class="docutils literal"
+                    ><span class="pre">/blog/</span></tt
+                >
+                -- you can configure your way around some (like
+                <tt class="docutils literal"
+                    ><span class="pre">^/blog/200[012345]/</span></tt
+                >), but for how long? Must you only change blog software on new
+                years day, or on the first of the month?
+            </p>
+            <p>
+                When serving files you need a layered approach. First you look
+                for this legacy content. If the content doesn't exist, you do
+                the normal lookups, going to your new blogging software. The
+                lookup must go to the full depth. That is, you don't look at
+                <tt class="docutils literal"><span class="pre">/blog</span></tt>
+                and decide what to dispatch to. You look at
+                <tt class="docutils literal"
+                    ><span class="pre">/blog/?p=45</span></tt
+                >
+                (or whatever) and if you don't find it you start with the next
+                option (the live software).
+            </p>
+            <p>
+                Then you only have to worry about overlaps. And that's not
+                without concern;
+                <tt class="docutils literal"
+                    ><span class="pre">/blog/archive/</span></tt
+                >
+                may in both systems. So some management may be necessary to
+                rename or remove some of that legacy content.
+            </p>
+            <p>
+                This is a good solution for content that is timely, or archival.
+                If you have content that is not timely, you are probably using a
+                CMS, and you really want to move the content into the new system
+                so you can continue to manage it in a consistent way.
+            </p>
+            <p>
+                In <em>that</em> case while it would be nice to keep URIs stable
+                it might not be feasible. Which is why all stacks need easily
+                managed redirects, with feedback taken from 404s in the logs.
+            </p>
+            <p>
+                A system setup like this still has some problems. How do you
+                show all the old entries as well as the new on your archive
+                page? While I'm not terribly concerned about the styling of old
+                pages, sensible navigation would be nice -- if you have archive
+                links in your old pages, it will appear as though you've stopped
+                posting (when in fact that's just the last date when the page
+                was updated). And you want to do searches across all your
+                content.
+            </p>
+            <p>
+                These are also solvable problems, but they require some more
+                significant changes. We need to move the data that is currently
+                stored in the model out into the pages themselves. We need smart
+                spidering, maybe building on Google Sitemaps or other
+                enumerations of the &quot;interesting&quot; parts of a site. In
+                addition notification of new content (by pushing out event
+                notification, maybe in the form of
+                <a
+                    class="reference"
+                    href="http://www.ietf.org/html.charters/atompub-charter.html"
+                    >APP</a
+                >). From there you could build an archive page entirely separate
+                from the blog software, and capable of reading content from more
+                than one location. Another more conservative option is just
+                building some basic customizability into blog software so that
+                you could copy the static HTML for your old archives, and the
+                blog software would simply append this to the archive page.
+            </p>
+            <p>
+                For styling and navigation I think a pipeline approach is most
+                appropriate -- we're working on
+                <a
+                    class="reference"
+                    href="http://openplans.org/projects/deliverance"
+                    >Deliverance</a
+                >
+                to do this this, but it's a tricky problem. For searching...
+                well, <em>that</em> at least is already easy; reasonable hints
+                along with a third-part search service should work well (where
+                &quot;reasonable hints&quot; includes not having your archive
+                page indexed), and if a third-party search won't work then
+                privately-hosted search services are still likely to be of
+                higher quality than searches built into blog software.
+            </p>
+            <p>
+                What annoys me is that technically none of this stuff is
+                difficult (this is actually the <em>dumbest/easiest</em> way to
+                handle legacy content), but existing stacks <em>make</em> it
+                difficult. (I'm looking at you, Apache!) This kind of system
+                design can be more stable than what we currently have, easier to
+                maintain, more general, and just more <em>web</em>.
+            </p>
+            <p>
+                This is the kind of stuff I'm trying to tackle with Paste and
+                WSGI and all these little bits of code fitting together. I might
+                just be tilting at windmills in the endeavor, as developers both
+                young and old just <em>love</em> their backend models and want
+                to have total control over everything (driven in no small part
+                by over-controlling customers, graphic designers, marketers, and
+                their ilk). And I can't really expect WSGI to take over the
+                world; it's not going to be the next Apache. But
+                <a class="reference" href="http://openplans.org">we</a> are
+                definitely going to give some of this stuff a serious try.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 07 Feb</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    This kind of simple HTTP based approach is definitely
+                    showing a lot of promise. It significantly simplifies
+                    scaling (look at Amazon's S3 service) but still leaves the
+                    difficult problem of maintaining transactional integrity --
+                    which is inherently difficult to scale -- for the active
+                    part of your site.
+                </p>
+                <p>
+                    We need to develop architectures that give us the easy
+                    scalability of simple HTTP for the majority of our requests
+                    while minimising that which is reliant on hard to scale
+                    transactional systems. The alternative is ever larger
+                    monolithic databases. Perhaps we can learn from Google.
+                    <a
+                        class="reference"
+                        href="http://labs.google.com/papers/bigtable-osdi06.pdf"
+                        >http://labs.google.com/papers/bigtable-osdi06.pdf</a
+                    >
+                </p>
+                <p>Laurence</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/easier-legacy-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://objectvibe.net/blog">Laurence Rowe</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Somewhat interestingly, WebDAV has this idea of
+                        combining multiple requests (in an XML wrapper). The
+                        intention there is to do the entire set of requests in a
+                        transactional fashion. If you just have a way of
+                        referring to a transactional context, you could then
+                        explode that multirequest into a set of normal requests.
+                        This doesn't work across multiple backends (without, I
+                        suppose, some fancy transactional event system), but at
+                        least it offers transactions on some compound
+                        structures. (I've actually been thinking about this a
+                        lot as it relates to
+                        <a class="reference" href="http://pythonpaste.org/ohm/"
+                            >OHM</a
+                        >, as it's kind of an outstanding issue there.)
+                    </p>
+                    <p>
+                        The other approach is to be sloppy, and to be ready to
+                        deal with situations where the consistency of the system
+                        has been compromised. This is much more practical when
+                        you don't control all the pieces. Actually, it's about
+                        the only thing that is practical when you don't control
+                        all the pieces.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/easier-legacy-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>An Easier Legacy</h1>
- 
-<div class="document">
-<p>Changing blog software can be hard, as many of us now doubt know.  In
-a <a class="reference" href="http://www.dehora.net/journal/2007/02/journal_migration_i_export_entries_from_1.html">recent post</a>
-Bill de hÓra discusses some of the issues exporting his existing blog
-to a new blog system.  I know both the difficulty doing this sort of
-thing, the difficulties implementing it, and all the broken links left
-behind because of it.  And it's all stupid.  We can make things <em>much
-easier</em> if the people writing the software would just <em>let go</em> a
-little more and stop demanding that all the information go in some
-opaque (to the web) backend data silo (i.e., a database).</p>
-<p>For blogs the transition story <em>should</em> be much easier.  When you want
-to retire your blogging software you should rip your site.  Spider the
-whole thing down.  It's not that much space, even when you have lots
-of redundant files.</p>
-<p>Of course, you probably can't serve the results up with Apache.
-Apache just... isn't good enough.  For instance, your files may not
-have extensions; you have to keep some of the metadata, at least
-content type, and there's no clear way to do that in Apache.  (There
-might be tricks or modules to do this in Apache, I'm not sure.)  Also,
-the page names might be awkward, like <tt class="docutils literal"><span class="pre">/blog/?p=45</span></tt> -- Apache
-<em>interprets</em> that sort of stuff, and we don't want to interpret it, we
-spidered it as a page (irregardless of what <em>implements</em> that page),
-and we just want to serve it up as a page.  That's it.</p>
-<p>But ignore the server portion for now -- we know we can build it if we
-want to.  You now have an archive you can keep around forever and move
-to different hosts, and it doesn't rely on a software stack or any
-data formats except the one that matters most: the HTML that people
-read.</p>
-<p>But it's not perfect.  You have a link like <tt class="docutils literal"><span class="pre">/blog/2005/07/my-post</span></tt>,
-or even <tt class="docutils literal"><span class="pre">/blog/?p=45</span></tt>.  You new system has a link like
-<tt class="docutils literal"><span class="pre">/blog/2007/01/another-post.html</span></tt>.  They both share <tt class="docutils literal"><span class="pre">/blog/</span></tt> --
-you can configure your way around some (like <tt class="docutils literal"><span class="pre">^/blog/200[012345]/</span></tt>),
-but for how long?  Must you only change blog software on new years
-day, or on the first of the month?</p>
-<p>When serving files you need a layered approach.  First you look for
-this legacy content.  If the content doesn't exist, you do the normal
-lookups, going to your new blogging software.  The lookup must go to
-the full depth.  That is, you don't look at <tt class="docutils literal"><span class="pre">/blog</span></tt> and decide what
-to dispatch to.  You look at <tt class="docutils literal"><span class="pre">/blog/?p=45</span></tt> (or whatever) and if you
-don't find it you start with the next option (the live software).</p>
-<p>Then you only have to worry about overlaps.  And that's not without
-concern; <tt class="docutils literal"><span class="pre">/blog/archive/</span></tt> may in both systems.  So some management
-may be necessary to rename or remove some of that legacy content.</p>
-<p>This is a good solution for content that is timely, or archival.  If
-you have content that is not timely, you are probably using a CMS, and
-you really want to move the content into the new system so you can
-continue to manage it in a consistent way.</p>
-<p>In <em>that</em> case while it would be nice to keep URIs stable it might not
-be feasible.  Which is why all stacks need easily managed redirects,
-with feedback taken from 404s in the logs.</p>
-<p>A system setup like this still has some problems.  How do you show all
-the old entries as well as the new on your archive page?  While I'm
-not terribly concerned about the styling of old pages, sensible
-navigation would be nice -- if you have archive links in your old
-pages, it will appear as though you've stopped posting (when in fact
-that's just the last date when the page was updated).  And you want to
-do searches across all your content.</p>
-<p>These are also solvable problems, but they require some more
-significant changes.  We need to move the data that is currently
-stored in the model out into the pages themselves.  We need smart
-spidering, maybe building on Google Sitemaps or other enumerations of
-the &quot;interesting&quot; parts of a site.  In addition notification of new
-content (by pushing out event notification, maybe in the form of <a class="reference" href="http://www.ietf.org/html.charters/atompub-charter.html">APP</a>).  From
-there you could build an archive page entirely separate from the blog
-software, and capable of reading content from more than one location.
-Another more conservative option is just building some basic
-customizability into blog software so that you could copy the static
-HTML for your old archives, and the blog software would simply append
-this to the archive page.</p>
-<p>For styling and navigation I think a pipeline approach is most
-appropriate -- we're working on <a class="reference" href="http://openplans.org/projects/deliverance">Deliverance</a> to do this this, but
-it's a tricky problem.  For searching... well, <em>that</em> at least is
-already easy; reasonable hints along with a third-part search service
-should work well (where &quot;reasonable hints&quot; includes not having your
-archive page indexed), and if a third-party search won't work then
-privately-hosted search services are still likely to be of higher
-quality than searches built into blog software.</p>
-<p>What annoys me is that technically none of this stuff is difficult
-(this is actually the <em>dumbest/easiest</em> way to handle legacy content),
-but existing stacks <em>make</em> it difficult.  (I'm looking at you,
-Apache!)  This kind of system design can be more stable than what we
-currently have, easier to maintain, more general, and just more <em>web</em>.</p>
-<p>This is the kind of stuff I'm trying to tackle with Paste and WSGI and
-all these little bits of code fitting together.  I might just be
-tilting at windmills in the endeavor, as developers both young and old
-just <em>love</em> their backend models and want to have total control over
-everything (driven in no small part by over-controlling customers,
-graphic designers, marketers, and their ilk).  And I can't really
-expect WSGI to take over the world; it's not going to be the next
-Apache.  But <a class="reference" href="http://openplans.org">we</a> are definitely going to give
-some of this stuff a serious try.</p>
-</div>
- <div class="dates" align="right">
-Created 07 Feb</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>This kind of simple HTTP based approach is definitely showing a lot of promise. It significantly simplifies scaling (look at Amazon's S3 service) but still leaves the difficult problem of maintaining transactional integrity -- which is inherently difficult to scale -- for the active part of your site.</p>
-<p>We need to develop architectures that give us the easy scalability of simple HTTP for the majority of our requests while minimising that which is reliant on hard to scale transactional systems. The alternative is ever larger monolithic databases. Perhaps we can learn from Google. <a class="reference" href="http://labs.google.com/papers/bigtable-osdi06.pdf">http://labs.google.com/papers/bigtable-osdi06.pdf</a></p>
-<p>Laurence</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/easier-legacy-comment-1.html" rel="nofollow">#</a> <a href="http://objectvibe.net/blog">Laurence Rowe</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Somewhat interestingly, WebDAV has this idea of combining multiple requests (in an XML wrapper).  The intention there is to do the entire set of requests in a transactional fashion.  If you just have a way of referring to a transactional context, you could then explode that multirequest into a set of normal requests.  This doesn't work across multiple backends (without, I suppose, some fancy transactional event system), but at least it offers transactions on some compound structures.  (I've actually been thinking about this a lot as it relates to <a class="reference" href="http://pythonpaste.org/ohm/">OHM</a>, as it's kind of an outstanding issue there.)</p>
-<p>The other approach is to be sloppy, and to be ready to deal with situations where the consistency of the system has been compromised.  This is much more practical when you don't control all the pieces.  Actually, it's about the only thing that is practical when you don't control all the pieces.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/easier-legacy-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Maybe you need something like _blog backup: <a class="reference" href="http://www.doughellmann.com/projects/BlogBackup/">http://www.doughellmann.com/projects/BlogBackup/</a></p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/easier-legacy-comment-3.html" rel="nofollow">#</a> <a href="http:/www.la-grange.net/karl">karl</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <div class="document">
+                <p>
+                    Maybe you need something like _blog backup:
+                    <a
+                        class="reference"
+                        href="http://www.doughellmann.com/projects/BlogBackup/"
+                        >http://www.doughellmann.com/projects/BlogBackup/</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/easier-legacy-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http:/www.la-grange.net/karl">karl</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

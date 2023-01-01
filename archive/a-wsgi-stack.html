@@ -1,151 +1,201 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>A WSGI Stack</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>A WSGI Stack</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>A WSGI Stack</h1>
+        <p>
+            Phillip Eby posted another revision of
+            <a
+                href="http://mail.python.org/pipermail/web-sig/2004-August/000562.html"
+                >the Web Server Gateway Interface (WSGI)</a
+            >
+            spec, and it's pretty much ready to be proposed as a PEP and be
+            discussed more widely.
+        </p>
 
-<div style="float: right">
+        <p>
+            So I was thinking about WSGI middleware (extending my
+            <a
+                href="http://blog.colorstudy.com/ianb/weblog/2004/08/18.html#P148"
+                >previous thoughts</a
+            >). WSGI specifies a fairly simple interface between a "server" and
+            an "application". The application in turn can be a server to another
+            application; thus it would be middleware. It would be cool to
+            implement <a href="http://webwareforpython.org">Webware</a> as a
+            stack of such middleware: each piece would be small, easily
+            understood and debugged; parts could be shared with others (or taken
+            from other projects); smaller pieces are easier to understand, and
+            the code flow is very specific. If I was to take everything Webware
+            does now and turn it into these middleware components, this is what
+            I think I'd get:
+        </p>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+        <p>
+            1. The AppServer. This is a threaded server that accepts connections
+            (both a special FastCGI-like protocol and HTTP), spawns a thread for
+            the request, and passes the request on.
+        </p>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>A WSGI Stack</h1>
- <p>
+        <p>
+            2. Configuration handler. I don't know exactly where this comes in,
+            but I want to configure all these pieces together, but also include
+            URL-specific configuration. So the configuration has to be involved
+            in this chain of middleware.
+        </p>
 
-Phillip Eby posted another revision of <a href="http://mail.python.org/pipermail/web-sig/2004-August/000562.html">the
-Web Server Gateway Interface (WSGI)</a> spec, and it's pretty much
-ready to be proposed as a PEP and be discussed more widely.
+        <p>
+            3. An exception catcher. This will catch any exceptions in the
+            application, log them, email them, provide post-mortem debugging
+            information, display a pretty traceback, etc.
+        </p>
 
-<p>
+        <p>
+            4. A session handler. This will look for any session variables, and
+            create a session object if needed. It will put the session object in
+            the <tt>environ</tt> dictionary (<tt>webkit.session</tt>).
+        </p>
 
-So I was thinking about WSGI middleware (extending my <a href="http://blog.colorstudy.com/ianb/weblog/2004/08/18.html#P148">previous
-thoughts</a>).  WSGI specifies a fairly simple interface between a
-"server" and an "application".  The application in turn can be a
-server to another application; thus it would be middleware.  It would
-be cool to implement <a href="http://webwareforpython.org">Webware</a>
-as a stack of such middleware: each piece would be small, easily
-understood and debugged; parts could be shared with others (or taken
-from other projects); smaller pieces are easier to understand, and the
-code flow is very specific.  If I was to take everything Webware does
-now and turn it into these middleware components, this is what I think
-I'd get:
+        <p>
+            5. A URL parser/resource finder. This is <tt>URLParser</tt> in
+            Webware CVS. It looks on the disk to find a file (as well as looking
+            at other hooks). Once it finds a file or some resource, it finds a
+            factory (based on extension or some other metadata) and uses the
+            factory to create an application.
+        </p>
 
-<p>
+        <p>
+            6. A ServletFactory which talks WSGI. This moves things like the
+            creation of <tt>HTTPRequest</tt> further back in the process.
+        </p>
 
-1.  The AppServer.  This is a threaded server that accepts connections
-(both a special FastCGI-like protocol and HTTP), spawns a thread for
-the request, and passes the request on.
+        <p>
+            The interesting part of this is that a lot of this isn't very
+            Webware-specific at all. Step 6 is very specific to Webware, but the
+            rest isn't. Pieces can also be swapped out. For instance, I'd
+            actually like to change this, as I think Webware spawns a thread too
+            early -- I suspect threads and sockets interact poorly on some
+            platforms, causing the occasional lockup. Redhat and FreeBSD seem to
+            have problems. So I'd swap out #1 for:
+        </p>
 
-<p>
+        <p>
+            1a. An async server. Either
+            <a href="http://www.amk.ca/python/code/medusa.html">Medusa</a> or
+            <a href="http://www.twistedmatrix.com/">Twisted</a>. Medusa is
+            smaller, Twisted better; once the Twisted stuff I'm interested is
+            available separately (which is planned), then it would probably be
+            an easier choice.
+        </p>
 
-2. Configuration handler.  I don't know exactly where this comes in,
-but I want to configure all these pieces together, but also include
-URL-specific configuration.  So the configuration has to be involved
-in this chain of middleware.
+        <p>
+            1b. A threading middleware. It takes the async request that 1a
+            generates, and uses a threadpool to make it multithreaded, handling
+            whatever buffering or interaction it needs to do.
+        </p>
 
-<p>
+        <p>
+            There's other pieces that can be recombined. For instance, the
+            URLParser could redirect the request to any WSGI application, not
+            just Webware servlets. The exception catcher could be developed
+            separately, and should work just fine with any stack. Each piece
+            could reasonably have multiple implementations. This seems like a
+            good way to compose a framework.
+        </p>
 
+        <div class="dates" align="right">
+            Created 22 Aug '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            And, don't forget that WebWare users would also be able to switch
+            out 1, 1a, and 1b for something else altogether, like mod_python or
+            PEAK's FastCGI runner, once they support WSGI.
+            <br />
 
-3. An exception catcher.  This will catch any exceptions in the
-application, log them, email them, provide post-mortem debugging
-information, display a pretty traceback, etc.
+            <br />
+            Of course, that's assuming that the other pieces in your stack
+            support a multi-process execution model as well as the single
+            process, multi-thread modes. But even if they don't, the web server
+            can be any single-process multi-thread WSGI server or gateway.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment306.html" rel="nofollow"
+                    >#</a
+                >
+                Phillip J. Eby
+            </div>
+            <hr noshade />
+            Webware stuff generally expects a single-process, multi-threaded
+            model. But most of those things could be made neutral, though there
+            are a lot of Webware applications that assume a multi-threaded
+            environment (e.g., they store global information in global
+            variables).
+            <div align="right">
+                <a href="https://ianbicking.org/comment307.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            The python threading model is broken, it's about time we fix it:
+            <br />
+            <a href="http://www.usingcsp.com" target="_blank"
+                >http://www.usingcsp.com</a
+            >
+            <br />
 
-<p>
-
-4. A session handler.  This will look for any session variables, and
-create a session object if needed.  It will put the session object in
-the <tt>environ</tt> dictionary (<tt>webkit.session</tt>).
-
-<p>
-
-5. A URL parser/resource finder.  This is <tt>URLParser</tt> in
-Webware CVS.  It looks on the disk to find a file (as well as looking
-at other hooks).  Once it finds a file or some resource, it finds a
-factory (based on extension or some other metadata) and uses the
-factory to create an application.
-
-<p>
-
-6. A ServletFactory which talks WSGI.  This moves things like the
-creation of <tt>HTTPRequest</tt> further back in the process.
-
-<p>
-
-The interesting part of this is that a lot of this isn't very
-Webware-specific at all.  Step 6 is very specific to Webware, but the
-rest isn't.  Pieces can also be swapped out.  For instance, I'd
-actually like to change this, as I think Webware spawns a thread too
-early -- I suspect threads and sockets interact poorly on some
-platforms, causing the occasional lockup.  Redhat and FreeBSD seem to
-have problems.  So I'd swap out #1 for:
-
-<p>
-
-1a.  An async server.  Either <a href="http://www.amk.ca/python/code/medusa.html">Medusa</a> or <a href="http://www.twistedmatrix.com/">Twisted</a>.  Medusa is smaller,
-Twisted better; once the Twisted stuff I'm interested is available
-separately (which is planned), then it would probably be an easier
-choice.
-
-<p>
-
-1b.  A threading middleware.  It takes the async request that 1a
-generates, and uses a threadpool to make it multithreaded, handling
-whatever buffering or interaction it needs to do.
-
-<p>
-
-There's other pieces that can be recombined.  For instance, the
-URLParser could redirect the request to any WSGI application, not just
-Webware servlets.  The exception catcher could be developed
-separately, and should work just fine with any stack.  Each piece
-could reasonably have multiple implementations.  This seems like a
-good way to compose a framework.
- <div class="dates" align="right">
-Created 22 Aug '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- And, don't forget that WebWare users would also be able to switch out 1, 1a, and 1b for something else altogether, like mod_python or PEAK's FastCGI runner, once they support WSGI.
-<br />
-
-<br />
-Of course, that's assuming that the other pieces in your stack support a multi-process execution model as well as the single process, multi-thread modes.  But even if they don't, the web server can be any single-process multi-thread WSGI server or gateway.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment306.html" rel="nofollow">#</a> Phillip J. Eby</div><hr noshade>
- Webware stuff generally expects a single-process, multi-threaded model.  But most of those things could be made neutral, though there are a lot of Webware applications that assume a multi-threaded environment (e.g., they store global information in global variables).
- <div align="right"><a href="http://blog.ianbicking.org/comment307.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- The python threading model is broken, it's about time we fix it:
-<br />
-<a href="http://www.usingcsp.com" target="_blank">http://www.usingcsp.com</a>
-<br />
-
-<br />
-(I know that stackless implements part of the csp model, but stackless has lots of other stuff I don't want, and stackless is not CPython that is what I want to use)
- <div align="right"><a href="http://blog.ianbicking.org/comment308.html" rel="nofollow">#</a> Uriel</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <br />
+            (I know that stackless implements part of the csp model, but
+            stackless has lots of other stuff I don't want, and stackless is not
+            CPython that is what I want to use)
+            <div align="right">
+                <a href="https://ianbicking.org/comment308.html" rel="nofollow"
+                    >#</a
+                >
+                Uriel
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

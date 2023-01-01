@@ -1,181 +1,343 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>PyPI and small code</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>PyPI and small code</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>PyPI and small code</h1>
+        <p>
+            In some of my more recent developments I've been trying to build
+            smaller, more reusable modules. A lot of them aren't necessarily
+            terribly robust or generalized, but (for me at least) they are an
+            improvement. Some of them might be useful to other people. And I'm
+            sure there's lots of people who have done the same.
+        </p>
 
-<div style="float: right">
+        <p>
+            These files are part of larger projects, but aren't
+            <i>really</i> related. For instance, the
+            <a href="http://wiki.webwareforpython.org/thiswiki.html">wiki</a>
+            has some modules related to file uploading (<a
+                href="http://www.webwareforpython.org/~ianb/w4py.org/Wiki/lib/ftpclient.py"
+                >FTP</a
+            >
+            and
+            <a
+                href="http://www.webwareforpython.org/~ianb/w4py.org/Wiki/lib/sshclient.py"
+                >SSH</a
+            >) which are decoupled and pretty much unrelated to the larger
+            application. There exist more complete libraries (like
+            <a href="http://www.lag.net/~robey/paramiko/">Paramiko</a>), but
+            there are many small-scope problems that call for small-scope
+            libraries. I would probably have written less of these modules
+            myself if I had a good place to find other people's work.
+        </p>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+        <p>
+            Right now the only place we have to keep this code is the
+            <a href="http://aspn.activestate.com/ASPN/Python/Cookbook/"
+                >Python Cookbook</a
+            >, which has a whole host of problems. It would be great if PyPI
+            could take over that role.
+        </p>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>PyPI and small code</h1>
- <p> In some of my more recent developments I've been trying to build
-smaller, more reusable modules.  A lot of them aren't necessarily
-terribly robust or generalized, but (for me at least) they are an
-improvement.  Some of them might be useful to other people.  And I'm
-sure there's lots of people who have done the same.
+        <p>Some issues:</p>
+        <ul>
+            <li>
+                These aren't real packages, though they frequently belong to
+                larger packages.
+            </li>
 
-<p> These files are part of larger projects, but aren't <i>really</i>
-related.  For instance, the <a href="http://wiki.webwareforpython.org/thiswiki.html">wiki</a> has
-some modules related to file uploading (<a href="http://www.webwareforpython.org/~ianb/w4py.org/Wiki/lib/ftpclient.py">FTP</a>
-and <a href="http://www.webwareforpython.org/~ianb/w4py.org/Wiki/lib/sshclient.py">SSH</a>)
-which are decoupled and pretty much unrelated to the larger
-application.  There exist more complete libraries (like <a href="http://www.lag.net/~robey/paramiko/">Paramiko</a>), but there
-are many small-scope problems that call for small-scope libraries.  I
-would probably have written less of these modules myself if I had a
-good place to find other people's work.
+            <li>
+                There's no release schedule, maybe no independent versioning,
+                seldom documentation outside of docstrings.
+            </li>
 
-<p> Right now the only place we have to keep this code is the <a href="http://aspn.activestate.com/ASPN/Python/Cookbook/">Python
-Cookbook</a>, which has a whole host of problems.  It would be great
-if PyPI could take over that role.
+            <li>
+                Usually no distutils setup and there probably shouldn't be one.
+            </li>
+            <li>Hosting is likely to be unreliable.</li>
+            <li>
+                There could be a huge number of these libraries, of widely
+                varying scope and quality.
+            </li>
 
-<p> Some issues:
-<ul>
-  <li> These aren't real packages, though they frequently belong to
-  larger packages.  
-  <li> There's no release schedule, maybe no independent versioning,
-  seldom documentation outside of docstrings.
-  <li> Usually no distutils setup and there probably shouldn't be one.
-  <li> Hosting is likely to be unreliable.
-  <li> There could be a huge number of these libraries, of widely
-  varying scope and quality.
-  <li> There's likely to be naming conflicts.  (But since these aren't
-  packages, that's not as bad)
-</ul>
+            <li>
+                There's likely to be naming conflicts. (But since these aren't
+                packages, that's not as bad)
+            </li>
+        </ul>
 
-<p> With this in mind, the structure of PyPI doesn't seem right.  But
-the Python Cookbook is too little structure.  <a href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/286134">Safe
-Expression Evaluation</a> is not a recipe.  It's not a package either.  It's a module.
-Maybe I don't want to "release" my code, but I <i>do</i> want to
-update it and provide the most up-to-date version.  I do want to
-document it and provide it as a consistent module, not just a recipe.
-I want to provide both the module, and provide information about
-relationships to other modules (e.g., those <tt>ftpupload</tt> and
-<tt>sshupload</tt> modules go together, but can be used
-independently).  As a user I want PyPI to keep the code around when
-the informal releases go away.  I want to see what other people think
-of the code, and what other modules might be a better (or worse)
-choice, or modules that are symbiotic.  I want other people to be able
-to take over or fork the module in a structured way (i.e., make the
-forking relationship clear).
+        <p>
+            With this in mind, the structure of PyPI doesn't seem right. But the
+            Python Cookbook is too little structure.
+            <a
+                href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/286134"
+                >Safe Expression Evaluation</a
+            >
+            is not a recipe. It's not a package either. It's a module. Maybe I
+            don't want to "release" my code, but I <i>do</i> want to update it
+            and provide the most up-to-date version. I do want to document it
+            and provide it as a consistent module, not just a recipe. I want to
+            provide both the module, and provide information about relationships
+            to other modules (e.g., those <tt>ftpupload</tt> and
+            <tt>sshupload</tt> modules go together, but can be used
+            independently). As a user I want PyPI to keep the code around when
+            the informal releases go away. I want to see what other people think
+            of the code, and what other modules might be a better (or worse)
+            choice, or modules that are symbiotic. I want other people to be
+            able to take over or fork the module in a structured way (i.e., make
+            the forking relationship clear).
+        </p>
 
-<p> When I think about the concrete features, most of them could apply
-to normal packages as well.  So maybe this is just a generalization of
-PyPI.
- <div class="dates" align="right">
-Created 15 Jun '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- PyPI is intended to be an index of metadata that is generated by distutils. I'm not sure I'm comfortable extending that scope to include actual code fragments. It would confuse the meta-data schema and user interfaces considerably.
-<br />
+        <p>
+            When I think about the concrete features, most of them could apply
+            to normal packages as well. So maybe this is just a generalization
+            of PyPI.
+        </p>
 
-<br />
-Having said that, PyPI now has a reasonable user database which could be useful to you. Code like the Trove handling could also be useful. I've always wanted some form of comment / rating system for packages too - and that'd be essential for a code fragment database.
-<br />
+        <div class="dates" align="right">
+            Created 15 Jun '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            PyPI is intended to be an index of metadata that is generated by
+            distutils. I'm not sure I'm comfortable extending that scope to
+            include actual code fragments. It would confuse the meta-data schema
+            and user interfaces considerably.
+            <br />
 
-<br />
-Finally, PyPI is bordering on being too large for the technologies it's built on; sqlite will need to be replaced by postgresql some time soon and the cgi.py-based web ui scales very poorly. Development such as you're proposing would push those technologies over the edge :)
- <div align="right"><a href="http://blog.ianbicking.org/comment165.html" rel="nofollow">#</a> <a href="http://www.mechanicalcat.net/richard/log">Richard Jones</a></div><hr noshade>
- Richard Jones:
-<br />
-"Finally, PyPI is bordering on being too large for the technologies it's built on; sqlite will need to be replaced by postgresql some time soon"
-<br />
+            <br />
+            Having said that, PyPI now has a reasonable user database which
+            could be useful to you. Code like the Trove handling could also be
+            useful. I've always wanted some form of comment / rating system for
+            packages too - and that'd be essential for a code fragment database.
+            <br />
 
-<br />
-Eh? Could you elaborate on what you mean? What exactly is too large for sqlite?
-<br />
+            <br />
+            Finally, PyPI is bordering on being too large for the technologies
+            it's built on; sqlite will need to be replaced by postgresql some
+            time soon and the cgi.py-based web ui scales very poorly.
+            Development such as you're proposing would push those technologies
+            over the edge :)
+            <div align="right">
+                <a href="https://ianbicking.org/comment165.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.mechanicalcat.net/richard/log"
+                    >Richard Jones</a
+                >
+            </div>
+            <hr noshade />
+            Richard Jones:
+            <br />
+            "Finally, PyPI is bordering on being too large for the technologies
+            it's built on; sqlite will need to be replaced by postgresql some
+            time soon"
+            <br />
 
-<br />
-From the sqlite FAQ:
-<br />
+            <br />
+            Eh? Could you elaborate on what you mean? What exactly is too large
+            for sqlite?
+            <br />
 
-<br />
-"(10) Are there any known size limits to SQLite databases?
-<br />
+            <br />
+            From the sqlite FAQ:
+            <br />
 
-<br />
-    As of version 2.7.4, SQLite can handle databases up to 2^41 bytes (2 terabytes) in size on both Windows and Unix. Older version of SQLite were limited to databases of 2^31 bytes (2 gigabytes).
-<br />
+            <br />
+            "(10) Are there any known size limits to SQLite databases?
+            <br />
 
-<br />
-    SQLite arbitrarily limits the amount of data in one row to 1 megabyte. There is a single #define in the source code that can be changed to raise this limit as high as 16 megabytes if desired.
-<br />
+            <br />
+            As of version 2.7.4, SQLite can handle databases up to 2^41 bytes (2
+            terabytes) in size on both Windows and Unix. Older version of SQLite
+            were limited to databases of 2^31 bytes (2 gigabytes).
+            <br />
 
-<br />
-    There is a theoretical limit of about 2^32 (4 billion) rows in a single table, but this limit has never been tested.
-<br />
-    There is also a theoretical limit of about 2^32 tables and indices.
-<br />
+            <br />
+            SQLite arbitrarily limits the amount of data in one row to 1
+            megabyte. There is a single #define in the source code that can be
+            changed to raise this limit as high as 16 megabytes if desired.
+            <br />
 
-<br />
-    The name and "CREATE TABLE" statement for a table must fit entirely within a 1-megabyte row of the SQLITE_MASTER table. Other than this, there are no constraints on the length of the name of a table, or on the number of columns, etc. Indices are similarly unconstrained.
-<br />
+            <br />
+            There is a theoretical limit of about 2^32 (4 billion) rows in a
+            single table, but this limit has never been tested.
+            <br />
+            There is also a theoretical limit of about 2^32 tables and indices.
+            <br />
 
-<br />
-    The names of tables, indices, view, triggers, and columns can be as long as desired. However, the names of SQL functions (as created by the sqlite_create_function() API) may not exceed 255 characters in length."
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment166.html" rel="nofollow">#</a> Don Wong</div><hr noshade>
- The "too large" is not disk space, but more related to the limits of it being a cgi app that opens the database each time. 
-<br />
+            <br />
+            The name and "CREATE TABLE" statement for a table must fit entirely
+            within a 1-megabyte row of the SQLITE_MASTER table. Other than this,
+            there are no constraints on the length of the name of a table, or on
+            the number of columns, etc. Indices are similarly unconstrained.
+            <br />
 
-<br />
-sqlite also only allows a single writer per database, and even that is less useful than it could be. If you have a writer and one or more readers on the same DB, and the writer tries to modify a table while a reader is reading from it, the writer will fail. 
-<br />
+            <br />
+            The names of tables, indices, view, triggers, and columns can be as
+            long as desired. However, the names of SQL functions (as created by
+            the sqlite_create_function() API) may not exceed 255 characters in
+            length."
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment166.html" rel="nofollow"
+                    >#</a
+                >
+                Don Wong
+            </div>
+            <hr noshade />
+            The "too large" is not disk space, but more related to the limits of
+            it being a cgi app that opens the database each time.
+            <br />
 
-<br />
-Don't get me wrong - sqlite is great for small single-user prototypes, and it's certainly much better as an SQL engine than *spit* mysql, but it doesn't scale in the way that PyPI needs. 
-<br />
+            <br />
+            sqlite also only allows a single writer per database, and even that
+            is less useful than it could be. If you have a writer and one or
+            more readers on the same DB, and the writer tries to modify a table
+            while a reader is reading from it, the writer will fail.
+            <br />
 
-<br />
-Unfortunately getting a PG instance up and running is subject to round tuit availability on the part of the relevant python.org folks.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment167.html" rel="nofollow">#</a> Anthony Baxter</div><hr noshade>
- Surely the code fragments could live somewhere else, and everyone could be encouraged to upload their packages/modules to that location and to specify it as the download URL in PyPI. Obviously, it would be nicer if one could upload the package using the PyPI interface, however.
-<br />
+            <br />
+            Don't get me wrong - sqlite is great for small single-user
+            prototypes, and it's certainly much better as an SQL engine than
+            *spit* mysql, but it doesn't scale in the way that PyPI needs.
+            <br />
 
-<br />
-And as for the comments and ratings systems, is something like <a href="http://www.kde-look.org/" target="_blank">http://www.kde-look.org/</a> of interest?
- <div align="right"><a href="http://blog.ianbicking.org/comment168.html" rel="nofollow">#</a> <a href="http://www.boddie.org.uk/paul/">Paul Boddie</a></div><hr noshade>
- Pretty much anyone with spare time and bandwidth allowance could step up to that, sure. Not hard. All you need to do is make available a small script which imports a module, runs some obvious function (<tt>__minidist__</tt>?) to get a dictionary containing a subset of the usual setup keywords but without the py_modules, and lobs it at the minidist site with an XML-RPC call. The minidist site can then register more extensively with PyPI and make the module available as an automatically stitched together zip or tarchive with an appropriately generated <tt>setup.py</tt>. Overall, not a bad weekend hack. If only I weren't moving house. :|
- <div align="right"><a href="http://blog.ianbicking.org/comment169.html" rel="nofollow">#</a> <a href="http://www.deadlybloodyserious.com/Python/">Garth T Kidd</a></div><hr noshade>
- Please note that this discussion has moved to the catalog-sig mailing list. Please join in there!
- <div align="right"><a href="http://blog.ianbicking.org/comment170.html" rel="nofollow">#</a> <a href="http://www.mechanicalcat.net/richard/log">Richard Jones</a></div><hr noshade>
- What about the vaults of Parnassus ?
-<br />
-It's maintained by hand  - but it has a good set of links to small modules of the sort mentioned by Ian. Only links though, no repository.
-<br />
+            <br />
+            Unfortunately getting a PG instance up and running is subject to
+            round tuit availability on the part of the relevant python.org
+            folks.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment167.html" rel="nofollow"
+                    >#</a
+                >
+                Anthony Baxter
+            </div>
+            <hr noshade />
+            Surely the code fragments could live somewhere else, and everyone
+            could be encouraged to upload their packages/modules to that
+            location and to specify it as the download URL in PyPI. Obviously,
+            it would be nicer if one could upload the package using the PyPI
+            interface, however.
+            <br />
 
-<br />
-Whats  the address of the catalog-sig ? I'd be willing to do some work on maintaining... be nice to put something back ?
- <div align="right"><a href="http://blog.ianbicking.org/comment171.html" rel="nofollow">#</a> <a href="http://www.voidspace.org.uk/atlantibots/pythonutils.html">Fuzzyman</a></div><hr noshade>
- The Vaults are almost identical in scope to PyPI, which reduces the value of both of them.  For catalog-sig: <a href="http://www.python.org/sigs/catalog-sig/" target="_blank">http://www.python.org/sigs/catalog-sig/</a>
- <div align="right"><a href="http://blog.ianbicking.org/comment172.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <br />
+            And as for the comments and ratings systems, is something like
+            <a href="http://www.kde-look.org/" target="_blank"
+                >http://www.kde-look.org/</a
+            >
+            of interest?
+            <div align="right">
+                <a href="https://ianbicking.org/comment168.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.boddie.org.uk/paul/">Paul Boddie</a>
+            </div>
+            <hr noshade />
+            Pretty much anyone with spare time and bandwidth allowance could
+            step up to that, sure. Not hard. All you need to do is make
+            available a small script which imports a module, runs some obvious
+            function (<tt>__minidist__</tt>?) to get a dictionary containing a
+            subset of the usual setup keywords but without the py_modules, and
+            lobs it at the minidist site with an XML-RPC call. The minidist site
+            can then register more extensively with PyPI and make the module
+            available as an automatically stitched together zip or tarchive with
+            an appropriately generated <tt>setup.py</tt>. Overall, not a bad
+            weekend hack. If only I weren't moving house. :|
+            <div align="right">
+                <a href="https://ianbicking.org/comment169.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.deadlybloodyserious.com/Python/"
+                    >Garth T Kidd</a
+                >
+            </div>
+            <hr noshade />
+            Please note that this discussion has moved to the catalog-sig
+            mailing list. Please join in there!
+            <div align="right">
+                <a href="https://ianbicking.org/comment170.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.mechanicalcat.net/richard/log"
+                    >Richard Jones</a
+                >
+            </div>
+            <hr noshade />
+            What about the vaults of Parnassus ?
+            <br />
+            It's maintained by hand - but it has a good set of links to small
+            modules of the sort mentioned by Ian. Only links though, no
+            repository.
+            <br />
+
+            <br />
+            Whats the address of the catalog-sig ? I'd be willing to do some
+            work on maintaining... be nice to put something back ?
+            <div align="right">
+                <a href="https://ianbicking.org/comment171.html" rel="nofollow"
+                    >#</a
+                >
+                <a
+                    href="http://www.voidspace.org.uk/atlantibots/pythonutils.html"
+                    >Fuzzyman</a
+                >
+            </div>
+            <hr noshade />
+            The Vaults are almost identical in scope to PyPI, which reduces the
+            value of both of them. For catalog-sig:
+            <a href="http://www.python.org/sigs/catalog-sig/" target="_blank"
+                >http://www.python.org/sigs/catalog-sig/</a
+            >
+            <div align="right">
+                <a href="https://ianbicking.org/comment172.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

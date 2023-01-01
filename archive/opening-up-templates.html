@@ -1,152 +1,338 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Opening up templates</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Opening up templates</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Opening up templates</h1>
 
-<div style="float: right">
-
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Opening up templates</h1>
- 
-<div class="document">
-<p>I'm excited to see <a class="reference" href="http://www.blueskyonmars.com/2006/01/06/template-plugins-for-everyone/">Kevin's work on template plugins</a>,
-and that the TurboGears plugin system is fully extracted into a
-generic plugin for templates.  I think this will be an easy ad hoc
-standard to start supporting elsewhere.  It should encompass all the
-&quot;normal&quot; templating languages that just take a bunch of variables
-(something like <a class="reference" href="http://www.plope.com/software/meld3/">meld3</a>
-probably won't work with this, though).  I doubt code can be very well
-neutral with respect to the template language it is feeding.  Kid and
-Cheetah can have arbitrary Python to munge the data in them.  ZPT can
-have Python expressions, but not statements or functions.  Django and
-ClearSilver need data structures that require very little processing
-in the template, as they don't have generic expressions at all.  So
-you can't exactly be neutral.  But still this is an important step
-forward.</p>
-<p>One of the big issues in making <a class="reference" href="little-apps-instead-of-little-frameworks.html">little apps</a>
-is how to make them fit into a larger site.  It's mostly fine if the
-internals of the pages are written by different templating languages.
-Standard conventions for CSS classes would be a tremendous boon, but a
-little sloppiness isn't that big a deal.  But you still need an
-application that is well-wrapped in some template for your site.  Each
-application may have a way to give a site template, but if they are
-all using different templating languages that means a lot of
-duplication.  (And even if they are using the same templating
-language, some standard way to override templates is still needed, or
-else you have a mess of things to manage).</p>
-<p>So... what to do...</p>
-<p>I like HTTP, so I naturally go that direction for interoperability.
-<a class="reference" href="http://httpd.apache.org/docs/1.3/mod/mod_include.html">Server-side includes</a> provide a
-simple, relatively language-neutral way to handle templating.  But
-they work textually, not based on markup, and there's lots of issues
-with the typical implementations.  XSL applies well here, of course.
-I haven't used XSL for years, but my brief experiments with it left me
-so disheartened I simply can't imagine it being useful for templating.</p>
-<p>But more primitive templating is quite possible.  One of the
-interesting ideas I've seen (and I'm sure there's others -- if you
-have one, then do comment) is <a class="reference" href="http://disruptive-innovations.com/zoo/20040830/HTMLoverlays.html">HTML overlays</a>.
-This can be implemented on the client-side in Javascript, but of
-course it could be implemented as a filter easily enough as well.</p>
-<p>Then applications would each take a site_template configuration
-parameter, and maybe a Javascript parameter if client-side overlays
-were going to be used (presumably any filter would simply notice the
-overlay and implement it).  Then the application would put this in the
-head:</p>
-<pre class="literal-block">
+        <div class="document">
+            <p>
+                I'm excited to see
+                <a
+                    class="reference"
+                    href="http://www.blueskyonmars.com/2006/01/06/template-plugins-for-everyone/"
+                    >Kevin's work on template plugins</a
+                >, and that the TurboGears plugin system is fully extracted into
+                a generic plugin for templates. I think this will be an easy ad
+                hoc standard to start supporting elsewhere. It should encompass
+                all the &quot;normal&quot; templating languages that just take a
+                bunch of variables (something like
+                <a class="reference" href="http://www.plope.com/software/meld3/"
+                    >meld3</a
+                >
+                probably won't work with this, though). I doubt code can be very
+                well neutral with respect to the template language it is
+                feeding. Kid and Cheetah can have arbitrary Python to munge the
+                data in them. ZPT can have Python expressions, but not
+                statements or functions. Django and ClearSilver need data
+                structures that require very little processing in the template,
+                as they don't have generic expressions at all. So you can't
+                exactly be neutral. But still this is an important step forward.
+            </p>
+            <p>
+                One of the big issues in making
+                <a
+                    class="reference"
+                    href="little-apps-instead-of-little-frameworks.html"
+                    >little apps</a
+                >
+                is how to make them fit into a larger site. It's mostly fine if
+                the internals of the pages are written by different templating
+                languages. Standard conventions for CSS classes would be a
+                tremendous boon, but a little sloppiness isn't that big a deal.
+                But you still need an application that is well-wrapped in some
+                template for your site. Each application may have a way to give
+                a site template, but if they are all using different templating
+                languages that means a lot of duplication. (And even if they are
+                using the same templating language, some standard way to
+                override templates is still needed, or else you have a mess of
+                things to manage).
+            </p>
+            <p>So... what to do...</p>
+            <p>
+                I like HTTP, so I naturally go that direction for
+                interoperability.
+                <a
+                    class="reference"
+                    href="http://httpd.apache.org/docs/1.3/mod/mod_include.html"
+                    >Server-side includes</a
+                >
+                provide a simple, relatively language-neutral way to handle
+                templating. But they work textually, not based on markup, and
+                there's lots of issues with the typical implementations. XSL
+                applies well here, of course. I haven't used XSL for years, but
+                my brief experiments with it left me so disheartened I simply
+                can't imagine it being useful for templating.
+            </p>
+            <p>
+                But more primitive templating is quite possible. One of the
+                interesting ideas I've seen (and I'm sure there's others -- if
+                you have one, then do comment) is
+                <a
+                    class="reference"
+                    href="http://disruptive-innovations.com/zoo/20040830/HTMLoverlays.html"
+                    >HTML overlays</a
+                >. This can be implemented on the client-side in Javascript, but
+                of course it could be implemented as a filter easily enough as
+                well.
+            </p>
+            <p>
+                Then applications would each take a site_template configuration
+                parameter, and maybe a Javascript parameter if client-side
+                overlays were going to be used (presumably any filter would
+                simply notice the overlay and implement it). Then the
+                application would put this in the head:
+            </p>
+            <pre class="literal-block">
 &lt;link rel=&quot;overlay&quot; type=&quot;text/x-im-not-sure&quot;
  href=&quot;/configured-template-location&quot; /&gt;
-</pre>
-<p>Actually I now think the type should be configurable too, allowing for
-other kinds of templates than just this implementation of overlays.  Also
-overlays don't seem to have a way to pull in content, they only allow content
-to be pushed into them.</p>
-<p>Obviously the Javascript can be applied to any site.  A server-side
-filter could also be easily(ish) written in C as an Apache filter, or
-as libraries in a variety of frameworks and languages.</p>
-</div>
- <div class="dates" align="right">
-Created 07 Jan '06</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>FYI. In respect of filters in Apache, there is an intention of making some improvements to mod_python's support of filters and also its interaction with mod_include (SSI) filter module.</p>
-<blockquote>
-<p><a class="reference" href="http://issues.apache.org/jira/browse/MODPYTHON-103">http://issues.apache.org/jira/browse/MODPYTHON-103</a></p>
-<p><a class="reference" href="http://issues.apache.org/jira/browse/MODPYTHON-104">http://issues.apache.org/jira/browse/MODPYTHON-104</a></p>
-</blockquote>
-<p>In terms of server side includes, the intention is to allow Python code to be usable within a file passed through mod_include, much like how it can already be done with mod_perl. This would be more efficient than the current need to use &quot;include virtual&quot;.</p>
-<p>One could also explore whether a means could be provided of allowing whole new element tags to be defined where the callouts are implemented and processed within the context of mod_python.</p>
-<p>From what I have seen at the moment, people using mod_python don't tend to use filters much at all. This is possibly partly because of mod_python's inability to dynamically register filters, or more likely because there isn't a good appreciation of how Apache filters could be used. But then, at the moment, some parts of mod_python don't even play nice with predefined filters like CONTENT_LENGTH.</p>
-<blockquote>
-<a class="reference" href="http://issues.apache.org/jira/browse/MODPYTHON-107">http://issues.apache.org/jira/browse/MODPYTHON-107</a></blockquote>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/opening-up-templates-comment-1.html" rel="nofollow">#</a> <a href="http://www.dscpl.com.au">Graham Dumpleton</a></div><hr noshade>
- 
-<div class="document">
-<p>Hi Ian,</p>
-<p>Long time reader, first time poster (now I feel like I'm on  radio call in show).</p>
-<p>I agree that app developer can't really remain neutral as far as templating engines are concerned.  However, toolkits and frameworks, like <a class="reference" href="http://www.cherrypy.org">CherryPy</a> and <a class="reference" href="http://www.turbogears.org">TurboGears</a>, that want to intentionally remain neutral (or at least flexible) as far as templating languages go really stand to benefit from this plugin system.  Plus, since there are so many &quot;normal&quot; templating languages, it is handy to have a common means of getting at their functionality.  Since we've got a bazillion template languages in Python, we might as well put them to good use ;-)</p>
-<p>Christian</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/opening-up-templates-comment-2.html" rel="nofollow">#</a> <a href="http://www.dowski.com">Christian Wyglendowski</a></div><hr noshade>
- 
-<div class="document">
-<p>Actually, I use XSLT for all my templating needs, and I love it. It's a standard, and it makes sure that there's also nice XML which I can use for other purposed or interesting REST-style interaction, and it forces me to keep the code and the templates very strictly separated.</p>
-<p>See also <a class="reference" href="http://manuzhai.nl/weblog/comments/the-power-of-xslt/">http://manuzhai.nl/weblog/comments/the-power-of-xslt/</a></p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/opening-up-templates-comment-3.html" rel="nofollow">#</a> <a href="http://manuzhai.nl/weblog/">Manuzhai</a></div><hr noshade>
- 
-<div class="document">
-<p>I'll add another vote for using xslt for server-side and client-side templating.</p>
-<p>Though I recognize that it's not for everyone. To that end, I've been working on generating xsl templates
-using a ZPT like syntax.</p>
-<p>I'll say &quot;ZPT like&quot; because there are some extensions that aren't available in ZPT.</p>
-<p>I don't have anything to release yet, but it's an extension of the bitflux stuff</p>
-<p><a class="reference" href="http://wiki.bitflux.org/Templates_TAL_Example">http://wiki.bitflux.org/Templates_TAL_Example</a></p>
-<p>I have metal working, but it's a two step process to &quot;compile&quot; a set of .zpt files into an .xsl file.</p>
-<p>The resulting .xsl file is then used on the server-side to render the html, or sent to the client so it can
-do it's own rendering. I use a Paste filter to generate .xsl files in-the-fly and cache them. And, another
-Paste filter to sniff client capabilities and determine if .xsl should be sent back to the client,
-or wether transformation should be done on the server.</p>
-<p>I look at client-side XSLT rendering as very important. In a way, it can be a form of edge-side includes
-(ESI)  <a class="reference" href="http://www.esi.org/">http://www.esi.org/</a></p>
-<p>This is done through the use of the document() xslt function on the client. For
-example, this fragment uses a relative path to retrieve an XML document from
-the server and set it's root element in a variable:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>
+                Actually I now think the type should be configurable too,
+                allowing for other kinds of templates than just this
+                implementation of overlays. Also overlays don't seem to have a
+                way to pull in content, they only allow content to be pushed
+                into them.
+            </p>
+            <p>
+                Obviously the Javascript can be applied to any site. A
+                server-side filter could also be easily(ish) written in C as an
+                Apache filter, or as libraries in a variety of frameworks and
+                languages.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 07 Jan '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    FYI. In respect of filters in Apache, there is an intention
+                    of making some improvements to mod_python's support of
+                    filters and also its interaction with mod_include (SSI)
+                    filter module.
+                </p>
+                <blockquote>
+                    <p>
+                        <a
+                            class="reference"
+                            href="http://issues.apache.org/jira/browse/MODPYTHON-103"
+                            >http://issues.apache.org/jira/browse/MODPYTHON-103</a
+                        >
+                    </p>
+                    <p>
+                        <a
+                            class="reference"
+                            href="http://issues.apache.org/jira/browse/MODPYTHON-104"
+                            >http://issues.apache.org/jira/browse/MODPYTHON-104</a
+                        >
+                    </p>
+                </blockquote>
+                <p>
+                    In terms of server side includes, the intention is to allow
+                    Python code to be usable within a file passed through
+                    mod_include, much like how it can already be done with
+                    mod_perl. This would be more efficient than the current need
+                    to use &quot;include virtual&quot;.
+                </p>
+                <p>
+                    One could also explore whether a means could be provided of
+                    allowing whole new element tags to be defined where the
+                    callouts are implemented and processed within the context of
+                    mod_python.
+                </p>
+                <p>
+                    From what I have seen at the moment, people using mod_python
+                    don't tend to use filters much at all. This is possibly
+                    partly because of mod_python's inability to dynamically
+                    register filters, or more likely because there isn't a good
+                    appreciation of how Apache filters could be used. But then,
+                    at the moment, some parts of mod_python don't even play nice
+                    with predefined filters like CONTENT_LENGTH.
+                </p>
+                <blockquote>
+                    <a
+                        class="reference"
+                        href="http://issues.apache.org/jira/browse/MODPYTHON-107"
+                        >http://issues.apache.org/jira/browse/MODPYTHON-107</a
+                    >
+                </blockquote>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/opening-up-templates-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.dscpl.com.au">Graham Dumpleton</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>Hi Ian,</p>
+                <p>
+                    Long time reader, first time poster (now I feel like I'm on
+                    radio call in show).
+                </p>
+                <p>
+                    I agree that app developer can't really remain neutral as
+                    far as templating engines are concerned. However, toolkits
+                    and frameworks, like
+                    <a class="reference" href="http://www.cherrypy.org"
+                        >CherryPy</a
+                    >
+                    and
+                    <a class="reference" href="http://www.turbogears.org"
+                        >TurboGears</a
+                    >, that want to intentionally remain neutral (or at least
+                    flexible) as far as templating languages go really stand to
+                    benefit from this plugin system. Plus, since there are so
+                    many &quot;normal&quot; templating languages, it is handy to
+                    have a common means of getting at their functionality. Since
+                    we've got a bazillion template languages in Python, we might
+                    as well put them to good use ;-)
+                </p>
+                <p>Christian</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/opening-up-templates-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.dowski.com">Christian Wyglendowski</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Actually, I use XSLT for all my templating needs, and I love
+                    it. It's a standard, and it makes sure that there's also
+                    nice XML which I can use for other purposed or interesting
+                    REST-style interaction, and it forces me to keep the code
+                    and the templates very strictly separated.
+                </p>
+                <p>
+                    See also
+                    <a
+                        class="reference"
+                        href="http://manuzhai.nl/weblog/comments/the-power-of-xslt/"
+                        >http://manuzhai.nl/weblog/comments/the-power-of-xslt/</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/opening-up-templates-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://manuzhai.nl/weblog/">Manuzhai</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I'll add another vote for using xslt for server-side and
+                    client-side templating.
+                </p>
+                <p>
+                    Though I recognize that it's not for everyone. To that end,
+                    I've been working on generating xsl templates using a ZPT
+                    like syntax.
+                </p>
+                <p>
+                    I'll say &quot;ZPT like&quot; because there are some
+                    extensions that aren't available in ZPT.
+                </p>
+                <p>
+                    I don't have anything to release yet, but it's an extension
+                    of the bitflux stuff
+                </p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://wiki.bitflux.org/Templates_TAL_Example"
+                        >http://wiki.bitflux.org/Templates_TAL_Example</a
+                    >
+                </p>
+                <p>
+                    I have metal working, but it's a two step process to
+                    &quot;compile&quot; a set of .zpt files into an .xsl file.
+                </p>
+                <p>
+                    The resulting .xsl file is then used on the server-side to
+                    render the html, or sent to the client so it can do it's own
+                    rendering. I use a Paste filter to generate .xsl files
+                    in-the-fly and cache them. And, another Paste filter to
+                    sniff client capabilities and determine if .xsl should be
+                    sent back to the client, or wether transformation should be
+                    done on the server.
+                </p>
+                <p>
+                    I look at client-side XSLT rendering as very important. In a
+                    way, it can be a form of edge-side includes (ESI)
+                    <a class="reference" href="http://www.esi.org/"
+                        >http://www.esi.org/</a
+                    >
+                </p>
+                <p>
+                    This is done through the use of the document() xslt function
+                    on the client. For example, this fragment uses a relative
+                    path to retrieve an XML document from the server and set
+                    it's root element in a variable:
+                </p>
+                <pre class="literal-block">
 &lt;div tal:define=&quot;order document(concat('/orders/', $order_number, '.xml'))/ROOT)&quot;&gt;
-</pre>
-<p>Regarding context.. XSL expects XML as input, so the context is passed to the template as XML. So,
-it must be pre-rendered that way by the web request handler. The downside of course is that the templating
-engine cannot call python objects for dynamic rendering. The upside to that is that anything 
-rendered dynamically this way probably should be exposed using a REST style interface. Then 
-that data can be retrieved by the client directly, not just rendered on the server (as the 
-above example shows).</p>
-<p>Here's an example fragment of a tal:repeat traversing the first 24 elements of an invoice:</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    Regarding context.. XSL expects XML as input, so the context
+                    is passed to the template as XML. So, it must be
+                    pre-rendered that way by the web request handler. The
+                    downside of course is that the templating engine cannot call
+                    python objects for dynamic rendering. The upside to that is
+                    that anything rendered dynamically this way probably should
+                    be exposed using a REST style interface. Then that data can
+                    be retrieved by the client directly, not just rendered on
+                    the server (as the above example shows).
+                </p>
+                <p>
+                    Here's an example fragment of a tal:repeat traversing the
+                    first 24 elements of an invoice:
+                </p>
+                <pre class="literal-block">
 &lt;tr tal:repeat=&quot;li $order/OE0500[24 &gt; position()]&quot; tal:sort=&quot;PICSEQ ascending&quot;
         tal:attributes=&quot;class concat('R',position() mod 2)&quot;&gt;
         &lt;td tal:content=&quot;$li/ITEM&quot; /&gt;
@@ -155,52 +341,88 @@ above example shows).</p>
         &lt;td tal:content=&quot;$li/QTYORDERED&quot; /&gt;
         &lt;td&gt;&lt;div class=&quot;button&quot;&gt;BO&lt;/div&gt;&lt;/td&gt;
 &lt;/tr&gt;
-</pre>
-<p>And here's the example fragment of resulting .xsl (copied out of IE so not well formatted):</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    And here's the example fragment of resulting .xsl (copied
+                    out of IE so not well formatted):
+                </p>
+                <pre class="literal-block">
 &lt;xslout:for-each select=&quot;$order/OE0500[24 &gt; position()]&quot;&gt;
-    &lt;xslout:sort select=&quot;PICSEQ&quot; order=&quot;ascending&quot; /&gt; 
-    &lt;xslout:variable name=&quot;li&quot; select=&quot;.&quot; /&gt; 
+    &lt;xslout:sort select=&quot;PICSEQ&quot; order=&quot;ascending&quot; /&gt;
+    &lt;xslout:variable name=&quot;li&quot; select=&quot;.&quot; /&gt;
     &lt;tr&gt;
         &lt;xslout:attribute name=&quot;class&quot;&gt;
-        &lt;xslout:value-of select=&quot;concat('R',position() mod 2)&quot; /&gt; 
+        &lt;xslout:value-of select=&quot;concat('R',position() mod 2)&quot; /&gt;
         &lt;/xslout:attribute&gt;
         &lt;td&gt;
-        &lt;xslout:value-of select=&quot;$li/ITEM&quot; /&gt; 
+        &lt;xslout:value-of select=&quot;$li/ITEM&quot; /&gt;
         &lt;/td&gt;
         &lt;td&gt;
-        &lt;xslout:value-of select=&quot;$li/LINENUM&quot; /&gt; 
+        &lt;xslout:value-of select=&quot;$li/LINENUM&quot; /&gt;
         &lt;/td&gt;
         &lt;td&gt;
-        &lt;xslout:value-of select=&quot;$li/DESC&quot; /&gt; 
+        &lt;xslout:value-of select=&quot;$li/DESC&quot; /&gt;
         &lt;/td&gt;
         &lt;td&gt;
-        &lt;xslout:value-of select=&quot;$li/QTYORDERED&quot; /&gt; 
+        &lt;xslout:value-of select=&quot;$li/QTYORDERED&quot; /&gt;
         &lt;/td&gt;
         &lt;td&gt;
-        &lt;div class=&quot;button&quot;&gt;BO&lt;/div&gt; 
+        &lt;div class=&quot;button&quot;&gt;BO&lt;/div&gt;
         &lt;/td&gt;
     &lt;/tr&gt;
 &lt;/xslout:for-each&gt;
-</pre>
-<p>The 'li' placeholder variable is not necessary, but that's what the bitflux guys 
-came up with, so I stuck with it.</p>
-<p>This thing diverges from ZPT in a number of ways (like a sort option for tal:repeat).</p>
-<p>Also, there's a way of creating &quot;macros&quot; that can receive arguments. That is,
-something like metal:define, but it doesn't repeat the macro contents in the output
-file. It's more for defining xsl templates.</p>
-<p>So, I guess it's a frankenstein templating language. I still need to integrate with existing
-.xsl files (via xsl:includes or imports), but I like the ease of ZPT.</p>
-<p>I should spend more time working on it so I can get some feedback. It's definately a niche thing.</p>
-<p>However I still think for my clients, XSLT and XML is just too handy to pass up.</p>
-<p>I can take &quot;client-side&quot; .xsl scraps and re-use them in Apache FOP.. its great.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/opening-up-templates-comment-4.html" rel="nofollow">#</a> Brad Clements</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                >
+                <p>
+                    The 'li' placeholder variable is not necessary, but that's
+                    what the bitflux guys came up with, so I stuck with it.
+                </p>
+                <p>
+                    This thing diverges from ZPT in a number of ways (like a
+                    sort option for tal:repeat).
+                </p>
+                <p>
+                    Also, there's a way of creating &quot;macros&quot; that can
+                    receive arguments. That is, something like metal:define, but
+                    it doesn't repeat the macro contents in the output file.
+                    It's more for defining xsl templates.
+                </p>
+                <p>
+                    So, I guess it's a frankenstein templating language. I still
+                    need to integrate with existing .xsl files (via xsl:includes
+                    or imports), but I like the ease of ZPT.
+                </p>
+                <p>
+                    I should spend more time working on it so I can get some
+                    feedback. It's definately a niche thing.
+                </p>
+                <p>
+                    However I still think for my clients, XSLT and XML is just
+                    too handy to pass up.
+                </p>
+                <p>
+                    I can take &quot;client-side&quot; .xsl scraps and re-use
+                    them in Apache FOP.. its great.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/opening-up-templates-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Brad Clements
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

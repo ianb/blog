@@ -1,361 +1,1116 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Zope 3 Critique</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Zope 3 Critique</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Zope 3 Critique</h1>
 
-<div style="float: right">
-
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Zope 3 Critique</h1>
- 
-<div class="document">
-<p>(If you don't care about Zope, you can probably skip this entire
-post.)</p>
-<p>There was a small bit of controversy in the Zope community a while
-back when <a class="reference" href="http://www.nuxeo.com/en/">Nuxeo</a> announced they were
-switching from Zope and Python to Java.  Nuxeo has been using Zope for
-a long time, and has been an active part of that community, so this
-was a fairly major defection.  Jean-Marc Orliaguet wrote a
-<a class="reference" href="http://www.z3lab.org/sections/blogs/jean-marc-orliaguet/2006_09_23_times-they-changin">critique of Zope</a>
-which is notable because of how familiar he is with Zope from a
-technical view, and because as an active member of the community he is somewhat invested in the choices Zope
-has made.  It doesn't read like a condemnation to me, just a critique,
-though I think <a class="reference" href="http://faassen.n--tree.net/blog/view/weblog/2006/09/24/0">some people felt otherwise</a>. (<strong>correction</strong>: I had previously
-said that Jean-Marc was associated with Nuxeo, which he isn't)</p>
-<p>I don't know Zope that well, though Plone is core to <a class="reference" href="http://openplans.org">TOPP</a> and so I've been getting a lot more exposure
-to that environment.  I've also been at least aware of many of the
-techniques they're using, though not how those work in practice
-(having not practiced them), so Jean-Marc's critique was very
-interesting to me.  And it echos some of what I've been thinking.</p>
-<div class="section">
-<h1><a id="the-importance-of-the-ide" name="the-importance-of-the-ide">1) The importance of the IDE</a></h1>
-<p>This is a <a class="reference" href="http://osteele.com/archives/2004/11/ides">long-standing conflict</a>, and I don't have
-anything to add to it.</p>
-</div>
-<div class="section">
-<h1><a id="the-importance-of-stable-apis" name="the-importance-of-stable-apis">2) The importance of stable APIs</a></h1>
-<p>This is a tricky one.  Every project has to deal with this, and many
-projects deal with it poorly.  Part of Jean-Marc's argument here is
-that Java makes it very clear what is public and what is not, and what
-is allowed for and what is not, and so at least it makes it very clear
-what should be stable and what doesn't need to be stable.  I think
-this is a valid criticism.</p>
-<p>But Zope 3 is actually really good here because of their use of
-interfaces.  They are pretty clear about what methods are required,
-what methods are public.  I wish Python had some better conventions
-around this in general (mostly in terms of documentation), but
-interfaces are pretty decent.</p>
-<p>I'm not a fan of adaptation (more about that later), but I'd like to
-use interfaces more.  I use them here and there, but just in the
-abstract as documentation.  Unfortunately, documentation tools don't
-understand my interfaces.  I don't have a way to declare what
-interfaces something implements.  All sorts of other things.  I wish
-<tt class="docutils literal"><span class="pre">zope.interfaces</span></tt> was a bit lighter, though maybe it is light
-enough.  I actually want language-level support, so everyone could
-agree on the contentions and build tools around that.</p>
-<p>That said, using <a class="reference" href="http://codespeak.net/z3/five/">Five</a> I find the
-stream of deprecation warnings over the top.</p>
-</div>
-<div class="section">
-<h1><a id="the-importance-of-standards" name="the-importance-of-standards">3) The importance of standards</a></h1>
-<p>Here Jean-Marc argues that there's lots of code under the <tt class="docutils literal"><span class="pre">zope</span></tt>
-namespace that doesn't belong there.  It's not stable enough, or its
-APIs aren't stable enough, or its design or architecture is not widely
-enough applicable or agreed upon.</p>
-<p>I personally don't care much about namespaces.  Is <tt class="docutils literal"><span class="pre">zope.formlib</span></tt>
-any more &quot;right&quot; than <tt class="docutils literal"><span class="pre">zope_formlib</span></tt>?  Is it any more hierarchical?
-I don't think so.  I have <a class="reference" href="http://pythonpaste.org">one namespace package</a>, but it's
-kind of a historical accident.  I wouldn't (and don't) put any more
-libraries under that namespace.  Each library should stand on its own,
-so why create these hierarchies?  People read too much into those namespaces,
-which is happening right here.</p>
-<p>As for standards, I agree this is important.  In some way adaptation
-(uh, still more on that later) is a way of sidestepping standards.  I
-think in general Python needs more standard building.  Maybe that's
-true for Zope too, or maybe those standards should be inclusive of the
-wider Python world that includes Zope.</p>
-</div>
-<div class="section">
-<h1><a id="the-design-patterns" name="the-design-patterns">4) The Design Patterns</a></h1>
-<p>In the abstract, this is about patterns being unnecessarily built into
-the environment.  Relatedly: <a class="reference" href="http://newbabe.pobox.com/~mjd/blog/prog/design-patterns.html">this post argues they should be in the
-language</a> while
-<a class="reference" href="http://www.cincomsmalltalk.com/userblogs/ralph/blogView?entry=3335803396">this reaction says the opposite</a>
--- I actually agree with the first post, but in this case agree with
-Jean-Marc and the second post.  I guess I am inconsistent.</p>
-<p>But what Jean-Marc actually talks about is specifically adapters and
-the Zope component architecture.</p>
-<p>Adaptation is a useful pattern for dealing with API changes.  When you
-have two <a class="reference" href="http://en.wikipedia.org/wiki/Isomorphic">isomorphic</a> but
-incompatible objects, adaptation works great.  This happens when
-there's little API differences (e.g., <tt class="docutils literal"><span class="pre">mixedCase</span></tt> vs
-<tt class="docutils literal"><span class="pre">underscore_seperated</span></tt>).  It starts to become a bit of a stretch at
-other times.  And Zope 3 goes absolutely nuts with this, implementing
-all sorts of other patterns phrased as adaptation.  This is complex
-and powerful, but in the bad way.</p>
-<p>From this, I've seen one-off interfaces that define no methods;
-interfaces that are just names; adaptation that works on multiple
-objects; adaptation that works on no object at all (adapting the
-ether); adaptation in place of attributes... it takes a nice but small
-idea and just keeps using it and using it until it's worn out and
-confused.</p>
-<p>I could go into specifics, but it might not mean much to lots of you,
-and I'd probably get the specifics wrong.  If it quacks like a duck
-it's probably a duck.  Lots of uses of adaptation don't quack; I don't
-know <em>what</em> they all are, but they aren't ducks.</p>
-</div>
-<div class="section">
-<h1><a id="the-component-architecture" name="the-component-architecture">5) The Component Architecture</a></h1>
-<p>This is kind about plugins.  A lot of the Zope component architecture
-is about plugins.  It's fairly fine-grained; moreso than I think it
-needs to be.  It's declarative, but with too many declarations.</p>
-<p>I think <a class="reference" href="http://peak.telecommunity.com/DevCenter/setuptools#extensible-applications-and-frameworks">Setuptools' entry points</a>
-solve a number of similar goals, but in a simpler way.  There's still
-some issues that aren't well solved in either system (actually some of
-the exact same issues, like plugin activation), but I think
-Setuptools at least doesn't solve those problems in a simpler way.</p>
-</div>
-<div class="section">
-<h1><a id="zcml-is-not-xml" name="zcml-is-not-xml">6) ZCML is not XML</a></h1>
-<p>To correct Jean-Marc: ZCML is XML.  Maybe his real problem is that
-ZCML is fairly flat (maybe a bit too much like <a class="reference" href="http://en.wikipedia.org/wiki/Resource_Description_Framework">rdf</a>).
-It's neither a nice syntax (it is after all XML), nor is it a compact
-XML language.</p>
-<p>But the Zope people know about this problem already.  I don't think
-they are entirely sure how to fix it (maybe entry points will help),
-but I think everyone agrees it needs fixing.</p>
-<p>I guess the larger issue is that it's nice to declare things in Python code,
-but that only works if you import the Python code.  So if you have something
-like an adapter sitting in some code, the system won't know that an adapter
-<em>could be</em> available if only it imported that code.  An entry point version of this
-might be like:</p>
-<pre class="literal-block">
+        <div class="document">
+            <p>
+                (If you don't care about Zope, you can probably skip this entire
+                post.)
+            </p>
+            <p>
+                There was a small bit of controversy in the Zope community a
+                while back when
+                <a class="reference" href="http://www.nuxeo.com/en/">Nuxeo</a>
+                announced they were switching from Zope and Python to Java.
+                Nuxeo has been using Zope for a long time, and has been an
+                active part of that community, so this was a fairly major
+                defection. Jean-Marc Orliaguet wrote a
+                <a
+                    class="reference"
+                    href="http://www.z3lab.org/sections/blogs/jean-marc-orliaguet/2006_09_23_times-they-changin"
+                    >critique of Zope</a
+                >
+                which is notable because of how familiar he is with Zope from a
+                technical view, and because as an active member of the community
+                he is somewhat invested in the choices Zope has made. It doesn't
+                read like a condemnation to me, just a critique, though I think
+                <a
+                    class="reference"
+                    href="http://faassen.n--tree.net/blog/view/weblog/2006/09/24/0"
+                    >some people felt otherwise</a
+                >. (<strong>correction</strong>: I had previously said that
+                Jean-Marc was associated with Nuxeo, which he isn't)
+            </p>
+            <p>
+                I don't know Zope that well, though Plone is core to
+                <a class="reference" href="http://openplans.org">TOPP</a> and so
+                I've been getting a lot more exposure to that environment. I've
+                also been at least aware of many of the techniques they're
+                using, though not how those work in practice (having not
+                practiced them), so Jean-Marc's critique was very interesting to
+                me. And it echos some of what I've been thinking.
+            </p>
+            <div class="section">
+                <h1>
+                    <a
+                        id="the-importance-of-the-ide"
+                        name="the-importance-of-the-ide"
+                        >1) The importance of the IDE</a
+                    >
+                </h1>
+                <p>
+                    This is a
+                    <a
+                        class="reference"
+                        href="http://osteele.com/archives/2004/11/ides"
+                        >long-standing conflict</a
+                    >, and I don't have anything to add to it.
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a
+                        id="the-importance-of-stable-apis"
+                        name="the-importance-of-stable-apis"
+                        >2) The importance of stable APIs</a
+                    >
+                </h1>
+                <p>
+                    This is a tricky one. Every project has to deal with this,
+                    and many projects deal with it poorly. Part of Jean-Marc's
+                    argument here is that Java makes it very clear what is
+                    public and what is not, and what is allowed for and what is
+                    not, and so at least it makes it very clear what should be
+                    stable and what doesn't need to be stable. I think this is a
+                    valid criticism.
+                </p>
+                <p>
+                    But Zope 3 is actually really good here because of their use
+                    of interfaces. They are pretty clear about what methods are
+                    required, what methods are public. I wish Python had some
+                    better conventions around this in general (mostly in terms
+                    of documentation), but interfaces are pretty decent.
+                </p>
+                <p>
+                    I'm not a fan of adaptation (more about that later), but I'd
+                    like to use interfaces more. I use them here and there, but
+                    just in the abstract as documentation. Unfortunately,
+                    documentation tools don't understand my interfaces. I don't
+                    have a way to declare what interfaces something implements.
+                    All sorts of other things. I wish
+                    <tt class="docutils literal"
+                        ><span class="pre">zope.interfaces</span></tt
+                    >
+                    was a bit lighter, though maybe it is light enough. I
+                    actually want language-level support, so everyone could
+                    agree on the contentions and build tools around that.
+                </p>
+                <p>
+                    That said, using
+                    <a class="reference" href="http://codespeak.net/z3/five/"
+                        >Five</a
+                    >
+                    I find the stream of deprecation warnings over the top.
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a
+                        id="the-importance-of-standards"
+                        name="the-importance-of-standards"
+                        >3) The importance of standards</a
+                    >
+                </h1>
+                <p>
+                    Here Jean-Marc argues that there's lots of code under the
+                    <tt class="docutils literal"
+                        ><span class="pre">zope</span></tt
+                    >
+                    namespace that doesn't belong there. It's not stable enough,
+                    or its APIs aren't stable enough, or its design or
+                    architecture is not widely enough applicable or agreed upon.
+                </p>
+                <p>
+                    I personally don't care much about namespaces. Is
+                    <tt class="docutils literal"
+                        ><span class="pre">zope.formlib</span></tt
+                    >
+                    any more &quot;right&quot; than
+                    <tt class="docutils literal"
+                        ><span class="pre">zope_formlib</span></tt
+                    >? Is it any more hierarchical? I don't think so. I have
+                    <a class="reference" href="http://pythonpaste.org"
+                        >one namespace package</a
+                    >, but it's kind of a historical accident. I wouldn't (and
+                    don't) put any more libraries under that namespace. Each
+                    library should stand on its own, so why create these
+                    hierarchies? People read too much into those namespaces,
+                    which is happening right here.
+                </p>
+                <p>
+                    As for standards, I agree this is important. In some way
+                    adaptation (uh, still more on that later) is a way of
+                    sidestepping standards. I think in general Python needs more
+                    standard building. Maybe that's true for Zope too, or maybe
+                    those standards should be inclusive of the wider Python
+                    world that includes Zope.
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a id="the-design-patterns" name="the-design-patterns"
+                        >4) The Design Patterns</a
+                    >
+                </h1>
+                <p>
+                    In the abstract, this is about patterns being unnecessarily
+                    built into the environment. Relatedly:
+                    <a
+                        class="reference"
+                        href="http://newbabe.pobox.com/~mjd/blog/prog/design-patterns.html"
+                        >this post argues they should be in the language</a
+                    >
+                    while
+                    <a
+                        class="reference"
+                        href="http://www.cincomsmalltalk.com/userblogs/ralph/blogView?entry=3335803396"
+                        >this reaction says the opposite</a
+                    >
+                    -- I actually agree with the first post, but in this case
+                    agree with Jean-Marc and the second post. I guess I am
+                    inconsistent.
+                </p>
+                <p>
+                    But what Jean-Marc actually talks about is specifically
+                    adapters and the Zope component architecture.
+                </p>
+                <p>
+                    Adaptation is a useful pattern for dealing with API changes.
+                    When you have two
+                    <a
+                        class="reference"
+                        href="http://en.wikipedia.org/wiki/Isomorphic"
+                        >isomorphic</a
+                    >
+                    but incompatible objects, adaptation works great. This
+                    happens when there's little API differences (e.g.,
+                    <tt class="docutils literal"
+                        ><span class="pre">mixedCase</span></tt
+                    >
+                    vs
+                    <tt class="docutils literal"
+                        ><span class="pre">underscore_seperated</span></tt
+                    >). It starts to become a bit of a stretch at other times.
+                    And Zope 3 goes absolutely nuts with this, implementing all
+                    sorts of other patterns phrased as adaptation. This is
+                    complex and powerful, but in the bad way.
+                </p>
+                <p>
+                    From this, I've seen one-off interfaces that define no
+                    methods; interfaces that are just names; adaptation that
+                    works on multiple objects; adaptation that works on no
+                    object at all (adapting the ether); adaptation in place of
+                    attributes... it takes a nice but small idea and just keeps
+                    using it and using it until it's worn out and confused.
+                </p>
+                <p>
+                    I could go into specifics, but it might not mean much to
+                    lots of you, and I'd probably get the specifics wrong. If it
+                    quacks like a duck it's probably a duck. Lots of uses of
+                    adaptation don't quack; I don't know <em>what</em> they all
+                    are, but they aren't ducks.
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a
+                        id="the-component-architecture"
+                        name="the-component-architecture"
+                        >5) The Component Architecture</a
+                    >
+                </h1>
+                <p>
+                    This is kind about plugins. A lot of the Zope component
+                    architecture is about plugins. It's fairly fine-grained;
+                    moreso than I think it needs to be. It's declarative, but
+                    with too many declarations.
+                </p>
+                <p>
+                    I think
+                    <a
+                        class="reference"
+                        href="http://peak.telecommunity.com/DevCenter/setuptools#extensible-applications-and-frameworks"
+                        >Setuptools' entry points</a
+                    >
+                    solve a number of similar goals, but in a simpler way.
+                    There's still some issues that aren't well solved in either
+                    system (actually some of the exact same issues, like plugin
+                    activation), but I think Setuptools at least doesn't solve
+                    those problems in a simpler way.
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a id="zcml-is-not-xml" name="zcml-is-not-xml"
+                        >6) ZCML is not XML</a
+                    >
+                </h1>
+                <p>
+                    To correct Jean-Marc: ZCML is XML. Maybe his real problem is
+                    that ZCML is fairly flat (maybe a bit too much like
+                    <a
+                        class="reference"
+                        href="http://en.wikipedia.org/wiki/Resource_Description_Framework"
+                        >rdf</a
+                    >). It's neither a nice syntax (it is after all XML), nor is
+                    it a compact XML language.
+                </p>
+                <p>
+                    But the Zope people know about this problem already. I don't
+                    think they are entirely sure how to fix it (maybe entry
+                    points will help), but I think everyone agrees it needs
+                    fixing.
+                </p>
+                <p>
+                    I guess the larger issue is that it's nice to declare things
+                    in Python code, but that only works if you import the Python
+                    code. So if you have something like an adapter sitting in
+                    some code, the system won't know that an adapter
+                    <em>could be</em> available if only it imported that code.
+                    An entry point version of this might be like:
+                </p>
+                <pre class="literal-block">
 [zope.interface.adapters]
 package 1 = mypackage.adapter1
 package 2 = mypackage.adapter2
-</pre>
-<p>(In this case <tt class="docutils literal"><span class="pre">package</span> <span class="pre">1</span></tt> doesn't actually mean anything, though maybe some use
-for that name could be found)</p>
-</div>
-<div class="section">
-<h1><a id="the-presentation-layer" name="the-presentation-layer">7) The Presentation Layer</a></h1>
-<p>Zope views are confusing to me.  I think I don't like them.  I think
-this is probably my biggest issue with Zope 3 development.</p>
-<p>Zope seems unwilling to commit to being a web application environment.
-Everytime I see tutorials or descriptions about development in Zope 3,
-it always seems to begin with the model.  &quot;View&quot;, from what I can
-tell, is both &quot;View&quot; and &quot;Controller&quot; (when you are trying to be MVC
-about it), i.e., the Python controller and the template view.  (This
-is just an explanation, I don't care about the terminology.)</p>
-<p>While I respect the distinction between view and model, what bothers
-me is that the view is an adaptation of the model.  I think design should start at the ends, not the means.  The model is
-just a &quot;means&quot;.  The &quot;ends&quot; is what the user sees -- the HTML, the
-template, the forms, the functionality.  That's where application
-design should start.</p>
-<p>Admittedly, an experienced programmer can bang out a quick model
-pretty easily, and will do so quite quickly regardless of what the
-underlying architecture dictates.  But I'd rather see a sloppy model
-that is refined later than a rigid UI built magically by some
-framework.  I think Zope does a bit too much of the second.  Perhaps
-because a number of Zope developers don't actually <em>like</em> HTML, and so
-want to avoid it through frameworks.  I think they just need to get
-over it.</p>
-</div>
-<div class="section">
-<h1><a id="the-other-sections" name="the-other-sections">The other sections</a></h1>
-<ol class="arabic simple" start="8">
-<li>The &quot;pythonic&quot; trip:</li>
-</ol>
-<blockquote>
-Jean-Marc doesn't explain much here.  I think he is talking about
-<em>getting things done</em> vs. <em>doing things right</em>, and thinks there's
-too much <em>doing things right</em>.</blockquote>
-<ol class="arabic simple" start="9">
-<li>Balkanization:</li>
-</ol>
-<blockquote>
-We're not working enough together.  Sure, I think that's true.  But
-then working together can often get in the way of getting things
-done, so it's a hard thing to figure out.</blockquote>
-<ol class="arabic simple" start="10">
-<li>Self-criticism:</li>
-</ol>
-<blockquote>
-Considering Zope 3 is largely a response to the criticisms of Zope
-2, I think it's unfair to say Zope 3 doesn't repond to criticism or
-isn't reflective.  I think the problem is that Zope 3 doesn't know
-what it wants to be.  Does it want to be fundamental infrastructure?
-I think they are tackling far too much at once if they want to do
-that.  Do they want to be a web app development platform?  I don't
-think their architectural choices work that well there; they certainly aren't as expedient or conventional as other frameworks for banging out web apps.  Do they
-want to be a content management framework?  Then people should get
-to work on an actual CMS implementation.</blockquote>
-</div>
-</div>
- <div class="dates" align="right">
-Created 09 Oct '06<br>
-Modified 09 Oct '06</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>&quot;Jean-Marc Orliaguet from Nuxeo&quot; -&gt; Jean-Marc is not a Nuxeo employee, he is working for Chalmers University in Goteborg, Sweden.</p>
-<p>Cf. <a class="reference" href="http://www.medic.chalmers.se/~jmo/">http://www.medic.chalmers.se/~jmo/</a></p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-1.html" rel="nofollow">#</a> <a href="http://www.nuxeo.com/en/">Stefane Fermigier</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Oops; corrected in the article, thanks.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>&quot;From this, I've seen one-off interfaces that define no methods; interfaces that are just names; adaptation that works on multiple objects; adaptation that works on no object at all (adapting the ether); adaptation in place of attributes... it takes a nice but small idea and just keeps using it and using it until it's worn out and confused.&quot;</p>
-<p>While I see the criticism, there is a way to see this in a different light. What you're not saying is that we have names for the different patterns here: marker interfaces, multi-adapters, utilities, annotations. Sometimes adaptation is an implementation detail.</p>
-<p>Your criticism also sounds a little bit like a possible criticism of object oriented programming: &quot;one-off objects that define no methods; objects that are composed out of multiple objects; classes that are only ever instantiated once, delegation instead of inheritance... That OO thing is taking one nice but small idea and just keeps using it too much till its worn out and confused.&quot;</p>
-<p>While of course the Zope 3 patterns haven't proved themselves like the standard OO patterns have, you can argue that using the same basic machinery for a range of different patterns is actually an elegant approach and shows the strength of the concept.</p>
-<p>Let's go through the cases you mention:</p>
-<ul class="simple">
-<li>interfaces that define no methods; interfaces that are just names - I'm not sure whether there's a difference</li>
-</ul>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 12)</p>
-Bullet list ends without a blank line; unexpected unindent.</div>
-<p>between the two? We tend to call these 'marker interfaces'. I'm not sure whether these are very much related to adaptation itself. Adapters typically need some methods on the object to adapt and methods to expose on the adapter itself. I think we may need to a higher level abstraction that describes what you do with these.</p>
-<ul class="simple">
-<li>adaptation that works on multiple objects - I can see the criticism of complication. It's also quite powerful, and I think one can succesfully argue this as a general case of adaptation where adaptation of a single object is a special case. A view is an adaptation of an object and a request, for instance. This allows the system to support different types of view altogether (HTTP, WebDAV, etc), skins, and so on.</li>
-<li>adaptation that works on no object at all - we actually call these utilities and we have a special API for them. I think here the use of the adaptation machinery is truly an implementation detail. This is basically pluggable import by interface.</li>
-<li>adaptation in place of attributes - we call these annotations. I think the annotations pattern can be valuable when extending an application without having to modify its classes, though I think it shouldn't be overused.</li>
-</ul>
-<p>There's more: views in Zope 3 are also a kind of adapter, and the event system is built on top of adapters as well.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-3.html" rel="nofollow">#</a> Martijn Faassen</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<blockquote>
-Your criticism also sounds a little bit like a possible criticism of object oriented programming: &quot;one-off objects that define no methods; objects that are composed out of multiple objects; classes that are only ever instantiated once, delegation instead of inheritance... That OO thing is taking one nice but small idea and just keeps using it too much till its worn out and confused.&quot;</blockquote>
-<p>Yeah, I could totally get behind that criticism too.  Some of the OO mechanisms (like inheritance) have been overused, particularly in places where the mechanism is convenient but not really a proper metaphor for what's going on.</p>
-<blockquote>
-interfaces that define no methods; interfaces that are just names - I'm not sure whether there's a difference between the two? We tend to call these 'marker interfaces'. I'm not sure whether these are very much related to adaptation itself. Adapters typically need some methods on the object to adapt and methods to expose on the adapter itself. I think we may need to a higher level abstraction that describes what you do with these.</blockquote>
-<p>I think string names do okay here.  I can imagine a more structured way of doing this too, like &quot;marker = Marker('some_useful_identifier')&quot;.  It's vaguely like an <a class="reference" href="http://cheeseshop.python.org/pypi/enum">enum</a>.  There's other more compact ways to deal with this.</p>
-<blockquote>
-adaptation that works on multiple objects - I can see the criticism of complication. It's also quite powerful, and I think one can succesfully argue this as a general case of adaptation where adaptation of a single object is a special case. A view is an adaptation of an object and a request, for instance. This allows the system to support different types of view altogether (HTTP, WebDAV, etc), skins, and so on.</blockquote>
-<p>I think generic functions are probably a better for many cases of multiadapters.  There's probably several things hanging out in there, but I'm not sure how many are really adaptation.  I think adaptation is <em>possible</em> from multiple objects, insofar as the tuple of those objects represents an object of its own (a very light and unnamed object); I'm not sure that I believe that's how it really is working in practice.  In other cases, I think Zope leans on adaptation to avoid what could be simple attribute access.  E.g., <tt class="docutils literal"><span class="pre">get_controller(some_model_object).webdav_response(request)</span></tt></p>
-<blockquote>
-adaptation that works on no object at all - we actually call these utilities and we have a special API for them. I think here the use of the adaptation machinery is truly an implementation detail. This is basically pluggable import by interface.</blockquote>
-<p>This just isn't adaptation at all, even slightly.  It's a reasonable function, just not adaptation.  Maybe you are adding an API that doesn't look like adaptation?  What I've seen still does look like adaptation.</p>
-<p>Incidentally, the equivalent thing in Paste is <a class="reference" href="http://pythonpaste.org/module-paste.registry.html">paste.registry</a>, though I've come to dislike proxies and prefer just having simple <tt class="docutils literal"><span class="pre">get_whatever_kind_of_utility()</span></tt>, along with perhaps a <tt class="docutils literal"><span class="pre">get_whatever_kind_of_utility.register(threadlocal_implementation)</span></tt>.  It took me a while to figure out what utilities were, but after using different threadlocal things I definitely see the pattern.  It could also be considered a dynamically-scoped variable (ala <tt class="docutils literal"><span class="pre">*some-variable*</span></tt> in Lisps).  <tt class="docutils literal"><span class="pre">with:</span></tt> offers a syntax which works well for this pattern too; anyway, I'd like to see this filter up to a single Python-wide pattern.</p>
-<blockquote>
-adaptation in place of attributes - we call these annotations. I think the annotations pattern can be valuable when extending an application without having to modify its classes, though I think it shouldn't be overused.</blockquote>
-<p>Annotations are quite interesting, and I can see the utility of adaptation here for supporting multiple backends.  Though things like &quot;identity&quot; are a little vague to me, but maybe that would be clearer if I looked more closely at the code.</p>
-<blockquote>
-There's more: views in Zope 3 are also a kind of adapter, and the event system is built on top of adapters as well.</blockquote>
-<p>Views are reasonable, I think, but I'm not sure.  Probably more on that in reply to your other comment.</p>
-<p>I'm not that comfortable with the event system, but I haven't seen any one event system that really feels right to me on the whole.  It seems like a reasonable event system for Zope, but I don't think I'd be inclined to use it elsewhere.  I would prefer an event system where events were named (as is traditional), rather than using interfaces or adaptability to indicate applicability of the event to a listener.  That feels less clever to me, and less clever is more good.  Though I suppose most events also imply a kind of interface, as most events include arguments, and the meaning of those arguments is a kind of interface for listeners.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-6.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>You say you can totally get behind that critique of OO. That doesn't mean you think people shouldn't use OO, right? Does it mean you think OO is a simple idea taken too far? Similar to the component architecture, you can use the mechanisms of OO to design things the wrong way with it. It takes experience to know that you shouldn't overuse inheritance, and experience to know that yes, inheritance is actually the easier way to deal with some problems after all and you <em>shouldn't</em> be avoiding it then. We're clearly still gaining experience with appropriate uses of the Zope 3 component architecture.</p>
-<p>I'm not sure whether we're talking about the same thing, but to me 'adaptation of nothing at all' sounds like a utility lookup, and we have a getUtility() API for that and various ways to register utilities. Utility lookup is not adaptation, but is implemented on top of the same machinery as that gives us interface-based lookup and a generic pluggable registry. You seem to say that it's wrong to use this machinery as an implementation detail. Why? Perhaps because you haven't seen the utility specific APIs?</p>
-<p>Basically Zope 3's component architecture is built on top of the interface machinery. Interfaces have several advantages above strings for lookup purposes - they support a notion of interface inheritance and they are API documentation. The adaptation machinery then provides for a system of registration and pluggability. You can suggest several different potentially simpler mechanisms instead to replace the various patterns, but are you don't sure you won't actually lose elegance and power in that simplification process?</p>
-<p>The desire to have a generic lookup and registration machinery comes from our experience with pluggable applications in the Zope 2 context. We have found that we end up with a <em>lot</em> of registry and lookup systems there, all slightly different, and a lot of Python-based code that does all sorts of registration. A single explicit system for lookup and registration becomes very attractive with that experience.</p>
-<p>I agree by the way that generic methods are interesting and we should be investigating how they fit in a Zope 3 context.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-8.html" rel="nofollow">#</a> Martijn Faassen</div><hr noshade>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-<p>On some other criticisms of Zope 3 you mention.</p>
-<p>ZCML is indeed XML and I think right now there's too much text and too little it really does. There was a drive towards ZCML simplification in Zope 3 that got a rid of ZCML directives. I think that this was a good initiative, but what is also revealed to me is that what remains of ZCML is not pulling its weight. Too many declarations, indeed. Later this week I'll be at a sprint to see what we can do with that insight. I think the concept of explicit configuration is extremely valuable as a base, but we need good conventions to make it less burdensome.</p>
-<p>The other point of criticism that I agree with is that the frontend side of web development needs more emphasis and attention. I think the concept of model-driven user interfaces can be extremely convenient and powerful (just look at what the Plone community is doing with Archetypes, and also with UML-driven development). I also think it sometimes can get in the way, and is not conductive to learning a system and can lead to rigidity in some cases. We're going to look into bringing some template-driven development back into Zope 3 at the sprint I already mentioned. I need to thank you for making this explicit in this and a previous comment on the same topic. I think we were already on the right track in our self-criticism, but you've provided some useful words I can reuse.</p>
-<p>While I don't see what this has to do with the word &quot;Pythonic&quot;, I do agree with the following: getting things done vs. doing things right, and thinks there's too much doing things right.</p>
-<p>I think Zope 3 is in fact in a good place right now. We've focused on doing things right. We have a powerful architecture that focuses on reusable, pluggable components. We can do powerful model-driven development. With interfaces and doctests we have what amounts to a lot of awesome low-level documentation for developers. We have an explicit idea of declarations to hook things up. We're starting to gain a pool of <em>lots</em> of components to reuse when building an application.</p>
-<p>Now we need to focus on getting things done. We need to focus on taking this platform and building on it: adding convenience for experienced developers, focusing on reducing verboseness (a consequence of our explicitness and pluggability), and making platform easier to learn and adopt for beginners. I am convinced we can do this: getting things done <em>the right way</em>. We're already in a good place, but let's see where we are a year from now.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-4.html" rel="nofollow">#</a> Martijn Faassen</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<blockquote>
-The other point of criticism that I agree with is that the frontend side of web development needs more emphasis and attention. I think the concept of model-driven user interfaces can be extremely convenient and powerful (just look at what the Plone community is doing with Archetypes, and also with UML-driven development).</blockquote>
-<p>I think that content management systems and web apps are really quite different.  You can implement either using the other, but it's probably not worth it.  In the case of a CMS you really have to be much more abstract about your models, because you are operating on content objects in generic ways, and you probably have a lot of runtime-extensible parts of the system and UI.  For a traditional web app (what someone would build with Rails, for instance) this isn't the case -- the UI is mostly fixed (but heavily designed), and it's not too bad to create ad hoc UI extensibility when the need arises.</p>
-<p>I still find it very peculiar that no one seems to be writing a CMS with Zope 3, as that seems like the place where Zope 3 is most applicable.</p>
-<p>Anyway, I think it's important to keep the CMS/webapp distinction in mind.  Zope was used for webapps a lot back in the days of DTML and through-the-web development.  It let developers sidestep lots of problems, and at a time when there wasn't as much collective knowledge about things like deployment and development practices so letting people move forward regardless of those issues was beneficial.  But as we all know, that style of development didn't scale to more complex projects.  At that point Zope took a turn towards a level of abstraction that is appropriate for a CMS (or for building a CMS), but too complex for banging out webapps.</p>
-<p>And perhaps that's just fine.  There's a lot of other frameworks that are working hard on the tools for webapp development, and it probably won't be that successful for Zope to try to get in on that directly.  There's a lot of opportunities to embed (and be embedded by) those tools, and to use REST-style techniques to communicate between systems.  I personally am really drawn to RESTful collaboration between tools because it's so incredibly unclever, crude and explicit and localized... I want to see more of that kind of thing.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-7.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>&quot;I still find it very peculiar that no one seems to be writing a CMS with Zope 3, as that seems like the place where Zope 3 is most applicable.&quot;</p>
-<p>There's a simple answer for this: People <em>are</em> writing CMSes with Zope 3. Since we already have a bunch of powerful CMSes in Zope 2, they're doing it with Five in Zope 2. :) There are also some CMS initiatives in Zope 3, but nothing that got really prominent just yet. That will come.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-9.html" rel="nofollow">#</a> <a href="http://">Martijn Faassen</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Is it possible that with the ease of reusability of Zope3 components that a CMS isn't even necessary anymore? Instead of &quot;fighting the framework&quot;, perhaps &quot;there is no framework.&quot; What I find very interesting about Zope3 is that it doesn't really seem to be anything. It's more of a philosophy and a big big bag of (interoperable) components.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-11.html" rel="nofollow">#</a> Kevin Smith</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>I think the CMS-ish focus is a good point. When I first learnt Zope 3, the book I was reading built something CMS-ish and it wasn't immediately obvious to me how to do &quot;floating&quot; templates not bound to a particular context (answer: either make them registered on <a href="zope-3-critique.html#id1" name="id2"><span class="problematic" id="id2">*</span></a>, which means &quot;any interface&quot; and you can just invoke them anywhere)</p>
-<div class="system-message" id="id1">
-<p class="system-message-title">System Message: <a name="id1">WARNING/2</a> (<tt class="docutils">&lt;string&gt;</tt>, line 1); <em><a href="zope-3-critique.html#id2">backlink</a></em></p>
-Inline emphasis start-string without end-string.</div>
-<p>There is a kind of mismatch here, though. I find it very awkward to build certain types of applications in Java, say, because it is so template focused. I make directories inside my WEB-INF directory, and they become part of the URL, like /foo/pages/bar.jsp comes from Webapps/foo/WEB-INF/pages/bar.jsp (yes, I know there are ways to do different URL dispatch, that's not the point). You start from a template that pulls data from some bean, and probably needs a query paramter to know which records to pull out. In a CMS-ish world, I want to represent my content structure in the URLs. This is where Zope makes a lot of sense - you have a model that is essentially hierarhical, and you have registrations that if you visit /foo/bar and bar is of type IBar, then you get the default view on an IBar as registered with Zope, or if you go to /foo/bar/edit.html you get the edit.html view registered for IBar.</p>
-<p>If you have no need for that kind of hierarchy, then everything becomes a view on ISiteRoot or even on * (i.e. could be used on any type of object). Then the overhead of those registrations probably feels a bit wrong. Of course there are pages like that in CMF-ish applications too, but the number tends to be reasonably well-contained.</p>
-<p>However, I've found that a surprising number of real-world (often business-focused) applications can be modelled quite successfully on the concept of semi-structured content managed hierarchially. This has a lot to do with the fact that this is how people organise the files on their computer, I think.</p>
-<p>That debate is somewhat philosophical, and I've always been an advocate of right-tool-for-the-right-job. However, I do feel that Zope 3 offers some very elegant solutions to certain design problems. I quite like that there is a small number of concepts (interfaces, utilities, adapters) that is used widely and quite consistently. On the other hand, I agree that it's probably not the simplest system and requires more up-front investment in the concepts of component oriented development than something more &quot;flat&quot; (which in the extreme case is just PHP).</p>
-<p>As for views, what I like a lot about using views is that they give you a very natural place to put the Python code that is essentially your rendering logic. This code prepares simple data structures that the Zope Page Template renders using only basic TAL expressions (render this, make this tag conditional, repeat this tag over this list). Compared to how we used to develop in Zope 2, for example, it's a blessing. I agree that it's often model-driven, and that auto-generated forms are a mixed blessing, but you don't have to use them - we're just all too lazy! ;-)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-10.html" rel="nofollow">#</a> Martin Aspeli</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Thanks for this comment which is very enlightening about Zope 3 philosophie.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-12.html" rel="nofollow">#</a> Alex Garel</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Now as to my last comment: I did not interpret JMO's comment as a condemnation. But by saying what Zope 3 can learn from Java and then going into a mix of criticisms of the Zope 3 platform and highlights of the Java platform, I read certain implications into the text that I wanted to make explicit. I got a blanket answer that none of these were intended implications, which shows how bad I am at text comprehension. :)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/zope-3-critique-comment-5.html" rel="nofollow">#</a> Martijn Faassen</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                >
+                <p>
+                    (In this case
+                    <tt class="docutils literal"
+                        ><span class="pre">package</span>
+                        <span class="pre">1</span></tt
+                    >
+                    doesn't actually mean anything, though maybe some use for
+                    that name could be found)
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a id="the-presentation-layer" name="the-presentation-layer"
+                        >7) The Presentation Layer</a
+                    >
+                </h1>
+                <p>
+                    Zope views are confusing to me. I think I don't like them. I
+                    think this is probably my biggest issue with Zope 3
+                    development.
+                </p>
+                <p>
+                    Zope seems unwilling to commit to being a web application
+                    environment. Everytime I see tutorials or descriptions about
+                    development in Zope 3, it always seems to begin with the
+                    model. &quot;View&quot;, from what I can tell, is both
+                    &quot;View&quot; and &quot;Controller&quot; (when you are
+                    trying to be MVC about it), i.e., the Python controller and
+                    the template view. (This is just an explanation, I don't
+                    care about the terminology.)
+                </p>
+                <p>
+                    While I respect the distinction between view and model, what
+                    bothers me is that the view is an adaptation of the model. I
+                    think design should start at the ends, not the means. The
+                    model is just a &quot;means&quot;. The &quot;ends&quot; is
+                    what the user sees -- the HTML, the template, the forms, the
+                    functionality. That's where application design should start.
+                </p>
+                <p>
+                    Admittedly, an experienced programmer can bang out a quick
+                    model pretty easily, and will do so quite quickly regardless
+                    of what the underlying architecture dictates. But I'd rather
+                    see a sloppy model that is refined later than a rigid UI
+                    built magically by some framework. I think Zope does a bit
+                    too much of the second. Perhaps because a number of Zope
+                    developers don't actually <em>like</em> HTML, and so want to
+                    avoid it through frameworks. I think they just need to get
+                    over it.
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a id="the-other-sections" name="the-other-sections"
+                        >The other sections</a
+                    >
+                </h1>
+                <ol class="arabic simple" start="8">
+                    <li>The &quot;pythonic&quot; trip:</li>
+                </ol>
+                <blockquote>
+                    Jean-Marc doesn't explain much here. I think he is talking
+                    about
+                    <em>getting things done</em> vs.
+                    <em>doing things right</em>, and thinks there's too much
+                    <em>doing things right</em>.
+                </blockquote>
+                <ol class="arabic simple" start="9">
+                    <li>Balkanization:</li>
+                </ol>
+                <blockquote>
+                    We're not working enough together. Sure, I think that's
+                    true. But then working together can often get in the way of
+                    getting things done, so it's a hard thing to figure out.
+                </blockquote>
+                <ol class="arabic simple" start="10">
+                    <li>Self-criticism:</li>
+                </ol>
+                <blockquote>
+                    Considering Zope 3 is largely a response to the criticisms
+                    of Zope 2, I think it's unfair to say Zope 3 doesn't repond
+                    to criticism or isn't reflective. I think the problem is
+                    that Zope 3 doesn't know what it wants to be. Does it want
+                    to be fundamental infrastructure? I think they are tackling
+                    far too much at once if they want to do that. Do they want
+                    to be a web app development platform? I don't think their
+                    architectural choices work that well there; they certainly
+                    aren't as expedient or conventional as other frameworks for
+                    banging out web apps. Do they want to be a content
+                    management framework? Then people should get to work on an
+                    actual CMS implementation.
+                </blockquote>
+            </div>
+        </div>
+        <div class="dates" align="right">
+            Created 09 Oct '06<br />
+            Modified 09 Oct '06
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    &quot;Jean-Marc Orliaguet from Nuxeo&quot; -&gt; Jean-Marc
+                    is not a Nuxeo employee, he is working for Chalmers
+                    University in Goteborg, Sweden.
+                </p>
+                <p>
+                    Cf.
+                    <a
+                        class="reference"
+                        href="http://www.medic.chalmers.se/~jmo/"
+                        >http://www.medic.chalmers.se/~jmo/</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/zope-3-critique-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.nuxeo.com/en/">Stefane Fermigier</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>Oops; corrected in the article, thanks.</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/zope-3-critique-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    &quot;From this, I've seen one-off interfaces that define no
+                    methods; interfaces that are just names; adaptation that
+                    works on multiple objects; adaptation that works on no
+                    object at all (adapting the ether); adaptation in place of
+                    attributes... it takes a nice but small idea and just keeps
+                    using it and using it until it's worn out and
+                    confused.&quot;
+                </p>
+                <p>
+                    While I see the criticism, there is a way to see this in a
+                    different light. What you're not saying is that we have
+                    names for the different patterns here: marker interfaces,
+                    multi-adapters, utilities, annotations. Sometimes adaptation
+                    is an implementation detail.
+                </p>
+                <p>
+                    Your criticism also sounds a little bit like a possible
+                    criticism of object oriented programming: &quot;one-off
+                    objects that define no methods; objects that are composed
+                    out of multiple objects; classes that are only ever
+                    instantiated once, delegation instead of inheritance... That
+                    OO thing is taking one nice but small idea and just keeps
+                    using it too much till its worn out and confused.&quot;
+                </p>
+                <p>
+                    While of course the Zope 3 patterns haven't proved
+                    themselves like the standard OO patterns have, you can argue
+                    that using the same basic machinery for a range of different
+                    patterns is actually an elegant approach and shows the
+                    strength of the concept.
+                </p>
+                <p>Let's go through the cases you mention:</p>
+                <ul class="simple">
+                    <li>
+                        interfaces that define no methods; interfaces that are
+                        just names - I'm not sure whether there's a difference
+                    </li>
+                </ul>
+                <div class="system-message">
+                    <p class="system-message-title">
+                        System Message: WARNING/2 (<tt class="docutils"
+                            >&lt;string&gt;</tt
+                        >, line 12)
+                    </p>
+                    Bullet list ends without a blank line; unexpected unindent.
+                </div>
+                <p>
+                    between the two? We tend to call these 'marker interfaces'.
+                    I'm not sure whether these are very much related to
+                    adaptation itself. Adapters typically need some methods on
+                    the object to adapt and methods to expose on the adapter
+                    itself. I think we may need to a higher level abstraction
+                    that describes what you do with these.
+                </p>
+                <ul class="simple">
+                    <li>
+                        adaptation that works on multiple objects - I can see
+                        the criticism of complication. It's also quite powerful,
+                        and I think one can succesfully argue this as a general
+                        case of adaptation where adaptation of a single object
+                        is a special case. A view is an adaptation of an object
+                        and a request, for instance. This allows the system to
+                        support different types of view altogether (HTTP,
+                        WebDAV, etc), skins, and so on.
+                    </li>
+                    <li>
+                        adaptation that works on no object at all - we actually
+                        call these utilities and we have a special API for them.
+                        I think here the use of the adaptation machinery is
+                        truly an implementation detail. This is basically
+                        pluggable import by interface.
+                    </li>
+                    <li>
+                        adaptation in place of attributes - we call these
+                        annotations. I think the annotations pattern can be
+                        valuable when extending an application without having to
+                        modify its classes, though I think it shouldn't be
+                        overused.
+                    </li>
+                </ul>
+                <p>
+                    There's more: views in Zope 3 are also a kind of adapter,
+                    and the event system is built on top of adapters as well.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/zope-3-critique-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Martijn Faassen
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        Your criticism also sounds a little bit like a possible
+                        criticism of object oriented programming: &quot;one-off
+                        objects that define no methods; objects that are
+                        composed out of multiple objects; classes that are only
+                        ever instantiated once, delegation instead of
+                        inheritance... That OO thing is taking one nice but
+                        small idea and just keeps using it too much till its
+                        worn out and confused.&quot;
+                    </blockquote>
+                    <p>
+                        Yeah, I could totally get behind that criticism too.
+                        Some of the OO mechanisms (like inheritance) have been
+                        overused, particularly in places where the mechanism is
+                        convenient but not really a proper metaphor for what's
+                        going on.
+                    </p>
+                    <blockquote>
+                        interfaces that define no methods; interfaces that are
+                        just names - I'm not sure whether there's a difference
+                        between the two? We tend to call these 'marker
+                        interfaces'. I'm not sure whether these are very much
+                        related to adaptation itself. Adapters typically need
+                        some methods on the object to adapt and methods to
+                        expose on the adapter itself. I think we may need to a
+                        higher level abstraction that describes what you do with
+                        these.
+                    </blockquote>
+                    <p>
+                        I think string names do okay here. I can imagine a more
+                        structured way of doing this too, like &quot;marker =
+                        Marker('some_useful_identifier')&quot;. It's vaguely
+                        like an
+                        <a
+                            class="reference"
+                            href="http://cheeseshop.python.org/pypi/enum"
+                            >enum</a
+                        >. There's other more compact ways to deal with this.
+                    </p>
+                    <blockquote>
+                        adaptation that works on multiple objects - I can see
+                        the criticism of complication. It's also quite powerful,
+                        and I think one can succesfully argue this as a general
+                        case of adaptation where adaptation of a single object
+                        is a special case. A view is an adaptation of an object
+                        and a request, for instance. This allows the system to
+                        support different types of view altogether (HTTP,
+                        WebDAV, etc), skins, and so on.
+                    </blockquote>
+                    <p>
+                        I think generic functions are probably a better for many
+                        cases of multiadapters. There's probably several things
+                        hanging out in there, but I'm not sure how many are
+                        really adaptation. I think adaptation is
+                        <em>possible</em> from multiple objects, insofar as the
+                        tuple of those objects represents an object of its own
+                        (a very light and unnamed object); I'm not sure that I
+                        believe that's how it really is working in practice. In
+                        other cases, I think Zope leans on adaptation to avoid
+                        what could be simple attribute access. E.g.,
+                        <tt class="docutils literal"
+                            ><span class="pre"
+                                >get_controller(some_model_object).webdav_response(request)</span
+                            ></tt
+                        >
+                    </p>
+                    <blockquote>
+                        adaptation that works on no object at all - we actually
+                        call these utilities and we have a special API for them.
+                        I think here the use of the adaptation machinery is
+                        truly an implementation detail. This is basically
+                        pluggable import by interface.
+                    </blockquote>
+                    <p>
+                        This just isn't adaptation at all, even slightly. It's a
+                        reasonable function, just not adaptation. Maybe you are
+                        adding an API that doesn't look like adaptation? What
+                        I've seen still does look like adaptation.
+                    </p>
+                    <p>
+                        Incidentally, the equivalent thing in Paste is
+                        <a
+                            class="reference"
+                            href="http://pythonpaste.org/module-paste.registry.html"
+                            >paste.registry</a
+                        >, though I've come to dislike proxies and prefer just
+                        having simple
+                        <tt class="docutils literal"
+                            ><span class="pre"
+                                >get_whatever_kind_of_utility()</span
+                            ></tt
+                        >, along with perhaps a
+                        <tt class="docutils literal"
+                            ><span class="pre"
+                                >get_whatever_kind_of_utility.register(threadlocal_implementation)</span
+                            ></tt
+                        >. It took me a while to figure out what utilities were,
+                        but after using different threadlocal things I
+                        definitely see the pattern. It could also be considered
+                        a dynamically-scoped variable (ala
+                        <tt class="docutils literal"
+                            ><span class="pre">*some-variable*</span></tt
+                        >
+                        in Lisps).
+                        <tt class="docutils literal"
+                            ><span class="pre">with:</span></tt
+                        >
+                        offers a syntax which works well for this pattern too;
+                        anyway, I'd like to see this filter up to a single
+                        Python-wide pattern.
+                    </p>
+                    <blockquote>
+                        adaptation in place of attributes - we call these
+                        annotations. I think the annotations pattern can be
+                        valuable when extending an application without having to
+                        modify its classes, though I think it shouldn't be
+                        overused.
+                    </blockquote>
+                    <p>
+                        Annotations are quite interesting, and I can see the
+                        utility of adaptation here for supporting multiple
+                        backends. Though things like &quot;identity&quot; are a
+                        little vague to me, but maybe that would be clearer if I
+                        looked more closely at the code.
+                    </p>
+                    <blockquote>
+                        There's more: views in Zope 3 are also a kind of
+                        adapter, and the event system is built on top of
+                        adapters as well.
+                    </blockquote>
+                    <p>
+                        Views are reasonable, I think, but I'm not sure.
+                        Probably more on that in reply to your other comment.
+                    </p>
+                    <p>
+                        I'm not that comfortable with the event system, but I
+                        haven't seen any one event system that really feels
+                        right to me on the whole. It seems like a reasonable
+                        event system for Zope, but I don't think I'd be inclined
+                        to use it elsewhere. I would prefer an event system
+                        where events were named (as is traditional), rather than
+                        using interfaces or adaptability to indicate
+                        applicability of the event to a listener. That feels
+                        less clever to me, and less clever is more good. Though
+                        I suppose most events also imply a kind of interface, as
+                        most events include arguments, and the meaning of those
+                        arguments is a kind of interface for listeners.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/zope-3-critique-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            You say you can totally get behind that critique of
+                            OO. That doesn't mean you think people shouldn't use
+                            OO, right? Does it mean you think OO is a simple
+                            idea taken too far? Similar to the component
+                            architecture, you can use the mechanisms of OO to
+                            design things the wrong way with it. It takes
+                            experience to know that you shouldn't overuse
+                            inheritance, and experience to know that yes,
+                            inheritance is actually the easier way to deal with
+                            some problems after all and you
+                            <em>shouldn't</em> be avoiding it then. We're
+                            clearly still gaining experience with appropriate
+                            uses of the Zope 3 component architecture.
+                        </p>
+                        <p>
+                            I'm not sure whether we're talking about the same
+                            thing, but to me 'adaptation of nothing at all'
+                            sounds like a utility lookup, and we have a
+                            getUtility() API for that and various ways to
+                            register utilities. Utility lookup is not
+                            adaptation, but is implemented on top of the same
+                            machinery as that gives us interface-based lookup
+                            and a generic pluggable registry. You seem to say
+                            that it's wrong to use this machinery as an
+                            implementation detail. Why? Perhaps because you
+                            haven't seen the utility specific APIs?
+                        </p>
+                        <p>
+                            Basically Zope 3's component architecture is built
+                            on top of the interface machinery. Interfaces have
+                            several advantages above strings for lookup purposes
+                            - they support a notion of interface inheritance and
+                            they are API documentation. The adaptation machinery
+                            then provides for a system of registration and
+                            pluggability. You can suggest several different
+                            potentially simpler mechanisms instead to replace
+                            the various patterns, but are you don't sure you
+                            won't actually lose elegance and power in that
+                            simplification process?
+                        </p>
+                        <p>
+                            The desire to have a generic lookup and registration
+                            machinery comes from our experience with pluggable
+                            applications in the Zope 2 context. We have found
+                            that we end up with a <em>lot</em> of registry and
+                            lookup systems there, all slightly different, and a
+                            lot of Python-based code that does all sorts of
+                            registration. A single explicit system for lookup
+                            and registration becomes very attractive with that
+                            experience.
+                        </p>
+                        <p>
+                            I agree by the way that generic methods are
+                            interesting and we should be investigating how they
+                            fit in a Zope 3 context.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/zope-3-critique-comment-8.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Martijn Faassen
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>On some other criticisms of Zope 3 you mention.</p>
+                <p>
+                    ZCML is indeed XML and I think right now there's too much
+                    text and too little it really does. There was a drive
+                    towards ZCML simplification in Zope 3 that got a rid of ZCML
+                    directives. I think that this was a good initiative, but
+                    what is also revealed to me is that what remains of ZCML is
+                    not pulling its weight. Too many declarations, indeed. Later
+                    this week I'll be at a sprint to see what we can do with
+                    that insight. I think the concept of explicit configuration
+                    is extremely valuable as a base, but we need good
+                    conventions to make it less burdensome.
+                </p>
+                <p>
+                    The other point of criticism that I agree with is that the
+                    frontend side of web development needs more emphasis and
+                    attention. I think the concept of model-driven user
+                    interfaces can be extremely convenient and powerful (just
+                    look at what the Plone community is doing with Archetypes,
+                    and also with UML-driven development). I also think it
+                    sometimes can get in the way, and is not conductive to
+                    learning a system and can lead to rigidity in some cases.
+                    We're going to look into bringing some template-driven
+                    development back into Zope 3 at the sprint I already
+                    mentioned. I need to thank you for making this explicit in
+                    this and a previous comment on the same topic. I think we
+                    were already on the right track in our self-criticism, but
+                    you've provided some useful words I can reuse.
+                </p>
+                <p>
+                    While I don't see what this has to do with the word
+                    &quot;Pythonic&quot;, I do agree with the following: getting
+                    things done vs. doing things right, and thinks there's too
+                    much doing things right.
+                </p>
+                <p>
+                    I think Zope 3 is in fact in a good place right now. We've
+                    focused on doing things right. We have a powerful
+                    architecture that focuses on reusable, pluggable components.
+                    We can do powerful model-driven development. With interfaces
+                    and doctests we have what amounts to a lot of awesome
+                    low-level documentation for developers. We have an explicit
+                    idea of declarations to hook things up. We're starting to
+                    gain a pool of <em>lots</em> of components to reuse when
+                    building an application.
+                </p>
+                <p>
+                    Now we need to focus on getting things done. We need to
+                    focus on taking this platform and building on it: adding
+                    convenience for experienced developers, focusing on reducing
+                    verboseness (a consequence of our explicitness and
+                    pluggability), and making platform easier to learn and adopt
+                    for beginners. I am convinced we can do this: getting things
+                    done <em>the right way</em>. We're already in a good place,
+                    but let's see where we are a year from now.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/zope-3-critique-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Martijn Faassen
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        The other point of criticism that I agree with is that
+                        the frontend side of web development needs more emphasis
+                        and attention. I think the concept of model-driven user
+                        interfaces can be extremely convenient and powerful
+                        (just look at what the Plone community is doing with
+                        Archetypes, and also with UML-driven development).
+                    </blockquote>
+                    <p>
+                        I think that content management systems and web apps are
+                        really quite different. You can implement either using
+                        the other, but it's probably not worth it. In the case
+                        of a CMS you really have to be much more abstract about
+                        your models, because you are operating on content
+                        objects in generic ways, and you probably have a lot of
+                        runtime-extensible parts of the system and UI. For a
+                        traditional web app (what someone would build with
+                        Rails, for instance) this isn't the case -- the UI is
+                        mostly fixed (but heavily designed), and it's not too
+                        bad to create ad hoc UI extensibility when the need
+                        arises.
+                    </p>
+                    <p>
+                        I still find it very peculiar that no one seems to be
+                        writing a CMS with Zope 3, as that seems like the place
+                        where Zope 3 is most applicable.
+                    </p>
+                    <p>
+                        Anyway, I think it's important to keep the CMS/webapp
+                        distinction in mind. Zope was used for webapps a lot
+                        back in the days of DTML and through-the-web
+                        development. It let developers sidestep lots of
+                        problems, and at a time when there wasn't as much
+                        collective knowledge about things like deployment and
+                        development practices so letting people move forward
+                        regardless of those issues was beneficial. But as we all
+                        know, that style of development didn't scale to more
+                        complex projects. At that point Zope took a turn towards
+                        a level of abstraction that is appropriate for a CMS (or
+                        for building a CMS), but too complex for banging out
+                        webapps.
+                    </p>
+                    <p>
+                        And perhaps that's just fine. There's a lot of other
+                        frameworks that are working hard on the tools for webapp
+                        development, and it probably won't be that successful
+                        for Zope to try to get in on that directly. There's a
+                        lot of opportunities to embed (and be embedded by) those
+                        tools, and to use REST-style techniques to communicate
+                        between systems. I personally am really drawn to RESTful
+                        collaboration between tools because it's so incredibly
+                        unclever, crude and explicit and localized... I want to
+                        see more of that kind of thing.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/zope-3-critique-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            &quot;I still find it very peculiar that no one
+                            seems to be writing a CMS with Zope 3, as that seems
+                            like the place where Zope 3 is most
+                            applicable.&quot;
+                        </p>
+                        <p>
+                            There's a simple answer for this: People
+                            <em>are</em> writing CMSes with Zope 3. Since we
+                            already have a bunch of powerful CMSes in Zope 2,
+                            they're doing it with Five in Zope 2. :) There are
+                            also some CMS initiatives in Zope 3, but nothing
+                            that got really prominent just yet. That will come.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/zope-3-critique-comment-9.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">Martijn Faassen</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                Is it possible that with the ease of reusability
+                                of Zope3 components that a CMS isn't even
+                                necessary anymore? Instead of &quot;fighting the
+                                framework&quot;, perhaps &quot;there is no
+                                framework.&quot; What I find very interesting
+                                about Zope3 is that it doesn't really seem to be
+                                anything. It's more of a philosophy and a big
+                                big bag of (interoperable) components.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/zope-3-critique-comment-11.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Kevin Smith
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+
+                    <div class="document">
+                        <p>
+                            I think the CMS-ish focus is a good point. When I
+                            first learnt Zope 3, the book I was reading built
+                            something CMS-ish and it wasn't immediately obvious
+                            to me how to do &quot;floating&quot; templates not
+                            bound to a particular context (answer: either make
+                            them registered on
+                            <a href="zope-3-critique.html#id1" name="id2"
+                                ><span class="problematic" id="id2">*</span></a
+                            >, which means &quot;any interface&quot; and you can
+                            just invoke them anywhere)
+                        </p>
+                        <div class="system-message" id="id1">
+                            <p class="system-message-title">
+                                System Message: <a name="id1">WARNING/2</a> (<tt
+                                    class="docutils"
+                                    >&lt;string&gt;</tt
+                                >, line 1);
+                                <em
+                                    ><a href="zope-3-critique.html#id2"
+                                        >backlink</a
+                                    ></em
+                                >
+                            </p>
+                            Inline emphasis start-string without end-string.
+                        </div>
+                        <p>
+                            There is a kind of mismatch here, though. I find it
+                            very awkward to build certain types of applications
+                            in Java, say, because it is so template focused. I
+                            make directories inside my WEB-INF directory, and
+                            they become part of the URL, like /foo/pages/bar.jsp
+                            comes from Webapps/foo/WEB-INF/pages/bar.jsp (yes, I
+                            know there are ways to do different URL dispatch,
+                            that's not the point). You start from a template
+                            that pulls data from some bean, and probably needs a
+                            query paramter to know which records to pull out. In
+                            a CMS-ish world, I want to represent my content
+                            structure in the URLs. This is where Zope makes a
+                            lot of sense - you have a model that is essentially
+                            hierarhical, and you have registrations that if you
+                            visit /foo/bar and bar is of type IBar, then you get
+                            the default view on an IBar as registered with Zope,
+                            or if you go to /foo/bar/edit.html you get the
+                            edit.html view registered for IBar.
+                        </p>
+                        <p>
+                            If you have no need for that kind of hierarchy, then
+                            everything becomes a view on ISiteRoot or even on *
+                            (i.e. could be used on any type of object). Then the
+                            overhead of those registrations probably feels a bit
+                            wrong. Of course there are pages like that in
+                            CMF-ish applications too, but the number tends to be
+                            reasonably well-contained.
+                        </p>
+                        <p>
+                            However, I've found that a surprising number of
+                            real-world (often business-focused) applications can
+                            be modelled quite successfully on the concept of
+                            semi-structured content managed hierarchially. This
+                            has a lot to do with the fact that this is how
+                            people organise the files on their computer, I
+                            think.
+                        </p>
+                        <p>
+                            That debate is somewhat philosophical, and I've
+                            always been an advocate of
+                            right-tool-for-the-right-job. However, I do feel
+                            that Zope 3 offers some very elegant solutions to
+                            certain design problems. I quite like that there is
+                            a small number of concepts (interfaces, utilities,
+                            adapters) that is used widely and quite
+                            consistently. On the other hand, I agree that it's
+                            probably not the simplest system and requires more
+                            up-front investment in the concepts of component
+                            oriented development than something more
+                            &quot;flat&quot; (which in the extreme case is just
+                            PHP).
+                        </p>
+                        <p>
+                            As for views, what I like a lot about using views is
+                            that they give you a very natural place to put the
+                            Python code that is essentially your rendering
+                            logic. This code prepares simple data structures
+                            that the Zope Page Template renders using only basic
+                            TAL expressions (render this, make this tag
+                            conditional, repeat this tag over this list).
+                            Compared to how we used to develop in Zope 2, for
+                            example, it's a blessing. I agree that it's often
+                            model-driven, and that auto-generated forms are a
+                            mixed blessing, but you don't have to use them -
+                            we're just all too lazy! ;-)
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/zope-3-critique-comment-10.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Martin Aspeli
+                    </div>
+                    <hr noshade />
+                </blockquote>
+
+                <div class="document">
+                    <p>
+                        Thanks for this comment which is very enlightening about
+                        Zope 3 philosophie.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/zope-3-critique-comment-12.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Alex Garel
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Now as to my last comment: I did not interpret JMO's comment
+                    as a condemnation. But by saying what Zope 3 can learn from
+                    Java and then going into a mix of criticisms of the Zope 3
+                    platform and highlights of the Java platform, I read certain
+                    implications into the text that I wanted to make explicit. I
+                    got a blanket answer that none of these were intended
+                    implications, which shows how bad I am at text
+                    comprehension. :)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/zope-3-critique-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Martijn Faassen
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

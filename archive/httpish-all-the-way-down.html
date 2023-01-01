@@ -1,192 +1,510 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>HTTP(ish) all the way down</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>HTTP(ish) all the way down</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>HTTP(ish) all the way down</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                So what would a RESTish web framework look like? I don't see
+                much point to focusing on PUT and DELETE or URI design, simply
+                because it doesn't achieve anything new. That stuff can lead to
+                non-browser architectures, which means that there will have to
+                be an intermediary, and that intermediary will need a web
+                framework, and the premise here is that we're thinking about web
+                frameworks.
+            </p>
+            <p>
+                Maybe it's better to just think about the goals of REST...
+                loosely coupled, less code, decentralized, scalable, maybe even
+                vague ideas like democratic, hackable, avoiding consulting-ware,
+                less code, etc. etc. Small pieces.
+            </p>
+            <p>
+                So... Anders Pearson posted
+                <a
+                    class="reference"
+                    href="http://thraxil.org/users/anders/posts/2006/03/08/tasty-lightning/"
+                    >about his RESTful stack</a
+                >, a concrete set of actual small pieces. It's not
+                <em>one beautiful diamond</em>, but just <em>stuff</em>.
+                Hopefully useful. The architecture is interesting when thinking
+                about them working in concert, not reflecting on the beauty of
+                any one piece. Many of the pieces are incredibly boring, in
+                fact. Tagging, okay, but a RESTful hash table? (Well, he's not
+                the
+                <a class="reference" href="http://aws.amazon.com/s3"
+                    >only one doing that</a
+                >
+                -- but clearly it takes a bit of imagination to see the
+                potential; the
+                <a
+                    class="reference"
+                    href="http://www.ibm.com/developerworks/edu/ws-dw-ws-aws2.html"
+                    >queue stuff Amazon is doing</a
+                >
+                is also pretty abstract.)
+            </p>
+            <p>
+                What's interesting -- and hard -- is doing something with this
+                mix. How will we keep the architecture manageable?
+            </p>
+            <p>
+                The direction I've been focused on for a while now is how to use
+                this style internally in an application. Because yes, you
+                <em>may</em> want to move some RESTful piece of your app onto
+                another server, onto another service, into another environment.
+                But first you have to make something useful -- scaling tools is
+                boring, and for most of us scalability isn't even the reason for
+                REST. Only working web applications have to scale.
+            </p>
+            <p>
+                So how can you handle a simple application (like, say, a blog)
+                built from a dozen RESTful components? Lots of mod_rewrite
+                rules, several startup scripts, some XML configuration, a couple
+                app servers... oh just shoot me now. Setting up systems gets
+                geometrically more annoying and error-prone as you add the
+                number of systems working in concert. Probably half of why
+                people like the ASP model is just because installation is so
+                damned hard. You could just use S3 from the beginning... but I
+                find that a non-starter as well, when the distributed hash table
+                is just one piece among many. And then if you think about
+                automated testing... ASP-only just isn't an option.
+            </p>
+            <p>
+                But you can manage these pieces. That's what the
+                <a
+                    class="reference"
+                    href="little-apps-instead-of-little-frameworks.html"
+                    >small apps</a
+                >
+                post was about. And that's what the architecture of
+                <a class="reference" href="http://pythonpaste.org">Paste</a> is
+                about. I say the &quot;architecture&quot;, because Paste
+                includes several <em>examples</em> of the kind of small
+                application/component that you would use in this situation. By
+                sticking to WSGI -- kind of an HTTP-in-Python -- any piece can
+                be fully a peer, and Paste itself doesn't have a privileged
+                position. A larger system of these kinds of components is in the
+                works, like
+                <a class="reference" href="http://beaker.groovie.org/"
+                    >Beaker</a
+                >
+                for sessions and caching. For an example of how small an
+                application might be, in Paste there's an application for
+                sending a single file (<tt class="docutils literal"
+                    ><span class="pre">paste.fileapp.FileApp</span></tt
+                >), or an application for sending 404 messages (<tt
+                    class="docutils literal"
+                    ><span class="pre"
+                        >httpexceptions.HTTPNotFound.wsgi_application</span
+                    ></tt
+                >). It sounds tedious, but those applications are as simple to
+                invoke as they are to describe (at least once you have the WSGI
+                invocation part down).
+            </p>
+            <p>
+                In addition to these endpoints, there are lots of intermediaries
+                that rely on the transparency of the request. These get called
+                &quot;middleware&quot;... but ignore the terminology. An example
+                is code that checks IP addresses against rules (<tt
+                    class="docutils literal"
+                    ><span class="pre">paste.auth.grantip</span></tt
+                >), or validates HTML (<tt class="docutils literal"
+                    ><span class="pre">paste.debug.wdg_validate</span></tt
+                >). Intermediaries and end-point applications are even fuzzy --
+                <tt class="docutils literal"
+                    ><span class="pre">paste.auth.open_id</span></tt
+                >
+                does a little of both, annotating some requests and completely
+                intercepting others (since
+                <a class="reference" href="http://openid.net/">Open ID</a>
+                logins span several requests). In the context of WSGI,
+                authentication is <em>solved</em>. It goes in
+                <tt class="docutils literal"
+                    ><span class="pre">REMOTE_USER</span></tt
+                >
+                (recognizing the <em>standards we already have</em>, even if
+                those standards are sometimes undervalued due to poor
+                implementations in the past). How's
+                <tt class="docutils literal"
+                    ><span class="pre">REMOTE_USER</span></tt
+                >
+                get there? Out of scope! (Like REST, WSGI is as much about what
+                it <em>doesn't</em> promise as what it does promise.)
+            </p>
+            <p>
+                <a class="reference" href="http://pythonpaste.org/deploy/"
+                    >Paste Deploy</a
+                >
+                is then a way to bring these pieces together and configure them,
+                since a website will be built from a bunch of pieces. The actual
+                invocation looks rather primitive, but the important part is
+                that configuration is another syntax for Python function calls.
+                So when you build a cohesive application from these pieces you
+                put them all in a single process, build them at fixed locations.
+                You don't configure them independently, instead you provide a
+                cohesive single view of configuration, and programmatically
+                configure the sub-pieces.
+            </p>
+            <p>
+                Another issue with a highly granular REST stack is the HTTP
+                overhead. This may be a case of premature optimization, but
+                latency in particular is something that might bite you later.
+                But because WSGI maps so closely to HTTP, you can make
+                equivalent REST calls purely with WSGI and no network
+                connection; this just turns into some function calls. Later on
+                you can break it up, scale it out, configure pieces to be in
+                different locations. If you need to... and you probably won't,
+                and you may not know <em>which</em> pieces should be broken off
+                to begin with.
+            </p>
+            <p>
+                Anyway, that's why I think WSGI and Paste have some potential to
+                work well with REST; not because they respect some idea of the
+                purity of HTTP, but because they facilitate realistic
+                architectures that are highly decoupled with HTTP (or
+                looks-like-HTTP WSGI call) bringing those pieces together
+            </p>
+        </div>
+        <div class="dates" align="right">Created 26 Apr '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Concur, this is the idea that finally made me buy into WSGI
+                    a while back: lots of modular components talking (like) HTTP
+                    up and down, perhaps minimally functional on their own or
+                    just web-like intermediaries.
+                </p>
+                <p>
+                    In a (yet another) small side project that will probably
+                    never get beyond the barely functional prototype let alone
+                    see the outside world, I'm experimenting with implementing a
+                    REST-like interface to a relational database as a WSGI app,
+                    outputting simplistic XHTML representations of the data
+                    (rows/records), and then I have a minimal intermediary that
+                    queries this app to combine/restrict datasets or follow link
+                    references for parent-detail display. If I go much further
+                    in splitting things out (separate apps for each relational
+                    algebra operator?) I'll probably end up with a great example
+                    of what NOT to do with WSGI, but it's liberating in some
+                    ways.
+                </p>
+                <p>
+                    Definitely some mental mismatch at this point in doing all
+                    subprocessing against the HTML output of upstream apps, but
+                    the less extreme cases for compositing miniapps using WSGI
+                    are completely right in my mind now.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/httpish-all-the-way-down-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Luke Opperman</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Clark Evans, who has been a Paste contributor, was using
+                        it for an application exactly like you describe -- SQL
+                        over HTTP. It's not open source, but I thought the was
+                        trying to get it open sourced... but I don't know if
+                        that worked out ultimately.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/httpish-all-the-way-down-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>HTTP(ish) all the way down</h1>
- 
-<div class="document">
-<p>So what would a RESTish web framework look like?  I don't see much
-point to focusing on PUT and DELETE or URI design, simply because it
-doesn't achieve anything new.  That stuff can lead to non-browser
-architectures, which means that there will have to be an intermediary,
-and that intermediary will need a web framework, and the premise here
-is that we're thinking about web frameworks.</p>
-<p>Maybe it's better to just think about the goals of REST... loosely
-coupled, less code, decentralized, scalable, maybe even vague ideas
-like democratic, hackable, avoiding consulting-ware, less code,
-etc. etc.  Small pieces.</p>
-<p>So... Anders Pearson posted <a class="reference" href="http://thraxil.org/users/anders/posts/2006/03/08/tasty-lightning/">about his RESTful stack</a>,
-a concrete set of actual small pieces.  It's not <em>one beautiful
-diamond</em>, but just <em>stuff</em>.  Hopefully useful.  The
-architecture is interesting when thinking about them working in concert, not reflecting on the beauty of any
-one piece.  Many of the pieces are incredibly boring, in fact.
-Tagging, okay, but a RESTful hash table?  (Well, he's not the <a class="reference" href="http://aws.amazon.com/s3">only
-one doing that</a> -- but clearly it takes a
-bit of imagination to see the potential; the <a class="reference" href="http://www.ibm.com/developerworks/edu/ws-dw-ws-aws2.html">queue stuff Amazon is
-doing</a> is
-also pretty abstract.)</p>
-<p>What's interesting -- and hard -- is doing something with this mix.
-How will we keep the architecture manageable?</p>
-<p>The direction I've been focused on for a while now is how to use this
-style internally in an application.  Because yes, you <em>may</em> want to
-move some RESTful piece of your app onto another server, onto another
-service, into another environment.  But first you have to make
-something useful -- scaling tools is boring, and for most of us
-scalability isn't even the reason for REST.  Only working web
-applications have to scale.</p>
-<p>So how can you handle a simple application (like, say, a blog) built
-from a dozen RESTful components?  Lots of mod_rewrite rules, several
-startup scripts, some XML configuration, a couple app servers... oh
-just shoot me now.  Setting up systems gets geometrically more
-annoying and error-prone as you add the number of systems working in
-concert.  Probably half of why people like the ASP model is just
-because installation is so damned hard.  You could just use S3 from
-the beginning... but I find that a non-starter as well, when the
-distributed hash table is just one piece among many.  And then if you
-think about automated testing... ASP-only just isn't an option.</p>
-<p>But you can manage these pieces.  That's what the <a class="reference" href="little-apps-instead-of-little-frameworks.html">small apps</a>
-post was about.  And that's what the architecture of <a class="reference" href="http://pythonpaste.org">Paste</a> is about.  I say the &quot;architecture&quot;,
-because Paste includes several <em>examples</em> of the kind of small
-application/component that you would use in this situation.  By
-sticking to WSGI -- kind of an HTTP-in-Python -- any piece can be fully a peer,
-and Paste itself doesn't have a privileged position.
-A larger system of these kinds of components is in the
-works, like <a class="reference" href="http://beaker.groovie.org/">Beaker</a> for sessions and
-caching.  For an example of how small an application might be, in Paste
-there's an application for sending a single file
-(<tt class="docutils literal"><span class="pre">paste.fileapp.FileApp</span></tt>), or an application for sending 404
-messages (<tt class="docutils literal"><span class="pre">httpexceptions.HTTPNotFound.wsgi_application</span></tt>).  It sounds tedious,
-but those applications are as simple to invoke as they are to describe (at
-least once you have the WSGI invocation part down).</p>
-<p>In addition to these endpoints, there are lots of intermediaries that rely on the
-transparency of the request.  These get called &quot;middleware&quot;... but
-ignore the terminology.  An example is code that checks IP
-addresses against rules (<tt class="docutils literal"><span class="pre">paste.auth.grantip</span></tt>), or validates HTML
-(<tt class="docutils literal"><span class="pre">paste.debug.wdg_validate</span></tt>).  Intermediaries and end-point
-applications are even fuzzy -- <tt class="docutils literal"><span class="pre">paste.auth.open_id</span></tt> does a little of
-both, annotating some requests and completely intercepting others
-(since <a class="reference" href="http://openid.net/">Open ID</a> logins span several requests).
-In the context of WSGI, authentication is <em>solved</em>.  It goes in <tt class="docutils literal"><span class="pre">REMOTE_USER</span></tt> (recognizing
-the <em>standards we already have</em>, even if those standards are sometimes
-undervalued due to poor implementations in the past).  How's
-<tt class="docutils literal"><span class="pre">REMOTE_USER</span></tt> get there?  Out of scope!  (Like REST, WSGI is as much
-about what it <em>doesn't</em> promise as what it does promise.)</p>
-<p><a class="reference" href="http://pythonpaste.org/deploy/">Paste Deploy</a> is then a way to bring these
-pieces together and configure them, since a website will be built from a
-bunch of pieces.  The actual invocation looks rather primitive,
-but the important part is that configuration is another syntax for
-Python function calls.  So when you build a cohesive application from these pieces
-you put them all in a
-single process, build them at fixed locations.  You don't
-configure them independently, instead you provide a cohesive single
-view of configuration, and programmatically configure the sub-pieces.</p>
-<p>Another issue with a highly granular REST stack is the HTTP overhead.  This may
-be a case of premature optimization, but latency in particular is something
-that might bite you later.  But because WSGI maps so closely to HTTP, you can
-make equivalent REST calls purely with WSGI and no network connection; this just
-turns into some function calls.  Later on you can
-break it up, scale it out, configure pieces to be in different
-locations.  If you need to...  and you probably won't, and you may not know <em>which</em>
-pieces should be broken off to begin with.</p>
-<p>Anyway, that's why I think WSGI and Paste have some potential to work well with
-REST; not because they respect some idea of the purity of HTTP, but because
-they facilitate realistic architectures that are highly decoupled with HTTP (or looks-like-HTTP WSGI call) bringing those pieces together</p>
-</div>
- <div class="dates" align="right">
-Created 26 Apr '06</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>Concur, this is the idea that finally made me buy into WSGI a while back: lots of modular components talking (like) HTTP up and down, perhaps minimally functional on their own or just web-like intermediaries.</p>
-<p>In a (yet another) small side project that will probably never get beyond the barely functional prototype let alone see the outside world, I'm experimenting with implementing a REST-like interface to a relational database as a WSGI app, outputting simplistic XHTML representations of the data (rows/records), and then I have a minimal intermediary that queries this app to combine/restrict datasets or follow link references for parent-detail display. If I go much further in splitting things out (separate apps for each relational algebra operator?) I'll probably end up with a great example of what NOT to do with WSGI, but it's liberating in some ways.</p>
-<p>Definitely some mental mismatch at this point in doing all subprocessing against the HTML output of upstream apps, but the less extreme cases for compositing miniapps using WSGI are completely right in my mind now.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/httpish-all-the-way-down-comment-1.html" rel="nofollow">#</a> <a href="http://">Luke Opperman</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Clark Evans, who has been a Paste contributor, was using it for an application exactly like you describe -- SQL over HTTP.  It's not open source, but I thought the was trying to get it open sourced... but I don't know if that worked out ultimately.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/httpish-all-the-way-down-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Yeah, configuration/deployment and testing have been the hardest problems I've come up against with this architecture and ones that I don't feel like I have a good solution to yet.</p>
-<p>The WSGI/Paste approach is interesting. Unfortunately, my apps still need to work in a very heterogeneous environment so if I put everything into just a WSGI stack, I lose the ability to reuse it across languages as easily. Unified configuration is tempting enough that I might go for it sometime though.</p>
-<p>The idea of building your app as a bunch of WSGI components and later breaking them out into seperate REST apps as needed has crossed my mind as well. My thought on it was to go the other way though and have a library and registry that abstracts the difference away. So you would build all your components as WSGI components but call them through a fully HTTP looking API. Then, there would be a registry somewhere that knows which urls map to actual seperate applications and which can be silently converted to WSGI calls. So you do something like:</p>
-<pre class="literal-block">
+            <div class="document">
+                <p>
+                    Yeah, configuration/deployment and testing have been the
+                    hardest problems I've come up against with this architecture
+                    and ones that I don't feel like I have a good solution to
+                    yet.
+                </p>
+                <p>
+                    The WSGI/Paste approach is interesting. Unfortunately, my
+                    apps still need to work in a very heterogeneous environment
+                    so if I put everything into just a WSGI stack, I lose the
+                    ability to reuse it across languages as easily. Unified
+                    configuration is tempting enough that I might go for it
+                    sometime though.
+                </p>
+                <p>
+                    The idea of building your app as a bunch of WSGI components
+                    and later breaking them out into seperate REST apps as
+                    needed has crossed my mind as well. My thought on it was to
+                    go the other way though and have a library and registry that
+                    abstracts the difference away. So you would build all your
+                    components as WSGI components but call them through a fully
+                    HTTP looking API. Then, there would be a registry somewhere
+                    that knows which urls map to actual seperate applications
+                    and which can be silently converted to WSGI calls. So you do
+                    something like:
+                </p>
+                <pre class="literal-block">
 from magic_REST_WSGI_library import GET
 tags = GET(&quot;http://tasty.example.com/item/foo/&quot;)
-</pre>
-<p>and a registry that magic_REST_WSGI_library reads knows that &quot;tasty.example.com&quot; can really be mapped to a WSGI component and called in process. That way, when that component does need to be moved out to its own machine or written in a different language or something, no code has to be changed; just an update to the registry telling it that requests to that service now have to be proper HTTP requests. It's sort of a &quot;have your cake and eat it too&quot; approach. You get the flexibility and loose coupling of REST components but, if you happen to write all your components in python and keep them WSGI compatible, you can keep the performance and centralized configuration of having them all in-process. Maybe this is something that Paste could help with.</p>
-<p>The other observation I have on performance of applications built up out of small REST applications is that asynchronous requests are your friend. Latency does add up quickly and the way to avoid it is to avoid synchronous communication any time you can. Looking at how Erlang applications are structured is advisable.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/httpish-all-the-way-down-comment-3.html" rel="nofollow">#</a> <a href="http://www.columbia.edu/~anders/">anders</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<blockquote>
-The WSGI/Paste approach is interesting. Unfortunately, my apps still need to work in a very heterogeneous environment so if I put everything into just a WSGI stack, I lose the ability to reuse it across languages as easily. Unified configuration is tempting enough that I might go for it sometime though.</blockquote>
-<p>You'd still be making HTTPish calls between applications.  WSGI (and even Paste) doesn't relate to that; it just makes it more manageable when you have a bunch of WSGI/Paste pieces.  Well, WSGI does give you a backdoor to make requests on behalf of the original user, since it has a slightly larger concept of a request than what can be embedded in HTTP, including things like trusted attributes (keys that don't start with <tt class="docutils literal"><span class="pre">HTTP_</span></tt>).</p>
-<p>Of course, you can opt not to use these things and stick to what can be represented in HTTP.  But it can be very tempting.</p>
-<p>And of course, middleware is breaking out of what HTTP can give you.  Though it'd be neat if you could run PHP with FastCGI under a WSGI stack.</p>
-<p>Anyway, there's nothing stopping you from sticking to language-neutral constructs when using WSGI, and when WSGI-specific constructs get used it's fairly explicit so you know what you are getting into.</p>
-<blockquote>
-The idea of building your app as a bunch of WSGI components and later breaking them out into seperate REST apps as needed has crossed my mind as well. My thought on it was to go the other way though and have a library and registry that abstracts the difference away. So you would build all your components as WSGI components but call them through a fully HTTP looking API. Then, there would be a registry somewhere that knows which urls map to actual seperate applications and which can be silently converted to WSGI calls.</blockquote>
-<p>Titus' <a class="reference" href="http://darcs.idyll.org/~t/projects/wsgi_intercept/README.html">WSGI intercept</a> does just this transparently for anything using urllib/2.</p>
-<p>For something that requires less configuration and is probably a bit faster of a path, <a class="reference" href="http://pythonpaste.org/module-paste.recursive.html">paste.recursive</a> offers a model where you phrase it as a WSGI request.  By adding to that, you could translate the request into an actual HTTP request if it was outside of the WSGI stack.  paste.recursive isn't exactly the right match (and <a class="reference" href="http://pythonpaste.org/module-paste.proxy.html">paste.proxy</a> isn't exactly right for making a WSGI request into an HTTP request), but it would be very close to that.  You wouldn't need configuration, because by keeping note of the request on the way in you can automatically determine where the root of the WSGI server is.  Though it could be tricky if you have fancy dispatching, like virtual host dispatching, which means that the server is capable of internally responding to more requests than you might think.</p>
-<blockquote>
-The other observation I have on performance of applications built up out of small REST applications is that asynchronous requests are your friend.</blockquote>
-<p>I like the idea of using callbacks more, though I haven't tried it in practice.  Something like &quot;do this, then when you are done POST to this URL with the results&quot;.  Of course, many UIs need synchronous actions (people like to know that when they do something it is actually done), so you can't solve all latency problems this way.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/httpish-all-the-way-down-comment-5.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>It's some what off-topic, but I've been trying to figure out how to do simple, RESTful, yet secure authentication for xmlrpc.</p>
-<p>Take, for example, the Blogger API. Sends passwords via plaintext for each API hit. RESTful, but not secure. You can make it more secure with a back-and-forth digest authentication model, but then it's not really RESTful.</p>
-<p>Thoughts on that?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/httpish-all-the-way-down-comment-4.html" rel="nofollow">#</a> <a href="http://kenkinder.com/">Ken Kinder</a></div><hr noshade>
- 
-<div class="document">
-<p>FWIW, the RESTful hashtable (pita) is pretty handy for building stateful flash apps - that is, thicker clients that want to be able to save/load, and just stash their per-user state someplace. Slap on some standard metadata, authentication policy, and data-pocket mgmt and you have yourself a really useful mini-app.</p>
-<p>No, this would not be used for lots and lots of frequent hashtable lookups within a program.</p>
-<p>While we are on the topic, I have also written a <a class="reference" href="http://alchemicalmusings.blogspot.com/2006/03/saints-in-church-of-writely.html&gt;">post</a>. on why this design is important for people concerned with freeculture.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/httpish-all-the-way-down-comment-6.html" rel="nofollow">#</a> <a href="http://alchemicalmustings.blogspot.org">Jonah</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                >
+                <p>
+                    and a registry that magic_REST_WSGI_library reads knows that
+                    &quot;tasty.example.com&quot; can really be mapped to a WSGI
+                    component and called in process. That way, when that
+                    component does need to be moved out to its own machine or
+                    written in a different language or something, no code has to
+                    be changed; just an update to the registry telling it that
+                    requests to that service now have to be proper HTTP
+                    requests. It's sort of a &quot;have your cake and eat it
+                    too&quot; approach. You get the flexibility and loose
+                    coupling of REST components but, if you happen to write all
+                    your components in python and keep them WSGI compatible, you
+                    can keep the performance and centralized configuration of
+                    having them all in-process. Maybe this is something that
+                    Paste could help with.
+                </p>
+                <p>
+                    The other observation I have on performance of applications
+                    built up out of small REST applications is that asynchronous
+                    requests are your friend. Latency does add up quickly and
+                    the way to avoid it is to avoid synchronous communication
+                    any time you can. Looking at how Erlang applications are
+                    structured is advisable.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/httpish-all-the-way-down-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.columbia.edu/~anders/">anders</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        The WSGI/Paste approach is interesting. Unfortunately,
+                        my apps still need to work in a very heterogeneous
+                        environment so if I put everything into just a WSGI
+                        stack, I lose the ability to reuse it across languages
+                        as easily. Unified configuration is tempting enough that
+                        I might go for it sometime though.
+                    </blockquote>
+                    <p>
+                        You'd still be making HTTPish calls between
+                        applications. WSGI (and even Paste) doesn't relate to
+                        that; it just makes it more manageable when you have a
+                        bunch of WSGI/Paste pieces. Well, WSGI does give you a
+                        backdoor to make requests on behalf of the original
+                        user, since it has a slightly larger concept of a
+                        request than what can be embedded in HTTP, including
+                        things like trusted attributes (keys that don't start
+                        with
+                        <tt class="docutils literal"
+                            ><span class="pre">HTTP_</span></tt
+                        >).
+                    </p>
+                    <p>
+                        Of course, you can opt not to use these things and stick
+                        to what can be represented in HTTP. But it can be very
+                        tempting.
+                    </p>
+                    <p>
+                        And of course, middleware is breaking out of what HTTP
+                        can give you. Though it'd be neat if you could run PHP
+                        with FastCGI under a WSGI stack.
+                    </p>
+                    <p>
+                        Anyway, there's nothing stopping you from sticking to
+                        language-neutral constructs when using WSGI, and when
+                        WSGI-specific constructs get used it's fairly explicit
+                        so you know what you are getting into.
+                    </p>
+                    <blockquote>
+                        The idea of building your app as a bunch of WSGI
+                        components and later breaking them out into seperate
+                        REST apps as needed has crossed my mind as well. My
+                        thought on it was to go the other way though and have a
+                        library and registry that abstracts the difference away.
+                        So you would build all your components as WSGI
+                        components but call them through a fully HTTP looking
+                        API. Then, there would be a registry somewhere that
+                        knows which urls map to actual seperate applications and
+                        which can be silently converted to WSGI calls.
+                    </blockquote>
+                    <p>
+                        Titus'
+                        <a
+                            class="reference"
+                            href="http://darcs.idyll.org/~t/projects/wsgi_intercept/README.html"
+                            >WSGI intercept</a
+                        >
+                        does just this transparently for anything using
+                        urllib/2.
+                    </p>
+                    <p>
+                        For something that requires less configuration and is
+                        probably a bit faster of a path,
+                        <a
+                            class="reference"
+                            href="http://pythonpaste.org/module-paste.recursive.html"
+                            >paste.recursive</a
+                        >
+                        offers a model where you phrase it as a WSGI request. By
+                        adding to that, you could translate the request into an
+                        actual HTTP request if it was outside of the WSGI stack.
+                        paste.recursive isn't exactly the right match (and
+                        <a
+                            class="reference"
+                            href="http://pythonpaste.org/module-paste.proxy.html"
+                            >paste.proxy</a
+                        >
+                        isn't exactly right for making a WSGI request into an
+                        HTTP request), but it would be very close to that. You
+                        wouldn't need configuration, because by keeping note of
+                        the request on the way in you can automatically
+                        determine where the root of the WSGI server is. Though
+                        it could be tricky if you have fancy dispatching, like
+                        virtual host dispatching, which means that the server is
+                        capable of internally responding to more requests than
+                        you might think.
+                    </p>
+                    <blockquote>
+                        The other observation I have on performance of
+                        applications built up out of small REST applications is
+                        that asynchronous requests are your friend.
+                    </blockquote>
+                    <p>
+                        I like the idea of using callbacks more, though I
+                        haven't tried it in practice. Something like &quot;do
+                        this, then when you are done POST to this URL with the
+                        results&quot;. Of course, many UIs need synchronous
+                        actions (people like to know that when they do something
+                        it is actually done), so you can't solve all latency
+                        problems this way.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/httpish-all-the-way-down-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    It's some what off-topic, but I've been trying to figure out
+                    how to do simple, RESTful, yet secure authentication for
+                    xmlrpc.
+                </p>
+                <p>
+                    Take, for example, the Blogger API. Sends passwords via
+                    plaintext for each API hit. RESTful, but not secure. You can
+                    make it more secure with a back-and-forth digest
+                    authentication model, but then it's not really RESTful.
+                </p>
+                <p>Thoughts on that?</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/httpish-all-the-way-down-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://kenkinder.com/">Ken Kinder</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    FWIW, the RESTful hashtable (pita) is pretty handy for
+                    building stateful flash apps - that is, thicker clients that
+                    want to be able to save/load, and just stash their per-user
+                    state someplace. Slap on some standard metadata,
+                    authentication policy, and data-pocket mgmt and you have
+                    yourself a really useful mini-app.
+                </p>
+                <p>
+                    No, this would not be used for lots and lots of frequent
+                    hashtable lookups within a program.
+                </p>
+                <p>
+                    While we are on the topic, I have also written a
+                    <a
+                        class="reference"
+                        href="http://alchemicalmusings.blogspot.com/2006/03/saints-in-church-of-writely.html&gt;"
+                        >post</a
+                    >. on why this design is important for people concerned with
+                    freeculture.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/httpish-all-the-way-down-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://alchemicalmustings.blogspot.org">Jonah</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

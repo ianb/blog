@@ -1,327 +1,550 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Concurrency: looking for positive models</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Concurrency: looking for positive models</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Concurrency: looking for positive models</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                My recent post on
+                <a
+                    class="reference"
+                    href="http://blog.colorstudy.com/ianb/weblog/2004/03/30.html#P77"
+                    >Prothon</a
+                >
+                got
+                <a
+                    class="reference"
+                    href="http://blog.colorstudy.com/system/comments.py?u=0000001&amp;p=P77&amp;link=http://blog.colorstudy.com/ianb/weblog/2004/03/30.html%23P77"
+                    >several comments</a
+                >
+                about threading. Which is odd, since I hadn't mentioned
+                threading, and it really was entirely off-topic. (OK,
+                technically it related to Prothon's lack of a Global Interpreter
+                Lock, but I ignored that in my post because the GIL
+                <a
+                    class="reference"
+                    href="http://blog.colorstudy.com/ianb/weblog/2003/10/31.html#P24"
+                    >bores me</a
+                >)
+            </p>
+            <p>
+                During PyCon Bruce Eckel talked a little bit about threads in
+                his speach. Not a lot -- it was incidental to the main topic.
+                But it got a strong reaction from people -- heckling from the
+                crowd (good spirited though it was), and I'm sure Bruce heard
+                other reactions after. Whenever someone asks how to use threads,
+                there's always someone else who says &quot;don't&quot;.
+            </p>
+            <p>
+                Personally, my experience hasn't been so bad. There's been some
+                annoying problems, but frankly concurrency is hard, and a lot of
+                the problems have been due to concurrency issues that wouldn't
+                be magically solved by a different form of concurrency. And a
+                lot of people get things done with threads... isn't that the
+                real test?
+            </p>
+            <p>
+                What I don't see is a practical alternative being presented in
+                most cases. That is, an alternative that is easy to use,
+                reliable, and doesn't require you to twist your mind around new
+                ways of programming (pun not intended... or maybe it is
+                subconsciously?)
+            </p>
+            <p>
+                When people are getting stuff done using threads, it's not a
+                very convincing argument to tell them they are just wrong. And
+                you can take my blocking calls from my cold, dead hands! So
+                what's the realistic alternative? What's the example application
+                that deals with concurrency safely and pleasantly, with a
+                manageable codebase that is friendly to outsiders? I don't want
+                to drink the Kool Aid, I just want to get things done. For all
+                those that feel the same, threads so far have been the safe bet.
+            </p>
+            <p>
+                (Okay, I'll admit it, I wrote this while procrastinating on
+                fixing some threading bugs; oh irony!)
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 30 Mar '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            How about [1]medusa that uses multiplexing instead of multi-process
+            or multithread?
+            <br />
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+            <br />
+            1.
+            <a href="http://www.amk.ca/python/code/medusa.html" target="_blank"
+                >http://www.amk.ca/python/code/medusa.html</a
+            >
+            <div align="right">
+                <a href="https://ianbicking.org/comment780.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://blog.fiorile.org/fiorile/">pm5</a>
+            </div>
+            <hr noshade />
+            Message Passing Concurrency(aka CSP) and Declarative Concurrency.
+            <br />
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Concurrency: looking for positive models</h1>
- 
-<div class="document">
-<p>My recent post on <a class="reference" href="http://blog.colorstudy.com/ianb/weblog/2004/03/30.html#P77">Prothon</a> got <a class="reference" href="http://blog.colorstudy.com/system/comments.py?u=0000001&amp;p=P77&amp;link=http://blog.colorstudy.com/ianb/weblog/2004/03/30.html%23P77">several comments</a> about threading.
-Which is odd, since I hadn't mentioned threading, and it really was
-entirely off-topic.  (OK, technically it related to Prothon's lack of
-a Global Interpreter Lock, but I ignored that in my post because the
-GIL <a class="reference" href="http://blog.colorstudy.com/ianb/weblog/2003/10/31.html#P24">bores me</a>)</p>
-<p>During PyCon Bruce Eckel talked a little bit about threads in his
-speach.  Not a lot -- it was incidental to the main topic.  But it got
-a strong reaction from people -- heckling from the crowd (good
-spirited though it was), and I'm sure Bruce heard other reactions
-after.  Whenever someone asks how to use threads, there's always
-someone else who says &quot;don't&quot;.</p>
-<p>Personally, my experience hasn't been so bad.  There's been some
-annoying problems, but frankly concurrency is hard, and a lot of the
-problems have been due to concurrency issues that wouldn't be
-magically solved by a different form of concurrency.  And a lot of
-people get things done with threads... isn't that the real test?</p>
-<p>What I don't see is a practical alternative being presented in most
-cases.  That is, an alternative that is easy to use, reliable, and
-doesn't require you to twist your mind around new ways of programming
-(pun not intended... or maybe it is subconsciously?)</p>
-<p>When people are getting stuff done using threads, it's not a very
-convincing argument to tell them they are just wrong.  And you can
-take my blocking calls from my cold, dead hands!  So what's the
-realistic alternative?  What's the example application that deals with
-concurrency safely and pleasantly, with a manageable codebase that is
-friendly to outsiders?  I don't want to drink the Kool Aid, I just
-want to get things done.  For all those that feel the same, threads so
-far have been the safe bet.</p>
-<p>(Okay, I'll admit it, I wrote this while procrastinating on fixing
-some threading bugs; oh irony!)</p>
-</div>
- <div class="dates" align="right">
-Created 30 Mar '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- How about [1]medusa that uses multiplexing instead of multi-process or multithread?
-<br />
+            <br />
+            I know of some great results using CSP in real-world large projects.
+            <div align="right">
+                <a href="https://ianbicking.org/comment781.html" rel="nofollow"
+                    >#</a
+                >
+                Two saviors to threading
+            </div>
+            <hr noshade />
+            The paper
+            <a
+                href="http://www.usenix.org/events/hotos03/tech/vonbehren.html"
+                target="_blank"
+                >Why events are a bad idea</a
+            >
+            throughs some light on this issue.
+            <div align="right">
+                <a href="https://ianbicking.org/comment782.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.synnergy.net/~rwx/">Juan M. Bello Rivas</a>
+            </div>
+            <hr noshade />
+            Reading through this and the previous discussions, Jython seems to
+            provide an MP solution for those who need it. IronPython might as
+            well, so why throw out the baby (python) or the bathwater (GIL)?
+            <br />
+            In comparative ignorance
+            <div align="right">
+                <a href="https://ianbicking.org/comment783.html" rel="nofollow"
+                    >#</a
+                >
+                paul
+            </div>
+            <hr noshade />
+            The "Why events are a bad idea" paper DOES NOT APPLY TO PRE-EMPTIVE
+            THREADING IMPLEMENTATIONS LIKE PTHREADS! Yes, of course, if you
+            write your own specific threading implementation designed to be
+            faster, easier and more predictable than standard
+            works-in-my-compiler-right-now events, then YES IT WILL BE EASIER.
+            No shit!
+            <br />
 
-<br />
- 1. <a href="http://www.amk.ca/python/code/medusa.html" target="_blank">http://www.amk.ca/python/code/medusa.html</a>
- <div align="right"><a href="http://blog.ianbicking.org/comment780.html" rel="nofollow">#</a> <a href="http://blog.fiorile.org/fiorile/">pm5</a></div><hr noshade>
- Message Passing Concurrency(aka CSP) and Declarative Concurrency.
-<br />
+            <br />
+            If you want "blocking" calls without koolaid, use Stackless. It
+            offers a CSP paradigm. Otherwise, you're going to need to drink some
+            koolaid because Python needs macros and/or new syntax to do other
+            kinds of "sugar free" magic concurrency.
+            <div align="right">
+                <a href="https://ianbicking.org/comment784.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            One word: Oz!
+            <br />
 
-<br />
-I know of some great results using CSP in real-world large projects.
- <div align="right"><a href="http://blog.ianbicking.org/comment781.html" rel="nofollow">#</a> Two saviors to threading</div><hr noshade>
- The paper <a href="http://www.usenix.org/events/hotos03/tech/vonbehren.html" target="_blank">Why events are a bad idea</a> throughs some light on this issue.
- <div align="right"><a href="http://blog.ianbicking.org/comment782.html" rel="nofollow">#</a> <a href="http://www.synnergy.net/~rwx/">Juan M. Bello Rivas</a></div><hr noshade>
- Reading through this and the previous discussions, Jython seems to provide an MP solution for those who need it. IronPython might as well, so why throw out the baby (python) or the bathwater (GIL)?
-<br />
-In comparative ignorance
- <div align="right"><a href="http://blog.ianbicking.org/comment783.html" rel="nofollow">#</a> paul</div><hr noshade>
- The "Why events are a bad idea" paper DOES NOT APPLY TO PRE-EMPTIVE THREADING IMPLEMENTATIONS LIKE PTHREADS!  Yes, of course, if you write your own specific threading implementation designed to be faster, easier and more predictable than standard works-in-my-compiler-right-now events, then YES IT WILL BE EASIER.  No shit!
-<br />
+            <br />
+            Oz isn't the last (or the first) word in declarative concurrency,
+            but I strongly recommend playing with it, if only for a little
+            while, just so you can see how much the DC/CSP approach changes
+            things. It doesn't solve all your problems at once, but it gives you
+            a perspective from which the "low-hanging fruit" appears in
+            *completely* different places.
+            <div align="right">
+                <a href="https://ianbicking.org/comment785.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.dominicfox.net">Dominic Fox</a>
+            </div>
+            <hr noshade />
 
-<br />
-If you want "blocking" calls without koolaid, use Stackless.  It offers a CSP paradigm.  Otherwise, you're going to need to drink some koolaid because Python needs macros and/or new syntax to do other kinds of "sugar free" magic concurrency.
- <div align="right"><a href="http://blog.ianbicking.org/comment784.html" rel="nofollow">#</a> <a href="http://bob.pycs.net/">Bob Ippolito</a></div><hr noshade>
- One word: Oz!
-<br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment786.html" rel="nofollow"
+                    >#</a
+                >
+                Al
+            </div>
+            <hr noshade />
+            Yeah, I would've much rather seen a PythOz than a Prothon :) I like
+            Oz's feature set, but not its syntax.
+            <div align="right">
+                <a href="https://ianbicking.org/comment787.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            I agree with you Ian. Until I'm dragged into some environment that
+            provides a relatively easy alternative to threads (by which I mean,
+            I can do blocking calls or something that looks a lot like them),
+            I'm sticking with threads. A lot of people say that "threads are for
+            people who don't understand a state machine". I've written my share
+            of event-driven asynchronous code in which I need to maintain a
+            state machine, and I'll just need to admit that, yes, I'm too dumb.
+            The faster I need to get the job done, the dumber I become. It just
+            takes me far too long to figure out what the states *are*,
+            especially in anything more than something trivial. time.sleep(30)!
+            ;-)
+            <div align="right">
+                <a href="https://ianbicking.org/comment788.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://plope.com">Chris McDonough</a>
+            </div>
+            <hr noshade />
+            In static languages like C, an event-based system offers some
+            complication and hindrance. But in Python, it has been relatively
+            easy for me to write in an event-based manner, because of dynamic
+            function declaration.
+            <br />
 
-<br />
-Oz isn't the last (or the first) word in declarative concurrency, but I strongly recommend playing with it, if only for a little while, just so you can see how much the DC/CSP approach changes things. It doesn't solve all your problems at once, but it gives you a perspective from which the "low-hanging fruit" appears in *completely* different places.
- <div align="right"><a href="http://blog.ianbicking.org/comment785.html" rel="nofollow">#</a> <a href="http://www.dominicfox.net">Dominic Fox</a></div><hr noshade>
- 
- <div align="right"><a href="http://blog.ianbicking.org/comment786.html" rel="nofollow">#</a> Al</div><hr noshade>
- Yeah, I would've much rather seen a PythOz than a Prothon :)  I like Oz's feature set, but not its syntax.
- <div align="right"><a href="http://blog.ianbicking.org/comment787.html" rel="nofollow">#</a> <a href="http://bob.pycs.net/">Bob Ippolito</a></div><hr noshade>
- I agree with you Ian.  Until I'm dragged into some environment that provides a relatively easy alternative to threads (by which I mean, I can do blocking calls or something that looks a lot like them), I'm sticking with threads.  A lot of people say that "threads are for people who don't understand a state machine".  I've written my share of event-driven asynchronous code in which I need to maintain a state machine, and I'll just need to admit that, yes, I'm too dumb.  The faster I need to get the job done, the dumber I become.  It just takes me far too long to figure out what the states *are*, especially in anything more than something trivial.  time.sleep(30)! ;-)
- <div align="right"><a href="http://blog.ianbicking.org/comment788.html" rel="nofollow">#</a> <a href="http://plope.com">Chris McDonough</a></div><hr noshade>
- In static languages like C, an event-based system offers some complication and hindrance.  But in Python, it has been relatively easy for me to write in an event-based manner, because of dynamic function declaration.
-<br />
+            <br />
+            Here's a code snippet from my application, Mnet, boiled down to
+            minimal form:
+            <br />
 
-<br />
-Here's a code snippet from my application, Mnet, boiled down to minimal form:
-<br />
-
-<br />
-    def request_block_from_peer(self, peerId, blockId):
-<br />
-        def _handle_request_block_result(outcome, failure_reason=None):
-<br />
-            # No matter what comes out of this reply, we are removing this 
-<br />
-            # blockId/peerId pair from the located-blocks data.  (Because either 
-<br />
-            # this result means that we now have the block, or it means that the 
-<br />
+            <br />
+            def request_block_from_peer(self, peerId, blockId):
+            <br />
+            def _handle_request_block_result(outcome, failure_reason=None):
+            <br />
+            # No matter what comes out of this reply, we are removing this
+            <br />
+            # blockId/peerId pair from the located-blocks data. (Because either
+            <br />
+            # this result means that we now have the block, or it means that the
+            <br />
             # peer does not have the block!)
-<br />
+            <br />
             self.data.remove_Ids_of_located_blocks(peerId, blockIds=(blockId,))
-<br />
+            <br />
             if failure_reason or (outcome['result'] != "success"):
-<br />
-                # Inform reliability handicapper that this was actually a failure.
-<br />
-                self.mtm._keeper.get_counterparty_object(peerId).decrement_reliability()
-<br />
-                # Wake the block wrangling strategy -- failure to retrieve a block is the kind of thing that it might want to respond to.
-<br />
-                self.strategy.schedule_event()
-<br />
-            else:
-<br />
-                self._handle_block(blockId, outcome['data'], peerId)
-<br />
-
-<br />
-        self.mtm.initiate(peerId, "request block", blockId, outcome_func=_handle_timely_request_block_result)
-<br />
-
-<br />
-Back in the bad old days when this project used Python's multithreading, this code would have looked something like this:
-<br />
-
-<br />
-    def request_block_from_peer(self, peerId, blockId):
-<br />
-        try:
-<br />
-            outcome = self.mtm.initiate(peerId, "request block", blockId)
-<br />
-        except TransactionFailure, le:
-<br />
-            outcome = {'result': "transaction failure", 'le': le}
-<br />
-  
-<br />
-        # No matter what comes out of this reply, we are removing this 
-<br />
-        # blockId/peerId pair from the located-blocks data.  (Because either 
-<br />
-        # this result means that we now have the block, or it means that the 
-<br />
-        # peer does not have the block!)
-<br />
-        self.data.remove_Ids_of_located_blocks(peerId, blockIds=(blockId,))
-<br />
-
-<br />
-        if outcome['result'] != "success":
-<br />
+            <br />
             # Inform reliability handicapper that this was actually a failure.
-<br />
+            <br />
             self.mtm._keeper.get_counterparty_object(peerId).decrement_reliability()
-<br />
-            # Wake the block wrangling strategy -- failure to retrieve a block is the kind of thing that it might want to respond to.
-<br />
+            <br />
+            # Wake the block wrangling strategy -- failure to retrieve a block
+            is the kind of thing that it might want to respond to.
+            <br />
+            self.strategy.schedule_event()
+            <br />
+            else:
+            <br />
+            self._handle_block(blockId, outcome['data'], peerId)
+            <br />
+
+            <br />
+            self.mtm.initiate(peerId, "request block", blockId,
+            outcome_func=_handle_timely_request_block_result)
+            <br />
+
+            <br />
+            Back in the bad old days when this project used Python's
+            multithreading, this code would have looked something like this:
+            <br />
+
+            <br />
+            def request_block_from_peer(self, peerId, blockId):
+            <br />
+            try:
+            <br />
+            outcome = self.mtm.initiate(peerId, "request block", blockId)
+            <br />
+            except TransactionFailure, le:
+            <br />
+            outcome = {'result': "transaction failure", 'le': le}
+            <br />
+
+            <br />
+            # No matter what comes out of this reply, we are removing this
+            <br />
+            # blockId/peerId pair from the located-blocks data. (Because either
+            <br />
+            # this result means that we now have the block, or it means that the
+            <br />
+            # peer does not have the block!)
+            <br />
+            self.data.remove_Ids_of_located_blocks(peerId, blockIds=(blockId,))
+            <br />
+
+            <br />
+            if outcome['result'] != "success":
+            <br />
+            # Inform reliability handicapper that this was actually a failure.
+            <br />
+            self.mtm._keeper.get_counterparty_object(peerId).decrement_reliability()
+            <br />
+            # Wake the block wrangling strategy -- failure to retrieve a block
+            is the kind of thing that it might want to respond to.
+            <br />
             self.strategy.notify()
-<br />
+            <br />
             return None
-<br />
-        else:
-<br />
+            <br />
+            else:
+            <br />
             return (blockId, outcome['data'], peerId,)
-<br />
+            <br />
 
-<br />
+            <br />
 
-<br />
-Now, the multithreading version might be easier to read because the sequence of runtime events follows the sequence of code, but I hope you will agree that the event-based version is clear enough.
-<br />
+            <br />
+            Now, the multithreading version might be easier to read because the
+            sequence of runtime events follows the sequence of code, but I hope
+            you will agree that the event-based version is clear enough.
+            <br />
 
-<br />
-The nice thing about the event-based approach is that I don't have to spend any time worrying about the possibility that data will change out from under me during the execution of the "_handle_request_block_result()" function.  That function, and *all* functions, get executed atomically, in their entirety, without any of the data that they depend on changing in any way other than as dictated by the code of that one function.  It is difficult to express what a blessed relief it is to be able to just naively read the code and assume that if it says "remove the id and then decrement the reliability" then both of those effects will happen atomically, and it will not make any difference which order you do them in, and the data will not unexpectedly change between the first event and the second.
-<br />
+            <br />
+            The nice thing about the event-based approach is that I don't have
+            to spend any time worrying about the possibility that data will
+            change out from under me during the execution of the
+            "_handle_request_block_result()" function. That function, and *all*
+            functions, get executed atomically, in their entirety, without any
+            of the data that they depend on changing in any way other than as
+            dictated by the code of that one function. It is difficult to
+            express what a blessed relief it is to be able to just naively read
+            the code and assume that if it says "remove the id and then
+            decrement the reliability" then both of those effects will happen
+            atomically, and it will not make any difference which order you do
+            them in, and the data will not unexpectedly change between the first
+            event and the second.
+            <br />
 
-<br />
-Anyway, when I started out to write this note I just wanted to emphasize to you that for me, using Python, switching from multithreaded to event-based was relatively painless.  I've also had to do the same in some C code recently and it was a lot more hassle in C.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment789.html" rel="nofollow">#</a> <a href="http://zooko.com/log.html">Zooko</a></div><hr noshade>
- Hm.  Here are the two code snippets with "_" in place of " ".  Sorry about that.
-<br />
+            <br />
+            Anyway, when I started out to write this note I just wanted to
+            emphasize to you that for me, using Python, switching from
+            multithreaded to event-based was relatively painless. I've also had
+            to do the same in some C code recently and it was a lot more hassle
+            in C.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment789.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://zooko.com/log.html">Zooko</a>
+            </div>
+            <hr noshade />
+            Hm. Here are the two code snippets with "_" in place of " ". Sorry
+            about that.
+            <br />
 
-<br />
-In static languages like C, an event-based system offers some complication and hindrance.  But in Python, it has been relatively easy for me to write in an event-based manner, because of dynamic function declaration.
-<br />
+            <br />
+            In static languages like C, an event-based system offers some
+            complication and hindrance. But in Python, it has been relatively
+            easy for me to write in an event-based manner, because of dynamic
+            function declaration.
+            <br />
 
-<br />
-Here's a code snippet from my application, Mnet, boiled down to minimal form:
-<br />
+            <br />
+            Here's a code snippet from my application, Mnet, boiled down to
+            minimal form:
+            <br />
 
-<br />
-____def request_block_from_peer(self, peerId, blockId):
-<br />
-________def _handle_request_block_result(outcome, failure_reason=None):
-<br />
-____________# No matter what comes out of this reply, we are removing this 
-<br />
-____________# blockId/peerId pair from the located-blocks data.  (Because either 
-<br />
-____________# this result means that we now have the block, or it means that the 
-<br />
-____________# peer does not have the block!)
-<br />
-____________self.data.remove_Ids_of_located_blocks(peerId, blockIds=(blockId,))
-<br />
-____________if failure_reason or (outcome['result'] != "success"):
-<br />
-________________# Inform reliability handicapper that this was actually a failure.
-<br />
-________________self.mtm._keeper.get_counterparty_object(peerId).decrement_reliability()
-<br />
-________________# Wake the block wrangling strategy -- failure to retrieve a block is the kind of thing that it might want to respond to.
-<br />
-________________self.strategy.schedule_event()
-<br />
-____________else:
-<br />
-________________self._handle_block(blockId, outcome['data'], peerId)
-<br />
-_
-<br />
-________self.mtm.initiate(peerId, "request block", blockId, outcome_func=_handle_timely_request_block_result)
-<br />
+            <br />
+            ____def request_block_from_peer(self, peerId, blockId):
+            <br />
+            ________def _handle_request_block_result(outcome,
+            failure_reason=None):
+            <br />
+            ____________# No matter what comes out of this reply, we are
+            removing this
+            <br />
+            ____________# blockId/peerId pair from the located-blocks data.
+            (Because either
+            <br />
+            ____________# this result means that we now have the block, or it
+            means that the
+            <br />
+            ____________# peer does not have the block!)
+            <br />
+            ____________self.data.remove_Ids_of_located_blocks(peerId,
+            blockIds=(blockId,))
+            <br />
+            ____________if failure_reason or (outcome['result'] != "success"):
+            <br />
+            ________________# Inform reliability handicapper that this was
+            actually a failure.
+            <br />
+            ________________self.mtm._keeper.get_counterparty_object(peerId).decrement_reliability()
+            <br />
+            ________________# Wake the block wrangling strategy -- failure to
+            retrieve a block is the kind of thing that it might want to respond
+            to.
+            <br />
+            ________________self.strategy.schedule_event()
+            <br />
+            ____________else:
+            <br />
+            ________________self._handle_block(blockId, outcome['data'], peerId)
+            <br />
+            _
+            <br />
+            ________self.mtm.initiate(peerId, "request block", blockId,
+            outcome_func=_handle_timely_request_block_result)
+            <br />
 
-<br />
-Back in the bad old days when this project used Python's multithreading, this code would have looked something like this:
-<br />
+            <br />
+            Back in the bad old days when this project used Python's
+            multithreading, this code would have looked something like this:
+            <br />
 
-<br />
-____def request_block_from_peer(self, peerId, blockId):
-<br />
-________try:
-<br />
-____________outcome = self.mtm.initiate(peerId, "request block", blockId)
-<br />
-________except TransactionFailure, le:
-<br />
-____________outcome = {'result': "transaction failure", 'le': le}
-<br />
-_ 
-<br />
-________# No matter what comes out of this reply, we are removing this 
-<br />
-________# blockId/peerId pair from the located-blocks data.  (Because either 
-<br />
-________# this result means that we now have the block, or it means that the 
-<br />
-________# peer does not have the block!)
-<br />
-________self.data.remove_Ids_of_located_blocks(peerId, blockIds=(blockId,))
-<br />
-_
-<br />
-________if outcome['result'] != "success":
-<br />
-____________# Inform reliability handicapper that this was actually a failure.
-<br />
-____________self.mtm._keeper.get_counterparty_object(peerId).decrement_reliability()
-<br />
-____________# Wake the block wrangling strategy -- failure to retrieve a block is the kind of thing that it might want to respond to.
-<br />
-____________self.strategy.notify()
-<br />
-____________return None
-<br />
-________else:
-<br />
-____________return (blockId, outcome['data'], peerId,)
-<br />
+            <br />
+            ____def request_block_from_peer(self, peerId, blockId):
+            <br />
+            ________try:
+            <br />
+            ____________outcome = self.mtm.initiate(peerId, "request block",
+            blockId)
+            <br />
+            ________except TransactionFailure, le:
+            <br />
+            ____________outcome = {'result': "transaction failure", 'le': le}
+            <br />
+            _
+            <br />
+            ________# No matter what comes out of this reply, we are removing
+            this
+            <br />
+            ________# blockId/peerId pair from the located-blocks data. (Because
+            either
+            <br />
+            ________# this result means that we now have the block, or it means
+            that the
+            <br />
+            ________# peer does not have the block!)
+            <br />
+            ________self.data.remove_Ids_of_located_blocks(peerId,
+            blockIds=(blockId,))
+            <br />
+            _
+            <br />
+            ________if outcome['result'] != "success":
+            <br />
+            ____________# Inform reliability handicapper that this was actually
+            a failure.
+            <br />
+            ____________self.mtm._keeper.get_counterparty_object(peerId).decrement_reliability()
+            <br />
+            ____________# Wake the block wrangling strategy -- failure to
+            retrieve a block is the kind of thing that it might want to respond
+            to.
+            <br />
+            ____________self.strategy.notify()
+            <br />
+            ____________return None
+            <br />
+            ________else:
+            <br />
+            ____________return (blockId, outcome['data'], peerId,)
+            <br />
 
-<br />
+            <br />
 
-<br />
-Now, the multithreading version might be easier to read because the sequence of runtime events follows the sequence of code, but I hope you will agree that the event-based version is clear enough.
-<br />
+            <br />
+            Now, the multithreading version might be easier to read because the
+            sequence of runtime events follows the sequence of code, but I hope
+            you will agree that the event-based version is clear enough.
+            <br />
 
-<br />
-The nice thing about the event-based approach is that I don't have to spend any time worrying about the possibility that data will change out from under me during the execution of the "_handle_request_block_result()" function.  That function, and *all* functions, get executed atomically, in their entirety, without any of the data that they depend on changing in any way other than as dictated by the code of that one function.  It is difficult to express what a blessed relief it is to be able to just naively read the code and assume that if it says "remove the id and then decrement the reliability" then both of those effects will happen atomically, and it will not make any difference which order you do them in, and the data will not unexpectedly change between the first event and the second.
-<br />
+            <br />
+            The nice thing about the event-based approach is that I don't have
+            to spend any time worrying about the possibility that data will
+            change out from under me during the execution of the
+            "_handle_request_block_result()" function. That function, and *all*
+            functions, get executed atomically, in their entirety, without any
+            of the data that they depend on changing in any way other than as
+            dictated by the code of that one function. It is difficult to
+            express what a blessed relief it is to be able to just naively read
+            the code and assume that if it says "remove the id and then
+            decrement the reliability" then both of those effects will happen
+            atomically, and it will not make any difference which order you do
+            them in, and the data will not unexpectedly change between the first
+            event and the second.
+            <br />
 
-<br />
-Anyway, when I started out to write this note I just wanted to emphasize to you that for me, using Python, switching from multithreaded to event-based was relatively painless.  I've also had to do the same in some C code recently and it was a lot more hassle in C.
-<br />
+            <br />
+            Anyway, when I started out to write this note I just wanted to
+            emphasize to you that for me, using Python, switching from
+            multithreaded to event-based was relatively painless. I've also had
+            to do the same in some C code recently and it was a lot more hassle
+            in C.
+            <br />
 
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment790.html" rel="nofollow">#</a> <a href="http://zooko.com/log.html">Zooko</a></div><hr noshade>
- I'm coming into this late and with only a partial comment, but another approach is coroutines (a special case of continuations).  Coroutines feel like threads but are non-preemptive like events.  Python generators are themselves a special case of coroutines and Stackless Python has [had?] coroutines and continuations (although theirs seems a little more obtuse than I think it should be).
-<br />
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment790.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://zooko.com/log.html">Zooko</a>
+            </div>
+            <hr noshade />
+            I'm coming into this late and with only a partial comment, but
+            another approach is coroutines (a special case of continuations).
+            Coroutines feel like threads but are non-preemptive like events.
+            Python generators are themselves a special case of coroutines and
+            Stackless Python has [had?] coroutines and continuations (although
+            theirs seems a little more obtuse than I think it should be).
+            <br />
 
-<br />
-As an example application, SimPy uses generators in a "coroutine like" fashion for creating dozens or hundreds of "threads of execution".  The code for the each "thread" is straightforward and linear, normal Python methods.
- <div align="right"><a href="http://blog.ianbicking.org/comment791.html" rel="nofollow">#</a> <a href="http://bitsko.slc.ut.us/">Ken MacLeod</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <br />
+            As an example application, SimPy uses generators in a "coroutine
+            like" fashion for creating dozens or hundreds of "threads of
+            execution". The code for the each "thread" is straightforward and
+            linear, normal Python methods.
+            <div align="right">
+                <a href="https://ianbicking.org/comment791.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bitsko.slc.ut.us/">Ken MacLeod</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

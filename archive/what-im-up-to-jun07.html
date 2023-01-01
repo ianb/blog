@@ -1,294 +1,720 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>What I've Been Up To</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>What I've Been Up To</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>What I've Been Up To</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                I'm off for a bit of vacation, but before then I thought I'd
+                throw up a bunch of links to stuff I've been doing in the last
+                couple months:
+            </p>
+            <div class="section">
+                <h1><a id="html" name="html">HTML</a></h1>
+                <p>
+                    I've been doing a lot with HTML lately. HTML is great,
+                    because it's important. (Hmm... this statement sounds kind
+                    of weird. <em>Because</em> HTML is important, if you don't
+                    understand why it is great you need to think harder. Now the
+                    statement sounds weird, but in a <em>deep</em> way)
+                </p>
+                <ul class="simple">
+                    <li>
+                        I've started working with microformats some. This
+                        initially started with an
+                        <a
+                            class="reference"
+                            href="http://wiki.laptop.org/go/Content_stamping"
+                            >OLPC project</a
+                        >, where I wrote an
+                        <a
+                            class="reference"
+                            href="http://svn.colorstudy.com/home/ianb/hReviewParser/trunk"
+                            >hReview parser</a
+                        >
+                        (<a
+                            class="reference"
+                            href="http://microformats.org/wiki/hreview"
+                            >hReview</a
+                        >
+                        is a microformat).
+                    </li>
+                    <li>
+                        Then related to that, I wanted to download a bunch of
+                        pages in an isolated form, so all the internal links are
+                        fixed up. This became
+                        <a
+                            class="reference"
+                            href="http://svn.colorstudy.com/home/ianb/PageCollector/trunk"
+                            >PageCollector</a
+                        >. Since then I've added a script frontend. I think this
+                        could be a generally handy export system. It doesn't
+                        just make links relative, it also lets you completely
+                        remap filenames and is fairly careful about links
+                        (including links in CSS).
+                    </li>
+                    <li>
+                        Doing all this HTML-related stuff, I've been using
+                        <a class="reference" href="http://codespeak.net/lxml/"
+                            >lxml</a
+                        >
+                        a lot (and it should be inferred I therefor also like
+                        <a class="reference" href="http://xmlsoft.org/"
+                            >libxml2</a
+                        >
+                        a lot). I like lxml a lot; probably the biggest reason
+                        is that it has a fast permissive HTML parser. But the
+                        ElementTree API that lxml uses can be a bit awkward for
+                        HTML -- it works well for XML, but in HTML there's lots
+                        of mixing of text and tags, and that feels really weird
+                        in the ElementTree API. So I've started
+                        <a
+                            class="reference"
+                            href="http://codespeak.net/svn/lxml/branch/html"
+                            >lxml.html</a
+                        >
+                        in a branch with lots of feedback from Stefan Behnel.
+                        This adds methods that are useful in HTML. With just a
+                        few smallish methods, I think it makes HTML much easier
+                        to work with in lxml.
+                    </li>
+                    <li>
+                        Though
+                        <a
+                            class="reference"
+                            href="http://www.crummy.com/software/BeautifulSoup/"
+                            >BeautifulSoup</a
+                        >
+                        is nice, it's not a C-based HTML parser. With
+                        <a
+                            class="reference"
+                            href="http://www.openplans.org/projects/deliverance/"
+                            >Deliverance</a
+                        >
+                        we are literally parsing and rewriting every page as it
+                        comes through our site. I couldn't do this with
+                        BeautifulSoup. And we're not doing any crappy regex
+                        stuff; lxml lets us actually understand the HTML the way
+                        the browser understands the HTML. That's important. This
+                        is kind of the promise of XHTML -- the ability to create
+                        smart and useful intermediaries -- that XHTML never
+                        really fulfilled. The idea of smart intermediaries is a
+                        powerful one, XHTML just wasn't the right basis;
+                        <em>intermediaries</em> are supposed to work with
+                        <em>real</em> endpoints, and those endpoints were and
+                        continue to be HTML, not XHTML.
+                        <a
+                            class="reference"
+                            href="http://code.google.com/p/html5lib/"
+                            >html5lib</a
+                        >
+                        is cool too as an HTML parser, and important as a
+                        reference implementation, but I'll mostly be waiting for
+                        that work to filter back into something like libxml2.
+                    </li>
+                    <li>
+                        I should note that I think the stream model of handling
+                        HTML (as
+                        <a
+                            class="reference"
+                            href="http://python.org/doc/current/lib/module-HTMLParser.html"
+                            >HTMLParser</a
+                        >
+                        uses) is lame. Typical HTML is not very big, and a
+                        document model (where the whole document is loaded into
+                        memory) is way easier to handle. HTML is best understood
+                        as a document. (<a
+                            class="reference"
+                            href="http://genshi.edgewall.org/"
+                            >Genshi</a
+                        >
+                        would probably be rockin' fast if it used lxml)
+                    </li>
+                    <li>
+                        As part of lxml.html I've been writing an
+                        <a
+                            class="reference"
+                            href="http://codespeak.net/svn/lxml/branch/html/src/lxml/html/clean.py"
+                            >HTML cleaning module</a
+                        >. It's a bit messy, and incomplete, but I think it will
+                        be really useful. Because we fully parse and then
+                        serialize the HTML, a lot of XSS attacks are avoided
+                        really early. At work David Turner has been working on a
+                        <a
+                            class="reference"
+                            href="http://en.wikipedia.org/wiki/Transclusion"
+                            >Transclusion</a
+                        >
+                        intermediary called
+                        <a
+                            class="reference"
+                            href="https://svn.openplans.org/svn/transcluder/trunk"
+                            >Transcluder</a
+                        >. It's a little frightening to fold together disparate
+                        pieces of HTML; this might make it less frightening.
+                    </li>
+                    <li>
+                        I took the pattern from
+                        <tt class="docutils literal"
+                            ><span class="pre"
+                                >formencode.doctest_xml_compare</span
+                            ></tt
+                        >
+                        and also ported it to lxml. Now you can do
+                        <em>semantic</em> HTML and XML diffs in your doctests,
+                        instead of literal string comparison. This means that
+                        things like the order of your attributes are ignored, as
+                        is whitespace. And the diffs help highlight problems in
+                        a more fine-grained way. Using the html branch you can
+                        do
+                        <tt class="docutils literal"
+                            ><span class="pre">from</span>
+                            <span class="pre">lxml</span>
+                            <span class="pre">import</span>
+                            <span class="pre">usedoctest</span></tt
+                        >
+                        or
+                        <tt class="docutils literal"
+                            ><span class="pre">from</span>
+                            <span class="pre">lxml.html</span>
+                            <span class="pre">import</span>
+                            <span class="pre">usedoctest</span></tt
+                        >
+                        to enable the comparison inside a doctest. And you don't
+                        need a custom doctest runner. I managed to do this using
+                        horrible horrible monkeypatching. Also from FormEncode
+                        I'm hoping to port
+                        <a
+                            class="reference"
+                            href="http://formencode.org/htmlfill.html"
+                            >htmlfill</a
+                        >
+                        over to lxml.html sometime too.
+                    </li>
+                    <li>
+                        With Luke Tucker we wrote an
+                        <a
+                            class="reference"
+                            href="http://codespeak.net/svn/lxml/branch/html/src/lxml/html/diff.py"
+                            >html diff module</a
+                        >, which I've also put into lxml.html. This shows
+                        textual differences while trying to avoid markup
+                        differences (since it's really hard to visually
+                        represent changes in markup, and also usually not what
+                        people care about). This is surprisingly difficult
+                        because you also need to <em>preserve</em> the markup --
+                        you can't just smash all the words together. I think
+                        it's a pretty good implementation, and there aren't that
+                        many implementations of this out there. You can also do
+                        blame style annotations, showing who added what over the
+                        history of the page.
+                    </li>
+                </ul>
+            </div>
+            <div class="section">
+                <h1><a id="open-plans" name="open-plans">Open Plans</a></h1>
+                <p>
+                    Stuff from
+                    <a class="reference" href="http://topp.openplans.org"
+                        >work</a
+                    >
+                    (which is a little vague, because work, private projects,
+                    HTML, OLPC, all overlap a lot).
+                </p>
+                <ul class="simple">
+                    <li>
+                        <a
+                            class="reference"
+                            href="http://www.openplans.org/projects/deliverance/"
+                            >Deliverance</a
+                        >
+                        is deployed on the live site. We haven't really
+                        <em>used</em> its functionality much yet. But it's
+                        awesome functionality once we get around to using it.
+                    </li>
+                    <li>
+                        Related to that deployment, I spent some time with
+                        <tt class="docutils literal"
+                            ><span class="pre">paste.httpserver</span></tt
+                        >
+                        (trunk only) on the thread pool. It now adapts the
+                        thread pool to add threads when necessary, kill threads
+                        that seem to be wedged, and various tools around that.
+                        <a
+                            class="reference"
+                            href="http://sebulba.wikispaces.com/recipe+thread2"
+                            >This recipe</a
+                        >
+                        was handy, as now I can kill threads. It's surprisingly
+                        slow, though -- it frequently takes several minutes for
+                        the thread to be killed. But it shows up as a regular
+                        exception, which is great. You can read about the
+                        details in
+                        <a
+                            class="reference"
+                            href="http://svn.pythonpaste.org/Paste/trunk/docs/paste-httpserver-threadpool.txt"
+                            >this document</a
+                        >.
+                    </li>
+                    <li>
+                        I've been extracting some stuff into
+                        <a
+                            class="reference"
+                            href="http://pythonpaste.org/wsgiproxy/"
+                            >WSGIProxy</a
+                        >
+                        for your non-browser-based proxying. This is mostly for
+                        handling HTTP-based dispatch between server
+                        applications.
+                    </li>
+                    <li>
+                        Not really for work, but related to proxying I whipped
+                        together a
+                        <a
+                            class="reference"
+                            href="http://svn.colorstudy.com/home/ianb/OLPCProxy/trunk"
+                            >little HTTP proxy</a
+                        >
+                        using Paste and WSGI middleware. It kind of works. It
+                        was just a prototype, so I haven't worked on it more,
+                        but with just a <em>little</em> more work I think it
+                        should be easy to turn any WSGI middleware into an HTTP
+                        proxy. This is the kind of proxy you configure in your
+                        browser.
+                    </li>
+                    <li>
+                        A followup to the
+                        <a
+                            class="reference"
+                            href="evaluating-wysiwyg-editors.html"
+                            >HTML WYSIWYG post</a
+                        >, we decided to use
+                        <a
+                            class="reference"
+                            href="http://xinha.python-hosting.com/"
+                            >Xinha</a
+                        >. I feel pretty good about the decision, which is
+                        primarily motivated by Xinha's UI -- in small but
+                        important ways it feels like the best UI among the
+                        bunch. It's just more polished and higher quality than
+                        the other options. It's also a Real Open Source Project,
+                        which matters to us. But we haven't actually implemented
+                        this yet.
+                    </li>
+                    <li>
+                        I wrote a
+                        <a
+                            class="reference"
+                            href="http://svn.colorstudy.com/home/ianb/dtopt"
+                            >total hack of doctest</a
+                        >
+                        that lets you do
+                        <tt class="docutils literal"
+                            ><span class="pre">from</span>
+                            <span class="pre">dtopt</span>
+                            <span class="pre">import</span>
+                            <span class="pre">ELLIPSIS</span></tt
+                        >, and then the ELLIPSIS option (that lets you use
+                        <tt class="docutils literal"
+                            ><span class="pre">...</span></tt
+                        >
+                        as a wildcard in output) will be enabled for the rest of
+                        your doctest. It's ugly, but I might add a few more
+                        similar hacks to that package and make it into something
+                        more real. But still ugly.
+                    </li>
+                    <li>
+                        With Whit Morris I've been working on a
+                        <a
+                            class="reference"
+                            href="https://svn.openplans.org/svn/TaggerStore/trunk"
+                            >Tagging application</a
+                        >. It's just getting started, so nothing working yet. I
+                        like the
+                        <a
+                            class="reference"
+                            href="https://svn.openplans.org/svn/TaggerStore/trunk/taggerstore/atom.py"
+                            >atom module</a
+                        >, which represents Atom feeds and entries as plain XML.
+                        This didn't occur to me at first -- I was going to
+                        create a Python representation of the Atom data model
+                        and then add parse and serialize methods to it. This is
+                        wrong, because the Atom data model <em>is</em> XML. If
+                        you add a funky custom element to your entry and I
+                        normalize it into oblivion, then I've made a crappy
+                        library; by making the XML the one and only source of
+                        information I avoid such things.
+                    </li>
+                    <li>
+                        I wrote a
+                        <a
+                            class="reference"
+                            href="https://svn.openplans.org/svn/WebClippy/trunk/WebClippy/frame.html?doc=https%3A//svn.openplans.org/svn/WebClippy/trunk/examples/example.html&amp;help=https%3A//svn.openplans.org/svn/WebClippy/trunk/examples/example-docs.html"
+                            >little proof of concept for web application help
+                            called WebClippy</a
+                        >
+                        (svn
+                        <a
+                            class="reference"
+                            href="https://svn.openplans.org/svn/WebClippy/trunk/"
+                            >here</a
+                        >). It's inspired by
+                        <a class="reference" href="http://hacketyhack.net/"
+                            >Hackety Hack</a
+                        >
+                        (a neat Ruby educational environment) and how tutorials
+                        are written there -- just a very simple bit of
+                        persistent help. Writing it made me realize that
+                        <a
+                            class="reference"
+                            href="http://meyerweb.com/eric/tools/s5/"
+                            >S5</a
+                        >
+                        should totally be rewritten, because Javascript-based
+                        slideshow scripts are easy to write and S5 is annoying.
+                        Anyway, I need to actually try to document something
+                        with WebClippy, because my test slides are lame, and
+                        I've decided realistic examples are essential to good
+                        development.
+                    </li>
+                </ul>
+            </div>
+            <div class="section">
+                <h1><a id="olpc" name="olpc">OLPC</a></h1>
+                <p>
+                    Stuff from
+                    <a class="reference" href="http://laptop.org"
+                        >One Laptop Per Child</a
+                    >
+                    (besides the HTML experiments)...
+                </p>
+                <ul class="simple">
+                    <li>
+                        I went to Boston for OLPC, and we talked a lot about
+                        <a
+                            class="reference"
+                            href="http://wiki.laptop.org/go/Annotation"
+                            >Web-Based Annotation</a
+                        >. We want there to be a way for children to add notes
+                        (shared or private) to any web page. There seems to be
+                        people from several directions working towards this,
+                        outside of OLPC. Annotation is something that seems to
+                        pop up every few years, then die down; maybe this time
+                        we can actually make it work. Maybe Web 2.0 should just
+                        be &quot;good ideas that aren't new, but this time they
+                        might actually work&quot;.
+                    </li>
+                    <li>
+                        I didn't do any of it, but
+                        <a
+                            class="reference"
+                            href="http://developer.mozilla.org/en/docs/PyXPCOM"
+                            >PyXPCOM</a
+                        >
+                        is in the Sugar browser now (Sugar is the OLPC UI). This
+                        excites me, except then I looked at the code and I
+                        couldn't figure out how to get access to any interesting
+                        XPCOM objects (the DOM in particular) -- XPCOM seems
+                        very indirect. Oh well, at least now it's
+                        <em>possible</em> and I just have to figure out the
+                        details. I hope/want/am-optimistic that OLPC will have a
+                        great browser experience. It doesn't yet.
+                    </li>
+                    <li>
+                        We had a little OLPC sprint for
+                        <a
+                            class="reference"
+                            href="http://wiki.laptop.org/go/Chicago_Interest_Group"
+                            >Chicago people interested in the project</a
+                        >. Again getting a working Sugar environment was a bit
+                        of a problem. Afterward I
+                        <a
+                            class="reference"
+                            href="http://lists.laptop.org/pipermail/olpc-chicago/2007-June/000053.html"
+                            >played around with some VMWare techniques</a
+                        >. These need some polish, but I think it's the right
+                        direction and it's not that hard. If someone could get
+                        this working in a scripted way, I'm sure it could be
+                        added to the standard build process at OLPC.
+                    </li>
+                </ul>
+            </div>
+            <div class="section">
+                <h1>
+                    <a id="miscellaneous" name="miscellaneous">Miscellaneous</a>
+                </h1>
+                <ul class="simple">
+                    <li>
+                        I wrote
+                        <a
+                            class="reference"
+                            href="http://pythonpaste.org/waitforit/"
+                            >WaitForIt</a
+                        >, a little WSGI middleware that you can put in front of
+                        slow WSGI applications. If the application is too slow,
+                        it gives the user a page asking them to wait. This is
+                        particularly handy for things like administrative areas
+                        where you realize you are doing some really slow
+                        blocking operation and you don't want it to time out but
+                        you really don't feel like setting up a fancy queue for
+                        it. Just pop this in front and your problem is pretty
+                        much solved. This is part of a secret framework I'm
+                        developing.
+                    </li>
+                    <li>
+                        I started
+                        <a
+                            class="reference"
+                            href="http://svn.pythonpaste.org/buildutils/trunk"
+                            >revisiting buildutils</a
+                        >
+                        and cleaning some stuff up. Mostly I've added some
+                        commands to make it easier to add and make new commands
+                        for
+                        <tt class="docutils literal"
+                            ><span class="pre">setup.py</span></tt
+                        >. This relates to
+                        <a class="reference" href="pythons-makefile.html"
+                            >this post</a
+                        >. I added a
+                        <a
+                            class="reference"
+                            href="http://pylonshq.com/svn/WebHelpers/trunk/webhelpers/commands/compress_resources.py"
+                            >command to WebHelpers</a
+                        >
+                        for Javascript compression.
+                    </li>
+                    <li>
+                        It's a little old now, but I added a
+                        <a
+                            class="reference"
+                            href="http://svn.pythonpaste.org/Paste/trunk/paste/util/template.py"
+                            >templating language</a
+                        >
+                        to Paste. Using
+                        <tt class="docutils literal"
+                            ><span class="pre">string.Template</span></tt
+                        >
+                        for the little internal templating things just wasn't
+                        good. Cheetah has been too hard to install. So this is a
+                        simple, single-file templating language based on string
+                        substitution. I should probably extract it and do a few
+                        more things with it. I feel a little dumb about writing
+                        Yet Another Templating Language, but I couldn't find a
+                        templating language that I liked for small text-related
+                        tasks. For actual web programming a more complete
+                        language is good.
+                    </li>
+                    <li>
+                        I made a
+                        <a
+                            class="reference"
+                            href="http://svn.pythonpaste.org/CmdUtils/trunk"
+                            >little package called CmdUtils</a
+                        >
+                        to make it a bit easier to build command-line scripts,
+                        with the patterns that I personally like.
+                    </li>
+                    <li>
+                        I kind of got a
+                        <a
+                            class="reference"
+                            href="http://svn.colorstudy.com/home/ianb/whitespace.py"
+                            >new encoding working</a
+                        >. It encodes text to spaces, newlines, and tabs. Now
+                        whitespace can be even more significant! You can also
+                        put non-whitespace in the encoded text as a form of
+                        <a
+                            class="reference"
+                            href="http://en.wikipedia.org/wiki/Steganography"
+                            >steganography</a
+                        >.
+                    </li>
+                    <li>
+                        Among my
+                        <a
+                            class="reference"
+                            href="http://svn.colorstudy.com/home/ianb/recipes"
+                            >little recipes</a
+                        >
+                        I added
+                        <a
+                            class="reference"
+                            href="http://svn.colorstudy.com/home/ianb/recipes/propertyclass.py"
+                            >propertyclass</a
+                        >
+                        for making properties. I also added a
+                        <a
+                            class="reference"
+                            href="http://svn.colorstudy.com/home/ianb/makepasty.py"
+                            >little script</a
+                        >
+                        for pasting text to a pastebin (only for X users). And
+                        also one for creating
+                        <a
+                            class="reference"
+                            href="http://svn.colorstudy.com/home/ianb/SetupSVNLinks"
+                            >easy_install links from a subversion repository</a
+                        >.
+                    </li>
+                    <li>
+                        I wrote about
+                        <a
+                            class="reference"
+                            href="http://onyourdesktop.blogspot.com/2007/06/ian-bicking.html"
+                            >my desktop</a
+                        >
+                        for a new blog that Steve Holden created.
+                    </li>
+                </ul>
+                <p>
+                    Hmm... more stuff than I thought. Working at
+                    <a class="reference" href="http://topp.openplans.org"
+                        >The Open Planning Project</a
+                    >
+                    is great, because I spend all my time working on open source
+                    projects in public repositories. And also working on Stuff
+                    That Interests Me. If you've gotten an email from me
+                    recently, you may notice I link to
+                    <a
+                        class="reference"
+                        href="http://topp.openplans.org/careers"
+                        >our careers page</a
+                    >
+                    in my sig, simply because I think everyone cool should work
+                    at TOPP. We're doing other interesting things too that I'm
+                    not directly involved with; I'll try to write about other
+                    people's projects before too long.
+                </p>
+                <p>
+                    After vacation I should probably start looking more into
+                    getting WordPress on our site. TOPP is not technically
+                    tribalist! We do accept PHP, even if we don't really
+                    <em>trust</em> PHP. Once that's up, I'll move my own blog
+                    from this crappy piece of spam ridden crap (that I wrote, so
+                    no one but myself to blame), and then maybe I'll post more
+                    because I'll be less embarrassed about the software.
+                </p>
+            </div>
+        </div>
+        <div class="dates" align="right">
+            Created 07 Jun<br />
+            Modified 08 Jun
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <blockquote>
+                    html5lib is cool too as an HTML parser, and important as a
+                    reference implementation, but I'll mostly be waiting for
+                    that work to filter back into something like libxml2.
+                </blockquote>
+                <p>
+                    I should stress html5lib is not a reference implementation
+                    in the traditional sense of the word; it's the first public
+                    implementation of the HTML 5 spec and has a pretty valuable
+                    set of tests but it has no other status at all; any
+                    disagreements with the spec are bugs in html5lib. In
+                    particular testing implementations against html5lib output
+                    is not recommended.
+                </p>
+                <p>
+                    There is also some work going on on making a fast
+                    implementation of the HTML5 spec parsing algorithm in C; I
+                    will be first in line to make Python bindings when that work
+                    is complete (and no doubt others will come up with other
+                    bindings too).
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/what-im-up-to-jun07-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www-xray.ast.cam.ac.uk/~jgraham/">jgraham</a>
+            </div>
+            <hr noshade />
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>What I've Been Up To</h1>
- 
-<div class="document">
-<p>I'm off for a bit of vacation, but before then I thought I'd throw up
-a bunch of links to stuff I've been doing in the last couple months:</p>
-<div class="section">
-<h1><a id="html" name="html">HTML</a></h1>
-<p>I've been doing a lot with HTML lately.  HTML is great, because it's
-important.  (Hmm... this statement sounds kind of weird.  <em>Because</em> HTML is important,
-if you don't understand why it is great you need to think harder.  Now the statement
-sounds weird, but in a <em>deep</em> way)</p>
-<ul class="simple">
-<li>I've started working with microformats some.  This initially started
-with an <a class="reference" href="http://wiki.laptop.org/go/Content_stamping">OLPC project</a>, where I wrote an
-<a class="reference" href="http://svn.colorstudy.com/home/ianb/hReviewParser/trunk">hReview parser</a>
-(<a class="reference" href="http://microformats.org/wiki/hreview">hReview</a> is a
-microformat).</li>
-<li>Then related to that, I wanted to download a bunch of pages in an
-isolated form, so all the internal links are fixed up.  This became
-<a class="reference" href="http://svn.colorstudy.com/home/ianb/PageCollector/trunk">PageCollector</a>.  Since
-then I've added a script frontend.  I think this could be a
-generally handy export system.  It doesn't just make links relative,
-it also lets you completely remap filenames and is fairly careful
-about links (including links in CSS).</li>
-<li>Doing all this HTML-related stuff, I've been using <a class="reference" href="http://codespeak.net/lxml/">lxml</a> a lot (and it should be inferred I
-therefor also like <a class="reference" href="http://xmlsoft.org/">libxml2</a> a lot).  I like
-lxml a lot; probably the biggest reason is that it has a fast
-permissive HTML parser.  But the ElementTree API that lxml uses can
-be a bit awkward for HTML -- it works well for XML, but in HTML
-there's lots of mixing of text and tags, and that feels really weird
-in the ElementTree API.  So I've started <a class="reference" href="http://codespeak.net/svn/lxml/branch/html">lxml.html</a> in a branch with lots
-of feedback from Stefan Behnel.  This adds methods that are useful
-in HTML.  With just a few smallish methods, I think it makes HTML
-much easier to work with in lxml.</li>
-<li>Though <a class="reference" href="http://www.crummy.com/software/BeautifulSoup/">BeautifulSoup</a> is nice, it's not
-a C-based HTML parser.  With <a class="reference" href="http://www.openplans.org/projects/deliverance/">Deliverance</a> we are literally
-parsing and rewriting every page as it comes through our site.  I
-couldn't do this with BeautifulSoup.  And we're not doing any crappy
-regex stuff; lxml lets us actually understand the HTML the way the
-browser understands the HTML.  That's important.  This is kind of
-the promise of XHTML -- the ability to create smart and useful
-intermediaries -- that XHTML never really fulfilled.  The idea of
-smart intermediaries is a powerful one, XHTML just wasn't the right
-basis; <em>intermediaries</em> are supposed to work with <em>real</em> endpoints,
-and those endpoints were and continue to be HTML, not XHTML.
-<a class="reference" href="http://code.google.com/p/html5lib/">html5lib</a> is cool too as an
-HTML parser, and important as a reference implementation, but I'll
-mostly be waiting for that work to filter back into something like
-libxml2.</li>
-<li>I should note that I think the stream model of handling HTML (as
-<a class="reference" href="http://python.org/doc/current/lib/module-HTMLParser.html">HTMLParser</a> uses)
-is lame.  Typical HTML is not very big, and a document model (where
-the whole document is loaded into memory) is way easier to handle.
-HTML is best understood as a document.  (<a class="reference" href="http://genshi.edgewall.org/">Genshi</a> would probably be rockin' fast if it
-used lxml)</li>
-<li>As part of lxml.html I've been writing an <a class="reference" href="http://codespeak.net/svn/lxml/branch/html/src/lxml/html/clean.py">HTML cleaning module</a>.
-It's a bit messy, and incomplete, but I think it will be really
-useful.  Because we fully parse and then serialize the HTML, a lot
-of XSS attacks are avoided really early.  At work David Turner has
-been working on a <a class="reference" href="http://en.wikipedia.org/wiki/Transclusion">Transclusion</a> intermediary called
-<a class="reference" href="https://svn.openplans.org/svn/transcluder/trunk">Transcluder</a>.
-It's a little frightening to fold together disparate pieces of HTML;
-this might make it less frightening.</li>
-<li>I took the pattern from <tt class="docutils literal"><span class="pre">formencode.doctest_xml_compare</span></tt> and also
-ported it to lxml.  Now you can do <em>semantic</em> HTML and XML diffs in
-your doctests, instead of literal string comparison.  This means
-that things like the order of your attributes are ignored, as is
-whitespace.  And the diffs help highlight problems in a more
-fine-grained way.  Using the html branch you can do <tt class="docutils literal"><span class="pre">from</span> <span class="pre">lxml</span>
-<span class="pre">import</span> <span class="pre">usedoctest</span></tt> or <tt class="docutils literal"><span class="pre">from</span> <span class="pre">lxml.html</span> <span class="pre">import</span> <span class="pre">usedoctest</span></tt> to
-enable the comparison inside a doctest.  And you don't need a custom
-doctest runner.  I managed to do this using horrible horrible
-monkeypatching.  Also from FormEncode I'm hoping to port <a class="reference" href="http://formencode.org/htmlfill.html">htmlfill</a> over to lxml.html sometime
-too.</li>
-<li>With Luke Tucker we wrote an <a class="reference" href="http://codespeak.net/svn/lxml/branch/html/src/lxml/html/diff.py">html diff module</a>,
-which I've also put into lxml.html.  This shows textual differences
-while trying to avoid markup differences (since it's really hard to
-visually represent changes in markup, and also usually not what
-people care about).  This is surprisingly difficult because you also
-need to <em>preserve</em> the markup -- you can't just smash all the words
-together.  I think it's a pretty good implementation, and there
-aren't that many implementations of this out there.  You can also do
-blame style annotations, showing who added what over the history of
-the page.</li>
-</ul>
-</div>
-<div class="section">
-<h1><a id="open-plans" name="open-plans">Open Plans</a></h1>
-<p>Stuff from <a class="reference" href="http://topp.openplans.org">work</a> (which is a little
-vague, because work, private projects, HTML, OLPC, all overlap a lot).</p>
-<ul class="simple">
-<li><a class="reference" href="http://www.openplans.org/projects/deliverance/">Deliverance</a> is
-deployed on the live site.  We haven't really <em>used</em> its
-functionality much yet.  But it's awesome functionality once we get
-around to using it.</li>
-<li>Related to that deployment, I spent some time with
-<tt class="docutils literal"><span class="pre">paste.httpserver</span></tt> (trunk only) on the thread pool.  It now adapts
-the thread pool to add threads when necessary, kill threads that
-seem to be wedged, and various tools around that.  <a class="reference" href="http://sebulba.wikispaces.com/recipe+thread2">This recipe</a> was handy, as now I
-can kill threads.  It's surprisingly slow, though -- it frequently
-takes several minutes for the thread to be killed.  But it shows up
-as a regular exception, which is great.  You can read about the
-details in <a class="reference" href="http://svn.pythonpaste.org/Paste/trunk/docs/paste-httpserver-threadpool.txt">this document</a>.</li>
-<li>I've been extracting some stuff into <a class="reference" href="http://pythonpaste.org/wsgiproxy/">WSGIProxy</a> for your non-browser-based
-proxying.  This is mostly for handling HTTP-based dispatch between
-server applications.</li>
-<li>Not really for work, but related to proxying I whipped together a
-<a class="reference" href="http://svn.colorstudy.com/home/ianb/OLPCProxy/trunk">little HTTP proxy</a> using Paste
-and WSGI middleware.  It kind of works.  It was just a prototype, so
-I haven't worked on it more, but with just a <em>little</em> more work I
-think it should be easy to turn any WSGI middleware into an HTTP
-proxy.  This is the kind of proxy you configure in your browser.</li>
-<li>A followup to the <a class="reference" href="evaluating-wysiwyg-editors.html">HTML WYSIWYG post</a>, we
-decided to use <a class="reference" href="http://xinha.python-hosting.com/">Xinha</a>.  I feel
-pretty good about the decision, which is primarily motivated by
-Xinha's UI -- in small but important ways it feels like the best UI
-among the bunch.  It's just more polished and higher quality than
-the other options.  It's also a Real Open Source Project, which
-matters to us.  But we haven't actually implemented this yet.</li>
-<li>I wrote a <a class="reference" href="http://svn.colorstudy.com/home/ianb/dtopt">total hack of doctest</a> that lets you do
-<tt class="docutils literal"><span class="pre">from</span> <span class="pre">dtopt</span> <span class="pre">import</span> <span class="pre">ELLIPSIS</span></tt>, and then the ELLIPSIS option (that
-lets you use <tt class="docutils literal"><span class="pre">...</span></tt> as a wildcard in output) will be enabled for
-the rest of your doctest.  It's ugly, but I might add a few more
-similar hacks to that package and make it into something more real.
-But still ugly.</li>
-<li>With Whit Morris I've been working on a <a class="reference" href="https://svn.openplans.org/svn/TaggerStore/trunk">Tagging application</a>.  It's just
-getting started, so nothing working yet.  I like the <a class="reference" href="https://svn.openplans.org/svn/TaggerStore/trunk/taggerstore/atom.py">atom module</a>,
-which represents Atom feeds and entries as plain XML.  This didn't
-occur to me at first -- I was going to create a Python
-representation of the Atom data model and then add parse and
-serialize methods to it.  This is wrong, because the Atom data model
-<em>is</em> XML.  If you add a funky custom element to your entry and I
-normalize it into oblivion, then I've made a crappy library; by
-making the XML the one and only source of information I avoid such
-things.</li>
-<li>I wrote a <a class="reference" href="https://svn.openplans.org/svn/WebClippy/trunk/WebClippy/frame.html?doc=https%3A//svn.openplans.org/svn/WebClippy/trunk/examples/example.html&amp;help=https%3A//svn.openplans.org/svn/WebClippy/trunk/examples/example-docs.html">little proof of concept for web application help called
-WebClippy</a>
-(svn <a class="reference" href="https://svn.openplans.org/svn/WebClippy/trunk/">here</a>).
-It's inspired by <a class="reference" href="http://hacketyhack.net/">Hackety Hack</a> (a neat
-Ruby educational environment) and how tutorials are written there --
-just a very simple bit of persistent help.  Writing it made me
-realize that <a class="reference" href="http://meyerweb.com/eric/tools/s5/">S5</a> should
-totally be rewritten, because Javascript-based slideshow scripts are
-easy to write and S5 is annoying.  Anyway, I need to actually try to
-document something with WebClippy, because my test slides are lame,
-and I've decided realistic examples are essential to good
-development.</li>
-</ul>
-</div>
-<div class="section">
-<h1><a id="olpc" name="olpc">OLPC</a></h1>
-<p>Stuff from <a class="reference" href="http://laptop.org">One Laptop Per Child</a> (besides the
-HTML experiments)...</p>
-<ul class="simple">
-<li>I went to Boston for OLPC, and we talked a lot about <a class="reference" href="http://wiki.laptop.org/go/Annotation">Web-Based
-Annotation</a>.  We want there
-to be a way for children to add notes (shared or private) to any web
-page.  There seems to be people from several directions working
-towards this, outside of OLPC.  Annotation is something that seems
-to pop up every few years, then die down; maybe this time we can
-actually make it work.  Maybe Web 2.0 should just be &quot;good ideas
-that aren't new, but this time they might actually work&quot;.</li>
-<li>I didn't do any of it, but <a class="reference" href="http://developer.mozilla.org/en/docs/PyXPCOM">PyXPCOM</a> is in the Sugar
-browser now (Sugar is the OLPC UI).  This excites me, except then I
-looked at the code and I couldn't figure out how to get access to
-any interesting XPCOM objects (the DOM in particular) -- XPCOM seems
-very indirect.  Oh well, at least now it's <em>possible</em> and I just
-have to figure out the details.  I hope/want/am-optimistic that OLPC
-will have a great browser experience.  It doesn't yet.</li>
-<li>We had a little OLPC sprint for <a class="reference" href="http://wiki.laptop.org/go/Chicago_Interest_Group">Chicago people interested in the
-project</a>.  Again
-getting a working Sugar environment was a bit of a problem.
-Afterward I <a class="reference" href="http://lists.laptop.org/pipermail/olpc-chicago/2007-June/000053.html">played around with some VMWare techniques</a>.
-These need some polish, but I think it's the right direction and
-it's not that hard.  If someone could get this working in a scripted
-way, I'm sure it could be added to the standard build process at
-OLPC.</li>
-</ul>
-</div>
-<div class="section">
-<h1><a id="miscellaneous" name="miscellaneous">Miscellaneous</a></h1>
-<ul class="simple">
-<li>I wrote <a class="reference" href="http://pythonpaste.org/waitforit/">WaitForIt</a>, a little
-WSGI middleware that you can put in front of slow WSGI applications.
-If the application is too slow, it gives the user a page asking them
-to wait.  This is particularly handy for things like administrative
-areas where you realize you are doing some really slow blocking
-operation and you don't want it to time out but you really don't
-feel like setting up a fancy queue for it.  Just pop this in front
-and your problem is pretty much solved.  This is part of a secret
-framework I'm developing.</li>
-<li>I started <a class="reference" href="http://svn.pythonpaste.org/buildutils/trunk">revisiting buildutils</a> and cleaning some
-stuff up.  Mostly I've added some commands to make it easier to add
-and make new commands for <tt class="docutils literal"><span class="pre">setup.py</span></tt>.  This relates to <a class="reference" href="pythons-makefile.html">this post</a>.  I added a
-<a class="reference" href="http://pylonshq.com/svn/WebHelpers/trunk/webhelpers/commands/compress_resources.py">command to WebHelpers</a>
-for Javascript compression.</li>
-<li>It's a little old now, but I added a <a class="reference" href="http://svn.pythonpaste.org/Paste/trunk/paste/util/template.py">templating language</a> to
-Paste.  Using <tt class="docutils literal"><span class="pre">string.Template</span></tt> for the little internal templating
-things just wasn't good.  Cheetah has been too hard to install.  So
-this is a simple, single-file templating language based on string
-substitution.  I should probably extract it and do a few more things
-with it.  I feel a little dumb about writing Yet Another Templating
-Language, but I couldn't find a templating language that I liked for
-small text-related tasks.  For actual web programming a more
-complete language is good.</li>
-<li>I made a <a class="reference" href="http://svn.pythonpaste.org/CmdUtils/trunk">little package called CmdUtils</a> to make it a bit
-easier to build command-line scripts, with the patterns that I
-personally like.</li>
-<li>I kind of got a <a class="reference" href="http://svn.colorstudy.com/home/ianb/whitespace.py">new encoding working</a>.  It encodes
-text to spaces, newlines, and tabs.  Now whitespace can be even more
-significant!  You can also put non-whitespace in the encoded text as
-a form of <a class="reference" href="http://en.wikipedia.org/wiki/Steganography">steganography</a>.</li>
-<li>Among my <a class="reference" href="http://svn.colorstudy.com/home/ianb/recipes">little recipes</a> I added
-<a class="reference" href="http://svn.colorstudy.com/home/ianb/recipes/propertyclass.py">propertyclass</a> for
-making properties.  I also added a <a class="reference" href="http://svn.colorstudy.com/home/ianb/makepasty.py">little script</a> for pasting
-text to a pastebin (only for X users).  And also one for creating
-<a class="reference" href="http://svn.colorstudy.com/home/ianb/SetupSVNLinks">easy_install links from a subversion repository</a>.</li>
-<li>I wrote about <a class="reference" href="http://onyourdesktop.blogspot.com/2007/06/ian-bicking.html">my desktop</a> for a
-new blog that Steve Holden created.</li>
-</ul>
-<p>Hmm... more stuff than I thought.  Working at <a class="reference" href="http://topp.openplans.org">The Open Planning
-Project</a> is great, because I spend all my
-time working on open source projects in public repositories.  And also
-working on Stuff That Interests Me.  If you've gotten an email from me
-recently, you may notice I link to <a class="reference" href="http://topp.openplans.org/careers">our careers page</a> in my sig, simply because I
-think everyone cool should work at TOPP.  We're doing other
-interesting things too that I'm not directly involved with; I'll try
-to write about other people's projects before too long.</p>
-<p>After vacation I should probably start looking more into getting
-WordPress on our site.  TOPP is not technically tribalist!  We do
-accept PHP, even if we don't really <em>trust</em> PHP.  Once that's up, I'll
-move my own blog from this crappy piece of spam ridden crap (that I
-wrote, so no one but myself to blame), and then maybe I'll post more
-because I'll be less embarrassed about the software.</p>
-</div>
-</div>
- <div class="dates" align="right">
-Created 07 Jun<br>
-Modified 08 Jun</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<blockquote>
-html5lib is cool too as an HTML parser, and important as a reference implementation, but I'll mostly be waiting for that work to filter back into something like libxml2.</blockquote>
-<p>I should stress html5lib is not a reference implementation in the traditional sense of the word; it's the first public implementation of the HTML 5 spec and has a pretty valuable set of tests but it has no other status at all; any disagreements with the spec are bugs in html5lib. In particular testing implementations against html5lib output is not recommended.</p>
-<p>There is also some work going on on making a fast implementation of the HTML5 spec parsing algorithm in C; I will be first in line to make Python bindings when that work is complete (and no doubt others will come up with other bindings too).</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/what-im-up-to-jun07-comment-1.html" rel="nofollow">#</a> <a href="http://www-xray.ast.cam.ac.uk/~jgraham/">jgraham</a></div><hr noshade>
- 
-<div class="document">
-<blockquote>
-&quot;I went to Boston for OLPC, and we talked a lot about Web-Based Annotation&quot;</blockquote>
-<p>On the subject of annotation I imagine you have seen marginalia (<a class="reference" href="http://www.geof.net/code/annotation">http://www.geof.net/code/annotation</a>) which uses an Atom based format? I (re)used this when building 'annotater': <a class="reference" href="http://p.knowledgeforge.net/shakespeare/svn/annotater/trunk/">http://p.knowledgeforge.net/shakespeare/svn/annotater/trunk/</a>, a simple wsgi application for doing annotation (btw I did try using your Commentary app first but could never get to quite work -- plus I wanted to use marginalia as it worked cross-browser). You can see the result in action as part of Open Shakespeare at: <a class="reference" href="http://demo.openshakespeare.org/view?name=phoenix_and_the_turtle_gut&amp;format=annotate">http://demo.openshakespeare.org/view?name=phoenix_and_the_turtle_gut&amp;format=annotate</a></p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/what-im-up-to-jun07-comment-3.html" rel="nofollow">#</a> <a href="http://www.okfn.org/">Rufus Pollock</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <div class="document">
+                <blockquote>
+                    &quot;I went to Boston for OLPC, and we talked a lot about
+                    Web-Based Annotation&quot;
+                </blockquote>
+                <p>
+                    On the subject of annotation I imagine you have seen
+                    marginalia (<a
+                        class="reference"
+                        href="http://www.geof.net/code/annotation"
+                        >http://www.geof.net/code/annotation</a
+                    >) which uses an Atom based format? I (re)used this when
+                    building 'annotater':
+                    <a
+                        class="reference"
+                        href="http://p.knowledgeforge.net/shakespeare/svn/annotater/trunk/"
+                        >http://p.knowledgeforge.net/shakespeare/svn/annotater/trunk/</a
+                    >, a simple wsgi application for doing annotation (btw I did
+                    try using your Commentary app first but could never get to
+                    quite work -- plus I wanted to use marginalia as it worked
+                    cross-browser). You can see the result in action as part of
+                    Open Shakespeare at:
+                    <a
+                        class="reference"
+                        href="http://demo.openshakespeare.org/view?name=phoenix_and_the_turtle_gut&amp;format=annotate"
+                        >http://demo.openshakespeare.org/view?name=phoenix_and_the_turtle_gut&amp;format=annotate</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/what-im-up-to-jun07-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.okfn.org/">Rufus Pollock</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

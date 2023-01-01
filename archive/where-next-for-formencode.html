@@ -1,158 +1,384 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Where Next For FormEncode</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Where Next For FormEncode</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Where Next For FormEncode</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                <a class="reference" href="http://formencode.org">FormEncode</a
+                >, and
+                <a class="reference" href="http://funformkit.sf.net"
+                    >FunFormKit</a
+                >
+                that preceded it, have always left me indecisive and unsure.
+                They address a problem that is fairly small -- defining forms,
+                validation schemas, etc. But since that's a very large part of
+                many applications, lots of people are working and thinking about
+                these things. But FormEncode is just one project among many, and
+                very much on the periphery of other developments, including the
+                periphery of my own focus. I don't know what I <em>want</em> it
+                to be, except that it isn't there yet, and I'm not driven to
+                resolve that or to move forward despite that.
+            </p>
+            <p>
+                I tried splitting FormEncode off into a separate
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/trunk/Validator"
+                    >Validation</a
+                >
+                package, which would contain just the parts I felt most
+                comfortable about, and I have used this in some recent websites.
+                But I'm still a little iffy about it -- it's simpler than manual
+                form handling, but not so much simpler that it's worth it for
+                <em>just one project</em>. It introduces new metaphors and
+                concepts; for <em>ten</em> projects it would be
+                <em>simpler</em>, because it can express certain concepts of
+                validation more clearly than ad hoc validation code. But will it
+                live (as it is) to ten projects?
+            </p>
+            <p>
+                A coworker noticed that
+                <a
+                    class="reference"
+                    href="http://plone.org/documentation/archetypes"
+                    >Archetypes</a
+                >
+                had split off a validation package. I'd looked at Archetypes
+                before, but it was always so caught up in Plone and Zope that I
+                didn't really know what to do with it -- it seemed like too much
+                of an investment to try to figure out what the interesting parts
+                were, and what parts were the Zopey parts that I should avoid,
+                since they just give me a headache.
+            </p>
+            <p>
+                So, I start to think: do I need to cut the project loose? Maybe
+                I should explore what I could do with Archetypes, maybe help
+                split off larger portions of the projects. Or, if not
+                Archetypes, then one of the other libraries --
+                <a class="reference" href="http://www.gnuenterprise.org/"
+                    >GNU Enterprise</a
+                >,
+                <a class="reference" href="http://peak.telecommunity.com/"
+                    >PEAK</a
+                >,
+                <a
+                    class="reference"
+                    href="http://dev.zope.org/Wikis/DevSite/Projects/ComponentArchitecture/Zope3SchemasIntroduction"
+                    >Zope 3 Schemas</a
+                >, or one of the other projects?
+            </p>
+            <p>
+                Actually looking at the validation in the Archetypes package, I
+                can't help but think that FormEncode is much better. FormEncode
+                has a few ideas that don't seem to be common in these packages:
+            </p>
+            <ul class="simple">
+                <li>
+                    Validation and conversion are done together. E.g., a
+                    validator for &quot;sometime in the future&quot; can first
+                    convert the string to a date, then compare that date to now.
+                    Conversely, you can't convert without validation; is
+                    <tt class="docutils literal"
+                        ><span class="pre">&quot;2008-02-29&quot;</span></tt
+                    >
+                    a valid date? I'm certainly not going to encode leap year
+                    logic into my validator.
+                </li>
+                <li>
+                    Validation can be composed. Mostly it's just two
+                    compositions:
+                    <tt class="docutils literal"
+                        ><span class="pre">Any</span></tt
+                    >
+                    and
+                    <tt class="docutils literal"
+                        ><span class="pre">All</span></tt
+                    >
+                    (<tt class="docutils literal"
+                        ><span class="pre">or</span></tt
+                    >
+                    and
+                    <tt class="docutils literal"
+                        ><span class="pre">and</span></tt
+                    >). You'd actually do the date validation like
+                    <tt class="docutils literal"
+                        ><span class="pre">All(DateConverter(),</span>
+                        <span class="pre"
+                            >DateValidator(after=datetime.now()))</span
+                        ></tt
+                    >
+                </li>
+                <li>
+                    Conversion goes both ways -- external values (e.g., HTML
+                    forms) are converted to their Python representation, so
+                    Python representations have to be converted back. If you
+                    parse dates looking for
+                    <tt class="docutils literal"
+                        ><span class="pre">YYYY-MM-DD</span></tt
+                    >, you better be sure you write dates like
+                    <tt class="docutils literal"
+                        ><span class="pre">.strftime('%Y-%M-%d')</span></tt
+                    >. This was something missing in FunFormKit. I.e., you can
+                    only understand how to represent a value in a form
+                    <em>contextually</em>, there's no universal way to display a
+                    date, or a boolean, or list of strings.
+                    <tt class="docutils literal"
+                        ><span class="pre">__repr__</span></tt
+                    >
+                    or
+                    <tt class="docutils literal"
+                        ><span class="pre">__str__</span></tt
+                    >
+                    is a really bad way to do this; those are just too
+                    overloaded.
+                </li>
+                <li>
+                    It validates plain objects, like dictionaries and lists, so
+                    you can validate anything, and no particular interface is
+                    preferred.
+                </li>
+                <li>
+                    Everything goes through the same validation process,
+                    including entire forms. A form is just a dictionary that
+                    needs validation. This makes form composition and repetition
+                    a lot easier.
+                </li>
+            </ul>
+            <p>
+                So it would feel like a big step back if I started working with
+                a project that lacked some of these design features. And maybe
+                it's not very helpful to join a project coming in with a big
+                agenda for change. But I'm not really getting anywhere as it is,
+                so I feel like I need to do <em>something</em> with the code and
+                ideas; I'm willing to concede and compromise, but I'm not sure
+                where to even go with that. And maybe it's just stupid to give
+                up on a lot of code, design, and documentation.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 12 Jan '05<br />
+            Modified 24 Apr '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    At this point, I only care about web form validation, and I
+                    want that to be done on the client side with JavaScript and
+                    at the same time on the backend with Python once the form is
+                    submitted.
+                </p>
+                <p>
+                    I imagine there are many ways of doing this. Something that
+                    took a config file defining the form inputs with various
+                    conditions they must meet and could turn that into the
+                    required JavaScript and Python would be nice. I'm such a
+                    simpleton when it comes to this stuff though, so I've no
+                    idea if this has been done to death already, and I don't
+                    have any experience using any of Python's various web
+                    framework thingies. I plan to do my own pyweboff soon so I
+                    can learn them.
+                </p>
+                <p>
+                    Looking at the Validation documentation seems to make my
+                    eyes glaze over. I think I need to get more sleep or
+                    something.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/where-next-for-formencode-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://pycs.net/users/0000231">John P. Speno</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        FormEncode doesn't do the Javascript thing, though it's
+                        always been something I've meant to add. I've gotten a
+                        bit more experience with Javascript since then, so it
+                        might be clearer to me how to do it. It's another reason
+                        that validation requirements shouldn't be simple
+                        functions, but objects with state, with someplace to put
+                        the necessary Javascript-generating methods.
+                    </p>
+                    <p>
+                        I think that at the moment the library is portrayed in
+                        the documentation (and implemented) in a general way
+                        that still requires a fair amount of bridging to use
+                        usefully in an application. The pieces are there, but I
+                        think it's still a framework issue to make them usable.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/where-next-for-formencode-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+            <div class="document">
+                <p>
+                    I used FormEncode for a now-on-hold project and I really
+                    liked it for the most part. Being able to nest schemas was
+                    key for me. There were a few things that could have been
+                    easier though. Note that my usage was pretty strange though.
+                </p>
+                <p>
+                    Error reporting wasn't flexible enough for me. IIRC I ended
+                    up subclassing schema and only changing a few lines (and it
+                    made me feel sick :). I wanted to catch validation errors at
+                    the top and decide what to do with them there.
+                </p>
+                <p>
+                    I also wanted to add a bunch of state information to the
+                    validation errors. Errors needed to be persistent and I
+                    wanted a way of refering back to the validators that failed.
+                    (The whole point of the app was to run validations on
+                    existing data and to annotate errors, we didn't want to
+                    catch them up front.)
+                </p>
+                <p>
+                    I think I ended up passing a state object around to the
+                    different validators to accomplish all this, but I was never
+                    happy with it.
+                </p>
+                <p>
+                    Anyhow, if any of that interests you I'd be glad to talk
+                    about it more.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/where-next-for-formencode-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://recombiant.com">Joseph Kocherhans</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    I'd like to talk about it, but it should probably wait until
+                    I figure out where this discussion and where further
+                    developments should occur. I don't want to have a discussion
+                    where we're not ready to make actionable decisions, because
+                    that's just a waste of people's time, but how to make that
+                    happen is what I think I need to figure out.
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/where-next-for-formencode-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Where Next For FormEncode</h1>
- 
-<div class="document">
-<p><a class="reference" href="http://formencode.org">FormEncode</a>, and <a class="reference" href="http://funformkit.sf.net">FunFormKit</a> that preceded it, have always left me
-indecisive and unsure.  They address a problem that is fairly small --
-defining forms, validation schemas, etc.  But since that's a very
-large part of many applications, lots of people are working and
-thinking about these things.  But FormEncode is just one project among
-many, and very much on the periphery of other developments, including
-the periphery of my own focus.  I don't know what I <em>want</em> it to be,
-except that it isn't there yet, and I'm not driven to resolve that or
-to move forward despite that.</p>
-<p>I tried splitting FormEncode off into a separate <a class="reference" href="http://svn.colorstudy.com/trunk/Validator">Validation</a> package,
-which would contain just the parts I felt most comfortable about, and
-I have used this in some recent websites.  But I'm still a little iffy
-about it -- it's simpler than manual form handling, but not so much
-simpler that it's worth it for <em>just one project</em>.  It introduces new
-metaphors and concepts; for <em>ten</em> projects it would be <em>simpler</em>,
-because it can express certain concepts of validation more clearly
-than ad hoc validation code.  But will it live (as it is) to ten
-projects?</p>
-<p>A coworker noticed that <a class="reference" href="http://plone.org/documentation/archetypes">Archetypes</a> had split off a validation
-package.  I'd looked at Archetypes before, but it was always so caught
-up in Plone and Zope that I didn't really know what to do with it --
-it seemed like too much of an investment to try to figure out what the
-interesting parts were, and what parts were the Zopey parts that I
-should avoid, since they just give me a headache.</p>
-<p>So, I start to think: do I need to cut the project loose?  Maybe I
-should explore what I could do with Archetypes, maybe help split off
-larger portions of the projects.  Or, if not Archetypes, then one of
-the other libraries -- <a class="reference" href="http://www.gnuenterprise.org/">GNU Enterprise</a>, <a class="reference" href="http://peak.telecommunity.com/">PEAK</a>, <a class="reference" href="http://dev.zope.org/Wikis/DevSite/Projects/ComponentArchitecture/Zope3SchemasIntroduction">Zope 3 Schemas</a>, or
-one of the other projects?</p>
-<p>Actually looking at the validation in the Archetypes package, I can't
-help but think that FormEncode is much better.  FormEncode has a few
-ideas that don't seem to be common in these packages:</p>
-<ul class="simple">
-<li>Validation and conversion are done together.  E.g., a validator for
-&quot;sometime in the future&quot; can first convert the string to a date,
-then compare that date to now.  Conversely, you can't convert
-without validation; is <tt class="docutils literal"><span class="pre">&quot;2008-02-29&quot;</span></tt> a valid date?  I'm certainly
-not going to encode leap year logic into my validator.</li>
-<li>Validation can be composed.  Mostly it's just two compositions:
-<tt class="docutils literal"><span class="pre">Any</span></tt> and <tt class="docutils literal"><span class="pre">All</span></tt> (<tt class="docutils literal"><span class="pre">or</span></tt> and <tt class="docutils literal"><span class="pre">and</span></tt>).  You'd actually do the
-date validation like <tt class="docutils literal"><span class="pre">All(DateConverter(),</span>
-<span class="pre">DateValidator(after=datetime.now()))</span></tt></li>
-<li>Conversion goes both ways -- external values (e.g., HTML forms) are
-converted to their Python representation, so Python representations
-have to be converted back.  If you parse dates looking for
-<tt class="docutils literal"><span class="pre">YYYY-MM-DD</span></tt>, you better be sure you write dates like
-<tt class="docutils literal"><span class="pre">.strftime('%Y-%M-%d')</span></tt>.  This was something missing in
-FunFormKit.  I.e., you can only understand how to represent a value
-in a form <em>contextually</em>, there's no universal way to display a
-date, or a boolean, or list of strings.  <tt class="docutils literal"><span class="pre">__repr__</span></tt> or <tt class="docutils literal"><span class="pre">__str__</span></tt>
-is a really bad way to do this; those are just too overloaded.</li>
-<li>It validates plain objects, like dictionaries and lists, so you can
-validate anything, and no particular interface is preferred.</li>
-<li>Everything goes through the same validation process, including
-entire forms.  A form is just a dictionary that needs validation.
-This makes form composition and repetition a lot easier.</li>
-</ul>
-<p>So it would feel like a big step back if I started working with a
-project that lacked some of these design features.  And maybe it's not
-very helpful to join a project coming in with a big agenda for
-change.  But I'm not really getting anywhere as it is, so I feel like
-I need to do <em>something</em> with the code and ideas; I'm willing to
-concede and compromise, but I'm not sure where to even go with that.
-And maybe it's just stupid to give up on a lot of code, design,
-and documentation.</p>
-</div>
- <div class="dates" align="right">
-Created 12 Jan '05<br>
-Modified 24 Apr '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>At this point, I only care about web form validation, and I want that to be done on the client side with JavaScript and at the same time on the backend with Python once the form is submitted.</p>
-<p>I imagine there are many ways of doing this. Something that took a config file defining the form inputs with various conditions they must meet and could turn that into the required JavaScript and Python would be nice. I'm such a simpleton when it comes to this stuff though, so I've no idea if this has been done to death already, and I don't have any experience using any of Python's various web framework thingies. I plan to do my own pyweboff soon so I can learn them.</p>
-<p>Looking at the Validation documentation seems to make my eyes glaze over. I think I need to get more sleep or something.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/where-next-for-formencode-comment-1.html" rel="nofollow">#</a> <a href="http://pycs.net/users/0000231">John P. Speno</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>FormEncode doesn't do the Javascript thing, though it's always been something I've meant to add.  I've gotten a bit more experience with Javascript since then, so it might be clearer to me how to do it.  It's another reason that validation requirements shouldn't be simple functions, but objects with state, with someplace to put the necessary Javascript-generating methods.</p>
-<p>I think that at the moment the library is portrayed in the documentation (and implemented) in a general way that still requires a fair amount of bridging to use usefully in an application.  The pieces are there, but I think it's still a framework issue to make them usable.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/where-next-for-formencode-comment-3.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>I used FormEncode for a now-on-hold project and I really liked it for the most part. Being able to nest schemas was key for me. There were a few things that could have been easier though. Note that my usage was pretty strange though.</p>
-<p>Error reporting wasn't flexible enough for me. IIRC I ended up subclassing schema and only changing a few lines (and it made me feel sick :). I wanted to catch validation errors at the top and decide what to do with them there.</p>
-<p>I also wanted to add a bunch of state information to the validation errors. Errors needed to be persistent and I wanted a way of refering back to the validators that failed. (The whole point of the app was to run validations on existing data and to annotate errors, we didn't want to catch them up front.)</p>
-<p>I think I ended up passing a state object around to the different validators to accomplish all this, but I was never happy with it.</p>
-<p>Anyhow, if any of that interests you I'd be glad to talk about it more.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/where-next-for-formencode-comment-2.html" rel="nofollow">#</a> <a href="http://recombiant.com">Joseph Kocherhans</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-I'd like to talk about it, but it should probably wait until I figure out where this discussion and where further developments should occur.  I don't want to have a discussion where we're not ready to make actionable decisions, because that's just a waste of people's time, but how to make that happen is what I think I need to figure out.</div>
- <div align="right"><a href="http://blog.ianbicking.org/where-next-for-formencode-comment-4.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
- 
-<div class="document">
-<p>I also have used Formencode off and on for a couple things but haven't yet taken the big task to use a different form validation and scheme-building package for our bread-and-butter product, a dynamic survey-building tool.</p>
-<p>We may eventually roll our own, but we're currently using FormKit to do it all and have had to build many work-arounds to fit our needs.</p>
-<p>I, too, would like to talk to you further about the direction of formencode and how we could participate in its development and testing.</p>
-<p>I will be at this year's Pycon so maybe a birds-of-a-feather meeting would be great, or even a sprint on the code would be good.  What do you think?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/where-next-for-formencode-comment-5.html" rel="nofollow">#</a> <a href="http://www.axiomfire.com">Tracy Ruggles</a></div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>I was trying to figure out how to invoke a FormValidator (a comment in the code says it should be chained with Schema).
-The one that checks all the dependencies in the form and validate the whole request dictionary.
-We are using ZPT templates for the presentation</p>
-<p>Thanks</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/where-next-for-formencode-comment-6.html" rel="nofollow">#</a> Stella Kazansky</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+                <div class="document">
+                    <p>
+                        I also have used Formencode off and on for a couple
+                        things but haven't yet taken the big task to use a
+                        different form validation and scheme-building package
+                        for our bread-and-butter product, a dynamic
+                        survey-building tool.
+                    </p>
+                    <p>
+                        We may eventually roll our own, but we're currently
+                        using FormKit to do it all and have had to build many
+                        work-arounds to fit our needs.
+                    </p>
+                    <p>
+                        I, too, would like to talk to you further about the
+                        direction of formencode and how we could participate in
+                        its development and testing.
+                    </p>
+                    <p>
+                        I will be at this year's Pycon so maybe a
+                        birds-of-a-feather meeting would be great, or even a
+                        sprint on the code would be good. What do you think?
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/where-next-for-formencode-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.axiomfire.com">Tracy Ruggles</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I was trying to figure out how to invoke a FormValidator (a
+                    comment in the code says it should be chained with Schema).
+                    The one that checks all the dependencies in the form and
+                    validate the whole request dictionary. We are using ZPT
+                    templates for the presentation
+                </p>
+                <p>Thanks</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/where-next-for-formencode-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Stella Kazansky
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

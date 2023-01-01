@@ -1,126 +1,240 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>FastCGI SCGI HTTP</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>FastCGI SCGI HTTP</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>FastCGI SCGI HTTP</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                <a
+                    class="reference"
+                    href="http://www.vmunix.com/mark/blog/archives/2006/01/02/fastcgi-scgi-and-apache-background-and-future"
+                    >Mark Mayo</a
+                >
+                has a useful post on FastCGI and SCGI, a kind of an overview of
+                the history. At the end, he comes out preferring HTTP with
+                proxying. I'll throw in my two cents...
+            </p>
+            <p>
+                Proxying HTTP seems elegant, but I don't think it is any more
+                elegant than FastCGI or SCGI. In reality they are almost the
+                same; you don't lose any information mapping from HTTP to
+                FastCGI or SCGI, and you abstract away a few things that are
+                nice to get rid of. But only a very small number.
+            </p>
+            <p>
+                One thing that is brought up is the quality of the HTTP
+                implementations. I don't think this is a big deal -- if I
+                understand correctly, a proxied HTTP connection will be cleaned
+                up, and you don't have to worry about the kinds of corner cases
+                that a public production web server needs to worry about.
+                Connections don't die that often, there's some sanity in
+                headers, etc. Putting SimpleHTTPServer or WEBrick behind Apache
+                is probably just fine.
+            </p>
+            <p>
+                What FastCGI and SCGI provide that HTTP doesn't is a clear
+                separation of the original request and the delegated request.
+                <tt class="docutils literal"
+                    ><span class="pre">REMOTE_ADDR</span></tt
+                >
+                is the IP address of <em>original</em> request, not the frontend
+                server, and
+                <tt class="docutils literal"
+                    ><span class="pre">HTTP_HOST</span></tt
+                >
+                is also the original host.
+                <tt class="docutils literal"
+                    ><span class="pre">SCRIPT_NAME</span></tt
+                >
+                and
+                <tt class="docutils literal"
+                    ><span class="pre">PATH_INFO</span></tt
+                >
+                are separated out, giving you some idea of context.
+            </p>
+            <p>
+                These are small issues, but they are important. Without this,
+                you have to do double configuration on both sides of the
+                connection, and passing through information through ad hoc
+                techniques like headers you make up (<tt
+                    class="docutils literal"
+                    ><span class="pre">X-Forwarded-For</span></tt
+                >
+                being a common example).
+            </p>
+            <p>
+                Which leads to the second issue... what can you trust? Can you
+                trust
+                <tt class="docutils literal"
+                    ><span class="pre">X-Forwarded-For</span></tt
+                >? Maybe. Can you trust 127.0.0.1? Probably; are you sure you
+                remembered to set that up?
+            </p>
+            <p>
+                With the *CGIs you get another internal channel of communication
+                for communicating trusted information. A common example is
+                <tt class="docutils literal"
+                    ><span class="pre">REMOTE_USER</span></tt
+                >, the logged-in user. You don't have to sign it or go through
+                hoops to be sure you can trust it. If it's there, you know that
+                an upstream <em>internal</em> server added it.
+            </p>
+            <p>
+                These are small details, but I think they are useful enough to
+                make the *CGIs worth it compared to proxying. They reduce
+                configuration, and I <em>hate</em> configuration, and they help
+                avoid insecure and ad hoc conventions for information sharing.
+                At the same time, all three are very similar techniques, and you
+                shouldn't read too much into the decision.
+            </p>
+            <p>
+                FastCGI has some more features still, particularly process
+                management. I wish I felt like I could confidently use such
+                features, they seem nice. But I also don't think they need to be
+                part of the communication protocol; SCGI is a nice, simple
+                protocol, and the process management might be best implemented
+                separately. FastCGI's heapin' pile o' features is probably its
+                biggest flaw.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 27 Apr '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    On the other hand, depending on where you put logic, with
+                    HTTP Proxy you can do your testing directly on your server,
+                    without Apache in the picture. The fact that it does go over
+                    the network also gives you some flexability about
+                    distributing your application.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/fastcgi-scgi-http-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://kenkinder.com/">Ken Kinder</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        SCGI and FastCGI can go over the network. But yes, HTTP
+                        is nice for testing. And so with WSGI you needn't choose
+                        one over the other ;)
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/fastcgi-scgi-http-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>FastCGI SCGI HTTP</h1>
- 
-<div class="document">
-<p><a class="reference" href="http://www.vmunix.com/mark/blog/archives/2006/01/02/fastcgi-scgi-and-apache-background-and-future">Mark Mayo</a>
-has a useful post on FastCGI and SCGI, a kind of an overview of the
-history.  At the end, he comes out preferring HTTP with proxying.
-I'll throw in my two cents...</p>
-<p>Proxying HTTP seems elegant, but I don't think it is any more elegant
-than FastCGI or SCGI.  In reality they are almost the same; you don't
-lose any information mapping from HTTP to FastCGI or SCGI, and you
-abstract away a few things that are nice to get rid of.  But only a
-very small number.</p>
-<p>One thing that is brought up is the quality of the HTTP
-implementations.  I don't think this is a big deal -- if I understand
-correctly, a proxied HTTP connection will be cleaned up, and you don't
-have to worry about the kinds of corner cases that a public production
-web server needs to worry about.  Connections don't die that often,
-there's some sanity in headers, etc.  Putting SimpleHTTPServer or
-WEBrick behind Apache is probably just fine.</p>
-<p>What FastCGI and SCGI provide that HTTP doesn't is a clear separation
-of the original request and the delegated request.  <tt class="docutils literal"><span class="pre">REMOTE_ADDR</span></tt> is
-the IP address of <em>original</em> request, not the frontend server, and
-<tt class="docutils literal"><span class="pre">HTTP_HOST</span></tt> is also the original host.  <tt class="docutils literal"><span class="pre">SCRIPT_NAME</span></tt> and
-<tt class="docutils literal"><span class="pre">PATH_INFO</span></tt> are separated out, giving you some idea of context.</p>
-<p>These are small issues, but they are important.  Without this, you
-have to do double configuration on both sides of the connection, and
-passing through information through ad hoc techniques like headers you
-make up (<tt class="docutils literal"><span class="pre">X-Forwarded-For</span></tt> being a common example).</p>
-<p>Which leads to the second issue... what can you trust?  Can you trust
-<tt class="docutils literal"><span class="pre">X-Forwarded-For</span></tt>?  Maybe.  Can you trust 127.0.0.1?  Probably; are
-you sure you remembered to set that up?</p>
-<p>With the *CGIs you get another internal channel of communication for
-communicating trusted information.  A common example is
-<tt class="docutils literal"><span class="pre">REMOTE_USER</span></tt>, the logged-in user.  You don't have to sign it or go
-through hoops to be sure you can trust it.  If it's there, you know
-that an upstream <em>internal</em> server added it.</p>
-<p>These are small details, but I think they are useful enough to make
-the *CGIs worth it compared to proxying.  They reduce configuration,
-and I <em>hate</em> configuration, and they help avoid insecure and ad hoc
-conventions for information sharing.  At the same time, all three are
-very similar techniques, and you shouldn't read too much into the
-decision.</p>
-<p>FastCGI has some more features still, particularly process
-management.  I wish I felt like I could confidently use such features,
-they seem nice.  But I also don't think they need to be part of the
-communication protocol; SCGI is a nice, simple protocol, and the
-process management might be best implemented separately.  FastCGI's
-heapin' pile o' features is probably its biggest flaw.</p>
-</div>
- <div class="dates" align="right">
-Created 27 Apr '06</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>On the other hand, depending on where you put logic, with HTTP Proxy you can do your testing directly on your server, without Apache in the picture. The fact that it does go over the network also gives you some flexability about distributing your application.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/fastcgi-scgi-http-comment-1.html" rel="nofollow">#</a> <a href="http://kenkinder.com/">Ken Kinder</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>SCGI and FastCGI can go over the network.  But yes, HTTP is nice for testing.  And so with WSGI you needn't choose one over the other ;)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/fastcgi-scgi-http-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>For me, the biggest boon to &quot;not PHP web frameworks&quot; has been FastCGI.  Finally I can run fancy web frameworks on my $10 / month Dreamhost account rather than shelling out ~ $100 or more a month for a dedicated server, or $40 for a virtual dedicated server.  I'm all for giving up root in favor of ease of administration, low cost, and a feeling of &quot;let those dudes take care of it for me.&quot;</p>
-<p>FastCGI is the big equalizer.  As long as your FoC (Framework of Choice) supports FastCGI, you're good to go (sort of).  It's very exciting to the cheapskate (me) web developer / hobbiests of the world who just want to blog about wine, their cats, or maybe bees.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/fastcgi-scgi-http-comment-3.html" rel="nofollow">#</a> <a href="http://weblog.lonelylion.com">Chris McAvoy</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<pre class="literal-block">
+            <div class="document">
+                <p>
+                    For me, the biggest boon to &quot;not PHP web
+                    frameworks&quot; has been FastCGI. Finally I can run fancy
+                    web frameworks on my $10 / month Dreamhost account rather
+                    than shelling out ~ $100 or more a month for a dedicated
+                    server, or $40 for a virtual dedicated server. I'm all for
+                    giving up root in favor of ease of administration, low cost,
+                    and a feeling of &quot;let those dudes take care of it for
+                    me.&quot;
+                </p>
+                <p>
+                    FastCGI is the big equalizer. As long as your FoC (Framework
+                    of Choice) supports FastCGI, you're good to go (sort of).
+                    It's very exciting to the cheapskate (me) web developer /
+                    hobbiests of the world who just want to blog about wine,
+                    their cats, or maybe bees.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/fastcgi-scgi-http-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://weblog.lonelylion.com">Chris McAvoy</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <pre class="literal-block">
 &gt; Finally I can run fancy web frameworks on my $10 / month Dreamhost
 &gt; account rather than shelling out ~ $100 or more a month for a
 &gt; dedicated server, or $40 for a virtual dedicated server.
-</pre>
-<p>Check that again. RapidVPS: $10. TekTonic VPS: $15.</p>
-<pre class="literal-block">
+</pre
+                    >
+                    <p>Check that again. RapidVPS: $10. TekTonic VPS: $15.</p>
+                    <pre class="literal-block">
 &gt; I'm all for giving up root in favor of ease of administration,
 &gt; low cost, and a feeling of &quot;let those dudes take care of it for me.&quot;
-</pre>
-<p>I'm not. I'm for control and versatility. Hands off my root! ;-P</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/fastcgi-scgi-http-comment-4.html" rel="nofollow">#</a> <a href="http://www.tekNico.net/">Nicola Larosa</a></div><hr noshade>
-</blockquote>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                    >
+                    <p>
+                        I'm not. I'm for control and versatility. Hands off my
+                        root! ;-P
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/fastcgi-scgi-http-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.tekNico.net/">Nicola Larosa</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

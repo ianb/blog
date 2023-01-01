@@ -1,100 +1,144 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>WSGI Implementations</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>WSGI Implementations</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>WSGI Implementations</h1>
+        <p>
+            There's been a number of implementations of
+            <a href="http://www.python.org/peps/pep-0333.html">WSGI</a> in the
+            last week or so:
+        </p>
 
-<div style="float: right">
+        <ul>
+            <li>
+                Alan Kennedy released version 0.2 of
+                <a href="http://www.xhaus.com/modjy/">modjy</a>, which is a WSGI
+                server that runs in a Java servlet container (using Jython).
+                He's had to deal with some of the issues of implementing WSGI
+                under Python 2.1, particularly iterators, but he's done some
+                work to mitigate those problems (in part by simulating the
+                Python 2.2 interator protocol).
+            </li>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+            <li>
+                Peter Hunt has implemented a Twisted Resource version of the
+                WSGI server, in addition to some other miscellaneous WSGI code
+                and tests. It's at
+                <a
+                    href="http://colorstudy.com/cgi-bin/viewcvs.cgi/trunk/WSGI/phunt/"
+                    >svn://colorstudy.com/trunk/WSGI/phunt</a
+                >, but I can't get to that site at the moment. Using the Twisted
+                server just requires an import and a single method call (once
+                Twisted is installed, of course) -- doesn't even seem to require
+                mktap. For all of these the setup is fairly simple.
+            </li>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>WSGI Implementations</h1>
- <p>
+            <li>
+                Phillip Eby (author of the WSGI PEP) has converted his web code
+                in <a href="http://peak.telecommunity.com/">PEAK</a> (Python
+                Enterprise Application Kit) to WSGI. It includes a CGI, FastCGI,
+                and SimpleHTTPServer implementation. FastCGI is a protocol where
+                the webserver (e.g., Apache) talks to a separate long-running
+                Python process. SimpleHTTPServer is a
+                <a
+                    href="http://python.org/doc/current/lib/module-SimpleHTTPServer.html"
+                    >standard library module</a
+                >
+                that implements a stand-alone HTTP server.
+                <a
+                    href="http://mail.python.org/pipermail/web-sig/2004-October/000966.html"
+                    >Read more in his mail to Web-SIG</a
+                >. The FastCGI server looks particularly interesting to me.
+            </li>
+        </ul>
 
-There's been a number of implementations of <a href="http://www.python.org/peps/pep-0333.html">WSGI</a> in the last
-week or so:
+        I think there's a good working set of servers now. To fill it out there
+        should also be a <a href="http://modpython.org">mod_python</a>
+        server, an ASP/IIS server, and maybe a Medusa server. I can't think of
+        any other servers that we really need, except maybe a server for
+        interactive debugging, and perhaps some other non-production "tool"
+        servers.
 
-<ul>
+        <p>
+            Really the next step is to get some more frameworks ported. I'm
+            really hoping other frameworks can also be factored into
+            framework-neutral portions, like I've been working with in
+            <a
+                href="http://mail.python.org/pipermail/web-sig/2004-October/000929.html"
+                >WSGI Webware</a
+            >. But even if not, for most frameworks it should be fairly easy to
+            port the framework in one big chunk -- any framework that supports a
+            non-CGI option should be easy to port.
+        </p>
 
-<li> Alan Kennedy released version 0.2 of <a href="http://www.xhaus.com/modjy/">modjy</a>, which is a WSGI server
-that runs in a Java servlet container (using Jython).  He's had to
-deal with some of the issues of implementing WSGI under Python 2.1,
-particularly iterators, but he's done some work to mitigate those
-problems (in part by simulating the Python 2.2 interator protocol).
+        <p>
+            <b>Update:</b> the files from st0rm.hopto.org are now in the
+            colorstudy repository.
+        </p>
 
-<li> Peter Hunt has implemented a Twisted Resource version of the WSGI
-server, in addition to some other miscellaneous WSGI code and tests.
-It's at <a href="http://colorstudy.com/cgi-bin/viewcvs.cgi/trunk/WSGI/phunt/">svn://colorstudy.com/trunk/WSGI/phunt</a>, but I
-can't get to that site at the moment.  Using the Twisted server just
-requires an import and a single method call (once Twisted is
-installed, of course) -- doesn't even seem to require mktap.  For all
-of these the setup is fairly simple.
-
-<li> Phillip Eby (author of the WSGI PEP) has converted his web code
-in <a href="http://peak.telecommunity.com/">PEAK</a> (Python
-Enterprise Application Kit) to WSGI.  It includes a CGI, FastCGI, and
-SimpleHTTPServer implementation.  FastCGI is a protocol where the
-webserver (e.g., Apache) talks to a separate long-running Python
-process.  SimpleHTTPServer is a <a href="http://python.org/doc/current/lib/module-SimpleHTTPServer.html">standard
-library module</a> that implements a stand-alone HTTP server.  <a href="http://mail.python.org/pipermail/web-sig/2004-October/000966.html">Read
-more in his mail to Web-SIG</a>.  The FastCGI server looks
-particularly interesting to me.
-
-</ul>
-
-I think there's a good working set of servers now.  To fill it out
-there should also be a <a href="http://modpython.org">mod_python</a>
-server, an ASP/IIS server, and maybe a Medusa server.  I can't think
-of any other servers that we really need, except maybe a server for
-interactive debugging, and perhaps some other non-production "tool"
-servers.
-
-<p>
-
-Really the next step is to get some more frameworks ported.  I'm
-really hoping other frameworks can also be factored into
-framework-neutral portions, like I've been working with in <a href="http://mail.python.org/pipermail/web-sig/2004-October/000929.html">WSGI
-Webware</a>.  But even if not, for most frameworks it should be fairly
-easy to port the framework in one big chunk -- any framework that
-supports a non-CGI option should be easy to port.
-
-<p>
-<b>Update:</b> the files from st0rm.hopto.org are now in the colorstudy repository.
- <div class="dates" align="right">
-Created 13 Oct '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>another, new WSGI implementation: <a class="reference" href="http://wsgiarea.pocoo.org">http://wsgiarea.pocoo.org</a></p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/wsgi-implementations-comment-1.html" rel="nofollow">#</a> <a href="http://wsgiarea.pocoo.org">anonymous</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+        <div class="dates" align="right">
+            Created 13 Oct '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    another, new WSGI implementation:
+                    <a class="reference" href="http://wsgiarea.pocoo.org"
+                        >http://wsgiarea.pocoo.org</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/wsgi-implementations-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://wsgiarea.pocoo.org">anonymous</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

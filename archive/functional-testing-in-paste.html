@@ -1,38 +1,50 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Functional testing in Paste</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Functional testing in Paste</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Functional testing in Paste</h1>
 
-<div style="float: right">
-
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Functional testing in Paste</h1>
- 
-<div class="document">
-<p>I was just looking at <a class="reference" href="http://manuals.rubyonrails.com/read/chapter/28">Rails' functional testing</a>.  Here's their first example:</p>
-<pre class="literal-block">
+        <div class="document">
+            <p>
+                I was just looking at
+                <a
+                    class="reference"
+                    href="http://manuals.rubyonrails.com/read/chapter/28"
+                    >Rails' functional testing</a
+                >. Here's their first example:
+            </p>
+            <pre class="literal-block">
 require File.dirname(__FILE__) + '/../test_helper'
 
 # grab our HomeController because we're going to test it
@@ -54,47 +66,168 @@ class HomeControllerTest &lt; Test::Unit::TestCase
     assert_response :success
   end
 end
-</pre>
-<p>Here's how you'd <a class="reference" href="http://pythonpaste.org/docs/testing-applications.html">do it in Paste</a>:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>
+                Here's how you'd
+                <a
+                    class="reference"
+                    href="http://pythonpaste.org/docs/testing-applications.html"
+                    >do it in Paste</a
+                >:
+            </p>
+            <pre class="literal-block">
 from paste.tests.fixture import *
 
 def test_index():
     res = app.get('/')
-</pre>
-<p>(Note: 100% framework neutral!)</p>
-<p>Why is it so much shorter?  Well, first it uses <a class="reference" href="http://codespeak.net/py/current/doc/test.html">py.test</a> instead of an XUnit-based system, which gets rid of the stupid cruft of XUnit.  This isn't a criticism of Rails or Ruby, per se -- we have <a class="reference" href="http://python.org/doc/current/lib/module-unittest.html">the same module</a> in Python and it's no better.  py.test <strong>is</strong> much better, though.</p>
-<p>Second, setup is done in <tt class="docutils literal"><span class="pre">paste.tests.fixture.setup_module</span></tt>, which is a special function that py.test calls (and you imported with <tt class="docutils literal"><span class="pre">import</span> <span class="pre">*</span></tt>).  This finds your configuration file and creates your WSGI application.  This part (finding a configuration file and using that to construct an application) is Paste-specific, but everything else sticks to <a class="reference" href="http://www.python.org/peps/pep-0333.html">WSGI</a>.  This also puts <tt class="docutils literal"><span class="pre">app</span></tt> (an object intended for testing) in the module's namespace.</p>
-<p>Lastly, this object assumes when you say <tt class="docutils literal"><span class="pre">app.get('/')</span></tt> that you expect everything to work.  That means a <tt class="docutils literal"><span class="pre">200</span> <span class="pre">OK</span></tt> response (as well as a couple other checks -- redirects are also okay).  You have to specifically indicate that you expect another response; since this is an object intended for testing, why not build test-friendly assumptions into it?</p>
-<p>Looking through the Rails docs on this, there's some other useful features I'd like to add.  Because this only uses opaque WSGI applications, you can't look at the variables used to render the document; the only communication you get is the actual textual response.  Here's what I frequently do:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>(Note: 100% framework neutral!)</p>
+            <p>
+                Why is it so much shorter? Well, first it uses
+                <a
+                    class="reference"
+                    href="http://codespeak.net/py/current/doc/test.html"
+                    >py.test</a
+                >
+                instead of an XUnit-based system, which gets rid of the stupid
+                cruft of XUnit. This isn't a criticism of Rails or Ruby, per se
+                -- we have
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-unittest.html"
+                    >the same module</a
+                >
+                in Python and it's no better. py.test <strong>is</strong> much
+                better, though.
+            </p>
+            <p>
+                Second, setup is done in
+                <tt class="docutils literal"
+                    ><span class="pre"
+                        >paste.tests.fixture.setup_module</span
+                    ></tt
+                >, which is a special function that py.test calls (and you
+                imported with
+                <tt class="docutils literal"
+                    ><span class="pre">import</span>
+                    <span class="pre">*</span></tt
+                >). This finds your configuration file and creates your WSGI
+                application. This part (finding a configuration file and using
+                that to construct an application) is Paste-specific, but
+                everything else sticks to
+                <a
+                    class="reference"
+                    href="http://www.python.org/peps/pep-0333.html"
+                    >WSGI</a
+                >. This also puts
+                <tt class="docutils literal"><span class="pre">app</span></tt>
+                (an object intended for testing) in the module's namespace.
+            </p>
+            <p>
+                Lastly, this object assumes when you say
+                <tt class="docutils literal"
+                    ><span class="pre">app.get('/')</span></tt
+                >
+                that you expect everything to work. That means a
+                <tt class="docutils literal"
+                    ><span class="pre">200</span>
+                    <span class="pre">OK</span></tt
+                >
+                response (as well as a couple other checks -- redirects are also
+                okay). You have to specifically indicate that you expect another
+                response; since this is an object intended for testing, why not
+                build test-friendly assumptions into it?
+            </p>
+            <p>
+                Looking through the Rails docs on this, there's some other
+                useful features I'd like to add. Because this only uses opaque
+                WSGI applications, you can't look at the variables used to
+                render the document; the only communication you get is the
+                actual textual response. Here's what I frequently do:
+            </p>
+            <pre class="literal-block">
 def test_index():
     res = app.get('/')
     for item in db.TodoItem.select():
         res.mustcontain(item.title)
-</pre>
-<p>I'm not actually that interested in how the view got the items, so looking at the communication between view and controller isn't that interesting.  But I can imagine adding some convention so that frameworks (when run in testing mode) could stuff objects into the WSGI environment for later inspection.</p>
-<p>One of the things I like about Paste's tests compared to tests that are more opaque (e.g., actually speak to the app over HTTP) is that I have access to the backend objects (like <tt class="docutils literal"><span class="pre">db.TodoItem</span></tt>), and exceptions propogate (which gives me py.test's fancy tracebacks).  As a result I've become less excited about the functional testing provided by <a class="reference" href="http://www.idyll.org/~t/www-tools/twill.html">Twill</a> and others.</p>
-<p>The whole thing is fairly young, but I think it is pleasantly simple and yet quite useful.  If you are interested look at the <a class="reference" href="http://pythonpaste.org/docs/testing-applications.html">docs</a>.</p>
-</div>
- <div class="dates" align="right">
-Created 01 Jun '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>I'd be nice to see examples of the test failures. As you say, the fancy tracebacks. These are often one of the hidden beauties of testing frameworks.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/functional-testing-in-paste-comment-1.html" rel="nofollow">#</a> michael</div><hr noshade>
- 
-<div class="document">
-<p>Where does app come from?</p>
-<p>From looking at the test I can't tell where app comes from.</p>
-<p>I suppose it could be a good thing to write generic tests for multiple applications.</p>
-<p>Perhaps explicitly tell it where the config file is?</p>
-<p>However what is in this config file?  If I was writing this test from scratch I'd need to know the config file format, and what needs to go in it.</p>
-<p>Importing your app module directly might be the go to make it more explicit?</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>
+                I'm not actually that interested in how the view got the items,
+                so looking at the communication between view and controller
+                isn't that interesting. But I can imagine adding some convention
+                so that frameworks (when run in testing mode) could stuff
+                objects into the WSGI environment for later inspection.
+            </p>
+            <p>
+                One of the things I like about Paste's tests compared to tests
+                that are more opaque (e.g., actually speak to the app over HTTP)
+                is that I have access to the backend objects (like
+                <tt class="docutils literal"
+                    ><span class="pre">db.TodoItem</span></tt
+                >), and exceptions propogate (which gives me py.test's fancy
+                tracebacks). As a result I've become less excited about the
+                functional testing provided by
+                <a
+                    class="reference"
+                    href="http://www.idyll.org/~t/www-tools/twill.html"
+                    >Twill</a
+                >
+                and others.
+            </p>
+            <p>
+                The whole thing is fairly young, but I think it is pleasantly
+                simple and yet quite useful. If you are interested look at the
+                <a
+                    class="reference"
+                    href="http://pythonpaste.org/docs/testing-applications.html"
+                    >docs</a
+                >.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 01 Jun '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    I'd be nice to see examples of the test failures. As you
+                    say, the fancy tracebacks. These are often one of the hidden
+                    beauties of testing frameworks.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/functional-testing-in-paste-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                michael
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>Where does app come from?</p>
+                <p>
+                    From looking at the test I can't tell where app comes from.
+                </p>
+                <p>
+                    I suppose it could be a good thing to write generic tests
+                    for multiple applications.
+                </p>
+                <p>Perhaps explicitly tell it where the config file is?</p>
+                <p>
+                    However what is in this config file? If I was writing this
+                    test from scratch I'd need to know the config file format,
+                    and what needs to go in it.
+                </p>
+                <p>
+                    Importing your app module directly might be the go to make
+                    it more explicit?
+                </p>
+                <pre class="literal-block">
 from paste.tests.fixture import *
 
 import yourapp
@@ -102,23 +235,66 @@ app = yourapp.app
 
 def test_index():
     res = app.get('/')
-</pre>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/functional-testing-in-paste-comment-2.html" rel="nofollow">#</a> <a href="http://www.madecollective.com/">Rene Dudfield</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>The configuration is a Paste configuration file, which describes an application.  The configuration file is found in <tt class="docutils literal"><span class="pre">server.conf</span></tt>, and the fixture searches parent directories for such a file until it finds one.</p>
-<p>The <tt class="docutils literal"><span class="pre">app</span></tt> object is actually <tt class="docutils literal"><span class="pre">paste.tests.fixture.TestApp(paste_app)</span></tt>.</p>
-<p>Generally this should work easily if you have your application set up to run in Paste.  But not so easy otherwise.  Hrm... and I don't think I really have good documentation for the configuration file at this time :(</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/functional-testing-in-paste-comment-3.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-</blockquote>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                >
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/functional-testing-in-paste-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.madecollective.com/">Rene Dudfield</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        The configuration is a Paste configuration file, which
+                        describes an application. The configuration file is
+                        found in
+                        <tt class="docutils literal"
+                            ><span class="pre">server.conf</span></tt
+                        >, and the fixture searches parent directories for such
+                        a file until it finds one.
+                    </p>
+                    <p>
+                        The
+                        <tt class="docutils literal"
+                            ><span class="pre">app</span></tt
+                        >
+                        object is actually
+                        <tt class="docutils literal"
+                            ><span class="pre"
+                                >paste.tests.fixture.TestApp(paste_app)</span
+                            ></tt
+                        >.
+                    </p>
+                    <p>
+                        Generally this should work easily if you have your
+                        application set up to run in Paste. But not so easy
+                        otherwise. Hrm... and I don't think I really have good
+                        documentation for the configuration file at this time :(
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/functional-testing-in-paste-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

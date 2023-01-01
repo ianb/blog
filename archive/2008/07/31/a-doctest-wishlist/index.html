@@ -1,577 +1,2038 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
-<script type="text/javascript">/*<![CDATA[*/(function(a){function b(a,b){if(+a)return~a||(d.cookie=h+"=; path=/");j=d.createElement(e),k=d.getElementsByTagName(e)[0],j.src=a,b&&(j.onload=j.onerror=b),k.parentNode.insertBefore(j,k)}function c(){n.api||b(l.shift()||-1,c)}if(this.Mobify)return;var d=document,e="script",f="mobify",g="."+f+".com/",h=f+"-path",i=g+"un"+f+".js",j,k,l=[!1,1],m,n=this.Mobify={points:[+(new Date)],tagVersion:[6,0]},o=/(; |#|&|^)mobify-path=([^&;]*)/g.exec(location.hash+"; "+d.cookie);o?(m=o[2])&&!+(m=sessionStorage[h]||m)&&(l=[!0,"//preview"+g+escape(m)]):(l=a()||l,l[0]&&l.push("//cdn"+i,"//files01"+i)),l.shift()?(d.write('<plaintext style="display:none;">'),setTimeout(c)):b(l[0])})(function(){if(/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)){return[1,"//cdn.mobify.com/sites/ians-blog/production/mobify.js"]}})/*]]>*/</script>
-<!-- END MOBIFY -->
-	<title>Ian Bicking: a blog   ::  A Doctest Wishlist</title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<meta name="generator" content="WordPress 3.4.2" /><!-- LEAVE FOR STATS -->
-	<meta name="description" content="" />
-	<link rel="stylesheet" title="plaintxtSimpler" href="../../../../wp-content/themes/Barthelme-ianb/style.css" type="text/css" media="all" />
-	<link rel="start" href="../../../../index.html" title="Ian Bicking: a blog" />
-	<link rel="alternate" type="application/atom+xml" title="Ian Bicking: a blog Atom Feed" href="../../../../feed/atom/index.html" />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog RSS 2.0 Feed" href="../../../../feed/rss/index.html" />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog Comments RSS 2.0 Feed" href="../../../../comments/feed/index.html" />
-	<link rel="alternate" type="application/rdf+xml" title="Ian Bicking: a blog RSS 1.0" href="../../../../feed/rdf/index.html" />
-	<link rel="alternate" type="text/xml" title="Ian Bicking: a blog RSS 0.92 Feed" href="../../../../feed/rss/index.html" />
-	<link rel="pingback" href="../../../../xmlrpc.php" />
-	<link rel="openid.server" href="http://www.myopenid.com/server" />
-	<link rel="openid.delegate" href="http://ianb.myopenid.com" />
-        <link rel="me" type="text/html" href="http://www.google.com/profiles/ianbicking"/>
-		<link rel='archives' title='October 2012' href='../../../../2012/10/index.html' />
-	<link rel='archives' title='February 2012' href='../../../../2012/02/index.html' />
-	<link rel='archives' title='April 2011' href='../../../../2011/04/index.html' />
-	<link rel='archives' title='March 2011' href='../../../../2011/03/index.html' />
-	<link rel='archives' title='September 2010' href='../../../../2010/09/index.html' />
-	<link rel='archives' title='August 2010' href='../../../../2010/08/index.html' />
-	<link rel='archives' title='May 2010' href='../../../../2010/05/index.html' />
-	<link rel='archives' title='April 2010' href='../../../../2010/04/index.html' />
-	<link rel='archives' title='March 2010' href='../../../../2010/03/index.html' />
-	<link rel='archives' title='February 2010' href='../../../../2010/02/index.html' />
-	<link rel='archives' title='January 2010' href='../../../../2010/01/index.html' />
-	<link rel='archives' title='September 2009' href='../../../../2009/09/index.html' />
-	<link rel='archives' title='May 2009' href='../../../../2009/05/index.html' />
-	<link rel='archives' title='April 2009' href='../../../../2009/04/index.html' />
-	<link rel='archives' title='January 2009' href='../../../../2009/01/index.html' />
-	<link rel='archives' title='December 2008' href='../../../12/index.html' />
-	<link rel='archives' title='November 2008' href='../../../11/index.html' />
-	<link rel='archives' title='October 2008' href='../../../10/index.html' />
-	<link rel='archives' title='September 2008' href='../../../09/index.html' />
-	<link rel='archives' title='August 2008' href='../../../08/index.html' />
-	<link rel='archives' title='July 2008' href='../../index.html' />
-	<link rel='archives' title='June 2008' href='../../../06/index.html' />
-	<link rel='archives' title='May 2008' href='../../../05/index.html' />
-	<link rel='archives' title='April 2008' href='../../../04/index.html' />
-	<link rel='archives' title='March 2008' href='../../../03/index.html' />
-	<link rel='archives' title='February 2008' href='../../../02/index.html' />
-	<link rel='archives' title='January 2008' href='../../../01/index.html' />
-	<link rel='archives' title='November 2007' href='../../../../2007/11/index.html' />
-	<link rel='archives' title='October 2007' href='../../../../2007/10/index.html' />
-	<link rel='archives' title='September 2007' href='../../../../2007/09/index.html' />
-	<link rel='archives' title='August 2007' href='../../../../2007/08/index.html' />
-	<link rel='archives' title='July 2007' href='../../../../2007/07/index.html' />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog &raquo; A Doctest Wishlist Comments Feed" href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/feed/" />
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="../../../../xmlrpc.php?rsd" />
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="../../../../wp-includes/wlwmanifest.xml" /> 
-<link rel='prev' title='Making a proxy with WSGI and lxml' href='../../30/making-a-proxy-with-wsgi-and-lxml/index.html' />
-<link rel='next' title='Happy Birthday PotteryBlog' href='../../../08/10/happy-birthday-potteryblog/index.html' />
-<meta name="generator" content="WordPress 3.4.2" />
-<link rel='canonical' href='index.html' />
-<link rel='shortlink' href='http://blog.ianbicking.org/?p=68' />
-<link rel="stylesheet" href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"  type="text/css" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+    <head>
+        <!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
+        <script type="text/javascript">
+            /*<![CDATA[*/ (function (a) {
+                function b(a, b) {
+                    if (+a) return ~a || (d.cookie = h + "=; path=/");
+                    (j = d.createElement(e)),
+                        (k = d.getElementsByTagName(e)[0]),
+                        (j.src = a),
+                        b && (j.onload = j.onerror = b),
+                        k.parentNode.insertBefore(j, k);
+                }
+                function c() {
+                    n.api || b(l.shift() || -1, c);
+                }
+                if (this.Mobify) return;
+                var d = document,
+                    e = "script",
+                    f = "mobify",
+                    g = "." + f + ".com/",
+                    h = f + "-path",
+                    i = g + "un" + f + ".js",
+                    j,
+                    k,
+                    l = [!1, 1],
+                    m,
+                    n = (this.Mobify = {
+                        points: [+new Date()],
+                        tagVersion: [6, 0],
+                    }),
+                    o = /(; |#|&|^)mobify-path=([^&;]*)/g.exec(
+                        location.hash + "; " + d.cookie
+                    );
+                o
+                    ? (m = o[2]) &&
+                      !+(m = sessionStorage[h] || m) &&
+                      (l = [!0, "//preview" + g + escape(m)])
+                    : ((l = a() || l),
+                      l[0] && l.push("//cdn" + i, "//files01" + i)),
+                    l.shift()
+                        ? (d.write('<plaintext style="display:none;">'),
+                          setTimeout(c))
+                        : b(l[0]);
+            })(function () {
+                if (
+                    /ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(
+                        navigator.userAgent
+                    )
+                ) {
+                    return [
+                        1,
+                        "//cdn.mobify.com/sites/ians-blog/production/mobify.js",
+                    ];
+                }
+            }); /*]]>*/
+        </script>
+        <!-- END MOBIFY -->
+        <title>Ian Bicking: a blog :: A Doctest Wishlist</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta name="generator" content="WordPress 3.4.2" />
+        <!-- LEAVE FOR STATS -->
+        <meta name="description" content="" />
+        <link
+            rel="stylesheet"
+            title="plaintxtSimpler"
+            href="../../../../wp-content/themes/Barthelme-ianb/style.css"
+            type="text/css"
+            media="all"
+        />
+        <link
+            rel="start"
+            href="../../../../index.html"
+            title="Ian Bicking: a blog"
+        />
+        <link
+            rel="alternate"
+            type="application/atom+xml"
+            title="Ian Bicking: a blog Atom Feed"
+            href="../../../../feed/atom/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog RSS 2.0 Feed"
+            href="../../../../feed/rss/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog Comments RSS 2.0 Feed"
+            href="../../../../comments/feed/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rdf+xml"
+            title="Ian Bicking: a blog RSS 1.0"
+            href="../../../../feed/rdf/index.html"
+        />
+        <link
+            rel="alternate"
+            type="text/xml"
+            title="Ian Bicking: a blog RSS 0.92 Feed"
+            href="../../../../feed/rss/index.html"
+        />
+
+        <link
+            rel="archives"
+            title="October 2012"
+            href="../../../../2012/10/index.html"
+        />
+        <link
+            rel="archives"
+            title="February 2012"
+            href="../../../../2012/02/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2011"
+            href="../../../../2011/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="March 2011"
+            href="../../../../2011/03/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2010"
+            href="../../../../2010/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2010"
+            href="../../../../2010/08/index.html"
+        />
+        <link
+            rel="archives"
+            title="May 2010"
+            href="../../../../2010/05/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2010"
+            href="../../../../2010/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="March 2010"
+            href="../../../../2010/03/index.html"
+        />
+        <link
+            rel="archives"
+            title="February 2010"
+            href="../../../../2010/02/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2010"
+            href="../../../../2010/01/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2009"
+            href="../../../../2009/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="May 2009"
+            href="../../../../2009/05/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2009"
+            href="../../../../2009/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2009"
+            href="../../../../2009/01/index.html"
+        />
+        <link
+            rel="archives"
+            title="December 2008"
+            href="../../../12/index.html"
+        />
+        <link
+            rel="archives"
+            title="November 2008"
+            href="../../../11/index.html"
+        />
+        <link
+            rel="archives"
+            title="October 2008"
+            href="../../../10/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2008"
+            href="../../../09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2008"
+            href="../../../08/index.html"
+        />
+        <link rel="archives" title="July 2008" href="../../index.html" />
+        <link rel="archives" title="June 2008" href="../../../06/index.html" />
+        <link rel="archives" title="May 2008" href="../../../05/index.html" />
+        <link rel="archives" title="April 2008" href="../../../04/index.html" />
+        <link rel="archives" title="March 2008" href="../../../03/index.html" />
+        <link
+            rel="archives"
+            title="February 2008"
+            href="../../../02/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2008"
+            href="../../../01/index.html"
+        />
+        <link
+            rel="archives"
+            title="November 2007"
+            href="../../../../2007/11/index.html"
+        />
+        <link
+            rel="archives"
+            title="October 2007"
+            href="../../../../2007/10/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2007"
+            href="../../../../2007/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2007"
+            href="../../../../2007/08/index.html"
+        />
+        <link
+            rel="archives"
+            title="July 2007"
+            href="../../../../2007/07/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog &raquo; A Doctest Wishlist Comments Feed"
+            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/feed/"
+        />
+        <link
+            rel="EditURI"
+            type="application/rsd+xml"
+            title="RSD"
+            href="../../../../xmlrpc.php?rsd"
+        />
+        <link
+            rel="wlwmanifest"
+            type="application/wlwmanifest+xml"
+            href="../../../../wp-includes/wlwmanifest.xml"
+        />
+        <link
+            rel="prev"
+            title="Making a proxy with WSGI and lxml"
+            href="../../30/making-a-proxy-with-wsgi-and-lxml/index.html"
+        />
+        <link
+            rel="next"
+            title="Happy Birthday PotteryBlog"
+            href="../../../08/10/happy-birthday-potteryblog/index.html"
+        />
+        <meta name="generator" content="WordPress 3.4.2" />
+        <link rel="canonical" href="index.html" />
+        <link rel="shortlink" href="https://ianbicking.org/?p=68" />
+        <link
+            rel="stylesheet"
+            href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"
+            type="text/css"
+        />
+        <style type="text/css">
+            .recentcomments a {
+                display: inline !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        </style>
         <style type="text/css" media="all">
-/*<![CDATA[*/
-body { font-size: 100%; }
-body { font-family: tahoma, geneva, sans-serif; }
-div.post-header, h2.post-title, p.post-date-single, h2.post-title-single, div.post-entry h1, div.post-entry h2, div.post-entry h3, div.post-entry h4, div.post-entry h5, div.post-entry h6, div.post-entry blockquote, div.post-footer, h3#comment-count, h4#comment-header, div#comments ol li p.comment-metadata, h4#respond { font-family: verdana, geneva, sans-serif; }
-div.post-entry p { text-align: left; }
-div#wrapper { width: 100%; }
+            /*<![CDATA[*/
+            body {
+                font-size: 100%;
+            }
+            body {
+                font-family: tahoma, geneva, sans-serif;
+            }
+            div.post-header,
+            h2.post-title,
+            p.post-date-single,
+            h2.post-title-single,
+            div.post-entry h1,
+            div.post-entry h2,
+            div.post-entry h3,
+            div.post-entry h4,
+            div.post-entry h5,
+            div.post-entry h6,
+            div.post-entry blockquote,
+            div.post-footer,
+            h3#comment-count,
+            h4#comment-header,
+            div#comments ol li p.comment-metadata,
+            h4#respond {
+                font-family: verdana, geneva, sans-serif;
+            }
+            div.post-entry p {
+                text-align: left;
+            }
+            div#wrapper {
+                width: 100%;
+            }
 
-/*]]>*/
-</style>
-</head>
-<body>
-
-<div id="wrapper">
-
-	<div id="header" onclick="location.href='http://blog.ianbicking.org/';" style="cursor:pointer;">
-		<h1 id="title"><a href="../../../../index.html" title="Ian Bicking: a blog">Ian Bicking: a blog</a></h1>
-		<p id="description"></p>
-	</div>
-<!-- WP Theme Credits -->
-<div style="display: none;">We can answer on question <a href="http://www.olnevhost.net/vps-hosting.html">what is VPS</a>? and
-what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap dedicated servers</strong></a>?</div>
-<!-- END HEADER -->
-<div id="container">
-	<div id="content" class="widecolumn">
-
-
-		<div id="post-68" class="post single-post">
-			<p class="post-date-single">{ 2008 07 31 }</p>
-			<h2 class="post-title-single">A Doctest Wishlist</h2>
-			<div class="post-entry">
-				<div class="document">
-<p>Lately I&#8217;ve been doing most of my testing with <a class="reference external" href="http://python.org/doc/current/lib/module-doctest.html">doctest</a>, primarily using <a class="reference external" href="http://python.org/doc/current/lib/doctest-simple-testfile.html">stand-alone text files</a>.  I generally like it (otherwise I wouldn&#8217;t be using it), but it does make me frustrated with doctest sometimes.  On my wishlist (roughly in order):</p>
-<ul>
-<li>
-<p class="first">I wish output was always displayed, even when there&#8217;s an exception.  I see no reason for the current behavior.  Really exceptions could be treated like any other output (if ELLIPSIS was on by default).</p>
-</li>
-<li>
-<p class="first">I wish you could turn on options like ELLIPSIS from within a doctest, for all expressions.  (<tt class="docutils literal"><span class="pre">#</span> <span class="pre">doctest:</span> <span class="pre">+ELLIPSIS</span></tt> on every line is beyond ugly.)</p>
-</li>
-<li>
-<p class="first"><tt class="docutils literal"><span class="pre">&lt;BLANKLINE&gt;</span></tt> is terribly ugly.</p>
-</li>
-<li>
-<p class="first">There&#8217;s no way of saying &quot;I don&#8217;t care what this prints&quot;.  You can&#8217;t do:</p>
-<div class="dean_ch" style="white-space: wrap;"><br />
-&gt;&gt;&gt; some_function<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
-...<br />
-&nbsp;</div>
-<p>because the <tt class="docutils literal"><span class="pre">...</span></tt> is treated like a continuation.</p>
-</li>
-<li>
-<p class="first">Plugging in an alternate output checker is kind of tedious, and can&#8217;t be done from within a doctest (without horrible hacks).</p>
-</li>
-<li>
-<p class="first">I&#8217;d like to be able to easily jump into an interactive state from doctest.  Maybe <a class="reference external" href="http://python.org/doc/current/lib/module-pdb.html">pdb</a> can do this, but I&#8217;ve never figured that out exactly.</p>
-</li>
-<li>
-<p class="first">Getting <a class="reference external" href="http://code.google.com/p/python-nose/">nose</a> to run <tt class="docutils literal"><span class="pre">.txt</span></tt> files as doctests is really hard, involving a combination of options I always forget.</p>
-</li>
-<li>
-<p class="first">There&#8217;s no way to abort the doctest.  Sometimes I&#8217;d like to run some environment checks early on, and be able to stop the test if they fail.</p>
-</li>
-<li>
-<p class="first">I wish it was easier to apply to non-Python code.  (I&#8217;ve adapted it via subclassing <a class="reference external" href="http://pylogo.org/">for Logo</a> but I wouldn&#8217;t do that often.)</p>
-</li>
-<li>
-<p class="first">I wish I could copy and paste from doctests to consoles.  But I don&#8217;t see any solution to this problem.</p>
-</li>
-<li>
-<p class="first">The <a class="reference external" href="http://python.org/doc/current/lib/doctest-unittest-api.html">integration</a> with <a class="reference external" href="http://python.org/doc/current/lib/module-unittest.html">unittest</a> is pretty hacky.  Not that I&#8217;ve used unittest in years.  But some other test frameworks build off this integration.</p>
-</li>
-<li>
-<p class="first"><tt class="docutils literal"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">doctest</span> <span class="pre">sometest.txt</span></tt> doesn&#8217;t do what it should do.  Instead it runs doctest&#8217;s self-tests.</p>
-</li>
-</ul>
-</div>
-<p>Automatically generated list of related posts:</p><ol>
-<li><a href='../../../../2007/08/23/doctest-for-ruby/index.html' rel='bookmark' title='Doctest for Ruby'>Doctest for Ruby</a> <small>Finally, someone wrote a version of doctest for Ruby. Recently...</small></li>
-<li><a href='../../../../index.html?p=239' rel='bookmark' title='Doctest.js &amp; Callbacks'>Doctest.js &#038; Callbacks</a> <small>Many years ago I wrote a fairly straight-forward port of...</small></li>
-</ol>											</div><!-- END POST-ENTRY  -->
-			<!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            /*]]>*/
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div
+                id="header"
+                onclick="location.href='https://ianbicking.org/';"
+                style="cursor: pointer"
+            >
+                <h1 id="title">
+                    <a href="../../../../index.html" title="Ian Bicking: a blog"
+                        >Ian Bicking: a blog</a
+                    >
+                </h1>
+                <p id="description"></p>
+            </div>
+            <!-- WP Theme Credits -->
+            <div style="display: none">
+                We can answer on question
+                <a href="http://www.olnevhost.net/vps-hosting.html"
+                    >what is VPS</a
+                >? and what is
+                <a href="http://www.olnevhost.net/dedicated-servers.html"
+                    ><strong>cheap dedicated servers</strong></a
+                >?
+            </div>
+            <!-- END HEADER -->
+            <div id="container">
+                <div id="content" class="widecolumn">
+                    <div id="post-68" class="post single-post">
+                        <p class="post-date-single">{ 2008 07 31 }</p>
+                        <h2 class="post-title-single">A Doctest Wishlist</h2>
+                        <div class="post-entry">
+                            <div class="document">
+                                <p>
+                                    Lately I&#8217;ve been doing most of my
+                                    testing with
+                                    <a
+                                        class="reference external"
+                                        href="http://python.org/doc/current/lib/module-doctest.html"
+                                        >doctest</a
+                                    >, primarily using
+                                    <a
+                                        class="reference external"
+                                        href="http://python.org/doc/current/lib/doctest-simple-testfile.html"
+                                        >stand-alone text files</a
+                                    >. I generally like it (otherwise I
+                                    wouldn&#8217;t be using it), but it does
+                                    make me frustrated with doctest sometimes.
+                                    On my wishlist (roughly in order):
+                                </p>
+                                <ul>
+                                    <li>
+                                        <p class="first">
+                                            I wish output was always displayed,
+                                            even when there&#8217;s an
+                                            exception. I see no reason for the
+                                            current behavior. Really exceptions
+                                            could be treated like any other
+                                            output (if ELLIPSIS was on by
+                                            default).
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            I wish you could turn on options
+                                            like ELLIPSIS from within a doctest,
+                                            for all expressions. (<tt
+                                                class="docutils literal"
+                                                ><span class="pre">#</span>
+                                                <span class="pre"
+                                                    >doctest:</span
+                                                >
+                                                <span class="pre"
+                                                    >+ELLIPSIS</span
+                                                ></tt
+                                            >
+                                            on every line is beyond ugly.)
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            <tt class="docutils literal"
+                                                ><span class="pre"
+                                                    >&lt;BLANKLINE&gt;</span
+                                                ></tt
+                                            >
+                                            is terribly ugly.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            There&#8217;s no way of saying
+                                            &quot;I don&#8217;t care what this
+                                            prints&quot;. You can&#8217;t do:
+                                        </p>
+                                        <div
+                                            class="dean_ch"
+                                            style="white-space: wrap"
+                                        >
+                                            <br />
+                                            &gt;&gt;&gt; some_function<span
+                                                class="br0"
+                                                >&#40;</span
+                                            ><span class="br0">&#41;</span
+                                            ><br />
+                                            ...<br />
+                                            &nbsp;
+                                        </div>
+                                        <p>
+                                            because the
+                                            <tt class="docutils literal"
+                                                ><span class="pre"
+                                                    >...</span
+                                                ></tt
+                                            >
+                                            is treated like a continuation.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            Plugging in an alternate output
+                                            checker is kind of tedious, and
+                                            can&#8217;t be done from within a
+                                            doctest (without horrible hacks).
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            I&#8217;d like to be able to easily
+                                            jump into an interactive state from
+                                            doctest. Maybe
+                                            <a
+                                                class="reference external"
+                                                href="http://python.org/doc/current/lib/module-pdb.html"
+                                                >pdb</a
+                                            >
+                                            can do this, but I&#8217;ve never
+                                            figured that out exactly.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            Getting
+                                            <a
+                                                class="reference external"
+                                                href="http://code.google.com/p/python-nose/"
+                                                >nose</a
+                                            >
+                                            to run
+                                            <tt class="docutils literal"
+                                                ><span class="pre"
+                                                    >.txt</span
+                                                ></tt
+                                            >
+                                            files as doctests is really hard,
+                                            involving a combination of options I
+                                            always forget.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            There&#8217;s no way to abort the
+                                            doctest. Sometimes I&#8217;d like to
+                                            run some environment checks early
+                                            on, and be able to stop the test if
+                                            they fail.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            I wish it was easier to apply to
+                                            non-Python code. (I&#8217;ve adapted
+                                            it via subclassing
+                                            <a
+                                                class="reference external"
+                                                href="http://pylogo.org/"
+                                                >for Logo</a
+                                            >
+                                            but I wouldn&#8217;t do that often.)
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            I wish I could copy and paste from
+                                            doctests to consoles. But I
+                                            don&#8217;t see any solution to this
+                                            problem.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            The
+                                            <a
+                                                class="reference external"
+                                                href="http://python.org/doc/current/lib/doctest-unittest-api.html"
+                                                >integration</a
+                                            >
+                                            with
+                                            <a
+                                                class="reference external"
+                                                href="http://python.org/doc/current/lib/module-unittest.html"
+                                                >unittest</a
+                                            >
+                                            is pretty hacky. Not that I&#8217;ve
+                                            used unittest in years. But some
+                                            other test frameworks build off this
+                                            integration.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="first">
+                                            <tt class="docutils literal"
+                                                ><span class="pre">python</span>
+                                                <span class="pre">-m</span>
+                                                <span class="pre">doctest</span>
+                                                <span class="pre"
+                                                    >sometest.txt</span
+                                                ></tt
+                                            >
+                                            doesn&#8217;t do what it should do.
+                                            Instead it runs doctest&#8217;s
+                                            self-tests.
+                                        </p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <p>
+                                Automatically generated list of related posts:
+                            </p>
+                            <ol>
+                                <li>
+                                    <a
+                                        href="../../../../2007/08/23/doctest-for-ruby/index.html"
+                                        rel="bookmark"
+                                        title="Doctest for Ruby"
+                                        >Doctest for Ruby</a
+                                    >
+                                    <small
+                                        >Finally, someone wrote a version of
+                                        doctest for Ruby. Recently...</small
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="../../../../index.html?p=239"
+                                        rel="bookmark"
+                                        title="Doctest.js &amp; Callbacks"
+                                        >Doctest.js &#038; Callbacks</a
+                                    >
+                                    <small
+                                        >Many years ago I wrote a fairly
+                                        straight-forward port of...</small
+                                    >
+                                </li>
+                            </ol>
+                        </div>
+                        <!-- END POST-ENTRY  -->
+                        <!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 			xmlns:dc="http://purl.org/dc/elements/1.1/"
 			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
-		<rdf:Description rdf:about="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/"
-    dc:identifier="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/"
+		<rdf:Description rdf:about="https://ianbicking.org/2008/07/31/a-doctest-wishlist/"
+    dc:identifier="https://ianbicking.org/2008/07/31/a-doctest-wishlist/"
     dc:title="A Doctest Wishlist"
-    trackback:ping="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/trackback/" />
+    trackback:ping="https://ianbicking.org/2008/07/31/a-doctest-wishlist/trackback/" />
 </rdf:RDF> -->
-			<div class="post-footer">
-				<p>Posted by Ian Bicking on Thursday, July 31st, 2008, at 10:11 pm, and filed under <a href="../../../../category/python/index.html" title="View all posts in Python" rel="category tag">Python</a>.</p>
-				<p>
-				Comments have a <a href='http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/feed/'>feed</a>.</p>
-			</div><!-- END POST-FOOTER -->
-		</div><!-- END POST -->
+                        <div class="post-footer">
+                            <p>
+                                Posted by Ian Bicking on Thursday, July 31st,
+                                2008, at 10:11 pm, and filed under
+                                <a
+                                    href="../../../../category/python/index.html"
+                                    title="View all posts in Python"
+                                    rel="category tag"
+                                    >Python</a
+                                >.
+                            </p>
+                            <p>
+                                Comments have a
+                                <a
+                                    href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/feed/"
+                                    >feed</a
+                                >.
+                            </p>
+                        </div>
+                        <!-- END POST-FOOTER -->
+                    </div>
+                    <!-- END POST -->
 
-<div id="comments">
+                    <div id="comments">
+                        <h4 id="comments">12 Comments</h4>
+                        <ul class="commentlist">
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-24281"
+                            >
+                                <div
+                                    id="div-comment-24281"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/5e5142d6a1a578f02e2d94c4d6d31088?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">Tarek Ziadé</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24281"
+                                        >
+                                            July 31, 2008 at 11:42 pm</a
+                                        >
+                                    </div>
 
+                                    <p>
+                                        &#8220;Getting nose to run .txt files as
+                                        doctests is really hard, involving a
+                                        combination of options I always
+                                        forget.&#8221;
+                                    </p>
 
+                                    <p>
+                                        Yes that is a problem, the nose plugin
+                                        is not really handy. We ended up faking
+                                        regular test cases to be able to run our
+                                        .txt doctests easily with Nose.
+                                    </p>
 
-<h4 id="comments">12 Comments</h4>
- <ul class="commentlist">
-		<li class="comment even thread-even depth-1" id="comment-24281">
-				<div id="div-comment-24281" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/5e5142d6a1a578f02e2d94c4d6d31088?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Tarek Ziadé</cite> <span class="says">says:</span>		</div>
+                                    <p>
+                                        see
+                                        <a
+                                            href="http://www.gawel.org/weblog/2008/07/nose-doctest-plugin-sucks"
+                                            rel="nofollow"
+                                            >http://www.gawel.org/weblog/2008/07/nose-doctest-plugin-sucks</a
+                                        >
+                                        for an example of such a script.
+                                    </p>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24281">
-			July 31, 2008 at 11:42 pm</a>		</div>
+                                    <p>I think Nose could be enhanced there.</p>
 
-		<p>&#8220;Getting nose to run .txt files as doctests is really hard, involving a combination of options I always forget.&#8221;</p>
+                                    <p>
+                                        &#8220;There’s no way to abort the
+                                        doctest. Sometimes I’d like to run some
+                                        environment checks early on, and be able
+                                        to stop the test if they fail.&#8221;
+                                    </p>
 
-<p>Yes that is a problem, the nose plugin is not really handy. We ended up faking regular test cases
-to be able to run our .txt doctests easily with Nose. </p>
+                                    <p>
+                                        You could do a simple assert on your
+                                        test, with the
+                                        <code>REPORT_ONLY_FIRST_FAILURE</code>
+                                        flag on. The assert can be wrapped in a
+                                        global function you provide in the test
+                                        environment.
+                                    </p>
 
-<p>see <a href="http://www.gawel.org/weblog/2008/07/nose-doctest-plugin-sucks" rel="nofollow">http://www.gawel.org/weblog/2008/07/nose-doctest-plugin-sucks</a> for an example
-of such a script.</p>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-24288"
+                            >
+                                <div
+                                    id="div-comment-24288"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/89f032bea7ea14c8157aaa72a243bd06?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://paddy3118.blogspot.com"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Paddy3118</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-<p>I think Nose could be enhanced there.</p>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24288"
+                                        >
+                                            August 1, 2008 at 2:53 am</a
+                                        >
+                                    </div>
 
-<p>&#8220;There’s no way to abort the doctest. Sometimes I’d like to run some environment checks early on, and be able to stop the test if they fail.&#8221;</p>
+                                    <p>
+                                        On dropping into the interpreter, Duncan
+                                        Booth set me strait [here](<a
+                                            href="http://groups.google.com/group/comp.lang.python/browse&#95;frm/thread/9c9274bdc43a17d2/0d941af24f2057a2?lnk=gst&#038;q=doctest+pdb#0d941af24f2057a2"
+                                            rel="nofollow"
+                                            >http://groups.google.com/group/comp.lang.python/browse_frm/thread/9c9274bdc43a17d2/0d941af24f2057a2?lnk=gst&#038;q=doctest+pdb#0d941af24f2057a2</a
+                                        >
+                                        &#8220;(In answer to) Ruby
+                                        doctest&#8221;).
+                                    </p>
 
-<p>You could do a simple assert on your test, with the <code>REPORT_ONLY_FIRST_FAILURE</code> flag on. 
-The assert can be wrapped in a global function you provide in the test environment.</p>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-24295"
+                            >
+                                <div
+                                    id="div-comment-24295"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/de43ec77c41eda38ad28267c432cbd7d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://gavinpanella.com/"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Gavin Panella</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-24288">
-				<div id="div-comment-24288" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/89f032bea7ea14c8157aaa72a243bd06?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://paddy3118.blogspot.com' rel='external nofollow' class='url'>Paddy3118</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24295"
+                                        >
+                                            August 1, 2008 at 6:05 am</a
+                                        >
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24288">
-			August 1, 2008 at 2:53 am</a>		</div>
+                                    <p>
+                                        You can drop into <code>pdb</code> with
+                                        the usual
+                                        <code>import pdb; pdb.set_trace()</code
+                                        >, but, in my experience, you land in
+                                        the middle of <code>pdb</code>&#8216;s
+                                        code. Just <code>next</code> to get back
+                                        to the doctest scope.
+                                    </p>
 
-		<p>On dropping into the interpreter, Duncan Booth set me strait [here](<a href="http://groups.google.com/group/comp.lang.python/browse&#95;frm/thread/9c9274bdc43a17d2/0d941af24f2057a2?lnk=gst&#038;q=doctest+pdb#0d941af24f2057a2" rel="nofollow">http://groups.google.com/group/comp.lang.python/browse_frm/thread/9c9274bdc43a17d2/0d941af24f2057a2?lnk=gst&#038;q=doctest+pdb#0d941af24f2057a2</a> &#8220;(In answer to) Ruby doctest&#8221;).</p>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-24297"
+                            >
+                                <div
+                                    id="div-comment-24297"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/aee56554ec30edfd680e1c937ed4e54d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://oliviergrisel.name"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >ogrisel</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-24295">
-				<div id="div-comment-24295" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/de43ec77c41eda38ad28267c432cbd7d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://gavinpanella.com/' rel='external nofollow' class='url'>Gavin Panella</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24297"
+                                        >
+                                            August 1, 2008 at 6:09 am</a
+                                        >
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24295">
-			August 1, 2008 at 6:05 am</a>		</div>
+                                    <p>
+                                        The zope.testing [1] testrunner launched
+                                        with the -D option drops pdb as
+                                        postmortem shell when a test fails. This
+                                        test runner can be used easily for
+                                        non-zope related project. This is really
+                                        a huge time saving feature when doing
+                                        TDD.
+                                    </p>
 
-		<p>You can drop into <code>pdb</code> with the usual <code>import pdb; pdb.set_trace()</code>, but, in my experience, you land in the middle of <code>pdb</code>&#8216;s code. Just <code>next</code> to get back to the doctest scope.</p>
+                                    <p>
+                                        [1]
+                                        <a
+                                            href="https://launchpad.net/zope.testing"
+                                            rel="nofollow"
+                                            >https://launchpad.net/zope.testing</a
+                                        >
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-24297">
-				<div id="div-comment-24297" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/aee56554ec30edfd680e1c937ed4e54d?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://oliviergrisel.name' rel='external nofollow' class='url'>ogrisel</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment byuser comment-author-ianb bypostauthor even thread-even depth-1"
+                                id="comment-24310"
+                            >
+                                <div
+                                    id="div-comment-24310"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="../../../../index.html"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Ian Bicking</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24297">
-			August 1, 2008 at 6:09 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24310"
+                                        >
+                                            August 1, 2008 at 9:02 am</a
+                                        >
+                                    </div>
 
-		<p>The zope.testing [1] testrunner launched with the -D option drops pdb as postmortem shell when a test fails. This test runner can be used easily for non-zope related project. This is really a huge time saving feature when doing TDD.</p>
+                                    <p>Some notes:</p>
 
-<p>[1] <a href="https://launchpad.net/zope.testing" rel="nofollow">https://launchpad.net/zope.testing</a></p>
+                                    <ul>
+                                        <li>
+                                            <p>
+                                                Stuff like
+                                                <code>pdb.set_trace()</code> is
+                                                good, but it&#8217;s better when
+                                                you can do it when the test
+                                                fails (what zope.testing and
+                                                nose can do with options).
+                                                Interaction isn&#8217;t
+                                                <em>part</em> of the test,
+                                                it&#8217;s part of the testing
+                                                process.
+                                            </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                Something I forgot to mention:
+                                                <code>REPORT_UDIFF</code> also
+                                                has this problem. You have to
+                                                put the option into the test to
+                                                see the diff&#8217;d output, but
+                                                it&#8217;s really part of the
+                                                testing process, something you
+                                                apply when you can&#8217;t
+                                                quickly see the differences in
+                                                output.
+                                            </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                <code>REPORT_ONLY_FIRST</code>
+                                                doesn&#8217;t work: it still
+                                                <em>runs</em> all the other
+                                                examples, it just doesn&#8217;t
+                                                report them. This is often fine,
+                                                but sometimes I really want to
+                                                abort the test. A common example
+                                                would be a database-oriented set
+                                                of tests, when I can&#8217;t
+                                                open the database connection.
+                                                Sometimes when testing
+                                                destructive file operations
+                                                it&#8217;s actually dangerous to
+                                                continue the test if you
+                                                can&#8217;t confirm that you are
+                                                in a safe scratch area.
+                                            </p>
+                                        </li>
+                                    </ul>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment byuser comment-author-ianb bypostauthor even thread-even depth-1" id="comment-24310">
-				<div id="div-comment-24310" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-24315"
+                            >
+                                <div
+                                    id="div-comment-24315"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/c82b7991f8e83a990aab7cdc48dde9ce?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">slinkp</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24310">
-			August 1, 2008 at 9:02 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24315"
+                                        >
+                                            August 1, 2008 at 10:06 am</a
+                                        >
+                                    </div>
 
-		<p>Some notes:</p>
+                                    <p>
+                                        Regarding pdb, a tip I learned from Rob
+                                        Miller is that you want to put your
+                                        set_trace() on the same line as the code
+                                        you want to step into:
+                                    </p>
 
-<ul>
-<li><p>Stuff like <code>pdb.set_trace()</code> is good, but it&#8217;s better when you can do it when the test fails (what zope.testing and nose can do with options).  Interaction isn&#8217;t <em>part</em> of the test, it&#8217;s part of the testing process.</p></li>
-<li><p>Something I forgot to mention: <code>REPORT_UDIFF</code> also has this problem.  You have to put the option into the test to see the diff&#8217;d output, but it&#8217;s really part of the testing process, something you apply when you can&#8217;t quickly see the differences in output.</p></li>
-<li><p><code>REPORT_ONLY_FIRST</code> doesn&#8217;t work: it still <em>runs</em> all the other examples, it just doesn&#8217;t report them.  This is often fine, but sometimes I really want to abort the test.  A common example would be a database-oriented set of tests, when I can&#8217;t open the database connection.  Sometimes when testing destructive file operations it&#8217;s actually dangerous to continue the test if you can&#8217;t confirm that you are in a safe scratch area.</p></li>
-</ul>
+                                    <p>
+                                        &gt;&gt;&gt; import pdb;
+                                        pdb.set_trace(); foo()
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-24315">
-				<div id="div-comment-24315" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/c82b7991f8e83a990aab7cdc48dde9ce?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">slinkp</cite> <span class="says">says:</span>		</div>
+                                    <p>
+                                        And once you step out of foo(), you can
+                                        still step through the doctest, but
+                                        stupidly you can&#8217;t see what line
+                                        you&#8217;re on. This sucks.
+                                    </p>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24315">
-			August 1, 2008 at 10:06 am</a>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-24318"
+                            >
+                                <div
+                                    id="div-comment-24318"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/86e49052bd9a5fb3eabfd7368b68bbb7?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">Jason Pellerin</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<p>Regarding pdb, a tip I learned from Rob Miller is that you want to put your set_trace() on the same line as the code you want to step into:</p>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24318"
+                                        >
+                                            August 1, 2008 at 10:59 am</a
+                                        >
+                                    </div>
 
-<p>&gt;&gt;&gt; import pdb; pdb.set_trace(); foo() </p>
+                                    <p>
+                                        “Getting nose to run .txt files as
+                                        doctests is really hard, involving a
+                                        combination of options I always forget.”
+                                    </p>
 
-<p>And once you step out of foo(), you can still step through the doctest, but stupidly you can&#8217;t see what line you&#8217;re on. This sucks.</p>
+                                    <p>
+                                        Me too, which is why I put them in
+                                        setup.cfg and/or ~/.noserc:
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-24318">
-				<div id="div-comment-24318" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/86e49052bd9a5fb3eabfd7368b68bbb7?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Jason Pellerin</cite> <span class="says">says:</span>		</div>
-
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24318">
-			August 1, 2008 at 10:59 am</a>		</div>
-
-		<p>“Getting nose to run .txt files as doctests is really hard, involving a combination of options I always forget.”</p>
-
-<p>Me too, which is why I put them in setup.cfg and/or ~/.noserc:</p>
-
-<pre><code>[nosetests]
+                                    <pre><code>[nosetests]
 with-doctest=1
 doctest-extension=.txt
 </code></pre>
 
-<p>&#8220;see <a href="http://www.gawel.org/weblog/2008/07/nose-doctest-plugin-sucks" rel="nofollow">http://www.gawel.org/weblog/2008/07/nose-doctest-plugin-sucks</a> &#8230; I think Nose could be enhanced there.&#8221;</p>
+                                    <p>
+                                        &#8220;see
+                                        <a
+                                            href="http://www.gawel.org/weblog/2008/07/nose-doctest-plugin-sucks"
+                                            rel="nofollow"
+                                            >http://www.gawel.org/weblog/2008/07/nose-doctest-plugin-sucks</a
+                                        >
+                                        &#8230; I think Nose could be enhanced
+                                        there.&#8221;
+                                    </p>
 
-<p>Unfortunately, I don&#8217;t speak French, so I&#8217;m only guessing that the post there is complaining about the lack of support in the doctest plugin for fixtures. If that&#8217;s the case, some support is scheduled for the next nose release: </p>
+                                    <p>
+                                        Unfortunately, I don&#8217;t speak
+                                        French, so I&#8217;m only guessing that
+                                        the post there is complaining about the
+                                        lack of support in the doctest plugin
+                                        for fixtures. If that&#8217;s the case,
+                                        some support is scheduled for the next
+                                        nose release:
+                                    </p>
 
-<p><a href="http://code.google.com/p/python-nose/issues/detail?id=60" rel="nofollow">http://code.google.com/p/python-nose/issues/detail?id=60</a></p>
+                                    <p>
+                                        <a
+                                            href="http://code.google.com/p/python-nose/issues/detail?id=60"
+                                            rel="nofollow"
+                                            >http://code.google.com/p/python-nose/issues/detail?id=60</a
+                                        >
+                                    </p>
 
-<p>You can find the current state of fixture support in the ticket-93 branch in nose&#8217;s svn. If you find it still too sucky, patches are always welcome.</p>
+                                    <p>
+                                        You can find the current state of
+                                        fixture support in the ticket-93 branch
+                                        in nose&#8217;s svn. If you find it
+                                        still too sucky, patches are always
+                                        welcome.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-24331">
-				<div id="div-comment-24331" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/243208d3a4a2c96fadd8736cf0c54a6f?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.eletztrick.de' rel='external nofollow' class='url'>Stefan Eletzhofer</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-24331"
+                            >
+                                <div
+                                    id="div-comment-24331"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/243208d3a4a2c96fadd8736cf0c54a6f?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://www.eletztrick.de"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Stefan Eletzhofer</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24331">
-			August 1, 2008 at 2:37 pm</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24331"
+                                        >
+                                            August 1, 2008 at 2:37 pm</a
+                                        >
+                                    </div>
 
-		<p>&#8221; &#8230; I wish I could copy and paste from doctests to consoles. But I don’t see any solution to this problem. &#8230; &#8220;</p>
+                                    <p>
+                                        &#8221; &#8230; I wish I could copy and
+                                        paste from doctests to consoles. But I
+                                        don’t see any solution to this problem.
+                                        &#8230; &#8220;
+                                    </p>
 
-<p>I use IPython. It solves quite some problems:</p>
+                                    <p>
+                                        I use IPython. It solves quite some
+                                        problems:
+                                    </p>
 
-<ul>
-<li><p>allows for pasting doctests and evaluating them (IPython.dtutils.idoctest), optionally</p></li>
-<li><p>raising a exception on the first failure</p></li>
-<li><p>doing a post-mortem pdb automatically</p></li>
-<li><p>executing the doctest in a separate namespace</p></li>
-<li><p>switching to a &#8220;normal&#8221; prompt (ipython normally has a fancy, colored, history-enabled prompt),
-so you can paste code from the interpreter to a doctest. One might consider this not a new feature,
-because the standard interpreter has this too :P</p></li>
-</ul>
+                                    <ul>
+                                        <li>
+                                            <p>
+                                                allows for pasting doctests and
+                                                evaluating them
+                                                (IPython.dtutils.idoctest),
+                                                optionally
+                                            </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                raising a exception on the first
+                                                failure
+                                            </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                doing a post-mortem pdb
+                                                automatically
+                                            </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                executing the doctest in a
+                                                separate namespace
+                                            </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                switching to a
+                                                &#8220;normal&#8221; prompt
+                                                (ipython normally has a fancy,
+                                                colored, history-enabled
+                                                prompt), so you can paste code
+                                                from the interpreter to a
+                                                doctest. One might consider this
+                                                not a new feature, because the
+                                                standard interpreter has this
+                                                too :P
+                                            </p>
+                                        </li>
+                                    </ul>
 
-<p>Btw, you can invoke a IPython-enabled pdb by using <a href="http://pypi.python.org/pypi/ipdb" rel="nofollow">http://pypi.python.org/pypi/ipdb</a> and:</p>
+                                    <p>
+                                        Btw, you can invoke a IPython-enabled
+                                        pdb by using
+                                        <a
+                                            href="http://pypi.python.org/pypi/ipdb"
+                                            rel="nofollow"
+                                            >http://pypi.python.org/pypi/ipdb</a
+                                        >
+                                        and:
+                                    </p>
 
-<p>from ipdb import set<em>trace; set</em>trace()</p>
+                                    <p>
+                                        from ipdb import set<em>trace; set</em
+                                        >trace()
+                                    </p>
 
-<p>I like IPython :)</p>
+                                    <p>I like IPython :)</p>
 
-<p>Stefan.</p>
+                                    <p>Stefan.</p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-24531">
-				<div id="div-comment-24531" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/f82e5f8db5a3a9516e83ca8e01e87726?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://noahgift.com' rel='external nofollow' class='url'>Noah Gift</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-24531"
+                            >
+                                <div
+                                    id="div-comment-24531"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/f82e5f8db5a3a9516e83ca8e01e87726?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://noahgift.com"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Noah Gift</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24531">
-			August 4, 2008 at 6:28 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-24531"
+                                        >
+                                            August 4, 2008 at 6:28 am</a
+                                        >
+                                    </div>
 
-		<p>I will second Stefan&#8217;s comments about IPython, it has changed the way I write Python code, and as such doctest is even more important.  Fortunately IPython has a form of support for doctest.  I think there are some improvements that could be made, but I find it very useful to go into doctest mode in IPython to try something out, then when I am done, paste that code into a test.</p>
+                                    <p>
+                                        I will second Stefan&#8217;s comments
+                                        about IPython, it has changed the way I
+                                        write Python code, and as such doctest
+                                        is even more important. Fortunately
+                                        IPython has a form of support for
+                                        doctest. I think there are some
+                                        improvements that could be made, but I
+                                        find it very useful to go into doctest
+                                        mode in IPython to try something out,
+                                        then when I am done, paste that code
+                                        into a test.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-25978">
-				<div id="div-comment-25978" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/5e5142d6a1a578f02e2d94c4d6d31088?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Tarek Ziadé</cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-25978"
+                            >
+                                <div
+                                    id="div-comment-25978"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/5e5142d6a1a578f02e2d94c4d6d31088?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">Tarek Ziadé</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-25978">
-			August 9, 2008 at 12:22 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-25978"
+                                        >
+                                            August 9, 2008 at 12:22 am</a
+                                        >
+                                    </div>
 
-		<p>@Jason Pellerin</p>
+                                    <p>@Jason Pellerin</p>
 
-<p>Thanks for the info, I&#8217;ll give a shot</p>
+                                    <p>
+                                        Thanks for the info, I&#8217;ll give a
+                                        shot
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-70139">
-				<div id="div-comment-70139" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/b4e2590d3e9900d359fdfcc96cbb040b?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://bioinfoblog.it' rel='external nofollow' class='url'>gioby</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-70139"
+                            >
+                                <div
+                                    id="div-comment-70139"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/b4e2590d3e9900d359fdfcc96cbb040b?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://bioinfoblog.it"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >gioby</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-70139">
-			January 9, 2009 at 9:46 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-70139"
+                                        >
+                                            January 9, 2009 at 9:46 am</a
+                                        >
+                                    </div>
 
-		<p>I agree with your points.
-It would be good to be able to set global fixtures for doctest (not only with nose, but in doctest in general).
-It is very silly when you write functions that open and read files, and you have to repeat a StringIO or TemporaryFile import everytime.
-In general, I don&#8217;t understand why there is no way to declare some setup and teardown methods for doctests, while it would be the most useful.</p>
+                                    <p>
+                                        I agree with your points. It would be
+                                        good to be able to set global fixtures
+                                        for doctest (not only with nose, but in
+                                        doctest in general). It is very silly
+                                        when you write functions that open and
+                                        read files, and you have to repeat a
+                                        StringIO or TemporaryFile import
+                                        everytime. In general, I don&#8217;t
+                                        understand why there is no way to
+                                        declare some setup and teardown methods
+                                        for doctests, while it would be the most
+                                        useful.
+                                    </p>
 
-<p>You can enable ELLIPSIS = True for every test automatically by passing optionflags=doctest.ELLIPSIS to testmod(), but it is ugly.</p>
+                                    <p>
+                                        You can enable ELLIPSIS = True for every
+                                        test automatically by passing
+                                        optionflags=doctest.ELLIPSIS to
+                                        testmod(), but it is ugly.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-76086">
-				<div id="div-comment-76086" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/bfebb14d2c59792728a1ce054f40ccdc?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://bluedynamics.com' rel='external nofollow' class='url'>Jens Klein</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-76086"
+                            >
+                                <div
+                                    id="div-comment-76086"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/bfebb14d2c59792728a1ce054f40ccdc?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://bluedynamics.com"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Jens Klein</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-76086">
-			January 31, 2009 at 6:43 pm</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/07/31/a-doctest-wishlist/comment-page-1/#comment-76086"
+                                        >
+                                            January 31, 2009 at 6:43 pm</a
+                                        >
+                                    </div>
 
-		<p>ad: &#8220;I’d like to be able to easily jump into an interactive state from doctest.&#8221;:</p>
+                                    <p>
+                                        ad: &#8220;I’d like to be able to easily
+                                        jump into an interactive state from
+                                        doctest.&#8221;:
+                                    </p>
 
-<p>I recently released interlude which is available at [pypi](<a href="http://pypi.python.org/pypi/interlude" rel="nofollow">http://pypi.python.org/pypi/interlude</a>). 
-See also my [blog post](<a href="http://bluedynamics.com/articles/jens/interlude-write-python-doctests-interactive" rel="nofollow">http://bluedynamics.com/articles/jens/interlude-write-python-doctests-interactive</a>).</p>
+                                    <p>
+                                        I recently released interlude which is
+                                        available at [pypi](<a
+                                            href="http://pypi.python.org/pypi/interlude"
+                                            rel="nofollow"
+                                            >http://pypi.python.org/pypi/interlude</a
+                                        >). See also my [blog post](<a
+                                            href="http://bluedynamics.com/articles/jens/interlude-write-python-doctests-interactive"
+                                            rel="nofollow"
+                                            >http://bluedynamics.com/articles/jens/interlude-write-python-doctests-interactive</a
+                                        >).
+                                    </p>
 
-<p>In short: it allows to write&#8230;</p>
+                                    <p>In short: it allows to write&#8230;</p>
 
-<pre><code>&amp;gt;&amp;gt;&amp;gt; interact(locals())
+                                    <pre><code>&amp;gt;&amp;gt;&amp;gt; interact(locals())
 </code></pre>
 
-<p>&#8230; in your doctest and it jump into interactive mode. It <em>feels</em> 
-like youre in the doctest and different from pdb. You can just copy paste from interactive 
-mode into the test.</p>
+                                    <p>
+                                        &#8230; in your doctest and it jump into
+                                        interactive mode. It <em>feels</em> like
+                                        youre in the doctest and different from
+                                        pdb. You can just copy paste from
+                                        interactive mode into the test.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-</ul>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                        </ul>
 
-<div class="navigation">
-<div class="alignleft"></div>
-<div class="alignright"></div>
-</div>
+                        <div class="navigation">
+                            <div class="alignleft"></div>
+                            <div class="alignright"></div>
+                        </div>
+                    </div>
 
+                    <div class="navigation">
+                        <div class="nav-left">
+                            &laquo;
+                            <a
+                                href="../../30/making-a-proxy-with-wsgi-and-lxml/index.html"
+                                rel="prev"
+                                >Making a proxy with WSGI and lxml</a
+                            >
+                        </div>
+                        <div class="nav-right">
+                            <a
+                                href="../../../08/10/happy-birthday-potteryblog/index.html"
+                                rel="next"
+                                >Happy Birthday PotteryBlog</a
+                            >
+                            &raquo;
+                        </div>
+                    </div>
+                    <!-- END NAVIGATION -->
+                </div>
+                <!-- END CONTENT -->
+            </div>
+            <!-- END CONTAINER  -->
 
+            <div id="sidebar">
+                <ul>
+                    <li id="home-link">
+                        <h2>
+                            <a
+                                href="../../../../index.html"
+                                title="Ian Bicking: a blog"
+                                >Home</a
+                            >
+                        </h2>
+                    </li>
+                    <li id="text-315934862" class="widget widget_text">
+                        <h2 class="widgettitle">About</h2>
+                        <div class="textwidget">
+                            Ian is a developer with Mozilla,
+                            <a href="http://ianbicking.appspot.com/projects"
+                                >Python open source developer</a
+                            >, actually uses
+                            <a
+                                href="https://plus.google.com/u/0/104537541227697934010/posts"
+                                >Google+</a
+                            >
+                            more than
+                            <a href="http://twitter.com/ianbicking">twitter</a>
+                            and lives in Minneapolis.<br />
+                            <span
+                                class="gittip-0001"
+                                gittip-username="ianbicking"
+                            ></span>
+                            <script
+                                id="gittip-0001"
+                                src="https://www.gittip.com/assets/widgets/0001.js"
+                            ></script>
+                        </div>
+                    </li>
+                    <li id="text-315934863" class="widget widget_text">
+                        <div class="textwidget">
+                            <!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> -->
+                        </div>
+                    </li>
+                    <li id="archives-2" class="widget widget_archive">
+                        <h2 class="widgettitle">Archives</h2>
+                        <ul>
+                            <li>
+                                <a
+                                    href="../../../../2012/10/index.html"
+                                    title="October 2012"
+                                    >October 2012</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2012/02/index.html"
+                                    title="February 2012"
+                                    >February 2012</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2011/04/index.html"
+                                    title="April 2011"
+                                    >April 2011</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2011/03/index.html"
+                                    title="March 2011"
+                                    >March 2011</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/09/index.html"
+                                    title="September 2010"
+                                    >September 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/08/index.html"
+                                    title="August 2010"
+                                    >August 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/05/index.html"
+                                    title="May 2010"
+                                    >May 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/04/index.html"
+                                    title="April 2010"
+                                    >April 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/03/index.html"
+                                    title="March 2010"
+                                    >March 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/02/index.html"
+                                    title="February 2010"
+                                    >February 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/01/index.html"
+                                    title="January 2010"
+                                    >January 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/09/index.html"
+                                    title="September 2009"
+                                    >September 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/05/index.html"
+                                    title="May 2009"
+                                    >May 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/04/index.html"
+                                    title="April 2009"
+                                    >April 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/01/index.html"
+                                    title="January 2009"
+                                    >January 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../12/index.html"
+                                    title="December 2008"
+                                    >December 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../11/index.html"
+                                    title="November 2008"
+                                    >November 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../10/index.html"
+                                    title="October 2008"
+                                    >October 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../09/index.html"
+                                    title="September 2008"
+                                    >September 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../08/index.html"
+                                    title="August 2008"
+                                    >August 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a href="../../index.html" title="July 2008"
+                                    >July 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../06/index.html"
+                                    title="June 2008"
+                                    >June 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../05/index.html"
+                                    title="May 2008"
+                                    >May 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../04/index.html"
+                                    title="April 2008"
+                                    >April 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../03/index.html"
+                                    title="March 2008"
+                                    >March 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../02/index.html"
+                                    title="February 2008"
+                                    >February 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../01/index.html"
+                                    title="January 2008"
+                                    >January 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/11/index.html"
+                                    title="November 2007"
+                                    >November 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/10/index.html"
+                                    title="October 2007"
+                                    >October 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/09/index.html"
+                                    title="September 2007"
+                                    >September 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/08/index.html"
+                                    title="August 2007"
+                                    >August 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/07/index.html"
+                                    title="July 2007"
+                                    >July 2007</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="text-315934861" class="widget widget_text">
+                        <div class="textwidget">
+                            <a href="../../../../archive/index.html"
+                                >The Older Archives</a
+                            >
+                        </div>
+                    </li>
+                    <li id="categories-1" class="widget widget_categories">
+                        <h2 class="widgettitle">Categories</h2>
+                        <ul>
+                            <li class="cat-item cat-item-12">
+                                <a
+                                    href="../../../../category/erlang/index.html"
+                                    title="View all posts filed under Erlang"
+                                    >Erlang</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-11">
+                                <a
+                                    href="../../../../category/html/index.html"
+                                    title="View all posts filed under HTML"
+                                    >HTML</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-8">
+                                <a
+                                    href="../../../../category/javascript/index.html"
+                                    title="View all posts filed under Javascript"
+                                    >Javascript</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-15">
+                                <a
+                                    href="../../../../category/licensing/index.html"
+                                    title="View all posts filed under Licensing"
+                                    >Licensing</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-18">
+                                <a
+                                    href="../../../../category/mozilla/index.html"
+                                    title="View all posts filed under Mozilla"
+                                    >Mozilla</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-5">
+                                <a
+                                    href="../../../../category/notech/index.html"
+                                    title="View all posts filed under Non-technical"
+                                    >Non-technical</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-6">
+                                <a
+                                    href="../../../../category/olpc/index.html"
+                                    title="View all posts filed under OLPC"
+                                    >OLPC</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-14">
+                                <a
+                                    href="../../../../category/packaging/index.html"
+                                    title="View all posts filed under Packaging"
+                                    >Packaging</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-4">
+                                <a
+                                    href="../../../../category/politics/index.html"
+                                    title="View all posts filed under Politics"
+                                    >Politics</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-3">
+                                <a
+                                    href="../../../../category/programming/index.html"
+                                    title="View all posts filed under Programming"
+                                    >Programming</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-7">
+                                <a
+                                    href="../../../../category/python/index.html"
+                                    title="View all posts filed under Python"
+                                    >Python</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-10">
+                                <a
+                                    href="../../../../category/ruby/index.html"
+                                    title="View all posts filed under Ruby"
+                                    >Ruby</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-19">
+                                <a
+                                    href="../../../../category/security/index.html"
+                                    title="View all posts filed under Security"
+                                    >Security</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-16">
+                                <a
+                                    href="../../../../category/silverlining.1"
+                                    title="View all posts filed under Silver Lining"
+                                    >Silver Lining</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-20">
+                                <a
+                                    href="../../../../category/programming/testing/index.html"
+                                    title="View all posts filed under Testing"
+                                    >Testing</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-9">
+                                <a
+                                    href="../../../../category/web/index.html"
+                                    title="View all posts filed under Web"
+                                    >Web</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-13">
+                                <a
+                                    href="../../../../category/zopeplone/index.html"
+                                    title="View all posts filed under Zope/Plone"
+                                    >Zope/Plone</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="search-2" class="widget widget_search">
+                        <form
+                            id="searchform"
+                            method="get"
+                            action="../../../../index.html"
+                        >
+                            <div>
+                                <input
+                                    id="s"
+                                    name="s"
+                                    type="text"
+                                    value=""
+                                    tabindex="1"
+                                    size="10"
+                                />
+                                <input
+                                    id="searchsubmit"
+                                    name="searchsubmit"
+                                    type="submit"
+                                    value="Find"
+                                    tabindex="2"
+                                />
+                            </div>
+                        </form>
+                    </li>
+                    <li
+                        id="recent-posts-2"
+                        class="widget widget_recent_entries"
+                    >
+                        <h2 class="widgettitle">Recent Posts</h2>
+                        <ul>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=291"
+                                    title="Why doctest.js is better than Python&#8217;s doctest"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=283"
+                                    title="Python Application Package"
+                                    >Python Application Package</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=277"
+                                    title="Git-as-sync, not source-control-as-deployment"
+                                    >Git-as-sync, not
+                                    source-control-as-deployment</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=253"
+                                    title="My Unsolicited Advice For PyPy"
+                                    >My Unsolicited Advice For PyPy</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=250"
+                                    title="A Python Web Application Package and Format (we should make one)"
+                                    >A Python Web Application Package and Format
+                                    (we should make one)</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li
+                        id="recent-comments-2"
+                        class="widget widget_recent_comments"
+                    >
+                        <h2 class="widgettitle">Recent Comments</h2>
+                        <ul id="recentcomments">
+                            <li class="recentcomments">
+                                <a
+                                    href="http://www.mirsa.com.tr"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >havalandırma</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                <a
+                                    href="http://redealmeidense.com.br/portalx/modules/"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >this website</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                Eric Pierce on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                Paul Brian on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                <a
+                                    href="http://benjiyork.com"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >Benji York</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
 
-
-</div>
-
-		<div class="navigation">
-			<div class="nav-left">&laquo; <a href="../../30/making-a-proxy-with-wsgi-and-lxml/index.html" rel="prev">Making a proxy with WSGI and lxml</a></div>
-			<div class="nav-right"><a href="../../../08/10/happy-birthday-potteryblog/index.html" rel="next">Happy Birthday PotteryBlog</a> &raquo;</div>
-		</div><!-- END NAVIGATION -->
-
-
-	</div><!-- END CONTENT -->
-</div><!-- END CONTAINER  -->
-
-<div id="sidebar">
-	<ul>
-		<li id="home-link">
-			<h2><a href="../../../../index.html" title="Ian Bicking: a blog">Home</a></h2>
-		</li>
-<li id="text-315934862" class="widget widget_text"><h2 class="widgettitle">About</h2>
-			<div class="textwidget">Ian is a developer with Mozilla, <a href="http://ianbicking.appspot.com/projects">Python open source developer</a>, actually uses <a href="https://plus.google.com/u/0/104537541227697934010/posts">Google+</a> more than <a href="http://twitter.com/ianbicking">twitter</a> and lives in Minneapolis.<br>
-<span class="gittip-0001" gittip-username="ianbicking"></span>
-<script id="gittip-0001"
-  src="https://www.gittip.com/assets/widgets/0001.js"></script>
-</div>
-		</li>
-<li id="text-315934863" class="widget widget_text">			<div class="textwidget"><!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> --></div>
-		</li>
-<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
-		<ul>
-			<li><a href='../../../../2012/10/index.html' title='October 2012'>October 2012</a></li>
-	<li><a href='../../../../2012/02/index.html' title='February 2012'>February 2012</a></li>
-	<li><a href='../../../../2011/04/index.html' title='April 2011'>April 2011</a></li>
-	<li><a href='../../../../2011/03/index.html' title='March 2011'>March 2011</a></li>
-	<li><a href='../../../../2010/09/index.html' title='September 2010'>September 2010</a></li>
-	<li><a href='../../../../2010/08/index.html' title='August 2010'>August 2010</a></li>
-	<li><a href='../../../../2010/05/index.html' title='May 2010'>May 2010</a></li>
-	<li><a href='../../../../2010/04/index.html' title='April 2010'>April 2010</a></li>
-	<li><a href='../../../../2010/03/index.html' title='March 2010'>March 2010</a></li>
-	<li><a href='../../../../2010/02/index.html' title='February 2010'>February 2010</a></li>
-	<li><a href='../../../../2010/01/index.html' title='January 2010'>January 2010</a></li>
-	<li><a href='../../../../2009/09/index.html' title='September 2009'>September 2009</a></li>
-	<li><a href='../../../../2009/05/index.html' title='May 2009'>May 2009</a></li>
-	<li><a href='../../../../2009/04/index.html' title='April 2009'>April 2009</a></li>
-	<li><a href='../../../../2009/01/index.html' title='January 2009'>January 2009</a></li>
-	<li><a href='../../../12/index.html' title='December 2008'>December 2008</a></li>
-	<li><a href='../../../11/index.html' title='November 2008'>November 2008</a></li>
-	<li><a href='../../../10/index.html' title='October 2008'>October 2008</a></li>
-	<li><a href='../../../09/index.html' title='September 2008'>September 2008</a></li>
-	<li><a href='../../../08/index.html' title='August 2008'>August 2008</a></li>
-	<li><a href='../../index.html' title='July 2008'>July 2008</a></li>
-	<li><a href='../../../06/index.html' title='June 2008'>June 2008</a></li>
-	<li><a href='../../../05/index.html' title='May 2008'>May 2008</a></li>
-	<li><a href='../../../04/index.html' title='April 2008'>April 2008</a></li>
-	<li><a href='../../../03/index.html' title='March 2008'>March 2008</a></li>
-	<li><a href='../../../02/index.html' title='February 2008'>February 2008</a></li>
-	<li><a href='../../../01/index.html' title='January 2008'>January 2008</a></li>
-	<li><a href='../../../../2007/11/index.html' title='November 2007'>November 2007</a></li>
-	<li><a href='../../../../2007/10/index.html' title='October 2007'>October 2007</a></li>
-	<li><a href='../../../../2007/09/index.html' title='September 2007'>September 2007</a></li>
-	<li><a href='../../../../2007/08/index.html' title='August 2007'>August 2007</a></li>
-	<li><a href='../../../../2007/07/index.html' title='July 2007'>July 2007</a></li>
-		</ul>
-</li>
-<li id="text-315934861" class="widget widget_text">			<div class="textwidget"><a href="../../../../archive/index.html">The Older Archives</a></div>
-		</li>
-<li id="categories-1" class="widget widget_categories"><h2 class="widgettitle">Categories</h2>
-		<ul>
-	<li class="cat-item cat-item-12"><a href="../../../../category/erlang/index.html" title="View all posts filed under Erlang">Erlang</a>
-</li>
-	<li class="cat-item cat-item-11"><a href="../../../../category/html/index.html" title="View all posts filed under HTML">HTML</a>
-</li>
-	<li class="cat-item cat-item-8"><a href="../../../../category/javascript/index.html" title="View all posts filed under Javascript">Javascript</a>
-</li>
-	<li class="cat-item cat-item-15"><a href="../../../../category/licensing/index.html" title="View all posts filed under Licensing">Licensing</a>
-</li>
-	<li class="cat-item cat-item-18"><a href="../../../../category/mozilla/index.html" title="View all posts filed under Mozilla">Mozilla</a>
-</li>
-	<li class="cat-item cat-item-5"><a href="../../../../category/notech/index.html" title="View all posts filed under Non-technical">Non-technical</a>
-</li>
-	<li class="cat-item cat-item-6"><a href="../../../../category/olpc/index.html" title="View all posts filed under OLPC">OLPC</a>
-</li>
-	<li class="cat-item cat-item-14"><a href="../../../../category/packaging/index.html" title="View all posts filed under Packaging">Packaging</a>
-</li>
-	<li class="cat-item cat-item-4"><a href="../../../../category/politics/index.html" title="View all posts filed under Politics">Politics</a>
-</li>
-	<li class="cat-item cat-item-3"><a href="../../../../category/programming/index.html" title="View all posts filed under Programming">Programming</a>
-</li>
-	<li class="cat-item cat-item-7"><a href="../../../../category/python/index.html" title="View all posts filed under Python">Python</a>
-</li>
-	<li class="cat-item cat-item-10"><a href="../../../../category/ruby/index.html" title="View all posts filed under Ruby">Ruby</a>
-</li>
-	<li class="cat-item cat-item-19"><a href="../../../../category/security/index.html" title="View all posts filed under Security">Security</a>
-</li>
-	<li class="cat-item cat-item-16"><a href="../../../../category/silverlining.1" title="View all posts filed under Silver Lining">Silver Lining</a>
-</li>
-	<li class="cat-item cat-item-20"><a href="../../../../category/programming/testing/index.html" title="View all posts filed under Testing">Testing</a>
-</li>
-	<li class="cat-item cat-item-9"><a href="../../../../category/web/index.html" title="View all posts filed under Web">Web</a>
-</li>
-	<li class="cat-item cat-item-13"><a href="../../../../category/zopeplone/index.html" title="View all posts filed under Zope/Plone">Zope/Plone</a>
-</li>
-		</ul>
-</li>
-<li id="search-2" class="widget widget_search"><form id="searchform" method="get" action="../../../../index.html">
-	<div>
-		<input id="s" name="s" type="text" value="" tabindex="1" size="10" />
-		<input id="searchsubmit" name="searchsubmit" type="submit" value="Find" tabindex="2" />
-	</div>
-</form> </li>
-		<li id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widgettitle">Recent Posts</h2>
-		<ul>
-				<li><a href="../../../../index.html?p=291" title="Why doctest.js is better than Python&#8217;s doctest">Why doctest.js is better than Python&#8217;s doctest</a></li>
-				<li><a href="../../../../index.html?p=283" title="Python Application Package">Python Application Package</a></li>
-				<li><a href="../../../../index.html?p=277" title="Git-as-sync, not source-control-as-deployment">Git-as-sync, not source-control-as-deployment</a></li>
-				<li><a href="../../../../index.html?p=253" title="My Unsolicited Advice For PyPy">My Unsolicited Advice For PyPy</a></li>
-				<li><a href="../../../../index.html?p=250" title="A Python Web Application Package and Format (we should make one)">A Python Web Application Package and Format (we should make one)</a></li>
-				</ul>
-		</li>
-<li id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widgettitle">Recent Comments</h2>
-<ul id="recentcomments"><li class="recentcomments"><a href='http://www.mirsa.com.tr' rel='external nofollow' class='url'>havalandırma</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://redealmeidense.com.br/portalx/modules/' rel='external nofollow' class='url'>this website</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Eric Pierce on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Paul Brian on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://benjiyork.com' rel='external nofollow' class='url'>Benji York</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320">Why doctest.js is better than Python&#8217;s doctest</a></li></ul></li>
-	</ul>
-</div>
-
-	<div id="footer">
-		<p>
-			&copy; 2013 Ian Bicking<!--
+            <div id="footer">
+                <p>
+                    &copy; 2013 Ian Bicking<!--
 Does this commenting make me evil?
 			|
 			Thanks, <a href="http://wordpress.org/" title="WordPress">WordPress</a>
 			|
 			<a href="http://www.plaintxt.org/themes/barthelme/" title="Barthelme for WordPress" rel="follow">Barthelme</a> theme by <a href="http://scottwallick.com/" title="scottwallick.com" rel="follow">Scott</a>
 			| <!-- The following is a link to the theme author's sponsor. Please consider its smallness and that Scott was nice enough to make this theme publically available. -->
-			Sponsor: <a href="http://www.active-sandals.com/womreefsan.html" title="Support: Reef Sandals">Reef Sandals</a>
-			|
-			Valid <a href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1" title="Valid XHTML 1.0 Strict" rel="nofollow">XHTML</a> &amp; <a href="http://jigsaw.w3.org/css-validator/validator?uri=http://blog.ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no" title="Valid CSS" rel="nofollow">CSS</a>
-			|
-			-->
-			RSS: <a href="../../../../feed/rss/index.html" title="Ian Bicking: a blog RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Posts</a> &amp; <a href="../../../../comments/feed/index.html" title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Comments</a>
-		</p>
-	</div>
+                    Sponsor:
+                    <a
+                        href="http://www.active-sandals.com/womreefsan.html"
+                        title="Support: Reef Sandals"
+                        >Reef Sandals</a
+                    >
+                    | Valid
+                    <a
+                        href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1"
+                        title="Valid XHTML 1.0 Strict"
+                        rel="nofollow"
+                        >XHTML</a
+                    >
+                    &amp;
+                    <a
+                        href="http://jigsaw.w3.org/css-validator/validator?uri=https://ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no"
+                        title="Valid CSS"
+                        rel="nofollow"
+                        >CSS</a
+                    >
+                    | --> RSS:
+                    <a
+                        href="../../../../feed/rss/index.html"
+                        title="Ian Bicking: a blog RSS 2.0 (XML) Feed"
+                        rel="alternate"
+                        type="application/rss+xml"
+                        >Posts</a
+                    >
+                    &amp;
+                    <a
+                        href="../../../../comments/feed/index.html"
+                        title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed"
+                        rel="alternate"
+                        type="application/rss+xml"
+                        >Comments</a
+                    >
+                </p>
+            </div>
+        </div>
+        <!-- END WRAPPER -->
 
-</div><!-- END WRAPPER -->
+        <!-- Somehow 44 queries occured in 1.294 seconds. Magic! -->
+        <!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
+        <script
+            type="text/javascript"
+            src="../../../../wp-includes/js/comment-reply.js?ver=3.4.2"
+        ></script>
 
-	<!-- Somehow 44 queries occured in 1.294 seconds. Magic! -->
-	<!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
-	<script type='text/javascript' src='../../../../wp-includes/js/comment-reply.js?ver=3.4.2'></script>
-
-<!-- Google Analytics -->
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script>
-
-</body>
+        <!-- Google Analytics -->
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

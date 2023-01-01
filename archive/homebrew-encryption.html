@@ -1,182 +1,384 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Homebrew encryption</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Homebrew encryption</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Homebrew encryption</h1>
+        <p>
+            I wrote a simple cryptographic algorithm this evening. Specifically
+            it is meant to encrypt passwords into cookies, to allow for
+            persistent logins. These were some of the requirements that made me
+            want to roll my own:
+        </p>
 
-<div style="float: right">
+        <ul>
+            <li>
+                Not too many requirements. Preferably nothing outside the
+                standard library. No
+                <a href="http://www.amk.ca/python/code/crypto.html">pycrypto</a>
+                or <a href="http://sandbox.rulemaker.net/ngps/m2/">M2Crypto</a>.
+                (<a href="http://sourceforge.net/projects/pyaes/">this</a> would
+                probably be okay, though)
+            </li>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+            <li>
+                Creates compact encrypted text. This has to fit into a cookie
+                reliably. I'm hoping for no more than 40 bytes of overhead.
+            </li>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Homebrew encryption</h1>
- <p> I wrote a simple cryptographic algorithm this evening.
-Specifically it is meant to encrypt passwords into cookies, to allow
-for persistent logins.  These were some of the requirements that made
-me want to roll my own:
+            <li>
+                Runs reasonably fast. I'm not sure if this really matters, but I
+                have noticed that AES in Python is noticeably slow.
+            </li>
 
-<ul>
+            <li>Is secure.</li>
+        </ul>
 
-  <li> Not too many requirements.  Preferably nothing outside the
-  standard library.  No <a href="http://www.amk.ca/python/code/crypto.html">pycrypto</a> or <a href="http://sandbox.rulemaker.net/ngps/m2/">M2Crypto</a>.  (<a href="http://sourceforge.net/projects/pyaes/">this</a> would
-  probably be okay, though)
+        <p>
+            Maybe this already exists, but most of the algorithms I've seen
+            either aren't secure (e.g.,
+            <a href="http://python.org/doc/current/lib/module-rotor.html"
+                >rotor</a
+            >) or aren't compact. And anyway, it seemed fun. I'd be very curious
+            if anyone sees particular vulnerabilities with this algorithm
+            (besides the fact that it should only encrypt short plaintexts). The
+            code is in
+            <a
+                href="http://www.webwareforpython.org/~ianb/w4py.org/Wiki/lib/simplecrypt.py"
+                >simplecrypt.py</a
+            >. The algorithm:
+        </p>
 
-  <li> Creates compact encrypted text.  This has to fit into a cookie
-  reliably.  I'm hoping for no more than 40 bytes of overhead.
+        <p>
+            First take the <i>plaintext</i> and encode it so that it is of
+            minimum length and aligned in some way. By default it must be 10
+            characters long, and aligned to the next 5 characters (e.g., a 12
+            byte string becomes 15 bytes). Random characters are added to the
+            end, and at least one random character is always used. We add a
+            leading character telling what the actual length of the string is.
+            (This way a very short password will not appear particularly short
+            when encrypted.) This is the <i>encoded plaintext</i>.
+        </p>
 
-  <li> Runs reasonably fast.  I'm not sure if this really matters, but
-  I have noticed that AES in Python is noticeably slow.
+        <p>
+            Take a hash of the <i>encoded plaintext</i> and the <i>key</i>,
+            possibly truncating it to save space. We will call this hash the
+            <i>signature</i>.
+        </p>
 
-  <li> Is secure.
+        <p>
+            Take an sha hash of the <i>signature</i> and the <i>key</i>. This
+            hash will be the <i>encoding key</i>.
+        </p>
 
-</ul>
+        <p>
+            XOR the <i>encoding key</i> with the <i>encoded plaintext</i>.
+            Prepend the <i>signature</i>. This is the full <i>ciphertext</i>.
+        </p>
 
-<p> Maybe this already exists, but most of the algorithms I've seen
-either aren't secure (e.g., <a href="http://python.org/doc/current/lib/module-rotor.html">rotor</a>)
-or aren't compact.  And anyway, it seemed fun.  I'd be very curious if
-anyone sees particular vulnerabilities with this algorithm (besides
-the fact that it should only encrypt short plaintexts).  The code is
-in <a href="http://www.webwareforpython.org/~ianb/w4py.org/Wiki/lib/simplecrypt.py">simplecrypt.py</a>.
-The algorithm:
+        <p>
+            Reverse the steps to decrypt. I use the
+            <a href="http://python.org/doc/current/lib/module-sha.html">SHA</a>
+            hash, which is 20 characters long. I think any plaintext over 20
+            characters could be vulnerable, since we have to reuse the encoding
+            key when XORing it with the plaintext, and patterns may emerge.
+        </p>
 
-<p> First take the <i>plaintext</i> and encode it so that it is of minimum
-length and aligned in some way.  By default it must be 10 characters
-long, and aligned to the next 5 characters (e.g., a 12 byte string
-becomes 15 bytes).  Random characters are added to the end, and at
-least one random character is always used.  We add a leading character
-telling what the actual length of the string is.  (This way a very
-short password will not appear particularly short when encrypted.)
-This is the <i>encoded plaintext</i>.
+        <p>
+            Anyway, this seemed pretty simple, and seems to fit the bill. Am I
+            missing anything?
+        </p>
 
-<p> Take a hash of the <i>encoded plaintext</i> and the <i>key</i>,
-possibly truncating it to save space.  We will call this hash the
-<i>signature</i>.
+        <div class="dates" align="right">
+            Created 02 Jun '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            Remember that (A XOR C) XOR (B XOR C) is A XOR B, so yes, even a
+            little bit of key reuse is bad.
+            <br />
 
-<p> Take an sha hash of the <i>signature</i> and the <i>key</i>.  This
-hash will be the <i>encoding key</i>.
+            <br />
+            Why aren't you just using HMAC? You probably already have a library
+            for it...
+            <br />
 
-<p> XOR the <i>encoding key</i> with the <i>encoded plaintext</i>.
-Prepend the <i>signature</i>.  This is the full <i>ciphertext</i>.
+            <br />
+            I notice that I've acquired the habit of twitching violently when
+            anyone says something like "homebrew encryption." I wonder where I
+            picked that up.
+            <div align="right">
+                <a href="https://ianbicking.org/comment118.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.1ts.org/~kcr/">Karl</a>
+            </div>
+            <hr noshade />
+            import hmac
+            <div align="right">
+                <a href="https://ianbicking.org/comment119.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://effbot.org">Fredrik</a>
+            </div>
+            <hr noshade />
+            Python 2.2 does indeed have an hmac library -- I hadn't noticed it
+            before. But I don't see how it changes much -- HMAC just seems to be
+            a way to sign things, and an HMAC is not noticeably different than
+            hashing the concatenation of the key and plaintext (except it
+            standardizes aspects). Standardizing my homebrew encryption isn't
+            that important ;)
+            <br />
 
-<p> Reverse the steps to decrypt.  I use the <a href="http://python.org/doc/current/lib/module-sha.html">SHA</a> hash,
-which is 20 characters long.  I think any plaintext over 20 characters
-could be vulnerable, since we have to reuse the encoding key when
-XORing it with the plaintext, and patterns may emerge.
+            <br />
+            Note that the key is in all cases secret, and is not reused. So (A
+            XOR C) XOR (B XOR C) wouldn't happen -- i.e., someone couldn't
+            submit a known plaintext (B), and use that to decode (A XOR C),
+            since the two messages would actually be (A XOR C1) and (B XOR C2).
+            But I think if, say, you had a 200 character plaintext, and a 20
+            character hash, you could potentially find out what the hash is,
+            since character 1, 21, 41, 61, 81, 101, 121, 141, 161, and 181 would
+            have been XORed with the same value, and you could start to guess
+            (using knowledge about the likely distribution of characters) what
+            that value of the key/mask had been. This would still only allow you
+            to break that one message -- the key would remain secret even after
+            a successful brute-force attack of this style.
+            <div align="right">
+                <a href="https://ianbicking.org/comment120.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            A SHA hash is a one way function. Why go through an encryption
+            scheme, when no one can really get back to the original password?
+            Use a SHA1 hash of the password and be done with it.
+            <div align="right">
+                <a href="https://ianbicking.org/comment121.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.trolocsis.com/">Ryan</a>
+            </div>
+            <hr noshade />
+            Because hashed passwords are hard to work with. Frequently a
+            password is stored in a hashed form, so you'd have to be sure to
+            hash the cookie in the exact same way, or do some sort of
+            double-hashing. There are also many situations where you need the
+            actual password to authenticate the person.
+            <br />
 
-<p> Anyway, this seemed pretty simple, and seems to fit the bill.  Am
-I missing anything?
- <div class="dates" align="right">
-Created 02 Jun '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- Remember that (A XOR C) XOR (B XOR C) is A XOR B, so yes, even a little bit of key reuse is bad.
-<br />
+            <br />
+            I have thought about storing some more arbitrary authentication,
+            though -- basically hashing the username with a secret key. Then
+            this would take the place of a password -- we'd rely on the fact
+            that sometime in the past (when we originally set the cookie) the
+            user had authenticated themself, and this the signed hash proves it
+            is the same user. (Well, actually just the same browser, but that's
+            a different issue)
+            <br />
 
-<br />
-Why aren't you just using HMAC?  You probably already have a library for it...
-<br />
+            <br />
+            If you store the password you also allow a person to implicitly
+            invalidate persistent logins by changing the account's password.
+            <div align="right">
+                <a href="https://ianbicking.org/comment122.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            google for python crypto oneliners. There is ARC4 as line or two.
+            <div align="right">
+                <a href="https://ianbicking.org/comment123.html" rel="nofollow"
+                    >#</a
+                >
+                Niki Spahiev
+            </div>
+            <hr noshade />
+            Never, ever, write your own encryption algorithm and assume it's
+            secure. It never is. Try using one of the existing, proven ones. And
+            keep the key secure.
+            <a href="http://www.schneier.com/blowfish.html" target="_blank"
+                >Blowfish</a
+            >
+            might be a good bet. It's faster than AES/rijndael, and pretty
+            secure.
+            <div align="right">
+                <a href="https://ianbicking.org/comment124.html" rel="nofollow"
+                    >#</a
+                >
+                Frederik De Bleser
+            </div>
+            <hr noshade />
+            But Blowfish turns my iddy bitty 8-character password into 118
+            characters! Looking at the cookie standards, that's still well
+            within the size limit, so maybe that's not so bad. Well, maybe
+            that's not even true, it seems to be a particular implementation of
+            Blowfish, which may be adding filename, a hash, and other
+            information to the encrypted stream. The raw algorithm seems to
+            cause little expansion (using this module:
+            <a href="http://bofh.concordia.ca/blowfish.py" target="_blank"
+                >http://bofh.concordia.ca/blowfish.py</a
+            >
+            )
+            <div align="right">
+                <a href="https://ianbicking.org/comment125.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            It might make it a bit more secure if you put the random chars at
+            the begining instead of at the end.
+            <br />
 
-<br />
-I notice that I've acquired the habit of twitching violently when anyone says something like "homebrew encryption."  I wonder where I picked that up.
- <div align="right"><a href="http://blog.ianbicking.org/comment118.html" rel="nofollow">#</a> <a href="http://www.1ts.org/~kcr/">Karl</a></div><hr noshade>
- import hmac
- <div align="right"><a href="http://blog.ianbicking.org/comment119.html" rel="nofollow">#</a> <a href="http://effbot.org">Fredrik</a></div><hr noshade>
- Python 2.2 does indeed have an hmac library -- I hadn't noticed it before.  But I don't see how it changes much -- HMAC just seems to be a way to sign things, and an HMAC is not noticeably different than hashing the concatenation of the key and plaintext (except it standardizes aspects).  Standardizing my homebrew encryption isn't that important ;)
-<br />
+            <br />
+            But I think for any real security, one should use a proven
+            algorythm.
+            <br />
 
-<br />
-Note that the key is in all cases secret, and is not reused.  So (A XOR C) XOR (B XOR C) wouldn't happen -- i.e., someone couldn't submit a known plaintext (B), and use that to decode (A XOR C), since the two messages would actually be (A XOR C1) and (B XOR C2).  But I think if, say, you had a 200 character plaintext, and a 20 character hash, you could potentially find out what the hash is, since character 1, 21, 41, 61, 81, 101, 121, 141, 161, and 181 would have been XORed with the same value, and you could start to guess (using knowledge about the likely distribution of characters) what that value of the key/mask had been.  This would still only allow you to break that one message -- the key would remain secret even after a successful brute-force attack of this style.
- <div align="right"><a href="http://blog.ianbicking.org/comment120.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- A SHA hash is a one way function.  Why go through an encryption scheme, when no one can really get back to the original password?  Use a SHA1 hash of the password and be done with it.
- <div align="right"><a href="http://blog.ianbicking.org/comment121.html" rel="nofollow">#</a> <a href="http://www.trolocsis.com/">Ryan</a></div><hr noshade>
- Because hashed passwords are hard to work with.  Frequently a password is stored in a hashed form, so you'd have to be sure to hash the cookie in the exact same way, or do some sort of double-hashing.  There are also many situations where you need the actual password to authenticate the person.
-<br />
+            <br />
+            I like this though because its light weight and would provide enough
+            security as needed non widespread use, certain situations.
+            <br />
 
-<br />
-I have thought about storing some more arbitrary authentication, though -- basically hashing the username with a secret key.  Then this would take the place of a password -- we'd rely on the fact that sometime in the past (when we originally set the cookie) the user had authenticated themself, and this the signed hash proves it is the same user.  (Well, actually just the same browser, but that's a different issue)
-<br />
+            <br />
 
-<br />
-If you store the password you also allow a person to implicitly invalidate persistent logins by changing the account's password.
- <div align="right"><a href="http://blog.ianbicking.org/comment122.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- google for python crypto oneliners. There is ARC4 as line or two.
- <div align="right"><a href="http://blog.ianbicking.org/comment123.html" rel="nofollow">#</a> Niki Spahiev</div><hr noshade>
- Never, ever, write your own encryption algorithm and assume it's secure. It never is. Try using one of the existing, proven ones. And keep the key secure. <a href="http://www.schneier.com/blowfish.html" target="_blank">Blowfish</a> might be a good bet. It's faster than AES/rijndael, and pretty secure.
- <div align="right"><a href="http://blog.ianbicking.org/comment124.html" rel="nofollow">#</a> Frederik De Bleser</div><hr noshade>
- But Blowfish turns my iddy bitty 8-character password into 118 characters!  Looking at the cookie standards, that's still well within the size limit, so maybe that's not so bad.  Well, maybe that's not even true, it seems to be a particular implementation of Blowfish, which may be adding filename, a hash, and other information to the encrypted stream.  The raw algorithm seems to cause little expansion (using this module: <a href="http://bofh.concordia.ca/blowfish.py" target="_blank">http://bofh.concordia.ca/blowfish.py</a> )
- <div align="right"><a href="http://blog.ianbicking.org/comment125.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- It might make it a bit more secure if you put the random chars at the begining instead of at the end.
-<br />
+            <br />
+            I tried to make one similar myself for storing passwords in
+            inifiles, but I couldn't make it as secure as I wanted, so I just
+            stored them xored with the repeating username then base64 encoded.
+            (Oh no now my secrets out!)
+            <br />
 
-<br />
-But I think for any real security, one should use a proven algorythm.
-<br />
+            <br />
+            No flames for the above insecure algorythm please, its just a step
+            up from plain text It's just to protect against nosey pc repair
+            guys. Even if they get the password, they have to build a twisted PB
+            program to use it, and as soon as they do we'll know and change it.
+            <br />
 
-<br />
-I like this though because its light weight and would provide enough security as needed non widespread use, certain situations.
-<br />
+            <br />
+            Now that I've shared this info, I think I'll have to start using
+            blowfish or something!. I think I'll use the hash of the username
+            appended with a hardcoded key.
+            <br />
 
-<br />
+            <br />
+            Thanks for sharing your algorythm.
+            <div align="right">
+                <a href="https://ianbicking.org/comment126.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.sherborneinternational.com"
+                    >Matthew Sherborne</a
+                >
+            </div>
+            <hr noshade />
+            I've found that security via obscurity seems to be the only way to
+            deal with some situations, particularly when you have a program that
+            stores a password and needs to be able to get the plaintext password
+            on its own, as in a client that does something on behalf of some
+            user. You can use whatever encryption, but it doesn't really matter,
+            because on some level you have a plaintext key. Passwords are secure
+            only because our brains are an exceptionally obscure storage medium.
+            <br />
 
-<br />
-I tried to make one similar myself for storing passwords in inifiles, but I couldn't make it as secure as I wanted, so I just stored them xored with the repeating username then base64 encoded. (Oh no now my secrets out!)
-<br />
+            <br />
+            This is why DRM schemes are breakable -- it's certainly not that the
+            designers don't understand encryption algorithms (DVD's CSS aside).
+            <div align="right">
+                <a href="https://ianbicking.org/comment127.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            Speed should not be an important requirement especially for small
+            messages of the kind found in cookies. For less than a couple
+            hundred bytes... speed won't matter.
+            <div align="right">
+                <a href="https://ianbicking.org/comment128.html" rel="nofollow"
+                    >#</a
+                >
+                Larry
+            </div>
+            <hr noshade />
+            I've seen performance issues when encrypting credit card numbers, so
+            speed is definitely a concern. That was public-key encryption, which
+            is typically much slower, but I've noticed similar issues with the
+            pure-Python AES implementation.
+            <div align="right">
+                <a href="https://ianbicking.org/comment129.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            BUT why send the password in the cookie in the first place. It is so
+            much easier (and IMHO more secure) to just store the password
+            locally and send a session id in the cookie. That way you have the
+            possibility to add more 'cookie' data as you go along without having
+            to send it all in a cookie.
+            <br />
+            Beats encryption anytime.
+            <br />
 
-<br />
-No flames for the above insecure algorythm please, its just a step up from plain text  It's just to protect against nosey pc repair guys.  Even if they get the password, they have to build a twisted PB program to use it, and as soon as they do we'll know and change it.
-<br />
-
-<br />
-Now that I've shared this info, I think I'll have to start using blowfish or something!. I think I'll use the hash of the username appended with a hardcoded key.
-<br />
-
-<br />
-Thanks for sharing your algorythm.
- <div align="right"><a href="http://blog.ianbicking.org/comment126.html" rel="nofollow">#</a> <a href="http://www.sherborneinternational.com">Matthew Sherborne</a></div><hr noshade>
- I've found that security via obscurity seems to be the only way to deal with some situations, particularly when you have a program that stores a password and needs to be able to get the plaintext password on its own, as in a client that does something on behalf of some user.  You can use whatever encryption, but it doesn't really matter, because on some level you have a plaintext key.  Passwords are secure only because our brains are an exceptionally obscure storage medium.
-<br />
-
-<br />
-This is why DRM schemes are breakable -- it's certainly not that the designers don't understand encryption algorithms (DVD's CSS aside).
- <div align="right"><a href="http://blog.ianbicking.org/comment127.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- Speed should not be an important requirement especially for small messages of the kind found in cookies.  For less than a couple hundred bytes...  speed won't matter.
- <div align="right"><a href="http://blog.ianbicking.org/comment128.html" rel="nofollow">#</a> Larry</div><hr noshade>
- I've seen performance issues when encrypting credit card numbers, so speed is definitely a concern.  That was public-key encryption, which is typically much slower, but I've noticed similar issues with the pure-Python AES implementation.
- <div align="right"><a href="http://blog.ianbicking.org/comment129.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- BUT why send the password in the cookie in the first place. It is so much easier (and IMHO more secure) to just store the password locally and send a session id in the cookie. That way you have the possibility to add more 'cookie' data as you go along without having to send it all in a cookie. 
-<br />
-Beats encryption anytime.
-<br />
-
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment130.html" rel="nofollow">#</a> Rob</div><hr noshade>
- Please do yourself a favor and read Applied Cryptography.
- <div align="right"><a href="http://blog.ianbicking.org/comment131.html" rel="nofollow">#</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment130.html" rel="nofollow"
+                    >#</a
+                >
+                Rob
+            </div>
+            <hr noshade />
+            Please do yourself a favor and read Applied Cryptography.
+            <div align="right">
+                <a href="https://ianbicking.org/comment131.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

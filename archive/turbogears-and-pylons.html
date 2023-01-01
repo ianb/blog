@@ -1,343 +1,1127 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>TurboGears and Pylons (a technical comparison)</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>TurboGears and Pylons (a technical comparison)</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>TurboGears and Pylons (a technical comparison)</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                TurboGears and Pylons are two popular web frameworks; TurboGears
+                hit the scene about a year and a half ago, Pylons started
+                picking up steam maybe six months ago. They are both modern MVC
+                frameworks, targeting a similar style of development. Here's a
+                description of the technical differences:
+            </p>
+            <div class="section">
+                <h1>
+                    <a id="similarities" name="similarities">Similarities</a>
+                </h1>
+                <ul class="simple">
+                    <li>
+                        Both are MVC-style frameworks. Neither is particularly
+                        CMS oriented in the framework itself (unlike Django or
+                        Zope).
+                    </li>
+                    <li>
+                        They both support SQLObject and SQLAlchemy specifically,
+                        though neither is as tied to a persistence system as
+                        much as Django. (TurboGears tries harder to add specific
+                        tools on top of these ORMs.)
+                    </li>
+                    <li>
+                        They both use Buffet templating plugins to support
+                        multiple languages. Both have preferred templating
+                        languages (TurboGears has Kid/Genshi, and Pylons
+                        Myghty/Mako), but both want to fully support whatever
+                        choice of templating language you might have.
+                        Interestingly, they are both in transition.
+                    </li>
+                    <li>They both use FormEncode for validation.</li>
+                    <li>
+                        In the future they both plan to use
+                        <a class="reference" href="http://toscawidgets.org/"
+                            >ToscaWidgets</a
+                        >
+                        for form generation. (ToscaWidgets is an extraction of
+                        TurboGears widget system, and FormBuilder which comes
+                        from a Pylons developer is being deprecated in favor of
+                        ToscaWidgets.)
+                    </li>
+                    <li>
+                        They use nose and py.test for tests (very similar test
+                        runners), though Pylons is probably going to migrate to
+                        nose from py.test at which point they'll have identical
+                        test runners.
+                    </li>
+                    <li>
+                        They both use Paste Script templates for project
+                        creation.
+                    </li>
+                    <li>
+                        Both use front-facing WSGI-based servers (such as
+                        CherryPy's WSGI/HTTP server, flup, or Paste's HTTP
+                        server).
+                    </li>
+                </ul>
+            </div>
+            <div class="section">
+                <h1><a id="differences" name="differences">Differences</a></h1>
+                <ul class="simple">
+                    <li>
+                        They use different dispatching mechanisms. TurboGears
+                        uses CherryPy's object publishing dispatch (basically
+                        each path segment becomes an attribute lookup). Pylons
+                        uses Route's pattern matching against the full URL path.
+                        TurboGears dispatching points to a function that is
+                        invoked by CherryPy, Pylons points to a WSGI
+                        application.
+                    </li>
+                    <li>
+                        The controllers look different. TurboGears uses a plain
+                        function, plus many decorators to alter the behavior of
+                        the function. Pylons uses a class, where the superclass
+                        provides the WSGI interface and the subclass implements
+                        the application-specific controller logic.
+                    </li>
+                    <li>
+                        Configuration in TurboGears uses CherryPy conventions,
+                        where Pylons uses Paste Deploy conventions. (TurboGears
+                        developers have expressed interest in using or
+                        supporting Paste conventions.)
+                    </li>
+                    <li>
+                        Pylons uses the Paste TestApp for functional tests,
+                        while TurboGears uses CherryPy's mechanisms for running
+                        artificial requests and inspecting side effects.
+                    </li>
+                    <li>
+                        Most added features in Pylons (that aren't simply
+                        libraries) are implemented as WSGI middleware.
+                        TurboGears features are usually implemented as function
+                        decorators, though a small number are implemented as
+                        CherryPy filters. A notable example is
+                        <a class="reference" href="http://authkit.org/"
+                            >AuthKit</a
+                        >
+                        (which is not Pylons-specific) for Pylons, and
+                        TurboGears'
+                        <a
+                            class="reference"
+                            href="http://docs.turbogears.org/1.0/IdentityManagment"
+                            >Identity system</a
+                        >.
+                    </li>
+                    <li>
+                        Pylons supports simple dispatching to WSGI applications,
+                        using WSGI middleware internally in your system, and
+                        easy wrapping of the entire application in WSGI
+                        middleware. Pylons applications can be entered multiple
+                        times in a single request (e.g., one Pylons application
+                        dispatching to another Pylons application). CherryPy has
+                        <a
+                            class="reference"
+                            href="http://www.cherrypy.org/wiki/WSGI#UsingCherryPyasaWSGIdispatcher"
+                            >some support for this</a
+                        >, but it is not used to any effect in TurboGears itself
+                        and doesn't seem to be programmatically controllable.
+                    </li>
+                    <li>
+                        Besides Paste Script project creation, their
+                        command-line tools are implemented differently.
+                        TurboGears has more command-line tools.
+                    </li>
+                    <li>
+                        TurboGears has considerable integration with the
+                        <a class="reference" href="http://mochikit.com/"
+                            >MochiKit</a
+                        >
+                        Javascript library. Pylons has some integration with
+                        <a class="reference" href="http://www.prototypejs.org/"
+                            >Prototype</a
+                        >
+                        in the form of its
+                        <a
+                            class="reference"
+                            href="http://pylonshq.com/WebHelpers/module-webhelpers.rails.html"
+                            >ported Rails helpers</a
+                        >. Translating those helpers to other libraries like
+                        MochiKit is quite feasible and would probably be a
+                        popular choice.
+                    </li>
+                </ul>
+            </div>
+            <div class="section">
+                <h1><a id="conclusion" name="conclusion">Conclusion</a></h1>
+                <p>
+                    You'll note there's not a lot of high level philosophical
+                    differences. And I don't think I glossed over that -- they
+                    just aren't there. The details of their differences are
+                    very... detailed. Very technical, very specific, often not
+                    particularly intentional. I'd have a hard time describing
+                    the technical differences in a meaningful way to someone who
+                    didn't already know something about Python web development.
+                </p>
+                <p>
+                    As communities the two frameworks are fairly similar. They
+                    both borrow heavily from existing projects, and have spawned
+                    projects in their own right. Technically not
+                    <em>everything</em> is the same, but the question would be:
+                    what are the <em>essential</em> differences, and which
+                    differences are just incidental?
+                </p>
+                <p>
+                    For instance, TurboGears is probably easier for a newbie to
+                    start with, but it's not because Pylons doesn't
+                    <em>want</em> to be easier to start with, there simply
+                    hasn't been as much investment in that. And TurboGears has
+                    less WSGI support inside the framework, which is not because
+                    they don't want to support WSGI in that way, again the
+                    investment simply hasn't been made.
+                </p>
+                <p>
+                    Actually &quot;merging&quot; the two is probably unlikely.
+                    It's the kind of weird political maneuver that open source
+                    projects don't really do, unless they are part of weird
+                    &quot;foundations&quot; and have &quot;managers&quot; and
+                    stuff like that -- it's too much politics for programmers,
+                    and reeks of <em>strategy</em> and <em>plans</em>. You
+                    aren't supposed to announce plans for your software, you are
+                    supposed to implement your plans and then announce them. If
+                    a merge happens, it should be more like a realization than a
+                    strategy.
+                </p>
+                <p>
+                    I can also imagine the two bleeding into one another --
+                    where one uses Genshi, the other Mako, one uses object
+                    publishing, the other Routes, etc. The differences could
+                    become much more shallow. That itself could become difficult
+                    -- the differences might be shallow, but the effect on
+                    documentation is not much better than if they were two
+                    completely different frameworks. And do people float around
+                    between communities, or in some middleground, or subscribe
+                    to <em>all</em> the lists or... what? Maybe at least by
+                    partitioning the communities it can help keep the newbies
+                    sufficiently diluted among the experienced users.
+                </p>
+                <p>
+                    Technically the biggest difference is definitely
+                    <a class="reference" href="http://cherrypy.org">CherryPy</a>
+                    vs.
+                    <a class="reference" href="http://pythonpaste.org">Paste</a
+                    >. This is something of a
+                    <a
+                        class="reference"
+                        href="http://cherrypy.org/wiki/CherryPyAndPaste"
+                        >sensitive point</a
+                    >
+                    and has been the source of some discord. The templating
+                    language differences are fairly shallow, since both are
+                    fairly agnostic anyway. The Javascript differences aren't
+                    heavy with intention, they are more coincidental than
+                    anything.
+                </p>
+                <p>
+                    So... what should be done? Plans are being made for
+                    TurboGears post-1.0 through version 2. The younger Pylons is
+                    still a blank slate in many areas. At the moment several
+                    people have feet in both communities. Push hard right now,
+                    when plans are being made? Let things develop naturally? (Of
+                    course, these are <em>people</em> making these decisions, so
+                    &quot;natural&quot; should still include discussion -- it's
+                    not like we're decided whether to transplant a hydrangea.)
+                </p>
+                <p>Discuss!</p>
+            </div>
+        </div>
+        <div class="dates" align="right">
+            Created 07 Feb<br />
+            Modified 07 Feb
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <p>
+                I'll comment on one specific area: object publishing vs.
+                Routes-based dispatching. I built a
+                <a href="http://www.merchantcircle.com"
+                    >fairly large web application</a
+                >
+                (together with a couple of other folks) on top of CherryPy,
+                starting before either project really existed. We initially used
+                the native object-publishing dispatch mechanisms of CherryPy.
+                After a year or so, we
+                <a
+                    href="http://www.zachary.com/s/blog/2006/02/02/integrating.cherrypy.and.routes.part.two"
+                    >ported Routes to CherryPy</a
+                >
+                and never looked back.
+            </p>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+            <p>
+                Object-publishing requires one to structure the code and modules
+                to match the URLs of the application -- that's just silly. The
+                URLs are part of the external interface of an application --
+                important to users and search engines alike. We found ourselves
+                having to resort to silly importing and naming games to get the
+                URLs that we wanted in all cases. Most importantly though, the
+                Routes pattern encapsulates and abstracts the actual URL from
+                it's use in the application. This allows things like easy
+                changes to the URL-space without touching dozens of files.
+                Pylons or not, Routes is a very useful tool.
+            </p>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/turbogearsandpylonscomment1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.zachary.com/blog">David Creemer</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I must concur on the dispatching being a pretty major
+                        differentiator. I did what David did and used Routes
+                        with TurboGears.
+                    </p>
+                    <p>
+                        But both options seem to suffer from a similar problem -
+                        redispatch or delegation of dispatch.
+                    </p>
+                    <p>
+                        In CherryPy (2, at least), you can't easily include an
+                        identifier early in a URL, and then carry on with the
+                        methods to perform on the object identified in that URL
+                        (ie, /object-type/identifier/verb, or
+                        /<em>blogname</em>/archives/<em>year</em>/<em>month</em>/<em>title</em>/edit).
+                        You basically have to reimplement the exposure-checking
+                        in your code to redispatch to another class/object - you
+                        can't just say &quot;restart the dispatch at this point
+                        on this class&quot;. In Quixote (another object
+                        publisher), for example, this is pretty trivial to do.
+                    </p>
+                    <p>
+                        The current Routes implementation (at least, as far as I
+                        can see) seems to expect only one instance of routing
+                        too. Django uses a somewhat-similar-to-use routing
+                        system, using regexes directly. But it is designed to
+                        work by delegation, meaning that the default mode of
+                        operation is to have components of sites controlling
+                        their own URLs. With Routes, it's possible to pass
+                        around the mapping object to do the same thing - I'm
+                        doing something like that with plugins in a project I'm
+                        working on - but it's cumbersome.
+                    </p>
+                    <p>
+                        Of course, one of the biggest wins for Routes over the
+                        Django dispatcher, the &quot;named routes&quot;, might
+                        be hard to reconcile with multiple mapping objects. Once
+                        you've been bitten by redesigning your URL scheme by
+                        using other methods, you'll quickly wonder why nobody
+                        thought of the url_for(&quot;article&quot;, article)
+                        construct earlier.
+                    </p>
+                    <p>
+                        I've not given Pylons a full go yet, but the only major
+                        thing I missed was some guidance in terms of existing
+                        projects. Perhaps it's a bit of an WSGI thing too - I
+                        didn't know where to start shopping for middleware that
+                        does SQLAlchemy setup and rollback/commit. Google found
+                        me some code, but I'd much prefer to see what other
+                        people are using and what they have to say about it. I
+                        might have given up too early - unfortunately I didn't
+                        have the time. Maybe a TurboGears-esque usage of the
+                        Cheese Shop to build a &quot;Usable by WSGI/Pylons&quot;
+                        page is what would've helped me get over that little
+                        hump.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/turbogearsandpylonscomment2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://nxsy.org/">Neil Blakey-Milner</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            It's true that CP 2 was not quite flexible in terms
+                            for dispatching but CherryPy 3 has fixed that and
+                            comes with three builtin dispatchers: URI-to-object
+                            as current, HTTP method dispatching and Routes
+                            dispatching.
+                        </p>
+                        <p>
+                            They all provide the same level of features from
+                            within CherryPy itself whil offering the flexibility
+                            many people were looking for.
+                        </p>
+                        <p>
+                            Personally in the WSGI world the selector middleware
+                            is my favourite dispatcher.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/turbogearsandpylons-comment-3.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.defuze.org">Sylvain Hellegouarch</a>
+                    </div>
+                    <hr noshade />
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>TurboGears and Pylons (a technical comparison)</h1>
- 
-<div class="document">
-<p>TurboGears and Pylons are two popular web frameworks; TurboGears hit
-the scene about a year and a half ago, Pylons started picking up steam
-maybe six months ago.  They are both modern MVC frameworks, targeting a
-similar style of development.  Here's a description of the technical
-differences:</p>
-<div class="section">
-<h1><a id="similarities" name="similarities">Similarities</a></h1>
-<ul class="simple">
-<li>Both are MVC-style frameworks.  Neither is particularly CMS oriented
-in the framework itself (unlike Django or Zope).</li>
-<li>They both support SQLObject and SQLAlchemy specifically, though
-neither is as tied to a persistence system as much as Django.
-(TurboGears tries harder to add specific tools on top of these
-ORMs.)</li>
-<li>They both use Buffet templating plugins to support multiple languages.  Both have
-preferred templating languages (TurboGears has Kid/Genshi, and
-Pylons Myghty/Mako), but both want to fully support whatever choice
-of templating language you might have.  Interestingly, they are both
-in transition.</li>
-<li>They both use FormEncode for validation.</li>
-<li>In the future they both plan to use <a class="reference" href="http://toscawidgets.org/">ToscaWidgets</a> for form
-generation.  (ToscaWidgets is an extraction of TurboGears widget
-system, and FormBuilder which comes from a Pylons developer is being
-deprecated in favor of ToscaWidgets.)</li>
-<li>They use nose and py.test for tests (very similar test runners),
-though Pylons is probably going to migrate to nose from py.test at
-which point they'll have identical test runners.</li>
-<li>They both use Paste Script templates for project creation.</li>
-<li>Both use front-facing WSGI-based servers (such as CherryPy's
-WSGI/HTTP server, flup, or Paste's HTTP server).</li>
-</ul>
-</div>
-<div class="section">
-<h1><a id="differences" name="differences">Differences</a></h1>
-<ul class="simple">
-<li>They use different dispatching mechanisms.  TurboGears uses
-CherryPy's object publishing dispatch (basically each path segment
-becomes an attribute lookup).  Pylons uses Route's pattern matching
-against the full URL path.  TurboGears dispatching points to a
-function that is invoked by CherryPy, Pylons points to a WSGI
-application.</li>
-<li>The controllers look different.  TurboGears uses a plain function,
-plus many decorators to alter the behavior of the function.  Pylons
-uses a class, where the superclass provides the WSGI interface and
-the subclass implements the application-specific controller logic.</li>
-<li>Configuration in TurboGears uses CherryPy conventions, where Pylons
-uses Paste Deploy conventions.  (TurboGears developers have
-expressed interest in using or supporting Paste conventions.)</li>
-<li>Pylons uses the Paste TestApp for functional tests, while TurboGears
-uses CherryPy's mechanisms for running artificial requests and
-inspecting side effects.</li>
-<li>Most added features in Pylons (that aren't simply libraries) are
-implemented as WSGI middleware.  TurboGears features are usually
-implemented as function decorators, though a small number are
-implemented as CherryPy filters.  A notable example is <a class="reference" href="http://authkit.org/">AuthKit</a> (which is not Pylons-specific) for Pylons,
-and TurboGears' <a class="reference" href="http://docs.turbogears.org/1.0/IdentityManagment">Identity system</a>.</li>
-<li>Pylons supports simple dispatching to WSGI applications, using WSGI
-middleware internally in your system, and easy wrapping of the
-entire application in WSGI middleware.  Pylons applications can be
-entered multiple times in a single request (e.g., one Pylons
-application dispatching to another Pylons application).  CherryPy
-has <a class="reference" href="http://www.cherrypy.org/wiki/WSGI#UsingCherryPyasaWSGIdispatcher">some support for this</a>,
-but it is not used to any effect in TurboGears itself and doesn't
-seem to be programmatically controllable.</li>
-<li>Besides Paste Script project creation, their command-line tools are
-implemented differently.  TurboGears has more command-line tools.</li>
-<li>TurboGears has considerable integration with the <a class="reference" href="http://mochikit.com/">MochiKit</a> Javascript library.  Pylons has some
-integration with <a class="reference" href="http://www.prototypejs.org/">Prototype</a> in the
-form of its <a class="reference" href="http://pylonshq.com/WebHelpers/module-webhelpers.rails.html">ported Rails helpers</a>.
-Translating those helpers to other libraries like MochiKit is quite
-feasible and would probably be a popular choice.</li>
-</ul>
-</div>
-<div class="section">
-<h1><a id="conclusion" name="conclusion">Conclusion</a></h1>
-<p>You'll note there's not a lot
-of high level philosophical differences.  And I don't think I
-glossed over that -- they just aren't there.  The details of their differences are very...
-detailed.  Very technical, very specific, often not particularly intentional.
-I'd have a hard time describing the technical differences in a meaningful way
-to someone who didn't already know something about Python web development.</p>
-<p>As communities the two frameworks are fairly similar.  They both borrow heavily from
-existing projects, and have spawned projects in their own right.  Technically not
-<em>everything</em> is the same, but the question would be: what are the <em>essential</em> differences, and which
-differences are just incidental?</p>
-<p>For instance, TurboGears is probably easier for a newbie to start
-with, but it's not because Pylons doesn't <em>want</em> to be easier to start
-with, there simply hasn't been as much investment in that.  And
-TurboGears has less WSGI support inside the framework, which is not
-because they don't want to support WSGI in that way, again the
-investment simply hasn't been made.</p>
-<p>Actually &quot;merging&quot; the two is probably unlikely.  It's the kind of
-weird political maneuver that open source projects don't really do,
-unless they are part of weird &quot;foundations&quot; and have &quot;managers&quot; and
-stuff like that -- it's too much politics for programmers, and reeks
-of <em>strategy</em> and <em>plans</em>.  You aren't supposed to announce plans for
-your software, you are supposed to implement your plans and then announce
-them.  If a merge happens, it should be more like a realization than a
-strategy.</p>
-<p>I can also imagine the two bleeding into one another -- where one uses
-Genshi, the other Mako, one uses object publishing, the other Routes,
-etc.  The differences could become much more shallow.  That itself could
-become difficult -- the differences might be shallow, but the effect
-on documentation is not much better than if they were two completely
-different frameworks.  And do people float around between communities,
-or in some middleground, or subscribe to <em>all</em> the lists or... what?
-Maybe at least by partitioning the communities it can help keep the
-newbies sufficiently diluted among the experienced users.</p>
-<p>Technically the biggest difference is definitely <a class="reference" href="http://cherrypy.org">CherryPy</a> vs. <a class="reference" href="http://pythonpaste.org">Paste</a>.  This
-is something of a <a class="reference" href="http://cherrypy.org/wiki/CherryPyAndPaste">sensitive point</a> and has been the source
-of some discord.  The templating language differences are fairly
-shallow, since both are fairly agnostic anyway.  The Javascript
-differences aren't heavy with intention, they are more coincidental
-than anything.</p>
-<p>So... what should be done?  Plans are being made for TurboGears post-1.0
-through version 2.  The younger Pylons is still a blank slate in many areas.
-At the moment several people have feet in both communities.  Push hard right now,
-when plans are being made?  Let things develop naturally?  (Of course, these are
-<em>people</em> making these decisions, so &quot;natural&quot; should still include discussion -- it's
-not like we're decided whether to transplant a hydrangea.)</p>
-<p>Discuss!</p>
-</div>
-</div>
- <div class="dates" align="right">
-Created 07 Feb<br>
-Modified 07 Feb</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- <p>I'll comment on one specific area: object publishing vs. Routes-based dispatching. I built a <a href="http://www.merchantcircle.com">fairly large web application</a> (together with a couple of other folks) on top of CherryPy, starting before either project really existed. We initially used the native object-publishing dispatch mechanisms of CherryPy. After a year or so, we <a href="http://www.zachary.com/s/blog/2006/02/02/integrating.cherrypy.and.routes.part.two">ported Routes to CherryPy</a> and never looked back.</p>
+                    <div class="document">
+                        <p>
+                            Typically what I think is called
+                            &quot;components&quot; in Django would be
+                            applications in Pylons. The analogous concept in
+                            TurboGears is a little vague; making it clearer was
+                            a motivation for using Paste Deploy configuration.
+                            Typically applications in Pylons are dispatched to
+                            be URL prefix, which is pretty easy to handle
+                            recursively. You can also set up a route that
+                            consumes a prefix, and leaves the rest in PATH_INFO
+                            for further dispatching. Actually doing that further
+                            dispatching with Routes is, I believe, non-trivial
+                            -- Routes currently is integrated with Pylons in
+                            such a way that it doesn't provide a simple WSGI
+                            application frontend. I doubt this is difficult to
+                            fix, and Ben has mentioned fixing it recently. I
+                            haven't generally had a need to do dispatching like
+                            that, so I'm a little unclear about the motivation.
+                        </p>
+                        <p>
+                            Notably, Pylons applications are just WSGI
+                            applications, and (especially at the prefix level)
+                            can be used fairly opaquely -- that is, you don't
+                            have to <em>know</em> it is a Pylons application.
+                        </p>
+                        <p>
+                            Well, maybe coming to your example,
+                            <tt class="docutils literal"
+                                ><span class="pre"
+                                    >/{blogname}/archives/{year}/{month}/{title}/edit</span
+                                ></tt
+                            >
+                            -- I would implement that with my own dispatcher on
+                            blogname, that instantiated the next application. I
+                            would probably do that as middleware, putting the
+                            blog name into the environment and expecting the
+                            Pylons application to pick that up. Thus the Pylons
+                            application would <em>only</em> implement one blog
+                            at a time, but the dispatcher would instantiate the
+                            application dynamically, turning that single
+                            instance into a farmable blog system.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/turbogearsandpylons-comment-5.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Ian Bicking
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                What do you mean, &quot;Routes currently is
+                                integrated with Pylons in such a way that it
+                                doesn't provide a simple WSGI application
+                                frontend&quot;? What would this look like?
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/turbogearsandpylons-comment-10.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Mike Orr
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+            </blockquote>
 
-<p>Object-publishing requires one to structure the code and modules to match the URLs of the application -- that's just silly. The URLs are part of the external interface of an application -- important to users and search engines alike. We found ourselves having to resort to silly importing and naming games to get the URLs that we wanted in all cases. Most importantly though, the Routes pattern encapsulates and abstracts the actual URL from it's use in the application. This allows things like easy changes to the URL-space without touching dozens of files. Pylons or not, Routes is a very useful tool.</p>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylonscomment1.html" rel="nofollow">#</a> <a href="http://www.zachary.com/blog">David Creemer</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>I must concur on the dispatching being a pretty major differentiator.  I did what David did and used Routes with TurboGears.</p>
-<p>But both options seem to suffer from a similar problem - redispatch or delegation of dispatch.</p>
-<p>In CherryPy (2, at least), you can't easily include an identifier early in a URL, and then carry on with the methods to perform on the object identified in that URL (ie, /object-type/identifier/verb, or /<em>blogname</em>/archives/<em>year</em>/<em>month</em>/<em>title</em>/edit).  You basically have to reimplement the exposure-checking in your code to redispatch to another class/object - you can't just say &quot;restart the dispatch at this point on this class&quot;.  In Quixote (another object publisher), for example, this is pretty trivial to do.</p>
-<p>The current Routes implementation (at least, as far as I can see) seems to expect only one instance of routing too.  Django uses a somewhat-similar-to-use routing system, using regexes directly.  But it is designed to work by delegation, meaning that the default mode of operation is to have components of sites controlling their own URLs.  With Routes, it's possible to pass around the mapping object to do the same thing - I'm doing something like that with plugins in a project I'm working on - but it's cumbersome.</p>
-<p>Of course, one of the biggest wins for Routes over the Django dispatcher, the &quot;named routes&quot;, might be hard to reconcile with multiple mapping objects.  Once you've been bitten by redesigning your URL scheme by using other methods, you'll quickly wonder why nobody thought of the url_for(&quot;article&quot;, article) construct earlier.</p>
-<p>I've not given Pylons a full go yet, but the only major thing I missed was some guidance in terms of existing projects.  Perhaps it's a bit of an WSGI thing too - I didn't know where to start shopping for middleware that does SQLAlchemy setup and rollback/commit.  Google found me some code, but I'd much prefer to see what other people are using and what they have to say about it.  I might have given up too early - unfortunately I didn't have the time.  Maybe a TurboGears-esque usage of the Cheese Shop to build a &quot;Usable by WSGI/Pylons&quot; page is what would've helped me get over that little hump.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylonscomment2.html" rel="nofollow">#</a> <a href="http://nxsy.org/">Neil Blakey-Milner</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>It's true that CP 2 was not quite flexible in terms for dispatching but CherryPy 3 has fixed that and comes with three builtin dispatchers: URI-to-object as current, HTTP method dispatching and Routes dispatching.</p>
-<p>They all provide the same level of features from within CherryPy itself whil offering the flexibility many people were looking for.</p>
-<p>Personally in the WSGI world the selector middleware is my favourite dispatcher.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylons-comment-3.html" rel="nofollow">#</a> <a href="http://www.defuze.org">Sylvain Hellegouarch</a></div><hr noshade>
- 
-<div class="document">
-<p>Typically what I think is called &quot;components&quot; in Django would be applications in Pylons.  The analogous concept in TurboGears is a little vague; making it clearer was a motivation for using Paste Deploy configuration.  Typically applications in Pylons are dispatched to be URL prefix, which is pretty easy to handle recursively.  You can also set up a route that consumes a prefix, and leaves the rest in PATH_INFO for further dispatching.  Actually doing that further dispatching with Routes is, I believe, non-trivial -- Routes currently is integrated with Pylons in such a way that it doesn't provide a simple WSGI application frontend.  I doubt this is difficult to fix, and Ben has mentioned fixing it recently.  I haven't generally had a need to do dispatching like that, so I'm a little unclear about the motivation.</p>
-<p>Notably, Pylons applications are just WSGI applications, and (especially at the prefix level) can be used fairly opaquely -- that is, you don't have to <em>know</em> it is a Pylons application.</p>
-<p>Well, maybe coming to your example, <tt class="docutils literal"><span class="pre">/{blogname}/archives/{year}/{month}/{title}/edit</span></tt> -- I would implement that with my own dispatcher on blogname, that instantiated the next application.  I would probably do that as middleware, putting the blog name into the environment and expecting the Pylons application to pick that up.  Thus the Pylons application would <em>only</em> implement one blog at a time, but the dispatcher would instantiate the application dynamically, turning that single instance into a farmable blog system.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylons-comment-5.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>What do you mean,  &quot;Routes currently is integrated with Pylons in such a way that it doesn't provide a simple WSGI application frontend&quot;?  What would this look like?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylons-comment-10.html" rel="nofollow">#</a> Mike Orr</div><hr noshade>
-</blockquote>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-<p>Couple comments:</p>
-<blockquote>
-<ul class="simple">
-<li>Despite appearances, TG has almost no integration with MochiKit. We
-support returning JSON and have a MochiKit widget. That's it. There are
-others packaged the same way in the Cogbin. With TW, Pylons will have more
-or less the same support.</li>
-<li>The current plan is to break up TurboGears into pieces and WSGI-fy it using
-CP3's WSGI mechanisms. At that point I'm expecting it to look pretty much
-like Pylons but with CherryPy instead of Paste.</li>
-</ul>
-</blockquote>
-<p>I'm amenable to merging the two projects. It'd be much simpler for marketing.</p>
-<p>Of course, that's easy for me to say because I have little personal
-investement in the TG codebase (some work on widgets before Alberto and
-Michelle took over). I haven't suggested it because I really don't have a good
-plan for how it would happen. The documentation work for me won't change
-significantly in either case.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogears-and-pylons-comment-4.html" rel="nofollow">#</a> <a href="http://gr.ayre.st">Karl Guertin</a></div><hr noshade>
- 
-<div class="document">
-<p>Perhaps this drifts off the topic, but I'm not terribly enthusiastic about any of the basic MVC frameworks, whether they be TG, Pylons, Maypole, Catalyst, or what's-that-obscure-Ruby-one?  They all seem to provide little more than some basic abstraction over CGI, and most always depend on CGI-like handling of things like forms.  Even where form abstractions are available, there's usually no support for concepts like viewstate (JSF, ASP.NET) conversation (Seam) or flow (Spring, Rife, Aranea).  Heck, there isn't really even a similar concept to Stateful Session Beans, we're usually stuck pulling data out of a monolithic session object to restore session state, when we should simply be able to instantiate a new controller instance per session and let the server collect them when they're done.</p>
-<p>I'm not saying MVC is &quot;old and busted&quot;, since component frameworks invariably boil down to the style anyway, but it pains me to handle state the old fashioned way, by binding request parameters and form fields myself, reading session state myself, and initiating and committing extended transactions, sing along now, by myself.</p>
-<p>There are some component frameworks like Prado for PHP (!), but nothing of the sort for Python.  It'd be nice to look well beyond Rails, stop disparaging the &quot;enterprisey&quot; frameworks, and start mining them for their actual useful bits.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylonscomment6.html" rel="nofollow">#</a> <a href="http://">Chuck Adams</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<blockquote>
-They all seem to provide little more than some basic abstraction over CGI, and most always depend on CGI-like handling of things like forms.</blockquote>
-<p>CGI of course is a basic abstraction over HTTP, and so we are basically relying on HTTP-like handling of things like forms.  I <em>like</em> handling things like what they are.  HTTP is HTTP.</p>
-<blockquote>
-we should simply be able to instantiate a new controller instance per session and let the server collect them when they're done</blockquote>
-<p>Well, you could do this if you were so inclined.  You could do something like:</p>
-<pre class="literal-block">
+            <div class="document">
+                <p>Couple comments:</p>
+                <blockquote>
+                    <ul class="simple">
+                        <li>
+                            Despite appearances, TG has almost no integration
+                            with MochiKit. We support returning JSON and have a
+                            MochiKit widget. That's it. There are others
+                            packaged the same way in the Cogbin. With TW, Pylons
+                            will have more or less the same support.
+                        </li>
+                        <li>
+                            The current plan is to break up TurboGears into
+                            pieces and WSGI-fy it using CP3's WSGI mechanisms.
+                            At that point I'm expecting it to look pretty much
+                            like Pylons but with CherryPy instead of Paste.
+                        </li>
+                    </ul>
+                </blockquote>
+                <p>
+                    I'm amenable to merging the two projects. It'd be much
+                    simpler for marketing.
+                </p>
+                <p>
+                    Of course, that's easy for me to say because I have little
+                    personal investement in the TG codebase (some work on
+                    widgets before Alberto and Michelle took over). I haven't
+                    suggested it because I really don't have a good plan for how
+                    it would happen. The documentation work for me won't change
+                    significantly in either case.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/turbogears-and-pylons-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://gr.ayre.st">Karl Guertin</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Perhaps this drifts off the topic, but I'm not terribly
+                    enthusiastic about any of the basic MVC frameworks, whether
+                    they be TG, Pylons, Maypole, Catalyst, or
+                    what's-that-obscure-Ruby-one? They all seem to provide
+                    little more than some basic abstraction over CGI, and most
+                    always depend on CGI-like handling of things like forms.
+                    Even where form abstractions are available, there's usually
+                    no support for concepts like viewstate (JSF, ASP.NET)
+                    conversation (Seam) or flow (Spring, Rife, Aranea). Heck,
+                    there isn't really even a similar concept to Stateful
+                    Session Beans, we're usually stuck pulling data out of a
+                    monolithic session object to restore session state, when we
+                    should simply be able to instantiate a new controller
+                    instance per session and let the server collect them when
+                    they're done.
+                </p>
+                <p>
+                    I'm not saying MVC is &quot;old and busted&quot;, since
+                    component frameworks invariably boil down to the style
+                    anyway, but it pains me to handle state the old fashioned
+                    way, by binding request parameters and form fields myself,
+                    reading session state myself, and initiating and committing
+                    extended transactions, sing along now, by myself.
+                </p>
+                <p>
+                    There are some component frameworks like Prado for PHP (!),
+                    but nothing of the sort for Python. It'd be nice to look
+                    well beyond Rails, stop disparaging the
+                    &quot;enterprisey&quot; frameworks, and start mining them
+                    for their actual useful bits.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/turbogearsandpylonscomment6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Chuck Adams</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        They all seem to provide little more than some basic
+                        abstraction over CGI, and most always depend on CGI-like
+                        handling of things like forms.
+                    </blockquote>
+                    <p>
+                        CGI of course is a basic abstraction over HTTP, and so
+                        we are basically relying on HTTP-like handling of things
+                        like forms. I <em>like</em> handling things like what
+                        they are. HTTP is HTTP.
+                    </p>
+                    <blockquote>
+                        we should simply be able to instantiate a new controller
+                        instance per session and let the server collect them
+                        when they're done
+                    </blockquote>
+                    <p>
+                        Well, you could do this if you were so inclined. You
+                        could do something like:
+                    </p>
+                    <pre class="literal-block">
 def wsgi_session_app(environ, start_response):
     session = environ['some_session']
     controller = session.get('current_controller')
     if not controller:
         controller = session['current_controller'] = make_controller(environ)
     return controller(environ, start_response)
-</pre>
-<p>There's not a clear end scope for sessions in Pylons; they just time out eventually.  And if you wanted stuff like a usable back button you'd need to start saving the controller at multiple points.  All of this assumes that the controller only contains pickleable objects (and for more reasons than just because it may need to be serialized).  But so it goes.</p>
-<blockquote>
-it pains me to handle state the old fashioned way, by binding request parameters and form fields myself, reading session state myself, and initiating and committing extended transactions, sing along now, by myself.</blockquote>
-<p>Then as you do that you should start to write library routines that abstract out your work.  I haven't really worked with stuff like viewstate or conversations, but whenever I hear explanations it just sounds so <em>complicated</em>.  Maybe I just don't write enough long multipage forms where it would be useful.  Nevertheless, though probably more code could be written for this use case, I would be skeptical about solving the problem generally.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylons-comment-7.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Certainly a SFSB (Stateful Session Bean) isn't too hard of an idea to implement by just shoving it in a session myself.  Not too scalable, and real EJB containers are a lot smarter about state replication than that, but it would work.  But to wax flippant a bit, the entire framework isn't something I couldn't reimplement by myself too once I understand how it works.  Yes, some pieces are complicated, and hard to get right, and that's precisely why frameworks are there to make them easy to _use_ so that the end user doesn't have to reinvent it in a buggy way that won't interoperate with anything else.</p>
-<p>Viewstate is another of those &quot;evil&quot; things everyone loves to hate about ASP.NET and JSF, but that no one's really come up with a satisfactory alternative for (it's something you can store server-side too, which removes most objections to the hideous clutter it adds to the client side html).</p>
-<p>I guess I'm just bemoaning the glut of classic MVC frameworks and the lack of anything else like a Prado or Seam -- let alone a Seaside.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylons-comment-8.html" rel="nofollow">#</a> <a href="http://">Chuck Adams</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<blockquote>
-Viewstate is another of those &quot;evil&quot; things everyone loves to hate about ASP.NET and JSF, but that no one's really come up with a satisfactory alternative for (it's something you can store server-side too, which removes most objections to the hideous clutter it adds to the client side html).</blockquote>
-<p>Maris Fogels has just started playing around with a ViewState helper for Pylons:</p>
-<p><a class="reference" href="http://pylonshq.com/project/pylonshq/wiki/ViewState">http://pylonshq.com/project/pylonshq/wiki/ViewState</a></p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylons-comment-9.html" rel="nofollow">#</a> Philip Jenvey</div><hr noshade>
-</blockquote>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-<p>Good article.  Linked on the <a class="reference" href="http://pylonshq.com/project/pylonshq/wiki/WikiStart">Pylons wiki</a>.  The differences really come down to what Ben thinks is cool vs what Kevin thinks is cool, and to their different philosophical emphases.  Historically, Kevin wanted &quot;one way to do it&quot; throughout the whole stack for newbies, and he really likes how CherryPy maps URL component directly to a function and query parameters to arguments.  Ben seems to focus more on flexibility, thus choosing Routes and Paste, which can be configured in every imaginable way under the sun.</p>
-<p>However, practicality is forcing both frameworks to accomodate libraries that weren't originally intended (Buffet for both, SQLAlchemy for TG, ToscaWidgets for Pylons, and presumably Routes for TG).  Since users are clamoring for access to the <em>same</em> set of Python libraries in both cases, this is pushing both frameworks toward each other.</p>
-<p>Perhaps this shows the biggest mistake of the original TG vision: the days are gone when a developer could impose an arbitrary choice of peripheral libraries on users.  To some extent this is because the libraries themselves have been evolving out from under them: Kid has speed problems which are corrected in Genshi, Myghty has too many non-template features which are absent in Mako, SQLAlchemy is more multi-layered than SQLObject. (How's SQLObject 2 coming along, Ian?)  All this in one short year.  Who knows what next year holds.  Another factor is the real world: some users have a large number of existing templates or custom libraries which they can't just rewrite at the drop of a hat.</p>
-<p>You're right that nothing is preventing Pylons from becoming more newbie-friendly or TG from becoming more backend-flexible: these areas have just not received much developer attention.  They're evolving into KDE vs GNOME: more compatible but still distinct.  Perhaps the codebases could be merged at some point, but then what happens to the two APIs?  Either one disappears or is frozen, or they both continue to diverge.  TG has looked into replacing CherryPy with RhubarbTart (a WSGI compatibility library for CP's dispatching model and global variables).  Could a Paste- or Pylons-ified version of RhubarbTart be written that TurboGears could sit on top of?</p>
-<p>Comparing CherryPy to Paste (the &quot;sensitive point&quot; link in Ian's original post) is a little unfair.  Paste is lower-level than CherryPy and is not aimed at end users (except the hacker sort).  Something like RhubarbTart-on-Paste could hide the WSGI dictionary that is so offensive to some people.  In spite of Paste's more &quot;cumbersome&quot; and &quot;non-Pythonic&quot; syntax, I found it easier to trace the Paste code: how Pylons launches an application.  I tried to do that with CherryPy (as TG uses it) and got totally lost in the thread pool code.  Too many layers of do-nothing superclasses, and I couldn't follow a thread's lifetime.  That in itself scared me away from CherryPy: I didn't want to depend on code I couldn't understand, especially when I started getting random errors and unhelpful tracebacks from various TG components (this was a year ago, before CherryPy 3).</p>
-<p>So if we assume that hiding Paste's &quot;cumbersome&quot; WSGI dict in a super-framework level is acceptable, the incompatibilities come down to the config file format and command-line tools.  Making a config format is <em>hard</em>: both TG and (I think) Paste have switched back and forth between INI format and Python format (or the hybrid Python-with-section-headers format).  Each has some advantages and disadvantages.  I wish I could declare ints and dicts directly in a Pylons config file.  But the opposite position sees too many quotes and braces.  Perhaps Paste and Pylons could one day support the hybrid format as an alternative.  Of course this means type conversions would have to be pushed to a lower level when using Pylons INI format: right now they're done in the application code, and this would fail if the values were already converted.  Neither format supports nested sections, if you ever want that.</p>
-<p>Both Pylons and TurboGears need a CMS to fully compete with Django and Zope/Plone.  This is a big task, and one which both communities could work on and perhaps create a common package both could use.  One issue is whether this could be implemented purely as middleware or whether it would have to interact too closely with the application.   As middleware it would use the WSGI protocol.  As an application-level library it would have to sidestep the differences between TG and Pylons, meaning the frameworks would have to accommodate it either via custom code or a Buffet-like plugin system.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylonscomment11.html" rel="nofollow">#</a> Mike Orr</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<blockquote>
-TG has looked into replacing CherryPy with RhubarbTart (a WSGI compatibility library for CP's dispatching model and global variables). Could a Paste- or Pylons-ified version of RhubarbTart be written that TurboGears could sit on top of?</blockquote>
-<p><a class="reference" href="http://rhubarbtart.org/">RhubarbTart</a> is very Pasty (I helped write parts of it, so that was inevitable ;).  It also provides a surprisingly good story for CherryPy 2 compatibility -- some of it involves some messy monkeypatching, but it works.  (During the sprint at last year's PyCon where we tried to use RhubartTart instead of CherryPy, we tried to avoid changing TurboGears too much, and TurboGears applications at all -- instead extending RhubartTart.)</p>
-<p>Some of these hacks could be maintained or ported to Pylons.  There are some other differences; for example, RT uses a request object modeled very directly on CP's.  However, the Paste/Pylons request object does not require exclusive access to the environment, and multiple request objects with different APIs can coexist.  There's also the dispatching system.  Right now there's not really alternate dispatching systems for Pylons, but there could be, and RhubarbTart's could be ported over.  Especially if you are comfortable depending on <tt class="docutils literal"><span class="pre">&#64;expose</span></tt> (a different implementation than the current TG one with the same interface), that could be a very cleanly implemented alternative to Routes (RhubarbTart uses CherryPy's mechanisms, which rely on a more limited interface than WSGI).</p>
-<blockquote>
-Something like RhubarbTart-on-Paste could hide the WSGI dictionary that is so offensive to some people.</blockquote>
-<p><tt class="docutils literal"><span class="pre">paste.wsgiwrappers.WSGIRequest</span></tt> already pretty much does that, so it's fine.  They just chose to put of the strawman of the low-level functions in <tt class="docutils literal"><span class="pre">paste.request</span></tt> to argue against.</p>
-<blockquote>
-Making a config format is hard: both TG and (I think) Paste have switched back and forth between INI format and Python format (or the hybrid Python-with-section-headers format). Each has some advantages and disadvantages.</blockquote>
-<p>Early Paste used Python files for configuration.  IMHO this worked quite poorly.  Using Python expressions is much more reasonable (which is what CherryPy and TurboGears do), without the full generality of Python statements, conditionals, etc.  Generally if you need really complicated configuration, I suspect you are doing your configuration wrong -- configuration should be a deployment concern, not something where you implement complex glue.  The glue in a typical Paste applications still goes in Python files (e.g., <tt class="docutils literal"><span class="pre">middleware.py</span></tt> in a Pylons project).  If that glue process needs to be informed by configuration values, you have the configuration and can glue stuff together based on that -- but providing a higher-level and domain-specific set of configuration values that effect that.</p>
-<blockquote>
-I wish I could declare ints and dicts directly in a Pylons config file. But the opposite position sees too many quotes and braces. Perhaps Paste and Pylons could one day support the hybrid format as an alternative. Of course this means type conversions would have to be pushed to a lower level when using Pylons INI format: right now they're done in the application code, and this would fail if the values were already converted.</blockquote>
-<p>At least most Paste-style conversions accept non-string values.  It's really that when you <em>do</em> get a string value, you should treat it as though it's a config value.  So <tt class="docutils literal"><span class="pre">'false'</span></tt> is a false value (where in Python it would normally be true, since it is a non-empty string).  So if you wanted to build a config format that accepted those values (and still used the Paste Deploy APIs, which are fairly config neutral), it would work.  Of course, if you depend on that in your application you will be incompatible with simpler APIs.</p>
-<p>It would be very reasonable to build another config file format that used Paste Deploy's APIs, but not its exact config format.  Something more path-oriented (that natively supported <tt class="docutils literal"><span class="pre">urlmap</span></tt>) would be quite feasible, for instance.</p>
-<blockquote>
-Neither format supports nested sections, if you ever want that.</blockquote>
-<p>They both support nested keys, like <tt class="docutils literal"><span class="pre">component.key</span> <span class="pre">=</span> <span class="pre">value</span></tt>.  Paste doesn't specially interpret those values (it's up to the consumer), while CherryPy does.  When an application requires more structure in its configuration I usually use expressions in the keys.</p>
-<blockquote>
-Both Pylons and TurboGears need a CMS to fully compete with Django and Zope/Plone. This is a big task, and one which both communities could work on and perhaps create a common package both could use. One issue is whether this could be implemented purely as middleware or whether it would have to interact too closely with the application.</blockquote>
-<p>A CMS is a very vague thing.  It means different things to different people, and any large website feels a lot like a CMS.</p>
-<p>I think relying on HTTP, REST, and middleware, you could very possibly make CMS construction easy.  For instance, AuthKit could be expanded with a full user system.  You could make a pluggable authorization middleware where you could restrict and manage user's access to areas of the site.  An event notification system could be constructed where you could notify a central component about the existence or deletion of pages, thus allowing a navigation system to keep track of what's on the website.  Things like <tt class="docutils literal"><span class="pre">paste.cascade</span></tt> can be used to fold a CMS in with dynamic applications (like a shopping cart), while programmatically-driven layout (again using the Paste Deploy APIs, but not config format) could allow local &quot;plugins&quot; to be added (like a checkout, forum, etc).</p>
-<p>But focusing on the big &quot;CMS&quot; will make this hard, because it's too big and too vague.  Focusing on specific problems you want to solve and using some of the concepts of reusability that Paste encourages (like <a class="reference" href="http://groovie.org/articles/2007/02/11/wsgi-middleware-isnt-middleware-time-for-better-language">WSGI Framework Components</a>) will build up the pieces you can use later.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylons-comment-12.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>By CMS I specifically mean the workflow of one person editing a document over several sessions, others possibly previewing it and correcting it, and then clicking something to make it visible to the public.  Enhancements include a rich Javascript editor, talkbacks, gathering articles into magazine issues, adding article metadata, etc.  We have the parts for all this, but some users rightly want it to work out of the box, and will skip over TG/Pylons to Plone if they don't have it.  Unfortunately Plone is in its own little world and depends on Zope 2, making it more difficult down the road when you want to combine the site with non-Plone tools.</p>
-<p>Security is a relatively straightforward problem.  Articles have roles (author, editor).  There will have to be some map of users to roles (&quot;editor for all articles&quot;, &quot;author for this article&quot;).  Then the authorization code just has to enforce it.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylons-comment-13.html" rel="nofollow">#</a> <a href="http://">Mike Orr</a></div><hr noshade>
- 
-<div class="document">
-<p>It's true webservice will grow spread our posibilities. But it makes things more breakable. I'm not sure how to prevent the internet from getting instable...</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogearsandpylons-comment-23.html" rel="nofollow">#</a> <a href="http://www.kaffeeabo.de">illy</a></div><hr noshade>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-<p>After many years in the FOSS world, I came to the conclusion that if you want to &quot;merge&quot; 2 projects, the best way is often to split each project into independent components, cut down the dependencies and either merge each pair of subcomponents or make them stick to common API/standards. Pylons and TG are no exception and fortunately this trend is well underway. See the ToscaWidgets as a good example.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogears-and-pylons-comment-14.html" rel="nofollow">#</a> ago</div><hr noshade>
- 
-<div class="document">
-<p>Apparently the two are merging...
-<a class="reference" href="http://www.oreillynet.com/onlamp/blog/2007/06/python_web_application_framewo.html">http://www.oreillynet.com/onlamp/blog/2007/06/python_web_application_framewo.html</a></p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/turbogears-and-pylons-comment-19.html" rel="nofollow">#</a> anonymous</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                    >
+                    <p>
+                        There's not a clear end scope for sessions in Pylons;
+                        they just time out eventually. And if you wanted stuff
+                        like a usable back button you'd need to start saving the
+                        controller at multiple points. All of this assumes that
+                        the controller only contains pickleable objects (and for
+                        more reasons than just because it may need to be
+                        serialized). But so it goes.
+                    </p>
+                    <blockquote>
+                        it pains me to handle state the old fashioned way, by
+                        binding request parameters and form fields myself,
+                        reading session state myself, and initiating and
+                        committing extended transactions, sing along now, by
+                        myself.
+                    </blockquote>
+                    <p>
+                        Then as you do that you should start to write library
+                        routines that abstract out your work. I haven't really
+                        worked with stuff like viewstate or conversations, but
+                        whenever I hear explanations it just sounds so
+                        <em>complicated</em>. Maybe I just don't write enough
+                        long multipage forms where it would be useful.
+                        Nevertheless, though probably more code could be written
+                        for this use case, I would be skeptical about solving
+                        the problem generally.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/turbogearsandpylons-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Certainly a SFSB (Stateful Session Bean) isn't too
+                            hard of an idea to implement by just shoving it in a
+                            session myself. Not too scalable, and real EJB
+                            containers are a lot smarter about state replication
+                            than that, but it would work. But to wax flippant a
+                            bit, the entire framework isn't something I couldn't
+                            reimplement by myself too once I understand how it
+                            works. Yes, some pieces are complicated, and hard to
+                            get right, and that's precisely why frameworks are
+                            there to make them easy to _use_ so that the end
+                            user doesn't have to reinvent it in a buggy way that
+                            won't interoperate with anything else.
+                        </p>
+                        <p>
+                            Viewstate is another of those &quot;evil&quot;
+                            things everyone loves to hate about ASP.NET and JSF,
+                            but that no one's really come up with a satisfactory
+                            alternative for (it's something you can store
+                            server-side too, which removes most objections to
+                            the hideous clutter it adds to the client side
+                            html).
+                        </p>
+                        <p>
+                            I guess I'm just bemoaning the glut of classic MVC
+                            frameworks and the lack of anything else like a
+                            Prado or Seam -- let alone a Seaside.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/turbogearsandpylons-comment-8.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">Chuck Adams</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <blockquote>
+                                Viewstate is another of those &quot;evil&quot;
+                                things everyone loves to hate about ASP.NET and
+                                JSF, but that no one's really come up with a
+                                satisfactory alternative for (it's something you
+                                can store server-side too, which removes most
+                                objections to the hideous clutter it adds to the
+                                client side html).
+                            </blockquote>
+                            <p>
+                                Maris Fogels has just started playing around
+                                with a ViewState helper for Pylons:
+                            </p>
+                            <p>
+                                <a
+                                    class="reference"
+                                    href="http://pylonshq.com/project/pylonshq/wiki/ViewState"
+                                    >http://pylonshq.com/project/pylonshq/wiki/ViewState</a
+                                >
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/turbogearsandpylons-comment-9.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Philip Jenvey
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Good article. Linked on the
+                    <a
+                        class="reference"
+                        href="http://pylonshq.com/project/pylonshq/wiki/WikiStart"
+                        >Pylons wiki</a
+                    >. The differences really come down to what Ben thinks is
+                    cool vs what Kevin thinks is cool, and to their different
+                    philosophical emphases. Historically, Kevin wanted &quot;one
+                    way to do it&quot; throughout the whole stack for newbies,
+                    and he really likes how CherryPy maps URL component directly
+                    to a function and query parameters to arguments. Ben seems
+                    to focus more on flexibility, thus choosing Routes and
+                    Paste, which can be configured in every imaginable way under
+                    the sun.
+                </p>
+                <p>
+                    However, practicality is forcing both frameworks to
+                    accomodate libraries that weren't originally intended
+                    (Buffet for both, SQLAlchemy for TG, ToscaWidgets for
+                    Pylons, and presumably Routes for TG). Since users are
+                    clamoring for access to the <em>same</em> set of Python
+                    libraries in both cases, this is pushing both frameworks
+                    toward each other.
+                </p>
+                <p>
+                    Perhaps this shows the biggest mistake of the original TG
+                    vision: the days are gone when a developer could impose an
+                    arbitrary choice of peripheral libraries on users. To some
+                    extent this is because the libraries themselves have been
+                    evolving out from under them: Kid has speed problems which
+                    are corrected in Genshi, Myghty has too many non-template
+                    features which are absent in Mako, SQLAlchemy is more
+                    multi-layered than SQLObject. (How's SQLObject 2 coming
+                    along, Ian?) All this in one short year. Who knows what next
+                    year holds. Another factor is the real world: some users
+                    have a large number of existing templates or custom
+                    libraries which they can't just rewrite at the drop of a
+                    hat.
+                </p>
+                <p>
+                    You're right that nothing is preventing Pylons from becoming
+                    more newbie-friendly or TG from becoming more
+                    backend-flexible: these areas have just not received much
+                    developer attention. They're evolving into KDE vs GNOME:
+                    more compatible but still distinct. Perhaps the codebases
+                    could be merged at some point, but then what happens to the
+                    two APIs? Either one disappears or is frozen, or they both
+                    continue to diverge. TG has looked into replacing CherryPy
+                    with RhubarbTart (a WSGI compatibility library for CP's
+                    dispatching model and global variables). Could a Paste- or
+                    Pylons-ified version of RhubarbTart be written that
+                    TurboGears could sit on top of?
+                </p>
+                <p>
+                    Comparing CherryPy to Paste (the &quot;sensitive point&quot;
+                    link in Ian's original post) is a little unfair. Paste is
+                    lower-level than CherryPy and is not aimed at end users
+                    (except the hacker sort). Something like
+                    RhubarbTart-on-Paste could hide the WSGI dictionary that is
+                    so offensive to some people. In spite of Paste's more
+                    &quot;cumbersome&quot; and &quot;non-Pythonic&quot; syntax,
+                    I found it easier to trace the Paste code: how Pylons
+                    launches an application. I tried to do that with CherryPy
+                    (as TG uses it) and got totally lost in the thread pool
+                    code. Too many layers of do-nothing superclasses, and I
+                    couldn't follow a thread's lifetime. That in itself scared
+                    me away from CherryPy: I didn't want to depend on code I
+                    couldn't understand, especially when I started getting
+                    random errors and unhelpful tracebacks from various TG
+                    components (this was a year ago, before CherryPy 3).
+                </p>
+                <p>
+                    So if we assume that hiding Paste's &quot;cumbersome&quot;
+                    WSGI dict in a super-framework level is acceptable, the
+                    incompatibilities come down to the config file format and
+                    command-line tools. Making a config format is <em>hard</em>:
+                    both TG and (I think) Paste have switched back and forth
+                    between INI format and Python format (or the hybrid
+                    Python-with-section-headers format). Each has some
+                    advantages and disadvantages. I wish I could declare ints
+                    and dicts directly in a Pylons config file. But the opposite
+                    position sees too many quotes and braces. Perhaps Paste and
+                    Pylons could one day support the hybrid format as an
+                    alternative. Of course this means type conversions would
+                    have to be pushed to a lower level when using Pylons INI
+                    format: right now they're done in the application code, and
+                    this would fail if the values were already converted.
+                    Neither format supports nested sections, if you ever want
+                    that.
+                </p>
+                <p>
+                    Both Pylons and TurboGears need a CMS to fully compete with
+                    Django and Zope/Plone. This is a big task, and one which
+                    both communities could work on and perhaps create a common
+                    package both could use. One issue is whether this could be
+                    implemented purely as middleware or whether it would have to
+                    interact too closely with the application. As middleware it
+                    would use the WSGI protocol. As an application-level library
+                    it would have to sidestep the differences between TG and
+                    Pylons, meaning the frameworks would have to accommodate it
+                    either via custom code or a Buffet-like plugin system.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/turbogearsandpylonscomment11.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Mike Orr
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        TG has looked into replacing CherryPy with RhubarbTart
+                        (a WSGI compatibility library for CP's dispatching model
+                        and global variables). Could a Paste- or Pylons-ified
+                        version of RhubarbTart be written that TurboGears could
+                        sit on top of?
+                    </blockquote>
+                    <p>
+                        <a class="reference" href="http://rhubarbtart.org/"
+                            >RhubarbTart</a
+                        >
+                        is very Pasty (I helped write parts of it, so that was
+                        inevitable ;). It also provides a surprisingly good
+                        story for CherryPy 2 compatibility -- some of it
+                        involves some messy monkeypatching, but it works.
+                        (During the sprint at last year's PyCon where we tried
+                        to use RhubartTart instead of CherryPy, we tried to
+                        avoid changing TurboGears too much, and TurboGears
+                        applications at all -- instead extending RhubartTart.)
+                    </p>
+                    <p>
+                        Some of these hacks could be maintained or ported to
+                        Pylons. There are some other differences; for example,
+                        RT uses a request object modeled very directly on CP's.
+                        However, the Paste/Pylons request object does not
+                        require exclusive access to the environment, and
+                        multiple request objects with different APIs can
+                        coexist. There's also the dispatching system. Right now
+                        there's not really alternate dispatching systems for
+                        Pylons, but there could be, and RhubarbTart's could be
+                        ported over. Especially if you are comfortable depending
+                        on
+                        <tt class="docutils literal"
+                            ><span class="pre">&#64;expose</span></tt
+                        >
+                        (a different implementation than the current TG one with
+                        the same interface), that could be a very cleanly
+                        implemented alternative to Routes (RhubarbTart uses
+                        CherryPy's mechanisms, which rely on a more limited
+                        interface than WSGI).
+                    </p>
+                    <blockquote>
+                        Something like RhubarbTart-on-Paste could hide the WSGI
+                        dictionary that is so offensive to some people.
+                    </blockquote>
+                    <p>
+                        <tt class="docutils literal"
+                            ><span class="pre"
+                                >paste.wsgiwrappers.WSGIRequest</span
+                            ></tt
+                        >
+                        already pretty much does that, so it's fine. They just
+                        chose to put of the strawman of the low-level functions
+                        in
+                        <tt class="docutils literal"
+                            ><span class="pre">paste.request</span></tt
+                        >
+                        to argue against.
+                    </p>
+                    <blockquote>
+                        Making a config format is hard: both TG and (I think)
+                        Paste have switched back and forth between INI format
+                        and Python format (or the hybrid
+                        Python-with-section-headers format). Each has some
+                        advantages and disadvantages.
+                    </blockquote>
+                    <p>
+                        Early Paste used Python files for configuration. IMHO
+                        this worked quite poorly. Using Python expressions is
+                        much more reasonable (which is what CherryPy and
+                        TurboGears do), without the full generality of Python
+                        statements, conditionals, etc. Generally if you need
+                        really complicated configuration, I suspect you are
+                        doing your configuration wrong -- configuration should
+                        be a deployment concern, not something where you
+                        implement complex glue. The glue in a typical Paste
+                        applications still goes in Python files (e.g.,
+                        <tt class="docutils literal"
+                            ><span class="pre">middleware.py</span></tt
+                        >
+                        in a Pylons project). If that glue process needs to be
+                        informed by configuration values, you have the
+                        configuration and can glue stuff together based on that
+                        -- but providing a higher-level and domain-specific set
+                        of configuration values that effect that.
+                    </p>
+                    <blockquote>
+                        I wish I could declare ints and dicts directly in a
+                        Pylons config file. But the opposite position sees too
+                        many quotes and braces. Perhaps Paste and Pylons could
+                        one day support the hybrid format as an alternative. Of
+                        course this means type conversions would have to be
+                        pushed to a lower level when using Pylons INI format:
+                        right now they're done in the application code, and this
+                        would fail if the values were already converted.
+                    </blockquote>
+                    <p>
+                        At least most Paste-style conversions accept non-string
+                        values. It's really that when you <em>do</em> get a
+                        string value, you should treat it as though it's a
+                        config value. So
+                        <tt class="docutils literal"
+                            ><span class="pre">'false'</span></tt
+                        >
+                        is a false value (where in Python it would normally be
+                        true, since it is a non-empty string). So if you wanted
+                        to build a config format that accepted those values (and
+                        still used the Paste Deploy APIs, which are fairly
+                        config neutral), it would work. Of course, if you depend
+                        on that in your application you will be incompatible
+                        with simpler APIs.
+                    </p>
+                    <p>
+                        It would be very reasonable to build another config file
+                        format that used Paste Deploy's APIs, but not its exact
+                        config format. Something more path-oriented (that
+                        natively supported
+                        <tt class="docutils literal"
+                            ><span class="pre">urlmap</span></tt
+                        >) would be quite feasible, for instance.
+                    </p>
+                    <blockquote>
+                        Neither format supports nested sections, if you ever
+                        want that.
+                    </blockquote>
+                    <p>
+                        They both support nested keys, like
+                        <tt class="docutils literal"
+                            ><span class="pre">component.key</span>
+                            <span class="pre">=</span>
+                            <span class="pre">value</span></tt
+                        >. Paste doesn't specially interpret those values (it's
+                        up to the consumer), while CherryPy does. When an
+                        application requires more structure in its configuration
+                        I usually use expressions in the keys.
+                    </p>
+                    <blockquote>
+                        Both Pylons and TurboGears need a CMS to fully compete
+                        with Django and Zope/Plone. This is a big task, and one
+                        which both communities could work on and perhaps create
+                        a common package both could use. One issue is whether
+                        this could be implemented purely as middleware or
+                        whether it would have to interact too closely with the
+                        application.
+                    </blockquote>
+                    <p>
+                        A CMS is a very vague thing. It means different things
+                        to different people, and any large website feels a lot
+                        like a CMS.
+                    </p>
+                    <p>
+                        I think relying on HTTP, REST, and middleware, you could
+                        very possibly make CMS construction easy. For instance,
+                        AuthKit could be expanded with a full user system. You
+                        could make a pluggable authorization middleware where
+                        you could restrict and manage user's access to areas of
+                        the site. An event notification system could be
+                        constructed where you could notify a central component
+                        about the existence or deletion of pages, thus allowing
+                        a navigation system to keep track of what's on the
+                        website. Things like
+                        <tt class="docutils literal"
+                            ><span class="pre">paste.cascade</span></tt
+                        >
+                        can be used to fold a CMS in with dynamic applications
+                        (like a shopping cart), while programmatically-driven
+                        layout (again using the Paste Deploy APIs, but not
+                        config format) could allow local &quot;plugins&quot; to
+                        be added (like a checkout, forum, etc).
+                    </p>
+                    <p>
+                        But focusing on the big &quot;CMS&quot; will make this
+                        hard, because it's too big and too vague. Focusing on
+                        specific problems you want to solve and using some of
+                        the concepts of reusability that Paste encourages (like
+                        <a
+                            class="reference"
+                            href="http://groovie.org/articles/2007/02/11/wsgi-middleware-isnt-middleware-time-for-better-language"
+                            >WSGI Framework Components</a
+                        >) will build up the pieces you can use later.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/turbogearsandpylons-comment-12.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            By CMS I specifically mean the workflow of one
+                            person editing a document over several sessions,
+                            others possibly previewing it and correcting it, and
+                            then clicking something to make it visible to the
+                            public. Enhancements include a rich Javascript
+                            editor, talkbacks, gathering articles into magazine
+                            issues, adding article metadata, etc. We have the
+                            parts for all this, but some users rightly want it
+                            to work out of the box, and will skip over TG/Pylons
+                            to Plone if they don't have it. Unfortunately Plone
+                            is in its own little world and depends on Zope 2,
+                            making it more difficult down the road when you want
+                            to combine the site with non-Plone tools.
+                        </p>
+                        <p>
+                            Security is a relatively straightforward problem.
+                            Articles have roles (author, editor). There will
+                            have to be some map of users to roles (&quot;editor
+                            for all articles&quot;, &quot;author for this
+                            article&quot;). Then the authorization code just has
+                            to enforce it.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/turbogearsandpylons-comment-13.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">Mike Orr</a>
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        <p>
+                            It's true webservice will grow spread our
+                            posibilities. But it makes things more breakable.
+                            I'm not sure how to prevent the internet from
+                            getting instable...
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/turbogearsandpylons-comment-23.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.kaffeeabo.de">illy</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    After many years in the FOSS world, I came to the conclusion
+                    that if you want to &quot;merge&quot; 2 projects, the best
+                    way is often to split each project into independent
+                    components, cut down the dependencies and either merge each
+                    pair of subcomponents or make them stick to common
+                    API/standards. Pylons and TG are no exception and
+                    fortunately this trend is well underway. See the
+                    ToscaWidgets as a good example.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/turbogears-and-pylons-comment-14.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                ago
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Apparently the two are merging...
+                    <a
+                        class="reference"
+                        href="http://www.oreillynet.com/onlamp/blog/2007/06/python_web_application_framewo.html"
+                        >http://www.oreillynet.com/onlamp/blog/2007/06/python_web_application_framewo.html</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/turbogears-and-pylons-comment-19.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                anonymous
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

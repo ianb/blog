@@ -1,436 +1,1381 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>My Python 4k</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>My Python 4k</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>My Python 4k</h1>
 
-<div style="float: right">
-
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>My Python 4k</h1>
- 
-<div class="document">
-<p>I was reading <a class="reference" href="http://opal.cabochon.com/~stevey/sokoban/docs/article-jython.html">this unfinished article on Jython</a>
-(part of what looks to be very a good but also incomplete series of
-articles on JVM languages) and he had a few criticisms/suggestions of
-Python.  I've mentioned some minor things that annoy me before, but this made me want to
-collect them all, and list all the things I wish
-Python did.  Python 3K is <a class="reference" href="http://www.python.org/peps/pep-3000.html">already taken</a>, but I'll up the ante -- Python 4K will be the 33% better than even Python 3K.
-(Note: implementation of Python 4K is left an an exercise for the reader.)</p>
-<p>This isn't all backward compatible, but that said I'm not inclined to
-suggest needless backward incompatibilities either.  Some people seem
-allergic to any &quot;bloat&quot; in a language, and obsess over removing things
-from <tt class="docutils literal"><span class="pre">builtins</span></tt> and elsewhere.  I find this silly.  Some people need
-to learn how to ignore what they don't care about.</p>
-<p>So, what's my list?</p>
-<ul>
-<li><p class="first">Strings would not be iterable (noted <a class="reference" href="python-nit-chapter-3.html">here</a>).</p>
-</li>
-<li><p class="first">The <tt class="docutils literal"><span class="pre">self</span></tt> in method signatures would become optional.  <tt class="docutils literal"><span class="pre">self</span></tt>
-would be a keyword with special significance.  I <em>regularly</em> have bugs
-because of this -- mostly because I accidentally add <tt class="docutils literal"><span class="pre">self</span></tt> when calling
-methods on self, not because I leave them out of the function definition.
-But still, I find this lame.</p>
-</li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">cls</span></tt> would similarly become a keyword -- or maybe even allow
-<tt class="docutils literal"><span class="pre">class</span></tt> -- for class methods.  For symmetry as much as anything.</p>
-</li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">super</span></tt> would become a keyword with special significance.  I find
-<tt class="docutils literal"><span class="pre">super</span></tt> really confusing to use.</p>
-</li>
-<li><p class="first">Maybe class methods wouldn't be callable on instances.  But class <em>variables</em> should
-stay visible through instances.  That seems tricky at first, but I actually think it's just a matter of a
-slightly different <tt class="docutils literal"><span class="pre">classmethod</span></tt> implementation.</p>
-</li>
-<li><p class="first">We'd get some kind of declarative/lazy language extension, maybe
-like <a class="reference" href="A-Declarative-Syntax-Extension.html">this</a>.
-That turns <tt class="docutils literal"><span class="pre">class</span></tt> into one of several possible constructor
-arguments (<tt class="docutils literal"><span class="pre">property</span></tt> being a notable second such addition).
-Interface declarations could also be done more cleanly this way.
-This means that:</p>
-<pre class="literal-block">
+        <div class="document">
+            <p>
+                I was reading
+                <a
+                    class="reference"
+                    href="http://opal.cabochon.com/~stevey/sokoban/docs/article-jython.html"
+                    >this unfinished article on Jython</a
+                >
+                (part of what looks to be very a good but also incomplete series
+                of articles on JVM languages) and he had a few
+                criticisms/suggestions of Python. I've mentioned some minor
+                things that annoy me before, but this made me want to collect
+                them all, and list all the things I wish Python did. Python 3K
+                is
+                <a
+                    class="reference"
+                    href="http://www.python.org/peps/pep-3000.html"
+                    >already taken</a
+                >, but I'll up the ante -- Python 4K will be the 33% better than
+                even Python 3K. (Note: implementation of Python 4K is left an an
+                exercise for the reader.)
+            </p>
+            <p>
+                This isn't all backward compatible, but that said I'm not
+                inclined to suggest needless backward incompatibilities either.
+                Some people seem allergic to any &quot;bloat&quot; in a
+                language, and obsess over removing things from
+                <tt class="docutils literal"
+                    ><span class="pre">builtins</span></tt
+                >
+                and elsewhere. I find this silly. Some people need to learn how
+                to ignore what they don't care about.
+            </p>
+            <p>So, what's my list?</p>
+            <ul>
+                <li>
+                    <p class="first">
+                        Strings would not be iterable (noted
+                        <a class="reference" href="python-nit-chapter-3.html"
+                            >here</a
+                        >).
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        The
+                        <tt class="docutils literal"
+                            ><span class="pre">self</span></tt
+                        >
+                        in method signatures would become optional.
+                        <tt class="docutils literal"
+                            ><span class="pre">self</span></tt
+                        >
+                        would be a keyword with special significance. I
+                        <em>regularly</em> have bugs because of this -- mostly
+                        because I accidentally add
+                        <tt class="docutils literal"
+                            ><span class="pre">self</span></tt
+                        >
+                        when calling methods on self, not because I leave them
+                        out of the function definition. But still, I find this
+                        lame.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        <tt class="docutils literal"
+                            ><span class="pre">cls</span></tt
+                        >
+                        would similarly become a keyword -- or maybe even allow
+                        <tt class="docutils literal"
+                            ><span class="pre">class</span></tt
+                        >
+                        -- for class methods. For symmetry as much as anything.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        <tt class="docutils literal"
+                            ><span class="pre">super</span></tt
+                        >
+                        would become a keyword with special significance. I find
+                        <tt class="docutils literal"
+                            ><span class="pre">super</span></tt
+                        >
+                        really confusing to use.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Maybe class methods wouldn't be callable on instances.
+                        But class <em>variables</em> should stay visible through
+                        instances. That seems tricky at first, but I actually
+                        think it's just a matter of a slightly different
+                        <tt class="docutils literal"
+                            ><span class="pre">classmethod</span></tt
+                        >
+                        implementation.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        We'd get some kind of declarative/lazy language
+                        extension, maybe like
+                        <a
+                            class="reference"
+                            href="A-Declarative-Syntax-Extension.html"
+                            >this</a
+                        >. That turns
+                        <tt class="docutils literal"
+                            ><span class="pre">class</span></tt
+                        >
+                        into one of several possible constructor arguments (<tt
+                            class="docutils literal"
+                            ><span class="pre">property</span></tt
+                        >
+                        being a notable second such addition). Interface
+                        declarations could also be done more cleanly this way.
+                        This means that:
+                    </p>
+                    <pre class="literal-block">
 interface IFoo(Bar):
     a = 1
-</pre>
-<p>Means <tt class="docutils literal"><span class="pre">IFoo</span> <span class="pre">=</span> <span class="pre">interface('IFoo',</span> <span class="pre">(Bar,),</span> <span class="pre">{'a':</span> <span class="pre">1})</span></tt>.  You can kind of do
-that right now with metaclasses, but it feels very hacky, and
-<tt class="docutils literal"><span class="pre">Bar</span></tt> has to be designed for it.  Something more conservative
-might also be just fine.  It annoys me that attributes are unordered through
-these techniques.  But maybe not worth fixing.</p>
-</li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">object</span></tt> grows a <tt class="docutils literal"><span class="pre">__classinit__</span></tt> method, as described in <a class="reference" href="a-conservative-metaclass.html">a
-conservative metaclass</a>.</p>
-</li>
-<li><p class="first">Something to handle the <a class="reference" href="descriptor-nit.html">descriptor</a> problem, where
-descriptors don't know about what they are attached to.  Having
-tried several things related to this, handling subclassing is hard,
-but I think it's important enough to make happen even if there are
-some inevitable warts.</p>
-</li>
-<li><p class="first">There would only be <tt class="docutils literal"><span class="pre">bytes</span></tt> and <tt class="docutils literal"><span class="pre">unicode</span></tt>, no <tt class="docutils literal"><span class="pre">str</span></tt>, none of
-these Unicode*Errors.  I hate those <em>so</em> much.  Everyone does.  And
-none of this &quot;unicode is just intrinsically hard&quot; crap.  That's what
-slackers say about hard things.  Python 4K will be a stand-up
-language, not some slacker language!</p>
-<p>I'll admit this is a big backward compatibility issue.  But unicode has
-already introduced huge backward compatibility problems, but certain people
-aren't willing to admit it, and instead just call the issues &quot;bugs&quot;.  Yeah,
-there's more bugs than non-bugs in the <em>standard library</em>, so I'm unimpressed.</p>
-</li>
-<li><p class="first">Maybe something to clean up magic methods, like <tt class="docutils literal"><span class="pre">def</span> <span class="pre">*(other):</span></tt>.  This
-wouldn't clean up all magic methods, but would clean up several.  And
-right now, you actually <em>can</em> add a <tt class="docutils literal"><span class="pre">'*'</span></tt> method to objects.  Maybe
-<tt class="docutils literal"><span class="pre">def</span> <span class="pre">'*'(other)</span></tt>?  Not a big deal; magic methods are magic anyway, whatever
-name you give them.</p>
-</li>
-<li><p class="first">Some query syntax for LINQ-like expressions -- that is, expressions
-which are introspectable and not run immediately.  SQLObject's
-SQLBuilder (similar things seen elsewhere) is similar, but all
-hacky.  Stuff like <a class="reference" href="http://www-128.ibm.com/developerworks/library/l-cppeak2/">this</a> and
-<a class="reference" href="http://subway.python-hosting.com/wiki/SQLComp">this</a> would be
-easier and cleaner with it.</p>
-</li>
-<li><p class="first">Some order-by syntax.  Then you could do <tt class="docutils literal"><span class="pre">[value</span> <span class="pre">for</span> <span class="pre">key,</span> <span class="pre">value</span> <span class="pre">in</span>
-<span class="pre">some_dict.items()</span> <span class="pre">orderby</span> <span class="pre">value]</span></tt>.  Right now you have to do
-<tt class="docutils literal"><span class="pre">[value</span> <span class="pre">for</span> <span class="pre">key,</span> <span class="pre">value</span> <span class="pre">in</span> <span class="pre">sorted(some_dict.items(),</span> <span class="pre">key=lambda</span> <span class="pre">v:</span>
-<span class="pre">v[1])]</span></tt> and that's obviously not as nice.  Nice for the queries
-too.</p>
-</li>
-<li><p class="first">Some string interpolation.  Probably <tt class="docutils literal"><span class="pre">$&quot;something</span> <span class="pre">${expression}&quot;</span></tt>,
-ala <a class="reference" href="http://www.python.org/peps/pep-0215.html">PEP 215</a>.</p>
-</li>
-<li><p class="first">Some resolution to the <a class="reference" href="http://www.artima.com/forums/flat.jsp?forum=106&amp;thread=147358">anonymous function</a>
-thing.  I agree completely with Guido -- anonymous functions and
-function-expressions beyond <tt class="docutils literal"><span class="pre">lambda</span></tt> don't fit in Python.  I could
-care less if <tt class="docutils literal"><span class="pre">lambda</span></tt> goes away -- I just want something good and <tt class="docutils literal"><span class="pre">lambda</span></tt> isn't good (I'm not
-a minimalist).  I haven't figured out exactly what I want.  I would
-probably defer to the brainstorming of the Twisted guys and other
-people who frequently bang their heads on this.</p>
-</li>
-<li><p class="first">Some way of dealing with reloading.  Maybe just cleaning up
-<tt class="docutils literal"><span class="pre">reload()</span></tt> (making it overwrite classes instead of recreating
-them, for instance).  If that fancier reloading is part of the
-language, then people might be more careful about working so they
-don't break it.  There would have to be an option of module-level
-functions <tt class="docutils literal"><span class="pre">__before_reload__</span></tt> and <tt class="docutils literal"><span class="pre">__after_reload__</span></tt> or
-something, so that even tricky code could fix itself up.</p>
-</li>
-<li><p class="first">Something for object initialization.  I find this tedious:</p>
-<pre class="literal-block">
+</pre
+                    >
+                    <p>
+                        Means
+                        <tt class="docutils literal"
+                            ><span class="pre">IFoo</span>
+                            <span class="pre">=</span>
+                            <span class="pre">interface('IFoo',</span>
+                            <span class="pre">(Bar,),</span>
+                            <span class="pre">{'a':</span>
+                            <span class="pre">1})</span></tt
+                        >. You can kind of do that right now with metaclasses,
+                        but it feels very hacky, and
+                        <tt class="docutils literal"
+                            ><span class="pre">Bar</span></tt
+                        >
+                        has to be designed for it. Something more conservative
+                        might also be just fine. It annoys me that attributes
+                        are unordered through these techniques. But maybe not
+                        worth fixing.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        <tt class="docutils literal"
+                            ><span class="pre">object</span></tt
+                        >
+                        grows a
+                        <tt class="docutils literal"
+                            ><span class="pre">__classinit__</span></tt
+                        >
+                        method, as described in
+                        <a
+                            class="reference"
+                            href="a-conservative-metaclass.html"
+                            >a conservative metaclass</a
+                        >.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Something to handle the
+                        <a class="reference" href="descriptor-nit.html"
+                            >descriptor</a
+                        >
+                        problem, where descriptors don't know about what they
+                        are attached to. Having tried several things related to
+                        this, handling subclassing is hard, but I think it's
+                        important enough to make happen even if there are some
+                        inevitable warts.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        There would only be
+                        <tt class="docutils literal"
+                            ><span class="pre">bytes</span></tt
+                        >
+                        and
+                        <tt class="docutils literal"
+                            ><span class="pre">unicode</span></tt
+                        >, no
+                        <tt class="docutils literal"
+                            ><span class="pre">str</span></tt
+                        >, none of these Unicode*Errors. I hate those
+                        <em>so</em> much. Everyone does. And none of this
+                        &quot;unicode is just intrinsically hard&quot; crap.
+                        That's what slackers say about hard things. Python 4K
+                        will be a stand-up language, not some slacker language!
+                    </p>
+                    <p>
+                        I'll admit this is a big backward compatibility issue.
+                        But unicode has already introduced huge backward
+                        compatibility problems, but certain people aren't
+                        willing to admit it, and instead just call the issues
+                        &quot;bugs&quot;. Yeah, there's more bugs than non-bugs
+                        in the <em>standard library</em>, so I'm unimpressed.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Maybe something to clean up magic methods, like
+                        <tt class="docutils literal"
+                            ><span class="pre">def</span>
+                            <span class="pre">*(other):</span></tt
+                        >. This wouldn't clean up all magic methods, but would
+                        clean up several. And right now, you actually
+                        <em>can</em> add a
+                        <tt class="docutils literal"
+                            ><span class="pre">'*'</span></tt
+                        >
+                        method to objects. Maybe
+                        <tt class="docutils literal"
+                            ><span class="pre">def</span>
+                            <span class="pre">'*'(other)</span></tt
+                        >? Not a big deal; magic methods are magic anyway,
+                        whatever name you give them.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Some query syntax for LINQ-like expressions -- that is,
+                        expressions which are introspectable and not run
+                        immediately. SQLObject's SQLBuilder (similar things seen
+                        elsewhere) is similar, but all hacky. Stuff like
+                        <a
+                            class="reference"
+                            href="http://www-128.ibm.com/developerworks/library/l-cppeak2/"
+                            >this</a
+                        >
+                        and
+                        <a
+                            class="reference"
+                            href="http://subway.python-hosting.com/wiki/SQLComp"
+                            >this</a
+                        >
+                        would be easier and cleaner with it.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Some order-by syntax. Then you could do
+                        <tt class="docutils literal"
+                            ><span class="pre">[value</span>
+                            <span class="pre">for</span>
+                            <span class="pre">key,</span>
+                            <span class="pre">value</span>
+                            <span class="pre">in</span>
+                            <span class="pre">some_dict.items()</span>
+                            <span class="pre">orderby</span>
+                            <span class="pre">value]</span></tt
+                        >. Right now you have to do
+                        <tt class="docutils literal"
+                            ><span class="pre">[value</span>
+                            <span class="pre">for</span>
+                            <span class="pre">key,</span>
+                            <span class="pre">value</span>
+                            <span class="pre">in</span>
+                            <span class="pre">sorted(some_dict.items(),</span>
+                            <span class="pre">key=lambda</span>
+                            <span class="pre">v:</span>
+                            <span class="pre">v[1])]</span></tt
+                        >
+                        and that's obviously not as nice. Nice for the queries
+                        too.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Some string interpolation. Probably
+                        <tt class="docutils literal"
+                            ><span class="pre">$&quot;something</span>
+                            <span class="pre">${expression}&quot;</span></tt
+                        >, ala
+                        <a
+                            class="reference"
+                            href="http://www.python.org/peps/pep-0215.html"
+                            >PEP 215</a
+                        >.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Some resolution to the
+                        <a
+                            class="reference"
+                            href="http://www.artima.com/forums/flat.jsp?forum=106&amp;thread=147358"
+                            >anonymous function</a
+                        >
+                        thing. I agree completely with Guido -- anonymous
+                        functions and function-expressions beyond
+                        <tt class="docutils literal"
+                            ><span class="pre">lambda</span></tt
+                        >
+                        don't fit in Python. I could care less if
+                        <tt class="docutils literal"
+                            ><span class="pre">lambda</span></tt
+                        >
+                        goes away -- I just want something good and
+                        <tt class="docutils literal"
+                            ><span class="pre">lambda</span></tt
+                        >
+                        isn't good (I'm not a minimalist). I haven't figured out
+                        exactly what I want. I would probably defer to the
+                        brainstorming of the Twisted guys and other people who
+                        frequently bang their heads on this.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Some way of dealing with reloading. Maybe just cleaning
+                        up
+                        <tt class="docutils literal"
+                            ><span class="pre">reload()</span></tt
+                        >
+                        (making it overwrite classes instead of recreating them,
+                        for instance). If that fancier reloading is part of the
+                        language, then people might be more careful about
+                        working so they don't break it. There would have to be
+                        an option of module-level functions
+                        <tt class="docutils literal"
+                            ><span class="pre">__before_reload__</span></tt
+                        >
+                        and
+                        <tt class="docutils literal"
+                            ><span class="pre">__after_reload__</span></tt
+                        >
+                        or something, so that even tricky code could fix itself
+                        up.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Something for object initialization. I find this
+                        tedious:
+                    </p>
+                    <pre class="literal-block">
 class Foo(object):
     def __init__(self, bar, baz):
         self.bar = bar
         self.baz = baz
-</pre>
-<p>But I'm not actually sure what to do.  I mentioned that <a class="reference" href="reducing-boilerplate-code-in-init.html">here</a>.</p>
-</li>
-<li><p class="first">I think double-underscore class-private variables (like <tt class="docutils literal"><span class="pre">self.__private</span></tt>) are super-lame.  People
-think they are something they are not.  They are not really-truly-private variables.
-They are I'm-going-to-piss-people-off private variables.  They are I'm-too-lazy-to-use-name-mangling
-private variables.  They are I'm-going-to-break-subclassing private variables.  If you want
-class-private variables for a valid reason, explicit name mangling is in all ways better.</p>
-</li>
-<li><p class="first">Delegation using <tt class="docutils literal"><span class="pre">__getattr__</span></tt> and <tt class="docutils literal"><span class="pre">__setattr__</span></tt> can be hard to work with,
-both creating delegates and consuming them.  I'd like if there was more explicit
-support for this, with better failure conditions.  Maybe this just means a nice built-in
-metaclass that solves this problem particularly well.</p>
-</li>
-<li><p class="first">Something better for forward-references.  I don't know exactly what to call these -- except it
-means for references to things that don't exist yet.  Like a reference to a class that may or
-may not exist yet.  Maybe this could be handled with a descriptor or something.  Give it a
-specific implementation and pattern, so people can use it more easily than having to build
-the pattern up from what's there currently.</p>
-</li>
-</ul>
-<p>There's probably some interpreter things I'd like too...</p>
-<ul>
-<li><p class="first">Something like <a class="reference" href="http://www.cosc.canterbury.ac.nz/~greg/python/Pyrex/">Pyrex</a> but all
-polished and pretty.  Maybe <a class="reference" href="http://codespeak.net/pypy/dist/pypy/doc/coding-guide.html#rpython">RPython</a>
-can be this.</p>
-</li>
-<li><p class="first">Microprocesses -- I haven't really used <a class="reference" href="http://www.erlang.org/">Erlang</a> much, but I'm still drawn to it more than
-any of the other languages in that branch (the weird functional branch --
-Haskell, ML, etc).  They don't have <em>microthreads</em> (as you might see
-in <a class="reference" href="http://www.stackless.com/">Stackless</a>), but they are basically
-the same except without shared state.  Messages only.  I think
-that's so much cooler than microthreads, at least if you can pull it
-off and still be fast and reliable.</p>
-</li>
-<li><p class="first">Really fast interpreter startup.  That might make the reloading
-thing much less important.  I imagine frozen modules -- freezing the
-actual module in its full glory just as it looks immediately after
-import.  With copy-on-write in some fashion, to facilitate really
-fast microprocess startup too (so microprocesses can share some set
-of modules so long as they aren't written to).</p>
-<p>The first part
-(freezing) seems not-that-hard right now.  In theory you just put
-<a class="reference" href="http://python.org/doc/current/lib/module-pickle.html">pickle</a> and
-<a class="reference" href="http://python.org/doc/current/lib/module-marshal.html">marshal</a>
-together and you got it, so long as the module doesn't do anything
-environment-dependent on startup (modules could opt in or opt out or
-something with respect to their environment dependencies).
-Copy-on-write is probably much much harder; though maybe it's an
-extension of garbage collection algorithms.</p>
-</li>
-<li><p class="first">Really good cross-platform intra-Python interprocess communication.
-This should look just like inter-microprocess communication, for
-process portability.</p>
-</li>
-<li><p class="first">Traceback extensions, so you can better annotate your code in ways
-that will show up in tracebacks.  Similar in spirit to what Zope
-does with <tt class="docutils literal"><span class="pre">__traceback_info__</span></tt> (and what Paste copies).  But a
-built-in convention.</p>
-</li>
-<li><p class="first">Some improved exception messages.  I hate signature errors, for
-instance; very unhelpful (especially with the implicit-self-related
-counting error).  Python does pretty well -- lots of languages do a
-lot worse -- but I also think this is way up there in terms of
-usability and can always use improvement.</p>
-</li>
-<li><p class="first">No <tt class="docutils literal"><span class="pre">sys.path</span></tt> <a class="reference" href="site-packages-considered-harmful.html">crappiness</a>.
-Think this stuff through, one right way, no &quot;search paths&quot; (implicit
-awfulness).  Careful or explicit relative imports.</p>
-</li>
-<li><p class="first">A shortcut for <tt class="docutils literal"><span class="pre">for</span> <span class="pre">item</span> <span class="pre">in</span> <span class="pre">seq:</span> <span class="pre">yield</span> <span class="pre">item</span></tt>, when doing generator pass-through.
-Maybe <tt class="docutils literal"><span class="pre">yield</span> <span class="pre">*seq</span></tt>.  Saw this on python-dev already.  As I use generators more
-I encounter this desire fairly frequently.</p>
-</li>
-<li><p class="first">Tuple-unpacking, like <tt class="docutils literal"><span class="pre">first,</span> <span class="pre">*rest</span> <span class="pre">=</span> <span class="pre">path.split('/')</span></tt>.  This would be mighty useful.
-The guy who wrote the Jython review raves about Python packing; this would be another
-fine enhancement to a delightful feature.  I desire this frequently.</p>
-</li>
-<li><p class="first">Better signature unpacking, allowing <tt class="docutils literal"><span class="pre">def</span> <span class="pre">foo(*args,</span> <span class="pre">bar=None)</span></tt>.  I think I saw
-something recently about this in python-dev, and it might happen before 3.0.</p>
-</li>
-</ul>
-<p>Things I wouldn't do:</p>
-<ul>
-<li><p class="first">Put up with any significant-whitespace whining.  Here 99% of the
-Python community is with me.  I think there is a meme that Python
-people are close-minded to suggestions for changes in the language.  I
-think there is significant truth to that.  But sometimes everyone
-else is just completely wrong.  I want nothing to do with any
-programmer who would mis-indent their code.  If you want to
-mis-indent your code you are an idiot.  If you want idiotic code to
-be an option you are being absurd.</p>
-<p>One thing I noticed from some recent Ruby criticisms I've read is
-that its syntax errors can be hard to read -- and then I realized
-this is in part because you have to wait until the end of the
-file for the compiler to catch some syntax errors that a Python can catch
-immediately because of whitespace.</p>
-</li>
-<li><p class="first">Continuation-based web frameworks (like <a class="reference" href="http://www.seaside.st/">Seaside</a>) seem lame to me.  I'm so much more
-impressed by event-based programming, and continuations (used in
-that way) seem like a way to avoid explicit events.  Events are the
-web.  Continuations are people who want to make the web into an MVC
-GUI.  GUIs are so twentieth century.  Grow up!</p>
-<p>Language-level continuations (as opposed to the explicit
-continuation style used by Twisted) are cool and all -- I don't
-think they hurt -- but I don't think they are actually very useful
-either.  That you can implement other things in terms of them
-doesn't impress me either; I'm also pretty comfortable with a series
-of specific language features instead of one giant meta-feature, at
-least when it comes to control flow.</p>
-<p>I like the idea of adding to the ways you can express <em>data</em> in Python
-(it's not bad now).  But actual <em>macros</em> don't really interest me (in
-a general sense) as I think they work on the wrong level -- they deal
-with syntax transformations, as opposed to object-level transformations.
-A fairly conservative set of additions to the syntax (I note queries and the interface/etc extension above)
-are better than macros.</p>
-</li>
-<li><p class="first">Global interpreter lock?  I still <a class="reference" href="gil-of-doom.html">don't care</a>, sorry.  I want better processes,
-not better threads.</p>
-</li>
-<li><p class="first">Turning <tt class="docutils literal"><span class="pre">=</span></tt> into an expression.  To generalize: dynamic typing adds
-some usually shallow errors in return for far more expressive
-code.  Assignment as an expression adds some really obnoxious errors
-(ones that don't raise exceptions) in return for minor
-expressiveness.  That <tt class="docutils literal"><span class="pre">=</span></tt> isn't an expression catches me from
-making hard bugs almost every day (instead they are easy syntax error bugs).</p>
-<p>I'd be fine with <tt class="docutils literal"><span class="pre">:=</span></tt> as an assignment-expression, because I
-wouldn't misspell it.  That would certainly be useful.
-The minimalists would hate this.</p>
-</li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">self</span></tt> in method <em>bodies</em> would not become optional.  I.e., you'd still talk about <tt class="docutils literal"><span class="pre">self.instance_variable</span></tt>.
-That's a brevity that I don't want.  Ruby's <tt class="docutils literal"><span class="pre">&#64;</span></tt> is fine (but doesn't fit Python's aesthetic).  But the
-implicit <tt class="docutils literal"><span class="pre">this</span></tt> is horrible, and unworkable in Python anyway.  People often clump signature-self whining
-together with body-self whining.  One of those groups has a point, the other group doesn't.  Anyway, I think
-the complaining would go away entirely if signatures and <tt class="docutils literal"><span class="pre">super</span></tt> was fixed, because people only complain
-about method bodies because think it adds weight to their argument against signatures (even though I think the opposite is
-true).</p>
-</li>
-<li><p class="first">I actually like <tt class="docutils literal"><span class="pre">?</span></tt> and <tt class="docutils literal"><span class="pre">!</span></tt> in function names, as in Scheme.  But I
-don't think it is worth adding.</p>
-</li>
-<li><p class="first">I also kind of like no-public-attributes (i.e., all outside access is explicitly
-identified).  <tt class="docutils literal"><span class="pre">property()</span></tt> helps a lot, but isn't all I would like.</p>
-</li>
-<li><p class="first">The lexical scoping problems people have don't bother me.  I wouldn't want Javascript-like
-variable declarations to define scope.  It would be nice if Python gave an error earlier for
-scoping mistakes, though, and a better error too.  I think this is statically detectable.  Maybe
-something in addition to just the <tt class="docutils literal"><span class="pre">global</span></tt> declaration would be useful.  People ask for <tt class="docutils literal"><span class="pre">lexical</span></tt>, and I
-can certainly see the benefit.  (Note: this is only an issue when assigning to variables in enclosing scopes)</p>
-</li>
-</ul>
-<p>Well, that's all for now.  Now you know everything I think is wrong with Python (that I can think of right now), and most of what I think would make it right.  Looking over it again, I actually don't think it's that pie-in-the-sky, though
-some parts (like <tt class="docutils literal"><span class="pre">self</span></tt>) are indeed tricky, and involve more than just syntactic additions.</p>
-<p><strong>Update:</strong></p>
-<ul class="simple">
-<li>I didn't talk much about the standard library -- though there's a ton of issues there (maybe too many to create any simple list), and in many ways the backward compatibility issues can be harder.  But after reading <a class="reference" href="http://atlee.ca/blog/2006/02/16/python-warts-1/">this post</a> I remembered a more conservative change that I think would help a lot -- identify modules that may not be &quot;deprecated&quot; but are simply &quot;useless&quot;.  The <a class="reference" href="http://python.org/doc/current/lib/module-stat.html">stat</a> module, for instance, is largely useless -- its functionality has been mostly integrated into the return value of <tt class="docutils literal"><span class="pre">os.stat</span></tt> (and that process could be finished by adding a couple methods).  Now, I don't care if the <tt class="docutils literal"><span class="pre">stat</span></tt> module stays around, but simply as a matter of presentation it shouldn't clutter the Python standard library landscape.  Maybe that's just a matter of organizing how the stdlib is documented online.  I want some editorial flavor to that presentation.</li>
-<li>I'd like <a class="reference" href="py-std.html">py.std</a> to be in builtins, so that you don't have to import every little function you are using from the standard library.  I think this would significantly help programmer flow, with every bit as much readability (probably more readability) than the current mechanism.  <tt class="docutils literal"><span class="pre">std</span></tt> would not take the place of all uses of <tt class="docutils literal"><span class="pre">import</span></tt> -- probably not even most uses -- but would be another way to spell that, and would decrease the import garbage which feels like litter at the top of my modules.  That a module uses <tt class="docutils literal"><span class="pre">re</span></tt> or <tt class="docutils literal"><span class="pre">os</span></tt> or <tt class="docutils literal"><span class="pre">textwrap</span></tt> is not interesting or useful knowledge worthy of becoming a kind of header for the module.  If it uses <tt class="docutils literal"><span class="pre">SimpleHTTPServer</span></tt> that <em>is</em> worthy of being noted in the header.  There's a distinction to be made there.  <tt class="docutils literal"><span class="pre">std</span></tt> offers that distinction.</li>
-<li>I'd also add something like this <a class="reference" href="http://www.phyast.pitt.edu/~micheles/python/documentation.html">decorator module</a> to the standard library.  Right now decorators are slightly harder to write than they need to be, and the resulting decorators usually cover up important metadata about the function they wrap.  This module would encourage higher quality decorators.</li>
-<li>And <em>obviously</em> tabs would not be allowed for indentation.  I think any tab anywhere would be a syntax error (you'd have to use <tt class="docutils literal"><span class="pre">\t</span></tt> if you want to talk about tabs).  Maybe 1- and 3-space indentation would be disallowed too, but that's probably overboard.  I don't <em>like</em> 2-space indentation, but 1 is really hard to work with, and 3 spaces is just weird.  OTOH, you don't actually see them often, even by mistake.</li>
-</ul>
-</div>
- <div class="dates" align="right">
-Created 16 Feb '06<br>
-Modified 17 Feb '06</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>Well, I don't really need, or understand deeply, all the advanced/dynamic/metaclass features you're asking for, so I'll comment on the ones I care about.</p>
-<p>Definite agreement:</p>
-<ul class="simple">
-<li>non-iterable strings</li>
-<li>Object initialization</li>
-<li>Microprocesses. This is the holy Python grail for me. They are so sweet in Erlang.</li>
-<li>Better tuple unpacking. Another win for Erlang that we could steal and improve. I like your examples.</li>
-<li>Same for signature unpacking.</li>
-<li>Explicit relative imports.</li>
-<li>orderby.</li>
-<li>Better reload().</li>
-<li>LINQ-like stuff.</li>
-<li>Unicode - my number 2 behind microprocesses.</li>
-</ul>
-<p>Questions:</p>
-<ul class="simple">
-<li>You just say that __variables__ are lame, and mangling is better, without ever saying what you'd do about them. How does Python 4k handle private variables/name mangling properly?</li>
-<li>Why aren't &quot;?&quot; and &quot;!&quot; worth allowing in function names? I want these, personally. I feel like they would aid the descriptiveness of my code significantly. (How about &quot;-&quot;?)</li>
-</ul>
-<p>I'd add (and I don't follow python-dev, so forgive me if they exist/are coming soon):</p>
-<ul class="simple">
-<li>Built-in currying</li>
-<li>local variable dump in exceptions, like in cgi module</li>
-<li>Microprocesses. Oh, did I mention that one already?</li>
-<li>ipython in the standard distribution</li>
-<li>Real, Good, Pythonic, Documented, Cross-Platform GUI library. We're talking 4k here right? Can we ever make this happen?</li>
-</ul>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-1.html" rel="nofollow">#</a> <a href="http://llimllib.f2o.org/blog">Bill Mill</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<ul class="simple">
-<li>By class-private variables I mean <tt class="docutils literal"><span class="pre">__private</span></tt>, not <tt class="docutils literal"><span class="pre">__magic__</span></tt>.  Class-private variables are simply never needed.  If you have <tt class="docutils literal"><span class="pre">self.__really_private</span></tt> you can just use <tt class="docutils literal"><span class="pre">self._MyClass_really_private</span></tt> for similar effect (actually <tt class="docutils literal"><span class="pre">self._MyClass__really_private</span></tt> is the <strong>identical</strong> effect)</li>
-<li>I think adding <tt class="docutils literal"><span class="pre">?</span></tt> and <tt class="docutils literal"><span class="pre">!</span></tt> to function names (or symbol names in general) changes the feel of the language too much.  I'd add them if I was starting from zero, but at this point I wouldn't want to use those because it would be too jarring against the bulk of existing code.  Dashes are, of course, completely out ;)  Also, they conflict with outside naming conventions, making some Python symbols hard to access from other languages.  I don't know if this is a big deal in practice, but I think there's something good about using a lowest-common-denominator in naming.  Case sensitivity is useful for the same reason (though part of me would like to be case and underscore insensitive, to remove the source of needless style differences).</li>
-</ul>
-<p>For the things you would add:</p>
-<ul class="simple">
-<li>There is a proposal for a <tt class="docutils literal"><span class="pre">partial</span></tt> function, which I think is what you mean by currying.  Maybe in Python 2.5?  I personally don't think it's very readable in practice.  <tt class="docutils literal"><span class="pre">lambda</span></tt> actually not half bad for this one case.</li>
-<li>I agree that a nicer interactive prompt -- roughly based on ipython I imagine -- would be very useful.</li>
-<li>Local variable dumping is possible currently, but not enabled in the default traceback.  I don't know if it should be -- I think it's overwhelming except in interactive environments.  It should be included in more interactive environments; maybe standard library support would help.  Goes with the <tt class="docutils literal"><span class="pre">__traceback_info__</span></tt> stuff.</li>
-<li>GUI library... seems too hard, even for 4K ;)  If it hasn't happened outside of the standard library, how can it happen inside?  Plus GUIs are the past, the web is the future ;)  XUL will rock, though!  I'll be all over that.</li>
-</ul>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-2.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Bill: Check out PEP 309 for the currying/partial functions thing. <a class="reference" href="http://www.python.org/peps/pep-0309.html">http://www.python.org/peps/pep-0309.html</a>. According to the PEP, it'll be in Python 2.5.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-3.html" rel="nofollow">#</a> <a href="http://www.holovaty.com/">Adrian Holovaty</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>PartialApplication is officially in for 2.5
-I cannot resist pointing our my recipe here:</p>
-<p><a class="reference" href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/440557">http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/440557</a></p>
-<p>It's sortof PA++ 
-;)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-22.html" rel="nofollow">#</a> <a href="http://pythonzweb.blogspot.com">max khesin</a></div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>I very much want to see 'locals' and 'globals' be sort of accessible keywords much like you suggest 'super' and 'self', and also 'class'.  It'd make dealing with the various name-spaces a cinch.  Or maybe 'module' instead of 'globals'.</p>
-<p>That'd be nice.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-4.html" rel="nofollow">#</a> Brantley</div><hr noshade>
- 
-<div class="document">
-<p>Why Python 4k ? Since most of this is not backward compatible, I would be very thanksfull if you began making PEP's for it all.</p>
-<p>Personnally, don't understand all the stuff there but I vote for :</p>
-<ul class="simple">
-<li>really fast interpreter startup</li>
-<li>turns class into one of several possible constructor arguments</li>
-<li>order by syntax</li>
-<li>microprocesses (don't yet read about it but sounds cool).</li>
-</ul>
-<p>About your assertion that GUI is old-style, I'm not totally convinced but I really think, GUI should be able to use bookmarks, protocols and REST style programming. What I see as a limitation in web style programming is the lack for &quot;push&quot; facilities.</p>
-<p>Thanks for this wonderfull post.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-5.html" rel="nofollow">#</a> Alex Garel</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>The GUI stuff was really my slightly facetious rejection of those people who complain about how inelegent web programming is, and how it should be more like GUI programming.  I think they are just opening a can of worms for themselves, by trying to impose a style of programming they are familiar with to a domain where it is not appropriate.  Of course, I also think GUI programming is a bit retro all considered -- I genuinely think that as a user, not just as a programmer.  But that only directs my interest, it doesn't really effect the language much one way or the other.</p>
-<p>Some of these aren't language extensions per se, but just hard implementation problems: microprocesses are an example of that, as is interpreter startup.  I am hopeful that PyPy will open up this kind of development.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-10.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Good Ideas but please let strings yield characters on iteration :-) I've much code using string iteration.</p>
-<p>And self/cls should'nt be keywords and should be the first parameter of method. Really :)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-6.html" rel="nofollow">#</a> <a href="http://www.active-4.com">Armin Ronacher</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>String iteration just doesn't make sense.  They don't yield characters... they just yield smaller strings.  Strings that contain strings that contain strings.  Strings just aren't containers in Python -- they are indexable, but to iterate something should be a container.  It's only (IMHO) an accident of an earlier Python that didn't have the iterator protocol, that you can iterate over strings.  Strings should grow a method like <tt class="docutils literal"><span class="pre">.chars()</span></tt> that yields all the characters.  Of course, not backward compatible, but the errors should be obvious (&quot;TypeError: strings are not iterable&quot;).</p>
-<p>I've been thinking about the <tt class="docutils literal"><span class="pre">self</span></tt> thing more.  It's one of the hardest to resolve issues (and I doubt it will be resolved).  But I think it would be reasonable if functions defined in a class scope meant something different than a function defined outside of a class scope.  So if you were injecting a function definition into a class, it would (reasonably) work just like it does now, with an explicit <tt class="docutils literal"><span class="pre">self</span></tt> parameter.  But if you are doing it in a class scope, the metaclass (<tt class="docutils literal"><span class="pre">type</span></tt>) wraps the function in some fashion.  It seems less intrusive than class-private variables, even (which are statically determined).</p>
-<p>The self parameter also works badly with decorators, though the same might be true if that parameter was removed.  Getting a decorator to act properly with a method and with a function is hard.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-12.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>I certainly agree with some of the changes, like something as basic as proper relative imports. But I think I hear too many &quot;GUI is old style, the web is the future&quot; comments from a lot of programmers that are more over-enthusiasm for new web technologies rather than a careful look at why we keep and discard old/new technologies in general. As others have pointed out, even new asynchronous web technologies are still unidirectional in one sense: the client makes a request, and only then does the server send a reply. Web servers don't initiate requests to web browsers, although traditional networked GUI applications do this all the time. In tech history, we've gone from assembly language (independent of hardware), to portable languages (independent of assembly language), and now to various styles of cross-platform (independent of OS or basic platform). It's not just the web, but any successful model of cross-platform apps that is the future. The web is the future only because the browser is ubiquitous, but in the end I still have to install Firefox, etc. to be able to use the latest web technology. With things like PyGTK and wxPython, I can have the same ubiquity for GUI apps too. It's all the same: I download the app through my browser when I visit a page, or I download the Python script and run it. (P.S. I do agree with a lot of Ian's points in general. Sorry if this sounds like trolling).</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-7.html" rel="nofollow">#</a> Rob Walker</div><hr noshade>
- 
-<div class="document">
-<p>I don't personally find Python wishlists that interesting, especially the ones which propose language changes, but it's good to see that you've touched on issues with the runtime itself because that is where Python (the platform) should be innovating, or at least fixing itself a fair amount. The problem is that because the language syntax is the thing most people have direct experience with (and one can become superficially acquainted with Python in that way, provoking the &quot;whitespace sucks&quot; arguments offered by detractors/newcomers), people feel more inclined to suggest tweaks which frequently say more about their own habits (at many different levels) rather than to seriously think about some of the harder issues - things like concurrency, performance, predictability, memory usage and library support - and then provide improvements in those areas. And when the harder issues do manage to enter the scene, proposals like optional static typing emerge: the arguably lazy and inadequate approach to dealing with such issues.</p>
-<p>Certainly, I don't see Python diminishing in (relative) popularity because of the lack of some language constructs or notation: it's more likely to happen because Python doesn't conveniently work well with or support other, popular technologies, isn't perceived to scale well (in a way that involves convenient programming techniques), or isn't perceived to have good enough documentation - the latter being another story entirely.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-8.html" rel="nofollow">#</a> <a href="http://">Paul Boddie</a></div><hr noshade>
- 
-<div class="document">
-<p>My personal feeling is that a multi-line lambda is a mistake, like Guido says. However, I agree with the functionally oriented people that having to use a local named function breaks code locality and tends to make it hard to follow the code in Python written with a more functional flavor.</p>
-<p>I think that the right Pythonic answer is to introduce a syntax kind of like ruby blocks where a function call can optionally be followed by a colon, then arg list and a suite underneath and that the arguments and suite would be converted to a local function passed as the last argument to the function. Here is an example:</p>
-<pre class="literal-block">
+</pre
+                    >
+                    <p>
+                        But I'm not actually sure what to do. I mentioned that
+                        <a
+                            class="reference"
+                            href="reducing-boilerplate-code-in-init.html"
+                            >here</a
+                        >.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        I think double-underscore class-private variables (like
+                        <tt class="docutils literal"
+                            ><span class="pre">self.__private</span></tt
+                        >) are super-lame. People think they are something they
+                        are not. They are not really-truly-private variables.
+                        They are I'm-going-to-piss-people-off private variables.
+                        They are I'm-too-lazy-to-use-name-mangling private
+                        variables. They are I'm-going-to-break-subclassing
+                        private variables. If you want class-private variables
+                        for a valid reason, explicit name mangling is in all
+                        ways better.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Delegation using
+                        <tt class="docutils literal"
+                            ><span class="pre">__getattr__</span></tt
+                        >
+                        and
+                        <tt class="docutils literal"
+                            ><span class="pre">__setattr__</span></tt
+                        >
+                        can be hard to work with, both creating delegates and
+                        consuming them. I'd like if there was more explicit
+                        support for this, with better failure conditions. Maybe
+                        this just means a nice built-in metaclass that solves
+                        this problem particularly well.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Something better for forward-references. I don't know
+                        exactly what to call these -- except it means for
+                        references to things that don't exist yet. Like a
+                        reference to a class that may or may not exist yet.
+                        Maybe this could be handled with a descriptor or
+                        something. Give it a specific implementation and
+                        pattern, so people can use it more easily than having to
+                        build the pattern up from what's there currently.
+                    </p>
+                </li>
+            </ul>
+            <p>There's probably some interpreter things I'd like too...</p>
+            <ul>
+                <li>
+                    <p class="first">
+                        Something like
+                        <a
+                            class="reference"
+                            href="http://www.cosc.canterbury.ac.nz/~greg/python/Pyrex/"
+                            >Pyrex</a
+                        >
+                        but all polished and pretty. Maybe
+                        <a
+                            class="reference"
+                            href="http://codespeak.net/pypy/dist/pypy/doc/coding-guide.html#rpython"
+                            >RPython</a
+                        >
+                        can be this.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Microprocesses -- I haven't really used
+                        <a class="reference" href="http://www.erlang.org/"
+                            >Erlang</a
+                        >
+                        much, but I'm still drawn to it more than any of the
+                        other languages in that branch (the weird functional
+                        branch -- Haskell, ML, etc). They don't have
+                        <em>microthreads</em> (as you might see in
+                        <a class="reference" href="http://www.stackless.com/"
+                            >Stackless</a
+                        >), but they are basically the same except without
+                        shared state. Messages only. I think that's so much
+                        cooler than microthreads, at least if you can pull it
+                        off and still be fast and reliable.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Really fast interpreter startup. That might make the
+                        reloading thing much less important. I imagine frozen
+                        modules -- freezing the actual module in its full glory
+                        just as it looks immediately after import. With
+                        copy-on-write in some fashion, to facilitate really fast
+                        microprocess startup too (so microprocesses can share
+                        some set of modules so long as they aren't written to).
+                    </p>
+                    <p>
+                        The first part (freezing) seems not-that-hard right now.
+                        In theory you just put
+                        <a
+                            class="reference"
+                            href="http://python.org/doc/current/lib/module-pickle.html"
+                            >pickle</a
+                        >
+                        and
+                        <a
+                            class="reference"
+                            href="http://python.org/doc/current/lib/module-marshal.html"
+                            >marshal</a
+                        >
+                        together and you got it, so long as the module doesn't
+                        do anything environment-dependent on startup (modules
+                        could opt in or opt out or something with respect to
+                        their environment dependencies). Copy-on-write is
+                        probably much much harder; though maybe it's an
+                        extension of garbage collection algorithms.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Really good cross-platform intra-Python interprocess
+                        communication. This should look just like
+                        inter-microprocess communication, for process
+                        portability.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Traceback extensions, so you can better annotate your
+                        code in ways that will show up in tracebacks. Similar in
+                        spirit to what Zope does with
+                        <tt class="docutils literal"
+                            ><span class="pre">__traceback_info__</span></tt
+                        >
+                        (and what Paste copies). But a built-in convention.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Some improved exception messages. I hate signature
+                        errors, for instance; very unhelpful (especially with
+                        the implicit-self-related counting error). Python does
+                        pretty well -- lots of languages do a lot worse -- but I
+                        also think this is way up there in terms of usability
+                        and can always use improvement.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        No
+                        <tt class="docutils literal"
+                            ><span class="pre">sys.path</span></tt
+                        >
+                        <a
+                            class="reference"
+                            href="site-packages-considered-harmful.html"
+                            >crappiness</a
+                        >. Think this stuff through, one right way, no
+                        &quot;search paths&quot; (implicit awfulness). Careful
+                        or explicit relative imports.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        A shortcut for
+                        <tt class="docutils literal"
+                            ><span class="pre">for</span>
+                            <span class="pre">item</span>
+                            <span class="pre">in</span>
+                            <span class="pre">seq:</span>
+                            <span class="pre">yield</span>
+                            <span class="pre">item</span></tt
+                        >, when doing generator pass-through. Maybe
+                        <tt class="docutils literal"
+                            ><span class="pre">yield</span>
+                            <span class="pre">*seq</span></tt
+                        >. Saw this on python-dev already. As I use generators
+                        more I encounter this desire fairly frequently.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Tuple-unpacking, like
+                        <tt class="docutils literal"
+                            ><span class="pre">first,</span>
+                            <span class="pre">*rest</span>
+                            <span class="pre">=</span>
+                            <span class="pre">path.split('/')</span></tt
+                        >. This would be mighty useful. The guy who wrote the
+                        Jython review raves about Python packing; this would be
+                        another fine enhancement to a delightful feature. I
+                        desire this frequently.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Better signature unpacking, allowing
+                        <tt class="docutils literal"
+                            ><span class="pre">def</span>
+                            <span class="pre">foo(*args,</span>
+                            <span class="pre">bar=None)</span></tt
+                        >. I think I saw something recently about this in
+                        python-dev, and it might happen before 3.0.
+                    </p>
+                </li>
+            </ul>
+            <p>Things I wouldn't do:</p>
+            <ul>
+                <li>
+                    <p class="first">
+                        Put up with any significant-whitespace whining. Here 99%
+                        of the Python community is with me. I think there is a
+                        meme that Python people are close-minded to suggestions
+                        for changes in the language. I think there is
+                        significant truth to that. But sometimes everyone else
+                        is just completely wrong. I want nothing to do with any
+                        programmer who would mis-indent their code. If you want
+                        to mis-indent your code you are an idiot. If you want
+                        idiotic code to be an option you are being absurd.
+                    </p>
+                    <p>
+                        One thing I noticed from some recent Ruby criticisms
+                        I've read is that its syntax errors can be hard to read
+                        -- and then I realized this is in part because you have
+                        to wait until the end of the file for the compiler to
+                        catch some syntax errors that a Python can catch
+                        immediately because of whitespace.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Continuation-based web frameworks (like
+                        <a class="reference" href="http://www.seaside.st/"
+                            >Seaside</a
+                        >) seem lame to me. I'm so much more impressed by
+                        event-based programming, and continuations (used in that
+                        way) seem like a way to avoid explicit events. Events
+                        are the web. Continuations are people who want to make
+                        the web into an MVC GUI. GUIs are so twentieth century.
+                        Grow up!
+                    </p>
+                    <p>
+                        Language-level continuations (as opposed to the explicit
+                        continuation style used by Twisted) are cool and all --
+                        I don't think they hurt -- but I don't think they are
+                        actually very useful either. That you can implement
+                        other things in terms of them doesn't impress me either;
+                        I'm also pretty comfortable with a series of specific
+                        language features instead of one giant meta-feature, at
+                        least when it comes to control flow.
+                    </p>
+                    <p>
+                        I like the idea of adding to the ways you can express
+                        <em>data</em> in Python (it's not bad now). But actual
+                        <em>macros</em> don't really interest me (in a general
+                        sense) as I think they work on the wrong level -- they
+                        deal with syntax transformations, as opposed to
+                        object-level transformations. A fairly conservative set
+                        of additions to the syntax (I note queries and the
+                        interface/etc extension above) are better than macros.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Global interpreter lock? I still
+                        <a class="reference" href="gil-of-doom.html"
+                            >don't care</a
+                        >, sorry. I want better processes, not better threads.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Turning
+                        <tt class="docutils literal"
+                            ><span class="pre">=</span></tt
+                        >
+                        into an expression. To generalize: dynamic typing adds
+                        some usually shallow errors in return for far more
+                        expressive code. Assignment as an expression adds some
+                        really obnoxious errors (ones that don't raise
+                        exceptions) in return for minor expressiveness. That
+                        <tt class="docutils literal"
+                            ><span class="pre">=</span></tt
+                        >
+                        isn't an expression catches me from making hard bugs
+                        almost every day (instead they are easy syntax error
+                        bugs).
+                    </p>
+                    <p>
+                        I'd be fine with
+                        <tt class="docutils literal"
+                            ><span class="pre">:=</span></tt
+                        >
+                        as an assignment-expression, because I wouldn't misspell
+                        it. That would certainly be useful. The minimalists
+                        would hate this.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        <tt class="docutils literal"
+                            ><span class="pre">self</span></tt
+                        >
+                        in method <em>bodies</em> would not become optional.
+                        I.e., you'd still talk about
+                        <tt class="docutils literal"
+                            ><span class="pre">self.instance_variable</span></tt
+                        >. That's a brevity that I don't want. Ruby's
+                        <tt class="docutils literal"
+                            ><span class="pre">&#64;</span></tt
+                        >
+                        is fine (but doesn't fit Python's aesthetic). But the
+                        implicit
+                        <tt class="docutils literal"
+                            ><span class="pre">this</span></tt
+                        >
+                        is horrible, and unworkable in Python anyway. People
+                        often clump signature-self whining together with
+                        body-self whining. One of those groups has a point, the
+                        other group doesn't. Anyway, I think the complaining
+                        would go away entirely if signatures and
+                        <tt class="docutils literal"
+                            ><span class="pre">super</span></tt
+                        >
+                        was fixed, because people only complain about method
+                        bodies because think it adds weight to their argument
+                        against signatures (even though I think the opposite is
+                        true).
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        I actually like
+                        <tt class="docutils literal"
+                            ><span class="pre">?</span></tt
+                        >
+                        and
+                        <tt class="docutils literal"
+                            ><span class="pre">!</span></tt
+                        >
+                        in function names, as in Scheme. But I don't think it is
+                        worth adding.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        I also kind of like no-public-attributes (i.e., all
+                        outside access is explicitly identified).
+                        <tt class="docutils literal"
+                            ><span class="pre">property()</span></tt
+                        >
+                        helps a lot, but isn't all I would like.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        The lexical scoping problems people have don't bother
+                        me. I wouldn't want Javascript-like variable
+                        declarations to define scope. It would be nice if Python
+                        gave an error earlier for scoping mistakes, though, and
+                        a better error too. I think this is statically
+                        detectable. Maybe something in addition to just the
+                        <tt class="docutils literal"
+                            ><span class="pre">global</span></tt
+                        >
+                        declaration would be useful. People ask for
+                        <tt class="docutils literal"
+                            ><span class="pre">lexical</span></tt
+                        >, and I can certainly see the benefit. (Note: this is
+                        only an issue when assigning to variables in enclosing
+                        scopes)
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Well, that's all for now. Now you know everything I think is
+                wrong with Python (that I can think of right now), and most of
+                what I think would make it right. Looking over it again, I
+                actually don't think it's that pie-in-the-sky, though some parts
+                (like
+                <tt class="docutils literal"><span class="pre">self</span></tt
+                >) are indeed tricky, and involve more than just syntactic
+                additions.
+            </p>
+            <p><strong>Update:</strong></p>
+            <ul class="simple">
+                <li>
+                    I didn't talk much about the standard library -- though
+                    there's a ton of issues there (maybe too many to create any
+                    simple list), and in many ways the backward compatibility
+                    issues can be harder. But after reading
+                    <a
+                        class="reference"
+                        href="http://atlee.ca/blog/2006/02/16/python-warts-1/"
+                        >this post</a
+                    >
+                    I remembered a more conservative change that I think would
+                    help a lot -- identify modules that may not be
+                    &quot;deprecated&quot; but are simply &quot;useless&quot;.
+                    The
+                    <a
+                        class="reference"
+                        href="http://python.org/doc/current/lib/module-stat.html"
+                        >stat</a
+                    >
+                    module, for instance, is largely useless -- its
+                    functionality has been mostly integrated into the return
+                    value of
+                    <tt class="docutils literal"
+                        ><span class="pre">os.stat</span></tt
+                    >
+                    (and that process could be finished by adding a couple
+                    methods). Now, I don't care if the
+                    <tt class="docutils literal"
+                        ><span class="pre">stat</span></tt
+                    >
+                    module stays around, but simply as a matter of presentation
+                    it shouldn't clutter the Python standard library landscape.
+                    Maybe that's just a matter of organizing how the stdlib is
+                    documented online. I want some editorial flavor to that
+                    presentation.
+                </li>
+                <li>
+                    I'd like
+                    <a class="reference" href="py-std.html">py.std</a> to be in
+                    builtins, so that you don't have to import every little
+                    function you are using from the standard library. I think
+                    this would significantly help programmer flow, with every
+                    bit as much readability (probably more readability) than the
+                    current mechanism.
+                    <tt class="docutils literal"
+                        ><span class="pre">std</span></tt
+                    >
+                    would not take the place of all uses of
+                    <tt class="docutils literal"
+                        ><span class="pre">import</span></tt
+                    >
+                    -- probably not even most uses -- but would be another way
+                    to spell that, and would decrease the import garbage which
+                    feels like litter at the top of my modules. That a module
+                    uses
+                    <tt class="docutils literal"
+                        ><span class="pre">re</span></tt
+                    >
+                    or
+                    <tt class="docutils literal"
+                        ><span class="pre">os</span></tt
+                    >
+                    or
+                    <tt class="docutils literal"
+                        ><span class="pre">textwrap</span></tt
+                    >
+                    is not interesting or useful knowledge worthy of becoming a
+                    kind of header for the module. If it uses
+                    <tt class="docutils literal"
+                        ><span class="pre">SimpleHTTPServer</span></tt
+                    >
+                    that <em>is</em> worthy of being noted in the header.
+                    There's a distinction to be made there.
+                    <tt class="docutils literal"
+                        ><span class="pre">std</span></tt
+                    >
+                    offers that distinction.
+                </li>
+                <li>
+                    I'd also add something like this
+                    <a
+                        class="reference"
+                        href="http://www.phyast.pitt.edu/~micheles/python/documentation.html"
+                        >decorator module</a
+                    >
+                    to the standard library. Right now decorators are slightly
+                    harder to write than they need to be, and the resulting
+                    decorators usually cover up important metadata about the
+                    function they wrap. This module would encourage higher
+                    quality decorators.
+                </li>
+                <li>
+                    And <em>obviously</em> tabs would not be allowed for
+                    indentation. I think any tab anywhere would be a syntax
+                    error (you'd have to use
+                    <tt class="docutils literal"
+                        ><span class="pre">\t</span></tt
+                    >
+                    if you want to talk about tabs). Maybe 1- and 3-space
+                    indentation would be disallowed too, but that's probably
+                    overboard. I don't <em>like</em> 2-space indentation, but 1
+                    is really hard to work with, and 3 spaces is just weird.
+                    OTOH, you don't actually see them often, even by mistake.
+                </li>
+            </ul>
+        </div>
+        <div class="dates" align="right">
+            Created 16 Feb '06<br />
+            Modified 17 Feb '06
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Well, I don't really need, or understand deeply, all the
+                    advanced/dynamic/metaclass features you're asking for, so
+                    I'll comment on the ones I care about.
+                </p>
+                <p>Definite agreement:</p>
+                <ul class="simple">
+                    <li>non-iterable strings</li>
+                    <li>Object initialization</li>
+                    <li>
+                        Microprocesses. This is the holy Python grail for me.
+                        They are so sweet in Erlang.
+                    </li>
+                    <li>
+                        Better tuple unpacking. Another win for Erlang that we
+                        could steal and improve. I like your examples.
+                    </li>
+                    <li>Same for signature unpacking.</li>
+                    <li>Explicit relative imports.</li>
+                    <li>orderby.</li>
+                    <li>Better reload().</li>
+                    <li>LINQ-like stuff.</li>
+                    <li>Unicode - my number 2 behind microprocesses.</li>
+                </ul>
+                <p>Questions:</p>
+                <ul class="simple">
+                    <li>
+                        You just say that __variables__ are lame, and mangling
+                        is better, without ever saying what you'd do about them.
+                        How does Python 4k handle private variables/name
+                        mangling properly?
+                    </li>
+                    <li>
+                        Why aren't &quot;?&quot; and &quot;!&quot; worth
+                        allowing in function names? I want these, personally. I
+                        feel like they would aid the descriptiveness of my code
+                        significantly. (How about &quot;-&quot;?)
+                    </li>
+                </ul>
+                <p>
+                    I'd add (and I don't follow python-dev, so forgive me if
+                    they exist/are coming soon):
+                </p>
+                <ul class="simple">
+                    <li>Built-in currying</li>
+                    <li>
+                        local variable dump in exceptions, like in cgi module
+                    </li>
+                    <li>Microprocesses. Oh, did I mention that one already?</li>
+                    <li>ipython in the standard distribution</li>
+                    <li>
+                        Real, Good, Pythonic, Documented, Cross-Platform GUI
+                        library. We're talking 4k here right? Can we ever make
+                        this happen?
+                    </li>
+                </ul>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://llimllib.f2o.org/blog">Bill Mill</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <ul class="simple">
+                        <li>
+                            By class-private variables I mean
+                            <tt class="docutils literal"
+                                ><span class="pre">__private</span></tt
+                            >, not
+                            <tt class="docutils literal"
+                                ><span class="pre">__magic__</span></tt
+                            >. Class-private variables are simply never needed.
+                            If you have
+                            <tt class="docutils literal"
+                                ><span class="pre"
+                                    >self.__really_private</span
+                                ></tt
+                            >
+                            you can just use
+                            <tt class="docutils literal"
+                                ><span class="pre"
+                                    >self._MyClass_really_private</span
+                                ></tt
+                            >
+                            for similar effect (actually
+                            <tt class="docutils literal"
+                                ><span class="pre"
+                                    >self._MyClass__really_private</span
+                                ></tt
+                            >
+                            is the <strong>identical</strong> effect)
+                        </li>
+                        <li>
+                            I think adding
+                            <tt class="docutils literal"
+                                ><span class="pre">?</span></tt
+                            >
+                            and
+                            <tt class="docutils literal"
+                                ><span class="pre">!</span></tt
+                            >
+                            to function names (or symbol names in general)
+                            changes the feel of the language too much. I'd add
+                            them if I was starting from zero, but at this point
+                            I wouldn't want to use those because it would be too
+                            jarring against the bulk of existing code. Dashes
+                            are, of course, completely out ;) Also, they
+                            conflict with outside naming conventions, making
+                            some Python symbols hard to access from other
+                            languages. I don't know if this is a big deal in
+                            practice, but I think there's something good about
+                            using a lowest-common-denominator in naming. Case
+                            sensitivity is useful for the same reason (though
+                            part of me would like to be case and underscore
+                            insensitive, to remove the source of needless style
+                            differences).
+                        </li>
+                    </ul>
+                    <p>For the things you would add:</p>
+                    <ul class="simple">
+                        <li>
+                            There is a proposal for a
+                            <tt class="docutils literal"
+                                ><span class="pre">partial</span></tt
+                            >
+                            function, which I think is what you mean by
+                            currying. Maybe in Python 2.5? I personally don't
+                            think it's very readable in practice.
+                            <tt class="docutils literal"
+                                ><span class="pre">lambda</span></tt
+                            >
+                            actually not half bad for this one case.
+                        </li>
+                        <li>
+                            I agree that a nicer interactive prompt -- roughly
+                            based on ipython I imagine -- would be very useful.
+                        </li>
+                        <li>
+                            Local variable dumping is possible currently, but
+                            not enabled in the default traceback. I don't know
+                            if it should be -- I think it's overwhelming except
+                            in interactive environments. It should be included
+                            in more interactive environments; maybe standard
+                            library support would help. Goes with the
+                            <tt class="docutils literal"
+                                ><span class="pre">__traceback_info__</span></tt
+                            >
+                            stuff.
+                        </li>
+                        <li>
+                            GUI library... seems too hard, even for 4K ;) If it
+                            hasn't happened outside of the standard library, how
+                            can it happen inside? Plus GUIs are the past, the
+                            web is the future ;) XUL will rock, though! I'll be
+                            all over that.
+                        </li>
+                    </ul>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-python-4k-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Bill: Check out PEP 309 for the currying/partial functions
+                    thing.
+                    <a
+                        class="reference"
+                        href="http://www.python.org/peps/pep-0309.html"
+                        >http://www.python.org/peps/pep-0309.html</a
+                    >. According to the PEP, it'll be in Python 2.5.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.holovaty.com/">Adrian Holovaty</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        PartialApplication is officially in for 2.5 I cannot
+                        resist pointing our my recipe here:
+                    </p>
+                    <p>
+                        <a
+                            class="reference"
+                            href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/440557"
+                            >http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/440557</a
+                        >
+                    </p>
+                    <p>It's sortof PA++ ;)</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-python-4k-comment-22.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://pythonzweb.blogspot.com">max khesin</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I very much want to see 'locals' and 'globals' be sort of
+                    accessible keywords much like you suggest 'super' and
+                    'self', and also 'class'. It'd make dealing with the various
+                    name-spaces a cinch. Or maybe 'module' instead of 'globals'.
+                </p>
+                <p>That'd be nice.</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Brantley
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Why Python 4k ? Since most of this is not backward
+                    compatible, I would be very thanksfull if you began making
+                    PEP's for it all.
+                </p>
+                <p>
+                    Personnally, don't understand all the stuff there but I vote
+                    for :
+                </p>
+                <ul class="simple">
+                    <li>really fast interpreter startup</li>
+                    <li>
+                        turns class into one of several possible constructor
+                        arguments
+                    </li>
+                    <li>order by syntax</li>
+                    <li>
+                        microprocesses (don't yet read about it but sounds
+                        cool).
+                    </li>
+                </ul>
+                <p>
+                    About your assertion that GUI is old-style, I'm not totally
+                    convinced but I really think, GUI should be able to use
+                    bookmarks, protocols and REST style programming. What I see
+                    as a limitation in web style programming is the lack for
+                    &quot;push&quot; facilities.
+                </p>
+                <p>Thanks for this wonderfull post.</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Alex Garel
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        The GUI stuff was really my slightly facetious rejection
+                        of those people who complain about how inelegent web
+                        programming is, and how it should be more like GUI
+                        programming. I think they are just opening a can of
+                        worms for themselves, by trying to impose a style of
+                        programming they are familiar with to a domain where it
+                        is not appropriate. Of course, I also think GUI
+                        programming is a bit retro all considered -- I genuinely
+                        think that as a user, not just as a programmer. But that
+                        only directs my interest, it doesn't really effect the
+                        language much one way or the other.
+                    </p>
+                    <p>
+                        Some of these aren't language extensions per se, but
+                        just hard implementation problems: microprocesses are an
+                        example of that, as is interpreter startup. I am hopeful
+                        that PyPy will open up this kind of development.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-python-4k-comment-10.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Good Ideas but please let strings yield characters on
+                    iteration :-) I've much code using string iteration.
+                </p>
+                <p>
+                    And self/cls should'nt be keywords and should be the first
+                    parameter of method. Really :)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.active-4.com">Armin Ronacher</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        String iteration just doesn't make sense. They don't
+                        yield characters... they just yield smaller strings.
+                        Strings that contain strings that contain strings.
+                        Strings just aren't containers in Python -- they are
+                        indexable, but to iterate something should be a
+                        container. It's only (IMHO) an accident of an earlier
+                        Python that didn't have the iterator protocol, that you
+                        can iterate over strings. Strings should grow a method
+                        like
+                        <tt class="docutils literal"
+                            ><span class="pre">.chars()</span></tt
+                        >
+                        that yields all the characters. Of course, not backward
+                        compatible, but the errors should be obvious
+                        (&quot;TypeError: strings are not iterable&quot;).
+                    </p>
+                    <p>
+                        I've been thinking about the
+                        <tt class="docutils literal"
+                            ><span class="pre">self</span></tt
+                        >
+                        thing more. It's one of the hardest to resolve issues
+                        (and I doubt it will be resolved). But I think it would
+                        be reasonable if functions defined in a class scope
+                        meant something different than a function defined
+                        outside of a class scope. So if you were injecting a
+                        function definition into a class, it would (reasonably)
+                        work just like it does now, with an explicit
+                        <tt class="docutils literal"
+                            ><span class="pre">self</span></tt
+                        >
+                        parameter. But if you are doing it in a class scope, the
+                        metaclass (<tt class="docutils literal"
+                            ><span class="pre">type</span></tt
+                        >) wraps the function in some fashion. It seems less
+                        intrusive than class-private variables, even (which are
+                        statically determined).
+                    </p>
+                    <p>
+                        The self parameter also works badly with decorators,
+                        though the same might be true if that parameter was
+                        removed. Getting a decorator to act properly with a
+                        method and with a function is hard.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-python-4k-comment-12.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I certainly agree with some of the changes, like something
+                    as basic as proper relative imports. But I think I hear too
+                    many &quot;GUI is old style, the web is the future&quot;
+                    comments from a lot of programmers that are more
+                    over-enthusiasm for new web technologies rather than a
+                    careful look at why we keep and discard old/new technologies
+                    in general. As others have pointed out, even new
+                    asynchronous web technologies are still unidirectional in
+                    one sense: the client makes a request, and only then does
+                    the server send a reply. Web servers don't initiate requests
+                    to web browsers, although traditional networked GUI
+                    applications do this all the time. In tech history, we've
+                    gone from assembly language (independent of hardware), to
+                    portable languages (independent of assembly language), and
+                    now to various styles of cross-platform (independent of OS
+                    or basic platform). It's not just the web, but any
+                    successful model of cross-platform apps that is the future.
+                    The web is the future only because the browser is
+                    ubiquitous, but in the end I still have to install Firefox,
+                    etc. to be able to use the latest web technology. With
+                    things like PyGTK and wxPython, I can have the same ubiquity
+                    for GUI apps too. It's all the same: I download the app
+                    through my browser when I visit a page, or I download the
+                    Python script and run it. (P.S. I do agree with a lot of
+                    Ian's points in general. Sorry if this sounds like
+                    trolling).
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Rob Walker
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I don't personally find Python wishlists that interesting,
+                    especially the ones which propose language changes, but it's
+                    good to see that you've touched on issues with the runtime
+                    itself because that is where Python (the platform) should be
+                    innovating, or at least fixing itself a fair amount. The
+                    problem is that because the language syntax is the thing
+                    most people have direct experience with (and one can become
+                    superficially acquainted with Python in that way, provoking
+                    the &quot;whitespace sucks&quot; arguments offered by
+                    detractors/newcomers), people feel more inclined to suggest
+                    tweaks which frequently say more about their own habits (at
+                    many different levels) rather than to seriously think about
+                    some of the harder issues - things like concurrency,
+                    performance, predictability, memory usage and library
+                    support - and then provide improvements in those areas. And
+                    when the harder issues do manage to enter the scene,
+                    proposals like optional static typing emerge: the arguably
+                    lazy and inadequate approach to dealing with such issues.
+                </p>
+                <p>
+                    Certainly, I don't see Python diminishing in (relative)
+                    popularity because of the lack of some language constructs
+                    or notation: it's more likely to happen because Python
+                    doesn't conveniently work well with or support other,
+                    popular technologies, isn't perceived to scale well (in a
+                    way that involves convenient programming techniques), or
+                    isn't perceived to have good enough documentation - the
+                    latter being another story entirely.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Paul Boddie</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    My personal feeling is that a multi-line lambda is a
+                    mistake, like Guido says. However, I agree with the
+                    functionally oriented people that having to use a local
+                    named function breaks code locality and tends to make it
+                    hard to follow the code in Python written with a more
+                    functional flavor.
+                </p>
+                <p>
+                    I think that the right Pythonic answer is to introduce a
+                    syntax kind of like ruby blocks where a function call can
+                    optionally be followed by a colon, then arg list and a suite
+                    underneath and that the arguments and suite would be
+                    converted to a local function passed as the last argument to
+                    the function. Here is an example:
+                </p>
+                <pre class="literal-block">
 def open_in( filename, block ):
   f = open( filename )
   try:
@@ -444,101 +1389,326 @@ max_char = open_in( &quot;foo.txt&quot; ): (f)
   for l in f:
      x = max(x, len(l))
   return x
-</pre>
-<p>Or something like that. There are a few warts:</p>
-<ul class="simple">
-<li>The arg list of the anonymous block is awkward, maybe another colon at the end would help.</li>
-<li>The block is a lexical closure, not in the same frame as the outside function so you get the usual assignment to local problem, but its worse because it looks like a suite in the local scope the same way <tt class="docutils literal"><span class="pre">for</span></tt> and <tt class="docutils literal"><span class="pre">while</span></tt> suites are. That makes its more confusing.</li>
-<li>In a similar vein you need a return or yield in the block to get a result out which makes simple things like reduce look painful (but list comprehension saves filters and maps).</li>
-</ul>
-<p>To see what I mean about the return or yield thing, here is an example. First the new form of <tt class="docutils literal"><span class="pre">reduce</span></tt>:</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>Or something like that. There are a few warts:</p>
+                <ul class="simple">
+                    <li>
+                        The arg list of the anonymous block is awkward, maybe
+                        another colon at the end would help.
+                    </li>
+                    <li>
+                        The block is a lexical closure, not in the same frame as
+                        the outside function so you get the usual assignment to
+                        local problem, but its worse because it looks like a
+                        suite in the local scope the same way
+                        <tt class="docutils literal"
+                            ><span class="pre">for</span></tt
+                        >
+                        and
+                        <tt class="docutils literal"
+                            ><span class="pre">while</span></tt
+                        >
+                        suites are. That makes its more confusing.
+                    </li>
+                    <li>
+                        In a similar vein you need a return or yield in the
+                        block to get a result out which makes simple things like
+                        reduce look painful (but list comprehension saves
+                        filters and maps).
+                    </li>
+                </ul>
+                <p>
+                    To see what I mean about the return or yield thing, here is
+                    an example. First the new form of
+                    <tt class="docutils literal"
+                        ><span class="pre">reduce</span></tt
+                    >:
+                </p>
+                <pre class="literal-block">
 def reduce( l, v, f ):
   for x in l:
     v = f( v, x )
   return initial
-</pre>
-<p>Now, the clunky way to write a sum:</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>Now, the clunky way to write a sum:</p>
+                <pre class="literal-block">
 sum = reduce( x, 0 ): (a,b)
     return a+b
-</pre>
-<p>Vs, the more elegant (IMHO):</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>Vs, the more elegant (IMHO):</p>
+                <pre class="literal-block">
 sum = reduce( x, 0 ): (a,b)
     a+b
-</pre>
-<p>However, sum is a simple contrived example because of course sums, products, any, and all should be built in, and possibly the only real uses involve suites large enough that return or yield is help in understanding, instead of a hindrance.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-9.html" rel="nofollow">#</a> <a href="http://">Alan Falloon</a></div><hr noshade>
- &lt;pre&gt;<br />interface IFoo(Bar):<br />    a = 1<br />&lt;/pre&gt;<br /><br />Consider this declaration means:<br /><br />&lt;pre&gt;<br />def tmp():<br />    a = 1<br />IFoo = interface('IFoo', (Bar,), tmp)<br />&lt;/pre&gt;<br /><br />With this we can express user defined function definition. Interface or class declaration can be emulated by executing tmp and using its local scope as definitions list.
- <div align="right"><a href="http://blog.ianbicking.org/mypython4kcomment11.html" rel="nofollow">#</a> irg</div><hr noshade>
- 
-<div class="document">
-<p>&quot;I actually like ? and ! in function names, as in Scheme. But I don't think it is worth adding.&quot;</p>
-<p>Scheme? I thought Ruby invented that! ;)</p>
-<p>In any case, I hear you on the whitespace with one exception: I wonder if comments should be exempt from that rule. Sometimes it's just easier to scan down through a file when the important comments are left-aligned.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-13.html" rel="nofollow">#</a> <a href="http://www.joegrossberg.com">Joe Grossberg</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p><em>Sometimes it's just easier to scan down through a file when the important comments are left-aligned.</em></p>
-<p>Can't you do that right now?  I just tried it and it seems to work fine.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-14.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Surely you meant to write &quot;py-in-the-sky&quot;?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-15.html" rel="nofollow">#</a> <a href="http://cardboard.nu">Alan Green</a></div><hr noshade>
- 
-<div class="document">
-<p>I think making <tt class="docutils literal"><span class="pre">self.something</span></tt> spellable as <tt class="docutils literal"><span class="pre">.something</span></tt> would be nice.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-16.html" rel="nofollow">#</a> <a href="http://maluke.com/blog/">Sergey Schetinin</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Not a big fan of that myself.  I guess I usually read code in my head on some level, and <tt class="docutils literal"><span class="pre">.something</span></tt> isn't readable in the same way <tt class="docutils literal"><span class="pre">self.something</span></tt> is.  Also, that dot is really small.  As a separator that's size fine -- good even -- but if it is an independent modifier that's bothersome.  Plus I'm not so much looking to save a few keystrokes by taking it out of the signature, as much as bringing some symmetry in signature and use.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-17.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>&quot;Turning = into an expression. To generalize: dynamic typing adds some usually shallow errors in return for far more expressive code. Assignment as an expression adds some really obnoxious errors (ones that don't raise exceptions) in return for minor expressiveness. That = isn't an expression catches me from making hard bugs almost every day (instead they are easy syntax error bugs).</p>
-<p>I'd be fine with := as an assignment-expression, because I wouldn't misspell it. That would certainly be useful. The minimalists would hate this.
-&quot;</p>
-<p>I'm guessing yu'll be using = for equality?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-18.html" rel="nofollow">#</a> <a href="http://aida.homelinux.net/wordpress/">didier</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p><em>I'm guessing yu'll be using = for equality?</em></p>
-<p>No, nothing so dramatic; instead adding <tt class="docutils literal"><span class="pre">:=</span></tt> as another way to do assignment, allowed in expressions.  This is why minimalists would hate it (and not without justification).  My real problem making assignment into an expression is that it's really easy to spell <tt class="docutils literal"><span class="pre">==</span></tt> as <tt class="docutils literal"><span class="pre">=</span></tt>, with disasterous consequences.  It's really hard to accidentally leave out an <tt class="docutils literal"><span class="pre">=</span></tt> <em>and</em> add in a <tt class="docutils literal"><span class="pre">:</span></tt>, so with <tt class="docutils literal"><span class="pre">:=</span></tt> I don't expect that typos will be too much of a problem.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-20.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>I like the way you're handling self and cls. One thing to note here is that any method that contains a self. is an instance method, any method that contains a cls. is a class method if it doesn't contain a self. as well. If it contains neither, it's a static method. Both the classmethod and staticmethod functions go away.</p>
-<p>Another minor point here is that allowing both self. and cls. in the same method gives you access to the class object without any special syntax.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-19.html" rel="nofollow">#</a> John Roth</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>I don't know... I'd consider that much too magical and opaque. »Explicit is better than implicit«, right?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/my-python-4k-comment-21.html" rel="nofollow">#</a> <a href="http://www.mulk.de.vu/">Matthias Benkard</a></div><hr noshade>
-</blockquote>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                >
+                <p>
+                    However, sum is a simple contrived example because of course
+                    sums, products, any, and all should be built in, and
+                    possibly the only real uses involve suites large enough that
+                    return or yield is help in understanding, instead of a
+                    hindrance.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-9.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Alan Falloon</a>
+            </div>
+            <hr noshade />
+            &lt;pre&gt;<br />interface IFoo(Bar):<br />    a = 1<br />&lt;/pre&gt;<br /><br />Consider
+            this declaration means:<br /><br />&lt;pre&gt;<br />def tmp():<br />   
+            a = 1<br />IFoo = interface('IFoo', (Bar,), tmp)<br />&lt;/pre&gt;<br /><br />With
+            this we can express user defined function definition. Interface or
+            class declaration can be emulated by executing tmp and using its
+            local scope as definitions list.
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/mypython4kcomment11.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                irg
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    &quot;I actually like ? and ! in function names, as in
+                    Scheme. But I don't think it is worth adding.&quot;
+                </p>
+                <p>Scheme? I thought Ruby invented that! ;)</p>
+                <p>
+                    In any case, I hear you on the whitespace with one
+                    exception: I wonder if comments should be exempt from that
+                    rule. Sometimes it's just easier to scan down through a file
+                    when the important comments are left-aligned.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-13.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.joegrossberg.com">Joe Grossberg</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        <em
+                            >Sometimes it's just easier to scan down through a
+                            file when the important comments are
+                            left-aligned.</em
+                        >
+                    </p>
+                    <p>
+                        Can't you do that right now? I just tried it and it
+                        seems to work fine.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-python-4k-comment-14.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>Surely you meant to write &quot;py-in-the-sky&quot;?</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-15.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://cardboard.nu">Alan Green</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I think making
+                    <tt class="docutils literal"
+                        ><span class="pre">self.something</span></tt
+                    >
+                    spellable as
+                    <tt class="docutils literal"
+                        ><span class="pre">.something</span></tt
+                    >
+                    would be nice.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-16.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://maluke.com/blog/">Sergey Schetinin</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Not a big fan of that myself. I guess I usually read
+                        code in my head on some level, and
+                        <tt class="docutils literal"
+                            ><span class="pre">.something</span></tt
+                        >
+                        isn't readable in the same way
+                        <tt class="docutils literal"
+                            ><span class="pre">self.something</span></tt
+                        >
+                        is. Also, that dot is really small. As a separator
+                        that's size fine -- good even -- but if it is an
+                        independent modifier that's bothersome. Plus I'm not so
+                        much looking to save a few keystrokes by taking it out
+                        of the signature, as much as bringing some symmetry in
+                        signature and use.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-python-4k-comment-17.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    &quot;Turning = into an expression. To generalize: dynamic
+                    typing adds some usually shallow errors in return for far
+                    more expressive code. Assignment as an expression adds some
+                    really obnoxious errors (ones that don't raise exceptions)
+                    in return for minor expressiveness. That = isn't an
+                    expression catches me from making hard bugs almost every day
+                    (instead they are easy syntax error bugs).
+                </p>
+                <p>
+                    I'd be fine with := as an assignment-expression, because I
+                    wouldn't misspell it. That would certainly be useful. The
+                    minimalists would hate this. &quot;
+                </p>
+                <p>I'm guessing yu'll be using = for equality?</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-18.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://aida.homelinux.net/wordpress/">didier</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p><em>I'm guessing yu'll be using = for equality?</em></p>
+                    <p>
+                        No, nothing so dramatic; instead adding
+                        <tt class="docutils literal"
+                            ><span class="pre">:=</span></tt
+                        >
+                        as another way to do assignment, allowed in expressions.
+                        This is why minimalists would hate it (and not without
+                        justification). My real problem making assignment into
+                        an expression is that it's really easy to spell
+                        <tt class="docutils literal"
+                            ><span class="pre">==</span></tt
+                        >
+                        as
+                        <tt class="docutils literal"
+                            ><span class="pre">=</span></tt
+                        >, with disasterous consequences. It's really hard to
+                        accidentally leave out an
+                        <tt class="docutils literal"
+                            ><span class="pre">=</span></tt
+                        >
+                        <em>and</em> add in a
+                        <tt class="docutils literal"
+                            ><span class="pre">:</span></tt
+                        >, so with
+                        <tt class="docutils literal"
+                            ><span class="pre">:=</span></tt
+                        >
+                        I don't expect that typos will be too much of a problem.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-python-4k-comment-20.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I like the way you're handling self and cls. One thing to
+                    note here is that any method that contains a self. is an
+                    instance method, any method that contains a cls. is a class
+                    method if it doesn't contain a self. as well. If it contains
+                    neither, it's a static method. Both the classmethod and
+                    staticmethod functions go away.
+                </p>
+                <p>
+                    Another minor point here is that allowing both self. and
+                    cls. in the same method gives you access to the class object
+                    without any special syntax.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-python-4k-comment-19.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                John Roth
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I don't know... I'd consider that much too magical and
+                        opaque. »Explicit is better than implicit«, right?
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-python-4k-comment-21.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.mulk.de.vu/">Matthias Benkard</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

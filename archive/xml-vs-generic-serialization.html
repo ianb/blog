@@ -1,98 +1,135 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>XML vs. generic serialization</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>XML vs. generic serialization</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>XML vs. generic serialization</h1>
+        <p>
+            Sean McGrath
+            <a
+                href="http://seanmcgrath.blogspot.com/archives/2004_09_12_seanmcgrath_archive.html#109551766645487462"
+                >wonders about loading XML</a
+            >; particularly, he notes a claim that XML serialization and
+            deserialization (parsing) is faster than Java's object serialization
+            of a DOM, and wonders about Python's serialization (via
+            <a href="http://python.org/doc/current/lib/module-pickle.html"
+                >pickle</a
+            >).
+        </p>
 
-<div style="float: right">
+        <p>
+            If you think about it, it makes sense. First, we're talking about
+            serializing an in-language representation of an XML document; you
+            can serialize any object to XML (<a
+                href="http://gnosis.cx/download/gnosis/xml/pickle/"
+                >e.g.</a
+            >), but that's bound to be slower than the native serialization,
+            since the native serialization (if implemented properly) is more
+            compact.
+        </p>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+        <p>
+            But XML isn't hard to parse. It's quite restrictive, and a good XML
+            parser that produces a DOM object will mostly do the work it needs
+            to do, and no more. And you can't get a lot more compact than the
+            XML document, unless you are performing some sort of compression
+            (which has performance penalties of its own). If you used generic
+            serialization, the disk representation would have to contain all
+            sorts of metadata about Node objects and Attribute objects and
+            whatnot. Not only is that more data to read through, but generic
+            deserialization has to actually pay attention to that information.
+        </p>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>XML vs. generic serialization</h1>
- <p>
+        <p>
+            This was something I played with back when trying to optimize
+            <a href="http://blog.colorstudy.com/ianb/weblog/2003/10/26.html#P22"
+                >Kata 19</a
+            >. In that case, I was reading <tt>/etc/words</tt>, and creating a
+            graph based on those. I thought I could save some effort by saving a
+            pickle of the graph that I created. But in fact it was dramatically
+            slower -- the pickle was much larger, and merely the extra effort of
+            reading the file outweighed the effort that went into constructing
+            the graph. The graph itself was merely a dictionary; and
+            <a href="http://python.org/doc/current/lib/module-marshal.html"
+                >marshal</a
+            >
+            (which is more restrictive than pickle) wasn't significantly better.
+        </p>
 
-Sean McGrath <a href="http://seanmcgrath.blogspot.com/archives/2004_09_12_seanmcgrath_archive.html#109551766645487462">wonders
-about loading XML</a>; particularly, he notes a claim that XML
-serialization and deserialization (parsing) is faster than Java's
-object serialization of a DOM, and wonders about Python's
-serialization (via <a href="http://python.org/doc/current/lib/module-pickle.html">pickle</a>).
+        <p>
+            So, I imagine it can be the same with XML -- either way you have to
+            rebuild the objects, and XML is of course well-suited to producing
+            an object that represents XML.
+        </p>
 
-<p>
+        <div class="dates" align="right">
+            Created 21 Sep '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            I think Java is more fast than XML serialization, it's just on the
+            Windows platform some slow-downs.
+            <br />
+            Maybe reading this article will help:
+            <br />
+            <a
+                href="http://www.wdvl.com/Authoring/Languages/XML/Java/serialization.html"
+                target="_blank"
+                >http://www.wdvl.com/Authoring/Languages/XML/Java/serialization.html</a
+            >
+            <br />
 
-If you think about it, it makes sense.  First, we're talking about
-serializing an in-language representation of an XML document; you can
-serialize any object to XML (<a href="http://gnosis.cx/download/gnosis/xml/pickle/">e.g.</a>), but
-that's bound to be slower than the native serialization, since the
-native serialization (if implemented properly) is more compact.
-
-<p>
-
-But XML isn't hard to parse.  It's quite restrictive, and a good XML
-parser that produces a DOM object will mostly do the work it needs to
-do, and no more.  And you can't get a lot more compact than the XML
-document, unless you are performing some sort of compression (which
-has performance penalties of its own).  If you used generic
-serialization, the disk representation would have to contain all sorts
-of metadata about Node objects and Attribute objects and whatnot.  Not
-only is that more data to read through, but generic deserialization
-has to actually pay attention to that information.
-
-<p>
-
-This was something I played with back when trying to optimize <a href="http://blog.colorstudy.com/ianb/weblog/2003/10/26.html#P22">Kata
-19</a>.  In that case, I was reading <tt>/etc/words</tt>, and creating
-a graph based on those.  I thought I could save some effort by saving
-a pickle of the graph that I created.  But in fact it was dramatically
-slower -- the pickle was much larger, and merely the extra effort of
-reading the file outweighed the effort that went into constructing the
-graph.  The graph itself was merely a dictionary; and <a href="http://python.org/doc/current/lib/module-marshal.html">marshal</a>
-(which is more restrictive than pickle) wasn't significantly better.
-
-<p>
-
-So, I imagine it can be the same with XML -- either way you have to
-rebuild the objects, and XML is of course well-suited to producing an
-object that represents XML.
- <div class="dates" align="right">
-Created 21 Sep '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- I think Java is more fast than XML serialization, it's just on the Windows platform some slow-downs.
-<br />
-Maybe reading this article will help:
-<br />
-<a href="http://www.wdvl.com/Authoring/Languages/XML/Java/serialization.html" target="_blank">http://www.wdvl.com/Authoring/Languages/XML/Java/serialization.html</a>
-<br />
-
-<br />
-<a href="http://www.full-gba-roms.tk" target="_blank">http://www.full-gba-roms.tk</a>
- <div align="right"><a href="http://blog.ianbicking.org/comment351.html" rel="nofollow">#</a> <a href="http://www.full-gba-roms.tk/">Desco Rigato</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <br />
+            <a href="http://www.full-gba-roms.tk" target="_blank"
+                >http://www.full-gba-roms.tk</a
+            >
+            <div align="right">
+                <a href="https://ianbicking.org/comment351.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.full-gba-roms.tk/">Desco Rigato</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

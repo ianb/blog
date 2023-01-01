@@ -1,94 +1,130 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Descriptor Nit</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Descriptor Nit</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Descriptor Nit</h1>
+        <p>
+            There are some problems with
+            <a
+                href="http://blog.colorstudy.com/ianb/weblog/2004/07/15.html#P131"
+                ><tt>setonce</tt></a
+            >, one being that the resulting classes can't be pickled, because
+            the attributes are unstable. <tt>setonce</tt> stores its data in the
+            instance in a numbered attribute (e.g., <tt>_setonce_attr_15</tt>),
+            and that number can change depending on the order in which you
+            construct classes and attributes.
+        </p>
 
-<div style="float: right">
+        <p>
+            It would be better if <tt>setonce</tt> named that attribute
+            something like <tt>_setonce_classname_attrname</tt>, which would be
+            stable. Relatedly, it would be nice if the errors could included the
+            real attribute name.
+        </p>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+        <p>
+            The problem is that <tt>setonce</tt> doesn't know where it is being
+            used. It's just an anonymous object, and only when you actually get
+            or set an attribute can it tell what object or class it is bound to,
+            and it <i>still</i> can't tell what attribute it is bound to.
+        </p>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Descriptor Nit</h1>
- <p>
-There are some problems with <a href="http://blog.colorstudy.com/ianb/weblog/2004/07/15.html#P131"><tt>setonce</tt></a>,
-one being that the resulting classes can't be pickled, because the
-attributes are unstable.  <tt>setonce</tt> stores its data in the
-instance in a numbered attribute (e.g., <tt>_setonce_attr_15</tt>),
-and that number can change depending on the order in which you
-construct classes and attributes.
+        <p>
+            IMHO, this is a serious flaw in
+            <a href="http://users.rcn.com/python/download/Descriptor.htm"
+                >descriptors</a
+            >. <i>Most</i> of the time I want to know what class and attribute a
+            descriptor is being assigned to (this comes up a lot in
+            <a href="http://sqlobject.org">SQLObject</a> particularly).
+        </p>
 
-<p>
-It would be better if <tt>setonce</tt> named that attribute something
-like <tt>_setonce_classname_attrname</tt>, which would be stable.
-Relatedly, it would be nice if the errors could included the real
-attribute name.
+        <p>
+            One possibility is to use a metaclass that goes in and finds all the
+            descriptors with a certain method (say, <tt>__setclass__</tt>), and
+            call something like
+            <tt>descriptor.__setclass__(classObject, attributeName)</tt>. It
+            would be nice if there was a convention for this; even nicer if it
+            was built into <tt>type</tt> (the default metaclass). There are
+            various questions: Should <tt>__setclass__</tt> return a value?
+            Maybe a new descriptor? Optionally? Does this all happen before or
+            after the class is created? If before, what do we pass in in lieue
+            of <tt>classObject</tt>? Does this get called only for descriptors
+            that are being added, not for descriptors in superclasses? These
+            aren't particularly hard questions to answer, but if different
+            people will answer them differently unless we have some convention
+            in place.
+        </p>
 
-<p>
-The problem is that <tt>setonce</tt> doesn't know where it is being
-used.  It's just an anonymous object, and only when you actually get
-or set an attribute can it tell what object or class it is bound to,
-and it <i>still</i> can't tell what attribute it is bound to.
+        <div class="dates" align="right">
+            Created 15 Jul '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            FYI, check out the peak.binding.once.Activator metaclass for an
+            example of something that does what you're trying to do here.
+            <br />
 
-<p>
-IMHO, this is a serious flaw in <a href="http://users.rcn.com/python/download/Descriptor.htm">descriptors</a>.
-<i>Most</i> of the time I want to know what class and attribute a
-descriptor is being assigned to (this comes up a lot in <a href="http://sqlobject.org">SQLObject</a> particularly).
+            <br />
+            Specifically, it tries to adapt all its new attributes to
+            IActiveDescriptor. If they adapt, it calls the descriptor's
+            'activateInClass(klass,name)' method, and stores the result in the
+            class dictionary in place of the original descriptor. This happens
+            after the class is created, but before it's returned from __new__.
+            <br />
 
-<p>
-One possibility is to use a metaclass that goes in and finds all the
-descriptors with a certain method (say, <tt>__setclass__</tt>), and
-call something like <tt>descriptor.__setclass__(classObject,
-attributeName)</tt>.  It would be nice if there was a convention for
-this; even nicer if it was built into <tt>type</tt> (the default
-metaclass).  There are various questions: Should <tt>__setclass__</tt>
-return a value?  Maybe a new descriptor?  Optionally?  Does this all
-happen before or after the class is created?  If before, what do we
-pass in in lieue of <tt>classObject</tt>?  Does this get called only
-for descriptors that are being added, not for descriptors in
-superclasses?  These aren't particularly hard questions to answer, but
-if different people will answer them differently unless we have some
-convention in place.
- <div class="dates" align="right">
-Created 15 Jul '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- FYI, check out the peak.binding.once.Activator metaclass for an example of something that does what you're trying to do here.
-<br />
-
-<br />
-Specifically, it tries to adapt all its new attributes to IActiveDescriptor.  If they adapt, it calls the descriptor's 'activateInClass(klass,name)' method, and stores the result in the class dictionary in place of the original descriptor.  This happens after the class is created, but before it's returned from __new__.
-<br />
-
-<br />
-This approach has worked well for PEAK for over a year now, so if you're trying to get or set a de facto standard, maybe you should follow that one.  ;)
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment209.html" rel="nofollow">#</a> Phillip J. Eby</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <br />
+            This approach has worked well for PEAK for over a year now, so if
+            you're trying to get or set a de facto standard, maybe you should
+            follow that one. ;)
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment209.html" rel="nofollow"
+                    >#</a
+                >
+                Phillip J. Eby
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

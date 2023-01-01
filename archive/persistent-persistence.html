@@ -1,323 +1,693 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Persistent Persistence</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Persistent Persistence</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Persistent Persistence</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                When I first put user accounts into the
+                <a
+                    class="reference"
+                    href="http://wiki.webwareforpython.org/thiswiki.html"
+                    >wiki</a
+                >, I did it the simplest way I could -- I pickled each
+                <tt class="docutils literal"><span class="pre">User</span></tt>
+                object to disk. Then a little later I refactored the layout, so
+                all the modules changed locations -- and the pickles broke. I
+                could have tried to fix them -- maybe editing them by hand
+                (there weren't many), or putting files back in place,
+                unpickling, then reconstructing them. Either way it's a total
+                pain in the ass.
+            </p>
+            <p>
+                There weren't many accounts, so I just blew them away and stored
+                user information in flat files (<a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-rfc822.html"
+                    >rfc822</a
+                >
+                style). Now I don't have to worry about this in the future, as
+                the data is stored very transparently, and forward and backward
+                compatibility can be managed on an as-needed basis.
+            </p>
+            <p>
+                My conclusion? Never keep anything you care about in a pickle,
+                at any point you should be able to blow it away. If you can't,
+                then pickle isn't right for you.
+            </p>
+            <p>
+                A corollary: do keep things in explicitly formatted text files,
+                maybe XML (or even
+                <a class="reference" href="http://www.yaml.org/">YAML</a>),
+                maybe simpler than that (like RFC822, i.e., mail-header style).
+            </p>
+            <p>
+                The reason I like an RDBMS is because it's almost as good as a
+                flat text file, but with a bunch of extra features. Any good
+                RDBMS can be serialized to a sequence of SQL statements, again
+                increasing transparency. Mapping between Python and the RDBMS is
+                explicit, which is good -- because the data will probably live
+                longer than the code, so the code should adapt to the data, not
+                the other way around. The formality of an RDBMS -- type
+                restrictions and all -- again safeguards the data.
+            </p>
+            <p>
+                And perhaps a corollary: I'm not a big fan of using lots of
+                stored procedures and other related features (many uses of
+                triggers and views, for instance). I'm trying to
+                <em>protect</em> the data from the code, and putting code in the
+                database compromises that. Though I'm still trying to figure out
+                what the right balance is, where data integrity should (or can)
+                be ensured, what logic is intrinsic to the database.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 26 May '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            You can dissect pickles for which you do not have the original
+            source by subclassing Unpickler and overriding stuff like
+            find_class.. It's not as painful as you make it sound.
+            <br />
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+            <br />
+            rfc822, xml, etc. aren't very good at object graphs and memoizing :)
+            <div align="right">
+                <a href="https://ianbicking.org/comment48.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            Perhaps you should take a look at
+            <a href="http://xmlobject.base-art.net/" target="_blank"
+                >http://xmlobject.base-art.net/</a
+            >
+            :)
+            <br />
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Persistent Persistence</h1>
- 
-<div class="document">
-<p>When I first put user accounts into the <a class="reference" href="http://wiki.webwareforpython.org/thiswiki.html">wiki</a>, I did it the simplest
-way I could -- I pickled each <tt class="docutils literal"><span class="pre">User</span></tt> object to disk.  Then a little
-later I refactored the layout, so all the modules changed locations --
-and the pickles broke.  I could have tried to fix them -- maybe
-editing them by hand (there weren't many), or putting files back in
-place, unpickling, then reconstructing them.  Either way it's a total
-pain in the ass.</p>
-<p>There weren't many accounts, so I just blew them away and stored user
-information in flat files (<a class="reference" href="http://python.org/doc/current/lib/module-rfc822.html">rfc822</a> style).  Now I don't have to worry
-about this in the future, as the data is stored very transparently,
-and forward and backward compatibility can be managed on an as-needed
-basis.</p>
-<p>My conclusion?  Never keep anything you care about in a pickle, at any
-point you should be able to blow it away.  If you can't, then pickle
-isn't right for you.</p>
-<p>A corollary: do keep things in explicitly formatted text files, maybe
-XML (or even <a class="reference" href="http://www.yaml.org/">YAML</a>), maybe simpler than that (like RFC822, i.e.,
-mail-header style).</p>
-<p>The reason I like an RDBMS is because it's almost as good as a flat
-text file, but with a bunch of extra features.  Any good RDBMS can be
-serialized to a sequence of SQL statements, again increasing
-transparency.  Mapping between Python and the RDBMS is explicit, which
-is good -- because the data will probably live longer than the code,
-so the code should adapt to the data, not the other way around.  The
-formality of an RDBMS -- type restrictions and all -- again safeguards
-the data.</p>
-<p>And perhaps a corollary: I'm not a big fan of using lots of stored
-procedures and other related features (many uses of triggers and
-views, for instance).  I'm trying to <em>protect</em> the data from the code,
-and putting code in the database compromises that.  Though I'm still
-trying to figure out what the right balance is, where data integrity
-should (or can) be ensured, what logic is intrinsic to the database.</p>
-</div>
- <div class="dates" align="right">
-Created 26 May '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- You can dissect pickles for which you do not have the original source by subclassing Unpickler and overriding stuff like find_class..  It's not as painful as you make it sound.
-<br />
+            <br />
 
-<br />
-rfc822, xml, etc. aren't very good at object graphs and memoizing :)
- <div align="right"><a href="http://blog.ianbicking.org/comment48.html" rel="nofollow">#</a> <a href="http://bob.pycs.net/">Bob Ippolito</a></div><hr noshade>
- Perhaps you should take a look at <a href="http://xmlobject.base-art.net/" target="_blank">http://xmlobject.base-art.net/</a> :)
-<br />
+            <br />
+            Bye Bye
+            <div align="right">
+                <a href="https://ianbicking.org/comment49.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://larsen-b.com/">jkx</a>
+            </div>
+            <hr noshade />
+            xmlobject is GPL. I wouldn't even give it a second glance. GPL is ok
+            for applications, but way more trouble than it's worth for
+            libraries.
+            <div align="right">
+                <a href="https://ianbicking.org/comment50.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            Ian: "My conclusion? Never keep anything you care about in a pickle,
+            at any point you should be able to blow it away. If you can't, then
+            pickle isn't right for you."
+            <br />
 
-<br />
+            <br />
+            Hmm. By extension, would you say the same applies to
+            <br />
+            keeping things you care about in the ZODB?
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment51.html" rel="nofollow"
+                    >#</a
+                >
+                Don Wong
+            </div>
+            <hr noshade />
+            related:
+            <br />
 
-<br />
-Bye Bye
- <div align="right"><a href="http://blog.ianbicking.org/comment49.html" rel="nofollow">#</a> <a href="http://larsen-b.com/">jkx</a></div><hr noshade>
- xmlobject is GPL.  I wouldn't even give it a second glance.  GPL is ok for applications, but way more trouble than it's worth for libraries.
- <div align="right"><a href="http://blog.ianbicking.org/comment50.html" rel="nofollow">#</a> <a href="http://bob.pycs.net/">Bob Ippolito</a></div><hr noshade>
- Ian: "My conclusion? Never keep anything you care about in a pickle, at any point you should be able to blow it away. If you can't, then pickle isn't right for you."
-<br />
+            <br />
+            <a
+                href="http://www.livejournal.com/users/glyf/6877.html"
+                target="_blank"
+                >http://www.livejournal.com/users/glyf/6877.html</a
+            >
+            <br />
 
-<br />
-Hmm. By extension, would you say the same applies to
-<br />
-keeping things you care about in the ZODB?
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment51.html" rel="nofollow">#</a> Don Wong</div><hr noshade>
- related:
-<br />
+            <br />
+            (my own guideline is that "your application's data format is part of
+            the design, and if you never look at it, how can you know if it's
+            any good". fwiw, I only use pickle when I need to cache stuff on
+            disk, and even then I tend to stick to simple data types).
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment52.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://effbot.org">Fredrik</a>
+            </div>
+            <hr noshade />
+            Bob: I'm quite new to these issues. I read
+            <a
+                href="http://www.gnu.org/licenses/why-not-lgpl.html"
+                target="_blank"
+                >http://www.gnu.org/licenses/why-not-lgpl.html</a
+            >
+            and then chose the GPL. Could you explain the reasons why XMLObject
+            should not be under GPL ?
+            <br />
 
-<br />
-<a href="http://www.livejournal.com/users/glyf/6877.html" target="_blank">http://www.livejournal.com/users/glyf/6877.html</a>
-<br />
+            <br />
+            Of course I'm *open* to discussion :-)
+            <div align="right">
+                <a href="https://ianbicking.org/comment53.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://base-art.net">Philippe Normand</a>
+            </div>
+            <hr noshade />
+            Is XMLObject supposed to be a political statement or free software?
+            If it's a political statement, GPL is the way to go. Otherwise,
+            choose a less restrictive license and people may actually use your
+            software. The Linux kernel, GCC, and readline are flukes.. the most
+            popular open source software is more liberally licensed (Python,
+            Apache, etc.). So what if Microsoft uses your source code? Are you
+            more concerned about sharing, or forcing other people to share with
+            you?
+            <div align="right">
+                <a href="https://ianbicking.org/comment54.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            Dumbing down the database doesn't protect it from anything but a
+            lack of willingness to learn SQL.
+            <br />
+            The smart/dumb database argument is a perennial one amongst a
+            certain type of OO purist prevalent in Java circles. I tend to the
+            "smart database" end of this debate - This is my take on this
+            argument:
+            <br />
 
-<br />
-(my own guideline is that "your application's data format is part of the design, and if you never look at it, how can you know if it's any good".  fwiw, I only use pickle when I need to cache stuff on disk, and even then I tend to stick to simple data types).
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment52.html" rel="nofollow">#</a> <a href="http://effbot.org">Fredrik</a></div><hr noshade>
- Bob: I'm quite new to these issues. I read <a href="http://www.gnu.org/licenses/why-not-lgpl.html" target="_blank">http://www.gnu.org/licenses/why-not-lgpl.html</a> and then chose the GPL. Could you explain the reasons why XMLObject should not be under GPL ?
-<br />
+            <br />
+            Typically the "intrinsic" logic in the database concerns enforcing
+            cardinality and conditional relationships (child record can only
+            exist when the parent record has values a, b or c in field X). Think
+            in terms of data-related validations that an application would
+            otherwise have to check for (e.g. this date must be after that one).
+            Declarative constraints can get you quite a long way; use triggers
+            as it makes sense to do so for more complex validations. This is
+            much a matter of taste as anything else, but there are things that
+            triggers do really well.
+            <br />
 
-<br />
-Of course I'm *open* to discussion :-)
- <div align="right"><a href="http://blog.ianbicking.org/comment53.html" rel="nofollow">#</a> <a href="http://base-art.net">Philippe Normand</a></div><hr noshade>
- Is XMLObject supposed to be a political statement or free software?  If it's a political statement, GPL is the way to go.  Otherwise, choose a less restrictive license and people may actually use your software.  The Linux kernel, GCC, and readline are flukes.. the most popular open source software is more liberally licensed (Python, Apache, etc.).  So what if Microsoft uses your source code?  Are you more concerned about sharing, or forcing other people to share with you?
- <div align="right"><a href="http://blog.ianbicking.org/comment54.html" rel="nofollow">#</a> <a href="http://bob.pycs.net/">Bob Ippolito</a></div><hr noshade>
- Dumbing down the database doesn't protect it from anything but a lack of willingness to learn SQL.
-<br />
-The smart/dumb database argument is a perennial one amongst a certain type of OO purist prevalent in Java circles.  I tend to the "smart database" end of this debate - This is my take on this argument:
-<br />
+            <br />
+            The smarter the database the more that applications can assume about
+            the data (and therefore they are simpler). Note the plural
+            "applications" here - this is <i>never</i> a 1:1 relationship if the
+            database contains important information. Moving intelligence to the
+            database allows it to be reused between applications. Databases are
+            a mature technology today and tend to suck a lot less (and therefore
+            turn over less frequently) than application development technologies
+            *Cough*J2EE*Cough*.
+            <br />
 
-<br />
-Typically the "intrinsic" logic in the database concerns enforcing cardinality and conditional relationships (child record can only exist when the parent record has values a, b or c in field X).  Think in terms of data-related validations that an application would otherwise have to check for (e.g. this date must be after that one).  Declarative constraints can get you quite a long way; use triggers as it makes sense to do so for more complex validations.  This is much a matter of taste as anything else, but there are things that triggers do really well.
-<br />
+            <br />
+            The python language and DB-API provide fairly powerful features for
+            manipulating data as data. Python's type system fits nicely with
+            database work through pythonic DB-API interfaces [For a quickie PDF
+            report generator CGI try putting a lightweight generator (to do
+            rollups) over a large sorted query result and pretty-print the
+            output to LaTeX].
+            <br />
 
-<br />
-The smarter the database the more that applications can assume about the data (and therefore they are simpler).  Note the plural "applications" here - this is <i>never</i> a 1:1 relationship if the database contains important information.  Moving intelligence to the database allows it to be reused between applications.  Databases are a mature technology today and tend to suck a lot less (and therefore turn over less frequently) than application development technologies *Cough*J2EE*Cough*.  
-<br />
+            <br />
+            One of the arguments in favour of "model object" architectures is
+            that business logic all lives in the same place (ABC costing models
+            in Java anyone?). There is some merit in this argument but it needs
+            to be implemented in a fairly purist way to achieve this goal. Doing
+            this tends to bring in a lot of infrastructural baggage like CMP
+            entity beans to the architecture of a business application. Hard to
+            tune, hard to troubleshoot, "magic" stuff happening behind the
+            scenes that nobody understands.
+            <br />
 
-<br />
-The python language and DB-API provide fairly powerful features for manipulating data as data.  Python's type system fits nicely with database work through pythonic DB-API interfaces [For a quickie PDF report generator CGI try putting a lightweight generator (to do rollups) over a large sorted query result and pretty-print the output to LaTeX].
-<br />
+            <br />
+            I'm not convinced that a complex object mapping layer (try
+            implementing one that supports labelled M:M relationships,
+            transactional units of work and optimistic concurrency) adds much
+            value to Python. Database work in C++ or java is clumsy due to the
+            relatively low level nature of the interfaces and impedance mismatch
+            of the type systems. Python lets you manipulate data with relatively
+            high level constructs so there is not so much saved effort as there
+            is with Java. IIRC cx_Oracle 4.0 now supports XA transactions.
+            <br />
 
-<br />
-One of the arguments in favour of "model object" architectures is that business logic all lives in the same place (ABC costing models in Java anyone?).  There is some merit in this argument but it needs to be implemented in a fairly purist way to achieve this goal.  Doing this tends to bring in a lot of infrastructural baggage like CMP entity beans to the architecture of a business application.  Hard to tune, hard to troubleshoot, "magic" stuff happening behind the scenes that nobody understands.
-<br />
+            <br />
+            More importantly, placing all your validation in the middle-tier
+            locks you into J2EE, .NET, COBOL or whatever for your application
+            architecture happens to be today. Placing intelligence into the
+            database makes some steps to decoupling the applications from the
+            data. See
+            <a href="http://www.microfocus.com" target="_blank"
+                >http://www.microfocus.com</a
+            >
+            for a look into the market for tools to maintain legacy COBOL
+            applications.
+            <br />
 
-<br />
-I'm not convinced that a complex object mapping layer (try implementing one that supports labelled M:M relationships, transactional units of work and optimistic concurrency) adds much value to Python.  Database work in C++ or java is clumsy due to the relatively low level nature of the interfaces and impedance mismatch of the type systems.  Python lets you manipulate data with relatively high level constructs so there is not so much saved effort as there is with Java.  IIRC cx_Oracle 4.0 now supports XA transactions.
-<br />
+            <br />
+            Appropriate use of not-null fields, default values, referential and
+            check constraints goes quite a long way to keeping the data
+            relatively clean. Consider using database triggers to encapsulate
+            more complex validation on important tables. <i>Always</i> use
+            triggers or materialised views (where available) if you need to
+            denormalise data in a transactional application. This way the
+            de-normalisation is inherent in the schema and the database never
+            forgets it.
+            <br />
 
-<br />
-More importantly, placing all your validation in the middle-tier locks you into J2EE, .NET, COBOL or whatever for your application architecture happens to be today.  Placing intelligence into the database makes some steps to decoupling the applications from the data.  See <a href="http://www.microfocus.com" target="_blank">http://www.microfocus.com</a> for a look into the market for tools to maintain legacy COBOL applications.
-<br />
+            <br />
+            Back in 4GL days it was common to have insert, update and delete
+            sprocs for every table in a database; data level validation and
+            business rules were implemented in these procedures. They provided a
+            single place to look for business logic; the principal argument in
+            favour of purely middle-tier business logic. More than one way to
+            skin that particular cat. I've seen databases in this style moved
+            from Oracle forms to J2EE applications with little modification.
+            <br />
 
-<br />
-Appropriate use of not-null fields, default values, referential and check constraints goes quite a long way to keeping the data relatively clean.  Consider using database triggers to encapsulate more complex validation on important tables.  <i>Always</i> use triggers or materialised views (where available) if you need to denormalise data in a transactional application.  This way the de-normalisation is inherent in the schema and the database never forgets it.
-<br />
+            <br />
+            There's a whole essay in this particular topic (and many have been
+            written) which I don't have time to write at the moment. Take this
+            as food for thought from someone who's designed a big database or
+            two in their day.
+            <div align="right">
+                <a href="https://ianbicking.org/comment55.html" rel="nofollow"
+                    >#</a
+                >
+                Nigel Campbell
+            </div>
+            <hr noshade />
+            Re: GPL -- I think it's unfair to say GCC or Linux were a fluke.
+            They've both received significant contributions because of the GPL
+            -- like Objective C support, or any number of features in Linux --
+            and I expect that to continue. OTOH, I don't think the GPL is right
+            for XMLObject. The GPL is difficult to use in a conglomeration of
+            software, especially when the GPLed portion is small, and that's
+            going to be the case with any library.
+            <br />
 
-<br />
-Back in 4GL days it was common to have insert, update and delete sprocs for every table in a database; data level validation and business rules were implemented in these procedures.  They provided a single place to look for business logic; the principal argument in favour of purely middle-tier business logic.  More than one way to skin that particular cat.  I've seen databases in this style moved from Oracle forms to J2EE applications with little modification.
-<br />
+            <br />
+            If I had a really awesome library, or some compelling reason to
+            choose the GPL (e.g., business reasons, or I in turn used a GPLed
+            library), then I might choose GPL for a library. I think there are
+            very good arguments to be made for the GPL. However, in most cases
+            it's not really right for a library. OTOH, I think it's perfectly
+            fine for applications, and would be my license of choice in those
+            cases.
+            <div align="right">
+                <a href="https://ianbicking.org/comment56.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            "Never keep anything you care about in a pickle". Well, one way
+            around this is to decouple the storage from the representation. When
+            you want to store something, zap up a more-or-less generic object
+            from a MyStorage module and save the data on its attributes, then
+            pickle *that*. To reinstantiate, make your actual data model objects
+            consume an unpickled MyStorage object. Sure, it's an extra level of
+            indirection, but it isolates you. I see that as somewhat more fun
+            than messing around doing the sort of string-handling that one needs
+            to with text files... and as soon as you have text files you *know*
+            someone's going to start editing them, so you have to have a
+            resilient parser... yada yada yada. :)
+            <br />
+            ben_
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment57.html" rel="nofollow"
+                    >#</a
+                >
+                Ben Last
+            </div>
+            <hr noshade />
+            YAML is the way to go, better if it's possible to use it as the
+            pickling backend for a full blown object prevalence layer (dunno if
+            pypersist allows this, but it should)
+            <br />
 
-<br />
-There's a whole essay in this particular topic (and many have been written) which I don't have time to write at the moment.  Take this as food for thought from someone who's designed a big database or two in their day.
- <div align="right"><a href="http://blog.ianbicking.org/comment55.html" rel="nofollow">#</a> Nigel Campbell</div><hr noshade>
- Re: GPL -- I think it's unfair to say GCC or Linux were a fluke.  They've both received significant contributions because of the GPL -- like Objective C support, or any number of features in Linux -- and I expect that to continue.  OTOH, I don't think the GPL is right for XMLObject.  The GPL is difficult to use in a conglomeration of software, especially when the GPLed portion is small, and that's going to be the case with any library.
-<br />
+            <br />
+            Just my 2cents
+            <div align="right">
+                <a href="https://ianbicking.org/comment58.html" rel="nofollow"
+                    >#</a
+                >
+                gab
+            </div>
+            <hr noshade />
+            This got me out of a similar pickle.
+            <br />
 
-<br />
-If I had a really awesome library, or some compelling reason to choose the GPL (e.g., business reasons, or I in turn used a GPLed library), then I might choose GPL for a library.  I think there are very good arguments to be made for the GPL.  However, in most cases it's not really right for a library.  OTOH, I think it's perfectly fine for applications, and would be my license of choice in those cases.
- <div align="right"><a href="http://blog.ianbicking.org/comment56.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- "Never keep anything you care about in a pickle".  Well, one way around this is to decouple the storage from the representation.  When you want to store something, zap up a more-or-less generic object from a MyStorage module and save the data on its attributes, then pickle *that*.  To reinstantiate, make your actual data model objects consume an unpickled MyStorage object.  Sure, it's an extra level of indirection, but it isolates you.  I see that as somewhat more fun than messing around doing the sort of string-handling that one needs to with text files... and as soon as you have text files you *know* someone's going to start editing them, so you have to have a resilient parser... yada yada yada. :)
-<br />
-ben_
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment57.html" rel="nofollow">#</a> Ben Last</div><hr noshade>
- YAML is the way to go, better if it's possible to use it as the pickling backend for a full blown object prevalence layer (dunno if pypersist allows this, but it should)
-<br />
+            <br />
+            All my classes were in one module though...
+            <br />
 
-<br />
-Just my 2cents
- <div align="right"><a href="http://blog.ianbicking.org/comment58.html" rel="nofollow">#</a> gab</div><hr noshade>
- This got me out of a similar pickle.
-<br />
+            <br />
+            #-------------------------------------------------------------------------------
+            <br />
+            # This is a fix.
+            <br />
+            # The module name is saved in the pickle so if you move your module
+            hiearchy
+            <br />
+            # around you cant unpickle. This replaces the lookup function so
+            that a load
+            <br />
+            # will ignore the module name.
+            <br />
+            #-------------------------------------------------------------------------------
+            <br />
+            CLASSES = {}
+            <br />
 
-<br />
-All my classes were in one module though...
-<br />
+            <br />
+            def __find_global(modulename, classname):
+            <br />
+            global CLASSES
+            <br />
+            return CLASSES[classname]
+            <br />
 
-<br />
-#-------------------------------------------------------------------------------
-<br />
-# This is a fix.
-<br />
-# The module name is saved in the pickle so if you move your module hiearchy
-<br />
-# around you cant unpickle. This replaces the lookup function so that a load
-<br />
-# will ignore the module name.
-<br />
-#-------------------------------------------------------------------------------
-<br />
-CLASSES = {}
-<br />
+            <br />
+            def loads(s):
+            <br />
+            f = cStringIO.StringIO(s)
+            <br />
+            p = cPickle.Unpickler(f)
+            <br />
+            p.find_global = __find_global
+            <br />
+            return p.load()
+            <br />
 
-<br />
-def __find_global(modulename, classname):
-<br />
-    global CLASSES
-<br />
-    return CLASSES[classname]
-<br />
-    
-<br />
-def loads(s):
-<br />
-    f = cStringIO.StringIO(s)
-<br />
-    p = cPickle.Unpickler(f)
-<br />
-    p.find_global = __find_global
-<br />
-    return p.load()
-<br />
+            <br />
 
-<br />
+            <br />
+            ... your classes here
+            <br />
 
-<br />
-... your classes here
-<br />
+            <br />
 
-<br />
-
-<br />
-################################################################################
-<br />
-#
-<br />
-# This MUST be the last function/code defined in this module so that if finds
-<br />
-# ALL the classes in this module.
-<br />
-#
-<br />
-################################################################################
-<br />
-def findClasses(frame):
-<br />
-    d = {}
-<br />
-    for o in frame.f_locals.itervalues():
-<br />
-        if inspect.isclass(o):
-<br />
+            <br />
+            ################################################################################
+            <br />
+            #
+            <br />
+            # This MUST be the last function/code defined in this module so that
+            if finds
+            <br />
+            # ALL the classes in this module.
+            <br />
+            #
+            <br />
+            ################################################################################
+            <br />
+            def findClasses(frame):
+            <br />
+            d = {}
+            <br />
+            for o in frame.f_locals.itervalues():
+            <br />
+            if inspect.isclass(o):
+            <br />
             d[o.__name__] = o
-<br />
+            <br />
 
-<br />
-    return d
-<br />
+            <br />
+            return d
+            <br />
 
-<br />
+            <br />
 
-<br />
-CLASSES = findClasses(inspect.currentframe())
-<br />
+            <br />
+            CLASSES = findClasses(inspect.currentframe())
+            <br />
 
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment59.html" rel="nofollow">#</a> lcm</div><hr noshade>
- <i>Nigel Campbell wrote: Dumbing down the database doesn't protect it from anything but a lack of willingness to learn SQL.</i>
-<br />
-In this case, I believe Ian is trying to avoid having to use yet another server to provide simple application functionality.  You may argue that this is not scalable, but on a small-site level, it can be practical.
- <div align="right"><a href="http://blog.ianbicking.org/comment60.html" rel="nofollow">#</a></div><hr noshade>
- <i>And perhaps a corollary: I'm not a big fan of using lots of stored procedures and other related features (many uses of triggers and views, for instance). I'm trying to protect the data from the code, and putting code in the database compromises that.</i>
-<br />
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment59.html" rel="nofollow"
+                    >#</a
+                >
+                lcm
+            </div>
+            <hr noshade />
+            <i
+                >Nigel Campbell wrote: Dumbing down the database doesn't protect
+                it from anything but a lack of willingness to learn SQL.</i
+            >
+            <br />
+            In this case, I believe Ian is trying to avoid having to use yet
+            another server to provide simple application functionality. You may
+            argue that this is not scalable, but on a small-site level, it can
+            be practical.
+            <div align="right">
+                <a href="https://ianbicking.org/comment60.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+            <i
+                >And perhaps a corollary: I'm not a big fan of using lots of
+                stored procedures and other related features (many uses of
+                triggers and views, for instance). I'm trying to protect the
+                data from the code, and putting code in the database compromises
+                that.</i
+            >
+            <br />
 
-<br />
-Nigel has some good points on this above but I can't help adding my own comments. I suspect Ian's thoughts on this are colored by thoughts about SQLObject. At the moment SQLObject is an excellent (but limited) ORM. Ian is no doubt trying to find the balance between what belongs in SQLObject and what belongs in the database.
-<br />
+            <br />
+            Nigel has some good points on this above but I can't help adding my
+            own comments. I suspect Ian's thoughts on this are colored by
+            thoughts about SQLObject. At the moment SQLObject is an excellent
+            (but limited) ORM. Ian is no doubt trying to find the balance
+            between what belongs in SQLObject and what belongs in the database.
+            <br />
 
-<br />
-My experience is that data consistency rules belong in the database. For instance, audit tables should always be maintained by the database itself (where possible) via triggers. As Nigel said, other applications are going to use that database and you can nigh-on guarantee that they won't play by exactly the same rules unless you force them to by encoding the rules in the database itself.
-<br />
+            <br />
+            My experience is that data consistency rules belong in the database.
+            For instance, audit tables should always be maintained by the
+            database itself (where possible) via triggers. As Nigel said, other
+            applications are going to use that database and you can nigh-on
+            guarantee that they won't play by exactly the same rules unless you
+            force them to by encoding the rules in the database itself.
+            <br />
 
-<br />
-Ditto constraints on the data of all types (referential, uniqueness, value). 
-<br />
+            <br />
+            Ditto constraints on the data of all types (referential, uniqueness,
+            value).
+            <br />
 
-<br />
-The difficulty, as always, is making SQLObject treat database engines with different features in a consistent way, papering over the cracks.
-<br />
+            <br />
+            The difficulty, as always, is making SQLObject treat database
+            engines with different features in a consistent way, papering over
+            the cracks.
+            <br />
 
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment61.html" rel="nofollow">#</a> Ian Sparks</div><hr noshade>
- One key point I made is that I'm no longer convinced that OR mapping layers add much value to a language like Python.  Fowler's book <i>Patterns of Enterprise Application Architecture</i> is a good source for some examples of more data-centric approaches to this problem.  I did do some work on a Python ORML but never finished it after getting dragged off onto another project.  There's a working prototype of the top end (a database row cache and __getattr__()/__setattr__() based object-row mapping), but the database layer isn't done beyond some initial fiddling.  I should find some time and finish it.
-<br />
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment61.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Sparks
+            </div>
+            <hr noshade />
+            One key point I made is that I'm no longer convinced that OR mapping
+            layers add much value to a language like Python. Fowler's book
+            <i>Patterns of Enterprise Application Architecture</i> is a good
+            source for some examples of more data-centric approaches to this
+            problem. I did do some work on a Python ORML but never finished it
+            after getting dragged off onto another project. There's a working
+            prototype of the top end (a database row cache and
+            __getattr__()/__setattr__() based object-row mapping), but the
+            database layer isn't done beyond some initial fiddling. I should
+            find some time and finish it.
+            <br />
 
-<br />
-The resulting effort was surprisingly hard to write.  It looks simple until you try explaining how it works to someone else.  ORML's aren't easy things to do if you want to take care of complex relationships.  Now I'm not convinced that they add much value to Python as Python has fairly powerful native data manipulation capabilities to begin with.
-<br />
+            <br />
+            The resulting effort was surprisingly hard to write. It looks simple
+            until you try explaining how it works to someone else. ORML's aren't
+            easy things to do if you want to take care of complex relationships.
+            Now I'm not convinced that they add much value to Python as Python
+            has fairly powerful native data manipulation capabilities to begin
+            with.
+            <br />
 
-<br />
-To take the 'simple infrastructure' argument a layer further - if you have an RDBMS for a schema with (say) 5-10 tables it might be overkill, adding a relatively complex piece of infrastructure for little gain.  Consider using ZODB, metakit or another lightweight storage engine.  As an earlier poster said, they aren't so scalable, but for simple applications they add much less baggage than a client-server DBMS.
-<br />
+            <br />
+            To take the 'simple infrastructure' argument a layer further - if
+            you have an RDBMS for a schema with (say) 5-10 tables it might be
+            overkill, adding a relatively complex piece of infrastructure for
+            little gain. Consider using ZODB, metakit or another lightweight
+            storage engine. As an earlier poster said, they aren't so scalable,
+            but for simple applications they add much less baggage than a
+            client-server DBMS.
+            <br />
 
-<br />
+            <br />
 
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment62.html" rel="nofollow">#</a> Nigel Campbell</div><hr noshade>
- Nigel, perhaps you should check out <a href="http://sqlobject.org" target="_blank">SQLObject</a>. I'm not going to try to convince you of its merits, you should look and make your own decision.
- <div align="right"><a href="http://blog.ianbicking.org/comment63.html" rel="nofollow">#</a> Ian Sparks</div><hr noshade>
- For the record, I certainly think data integrity checks in the database are good.  "Auditing" in the database is probably the right thing too, but that implies bureaucratic requirements.  "Logging" means the same thing, but with a different motivation.  The issue with doing these in the database is that all the interesting information has to be passed into the database -- like who is performing the change, and potentially other contextual information (e.g. a transaction ID, so you can view the update as part of the atomic transaction it participates in).  So, I might not put "logging" logic into the database, because logging doesn't have to be enforced the same way auditing does.  (For instance, in my database-related logs I usually like to give an indication of what the larger action was -- e.g., moving something vs. creating something, even if both operations result in an insert).
-<br />
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment62.html" rel="nofollow"
+                    >#</a
+                >
+                Nigel Campbell
+            </div>
+            <hr noshade />
+            Nigel, perhaps you should check out
+            <a href="http://sqlobject.org" target="_blank">SQLObject</a>. I'm
+            not going to try to convince you of its merits, you should look and
+            make your own decision.
+            <div align="right">
+                <a href="https://ianbicking.org/comment63.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Sparks
+            </div>
+            <hr noshade />
+            For the record, I certainly think data integrity checks in the
+            database are good. "Auditing" in the database is probably the right
+            thing too, but that implies bureaucratic requirements. "Logging"
+            means the same thing, but with a different motivation. The issue
+            with doing these in the database is that all the interesting
+            information has to be passed into the database -- like who is
+            performing the change, and potentially other contextual information
+            (e.g. a transaction ID, so you can view the update as part of the
+            atomic transaction it participates in). So, I might not put
+            "logging" logic into the database, because logging doesn't have to
+            be enforced the same way auditing does. (For instance, in my
+            database-related logs I usually like to give an indication of what
+            the larger action was -- e.g., moving something vs. creating
+            something, even if both operations result in an insert).
+            <br />
 
-<br />
-In a lot of my experience I find there are parts of the system that live in the database, and parts that don't.  Well, that's why the database isn't an application server -- though not everyone agrees, hence many of Oracle's efforts to make Oracle an app server, and the recent experiment someone did embedding Zope in PostgreSQL.  If it's only transient UI logic that lives outside of the database this seems innocuous, but when you start doing network calls, writing files to disk, and so on, the "center" starts to move out of the database and into your code, and the database seems like one of many appendages of your code.  This is when logic in the database feels like a burden, and where it also feels incomplete, since the database's perspective seems much more limited than my application's perspective (unless, I suppose, you use lots of stored procedures).
- <div align="right"><a href="http://blog.ianbicking.org/comment64.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- Why didn't you just switch to xmlpickle?
- <div align="right"><a href="http://blog.ianbicking.org/comment65.html" rel="nofollow">#</a></div><hr noshade>
- I always think "how easy would it be to read the data using a program written in AWK". If you can manipulate the data in AWK then there is a good chance that you can go back to the project in five years time and re-use the data even though the program that generated it may be un-runnable. I say AWK because it is a simple, but not too simple language; tabular formats can be the easiest to process in AWK (but CSV/TSV neds careful thought , and documentation on how to treat strings containing separators/string terminators); tree structured data has to be carefully laid out, for example by putting list opening/closing brackets on a line by themselves. Once the output format is AWK freindly, then it becomes Python/Perl/TCL friendly too.
- <div align="right"><a href="http://blog.ianbicking.org/comment66.html" rel="nofollow">#</a> Paddy3118</div><hr noshade>
- ... Oh, and if their is a natural /useful order that can be applied to the data, save it in sorted form.
- <div align="right"><a href="http://blog.ianbicking.org/comment67.html" rel="nofollow">#</a> Paddy3118</div><hr noshade>
- The key thing is having <i>correct documentation</i> for your file format, otherwise you're on a reverse engineering spree next time you need to work with that file.  Working with binary files is quite easy, especially with an appropriate supporting framework (I've 90% written two for Python, neither really released though).  However, data that is tightly bound to some fixed schema, like SQL or XML (sometimes) is definitely easier to reverse engineer than anything else (AWK-able files included).
- <div align="right"><a href="http://blog.ianbicking.org/comment68.html" rel="nofollow">#</a> <a href="http://bob.pycs.net/">Bob Ippolito</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <br />
+            In a lot of my experience I find there are parts of the system that
+            live in the database, and parts that don't. Well, that's why the
+            database isn't an application server -- though not everyone agrees,
+            hence many of Oracle's efforts to make Oracle an app server, and the
+            recent experiment someone did embedding Zope in PostgreSQL. If it's
+            only transient UI logic that lives outside of the database this
+            seems innocuous, but when you start doing network calls, writing
+            files to disk, and so on, the "center" starts to move out of the
+            database and into your code, and the database seems like one of many
+            appendages of your code. This is when logic in the database feels
+            like a burden, and where it also feels incomplete, since the
+            database's perspective seems much more limited than my application's
+            perspective (unless, I suppose, you use lots of stored procedures).
+            <div align="right">
+                <a href="https://ianbicking.org/comment64.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            Why didn't you just switch to xmlpickle?
+            <div align="right">
+                <a href="https://ianbicking.org/comment65.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+            I always think "how easy would it be to read the data using a
+            program written in AWK". If you can manipulate the data in AWK then
+            there is a good chance that you can go back to the project in five
+            years time and re-use the data even though the program that
+            generated it may be un-runnable. I say AWK because it is a simple,
+            but not too simple language; tabular formats can be the easiest to
+            process in AWK (but CSV/TSV neds careful thought , and documentation
+            on how to treat strings containing separators/string terminators);
+            tree structured data has to be carefully laid out, for example by
+            putting list opening/closing brackets on a line by themselves. Once
+            the output format is AWK freindly, then it becomes Python/Perl/TCL
+            friendly too.
+            <div align="right">
+                <a href="https://ianbicking.org/comment66.html" rel="nofollow"
+                    >#</a
+                >
+                Paddy3118
+            </div>
+            <hr noshade />
+            ... Oh, and if their is a natural /useful order that can be applied
+            to the data, save it in sorted form.
+            <div align="right">
+                <a href="https://ianbicking.org/comment67.html" rel="nofollow"
+                    >#</a
+                >
+                Paddy3118
+            </div>
+            <hr noshade />
+            The key thing is having <i>correct documentation</i> for your file
+            format, otherwise you're on a reverse engineering spree next time
+            you need to work with that file. Working with binary files is quite
+            easy, especially with an appropriate supporting framework (I've 90%
+            written two for Python, neither really released though). However,
+            data that is tightly bound to some fixed schema, like SQL or XML
+            (sometimes) is definitely easier to reverse engineer than anything
+            else (AWK-able files included).
+            <div align="right">
+                <a href="https://ianbicking.org/comment68.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

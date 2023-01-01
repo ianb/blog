@@ -1,119 +1,199 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>WSGI</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>WSGI</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>WSGI</h1>
 
-<div style="float: right">
-
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>WSGI</h1>
- 
-<div class="document">
-<p>Things in WSGI-land have been going well lately, I think.  Paste is
-<a class="reference" href="paste-1-0.html">at 1.0</a> and doing fine
-there.  <a class="reference" href="http://pylonshq.com/">Pylons</a> has been gaining in
-popularity, and it's been doing really well as a traditional and
-familiar framework on the outside, but with WSGI just under the skin.
-It's been a compelling introduction to WSGI for many people.  Other
-WSGI-based frameworks have been appearing; I especially like niche
-frameworks like <a class="reference" href="http://bitworking.org/news/wsgicollection">wsgicollection</a> because they wouldn't be
-viable frameworks at all if they had to stand on their own.  But with
-WSGI you really can just solve <em>one</em> problem, and not worry about <em>all
-possible</em> problems.</p>
-<p>There's been <a class="reference" href="http://wsgi.org/wsgi/Learn_WSGI">several recent articles</a> on WSGI.  I'm never sure how WSGI
-should really be presented -- on one level it's an implementation
-detail of higher-level frameworks.  Creating WSGI middleware and
-dispatchers and whatnot is not terribly advanced, and is genuinely
-useful even if you aren't inclined to write your own framework from
-scratch, but it's not a prerequesite to getting things done in
-WSGI-based environments.  But WSGI's success will definitely rely on
-the community of people that feel comfortable with both the details
-and the architecture of these systems, so building wide familiarity is
-important.  I've personally come to believe that talking about the
-architecture of WSGI is more important than the details (which are
-easy enough to pick up if you are motivated).</p>
-<p>I started talking about more standards on <a class="reference" href="http://www.python.org/community/sigs/current/web-sig/">Web-SIG</a>.  Python is
-ripe for new standards in lots of areas, and WSGI stacks are among
-them.  The <a class="reference" href="http://wsgi.org/wsgi/Specifications/routing_args">first proposal</a> I introduced just
-because it seemed like low-hanging fruit, but people seemed to really
-like it.  I guess it's not surprise that low-hanging fruit is usually
-the best stuff to pick.  The proposal describes an environment key
-(<tt class="docutils literal"><span class="pre">wsgiorg.routing_args</span></tt>) that dispatchers can use to store captured
-information.  In the process we discussed a fairly light process for
-introducing and accepting proposals, centered now on a <a class="reference" href="http://wsgi.org/wsgi/Specifications">wsgi.org page</a>.  I also added a bunch of
-ideas for specs to the bottom of that page; so if you see one you are
-thinking about yourself, now you know someone else is thinking about
-it too.</p>
-<p>In my own coding, I've been working on <a class="reference" href="http://pythonpaste.org/wsgiremote/">WSGIRemote</a>, which is a library to help
-with making subrequests, both external requests and what should be
-very fast internal requests (not that I've benchmarked anything).
-This should make apps using REST internally more manageable -- they
-should scale <em>down</em> a lot further, requiring less setup and less
-general overhead.  Of course the performance characteristics will
-change a lot when you actually move services to other processes or
-servers, but I'm more concerned with manageability at this point.  A
-lot of the tools in Paste (and <a class="reference" href="http://pythonpaste.org/deploy/">Paste Deploy</a>) are about managing lots of small
-pieces without letting that turn into external complexity.  One aspect
-of this is to let applications self-provide the services they need,
-because most of the time simple internal implementations of an API
-will be sufficient.  Turning a Python library into a service is kind
-of like adding another level of formality to it; and I think more
-formality is useful as we try to share pieces of code.</p>
-<p>Another earlier-stage project is <a class="reference" href="http://pythonpaste.org/wsgifilter/">WSGIFilter</a>, perhaps notably one of the
-only frameworks for building WSGI <em>middleware</em>.  It's not a very big
-framework, to be sure (it's really just the <a class="reference" href="http://svn.pythonpaste.org/Paste/WSGIFilter/trunk/wsgifilter/filter.py">one file</a>)
-but it should help implement output filtering in WSGI, which can be
-really tricky.</p>
-<p>WSGI development can seem kind of plodding at times, because we're
-building up slowly from a low-level foundation.  But as the tools
-emerge they work together really well; I think we're starting to see
-real returns from that process.  If there was a motto for using these
-WSGI tools together, it might be <em>making large problems smaller</em> --
-it's not doing much <em>for</em> you, it's not fancy or magic, things like
-&quot;convention over configuration&quot; don't even <em>mean</em> anything on this
-level, it's not code or a framework, it's just an idea and an
-architecture.  Describing what that really means remains a challenge.</p>
-</div>
- <div class="dates" align="right">
-Created 13 Nov '06</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>I added a couple more specs tonight, for the heck of it:</p>
-<ul class="simple">
-<li><a class="reference" href="http://wsgi.org/wsgi/Specifications/simple_authentication">simple authentication</a></li>
-<li><a class="reference" href="http://wsgi.org/wsgi/Specifications/throw_errors">throw_errors</a></li>
-</ul>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/wsgi-update-comment-1.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+        <div class="document">
+            <p>
+                Things in WSGI-land have been going well lately, I think. Paste
+                is <a class="reference" href="paste-1-0.html">at 1.0</a> and
+                doing fine there.
+                <a class="reference" href="http://pylonshq.com/">Pylons</a> has
+                been gaining in popularity, and it's been doing really well as a
+                traditional and familiar framework on the outside, but with WSGI
+                just under the skin. It's been a compelling introduction to WSGI
+                for many people. Other WSGI-based frameworks have been
+                appearing; I especially like niche frameworks like
+                <a
+                    class="reference"
+                    href="http://bitworking.org/news/wsgicollection"
+                    >wsgicollection</a
+                >
+                because they wouldn't be viable frameworks at all if they had to
+                stand on their own. But with WSGI you really can just solve
+                <em>one</em> problem, and not worry about
+                <em>all possible</em> problems.
+            </p>
+            <p>
+                There's been
+                <a class="reference" href="http://wsgi.org/wsgi/Learn_WSGI"
+                    >several recent articles</a
+                >
+                on WSGI. I'm never sure how WSGI should really be presented --
+                on one level it's an implementation detail of higher-level
+                frameworks. Creating WSGI middleware and dispatchers and whatnot
+                is not terribly advanced, and is genuinely useful even if you
+                aren't inclined to write your own framework from scratch, but
+                it's not a prerequesite to getting things done in WSGI-based
+                environments. But WSGI's success will definitely rely on the
+                community of people that feel comfortable with both the details
+                and the architecture of these systems, so building wide
+                familiarity is important. I've personally come to believe that
+                talking about the architecture of WSGI is more important than
+                the details (which are easy enough to pick up if you are
+                motivated).
+            </p>
+            <p>
+                I started talking about more standards on
+                <a
+                    class="reference"
+                    href="http://www.python.org/community/sigs/current/web-sig/"
+                    >Web-SIG</a
+                >. Python is ripe for new standards in lots of areas, and WSGI
+                stacks are among them. The
+                <a
+                    class="reference"
+                    href="http://wsgi.org/wsgi/Specifications/routing_args"
+                    >first proposal</a
+                >
+                I introduced just because it seemed like low-hanging fruit, but
+                people seemed to really like it. I guess it's not surprise that
+                low-hanging fruit is usually the best stuff to pick. The
+                proposal describes an environment key (<tt
+                    class="docutils literal"
+                    ><span class="pre">wsgiorg.routing_args</span></tt
+                >) that dispatchers can use to store captured information. In
+                the process we discussed a fairly light process for introducing
+                and accepting proposals, centered now on a
+                <a class="reference" href="http://wsgi.org/wsgi/Specifications"
+                    >wsgi.org page</a
+                >. I also added a bunch of ideas for specs to the bottom of that
+                page; so if you see one you are thinking about yourself, now you
+                know someone else is thinking about it too.
+            </p>
+            <p>
+                In my own coding, I've been working on
+                <a class="reference" href="http://pythonpaste.org/wsgiremote/"
+                    >WSGIRemote</a
+                >, which is a library to help with making subrequests, both
+                external requests and what should be very fast internal requests
+                (not that I've benchmarked anything). This should make apps
+                using REST internally more manageable -- they should scale
+                <em>down</em> a lot further, requiring less setup and less
+                general overhead. Of course the performance characteristics will
+                change a lot when you actually move services to other processes
+                or servers, but I'm more concerned with manageability at this
+                point. A lot of the tools in Paste (and
+                <a class="reference" href="http://pythonpaste.org/deploy/"
+                    >Paste Deploy</a
+                >) are about managing lots of small pieces without letting that
+                turn into external complexity. One aspect of this is to let
+                applications self-provide the services they need, because most
+                of the time simple internal implementations of an API will be
+                sufficient. Turning a Python library into a service is kind of
+                like adding another level of formality to it; and I think more
+                formality is useful as we try to share pieces of code.
+            </p>
+            <p>
+                Another earlier-stage project is
+                <a class="reference" href="http://pythonpaste.org/wsgifilter/"
+                    >WSGIFilter</a
+                >, perhaps notably one of the only frameworks for building WSGI
+                <em>middleware</em>. It's not a very big framework, to be sure
+                (it's really just the
+                <a
+                    class="reference"
+                    href="http://svn.pythonpaste.org/Paste/WSGIFilter/trunk/wsgifilter/filter.py"
+                    >one file</a
+                >) but it should help implement output filtering in WSGI, which
+                can be really tricky.
+            </p>
+            <p>
+                WSGI development can seem kind of plodding at times, because
+                we're building up slowly from a low-level foundation. But as the
+                tools emerge they work together really well; I think we're
+                starting to see real returns from that process. If there was a
+                motto for using these WSGI tools together, it might be
+                <em>making large problems smaller</em> -- it's not doing much
+                <em>for</em> you, it's not fancy or magic, things like
+                &quot;convention over configuration&quot; don't even
+                <em>mean</em> anything on this level, it's not code or a
+                framework, it's just an idea and an architecture. Describing
+                what that really means remains a challenge.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 13 Nov '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>I added a couple more specs tonight, for the heck of it:</p>
+                <ul class="simple">
+                    <li>
+                        <a
+                            class="reference"
+                            href="http://wsgi.org/wsgi/Specifications/simple_authentication"
+                            >simple authentication</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            class="reference"
+                            href="http://wsgi.org/wsgi/Specifications/throw_errors"
+                            >throw_errors</a
+                        >
+                    </li>
+                </ul>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/wsgi-update-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

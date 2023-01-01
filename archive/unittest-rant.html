@@ -1,285 +1,583 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Unittest Rant</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Unittest Rant</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Unittest Rant</h1>
+        <p>
+            I don't like the <tt>unittest</tt> module. I'm just starting to
+            really do test-driven development (takes a while to catch on to),
+            and I find <tt>unittest</tt> to be obnoxious and highly
+            under-featured. Am I missing something?
+        </p>
 
-<div style="float: right">
+        <p>
+            For instance, I often want to be able to test data sets, i.e., a
+            bunch of inputs with expected outputs (or expected errors). This is
+            a pain in the butt. It's easy enough to use a <tt>for</tt> loop and
+            iterate over the data, but that's bad for test driven development --
+            I want to see progress right away, I don't want my test to bomb on
+            the first failure.
+        </p>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+        <p>So, I make a subclass of <tt>TestCase</tt>, maybe like:</p>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Unittest Rant</h1>
- <p>
-I don't like the <tt>unittest</tt> module.  I'm just starting to really do test-driven development (takes a while to catch on to), and I find <tt>unittest</tt> to be obnoxious and highly under-featured.  Am I missing something?
-
-<p>
-
-For instance, I often want to be able to test data sets, i.e., a bunch of inputs with expected outputs (or expected errors).  This is a pain in the butt.  It's easy enough to use a <tt>for</tt> loop and iterate over the data, but that's bad for test driven development -- I want to see progress right away, I don't want my test to bomb on the first failure. 
-
-<p>
-
-So, I make a subclass of <tt>TestCase</tt>, maybe like:
-
-<pre>
+        <pre>
 class DecodeTest(unittest.TestCase):
     def __init__(self, input, output):
         self.input = input
         self.output = output
     def test(self):
         self.assertEqual(decode(input), output)
-</pre>
+</pre
+        >
 
-OK, so it's annoying to create this class since it seems like an obvious need in testing, but once I've done it I can move on.  Except I have to collect these all into suites and add them to the system.  And once I've done that all my tests are essentially anonymous -- I can run a particular suite, but I can't run a particular input/output test. 
+        OK, so it's annoying to create this class since it seems like an obvious
+        need in testing, but once I've done it I can move on. Except I have to
+        collect these all into suites and add them to the system. And once I've
+        done that all my tests are essentially anonymous -- I can run a
+        particular suite, but I can't run a particular input/output test.
 
-<p>
+        <p>
+            Probably the issue here is that <tt>unittest.main</tt> is stupid.
+            You can't add options (e.g., your own verbosity hooks), you can't
+            easily indicate what tests you want to do... it's just dumb and not
+            extensible.
+        </p>
 
-Probably the issue here is that <tt>unittest.main</tt> is stupid.  You can't add options (e.g., your own verbosity hooks), you can't easily indicate what tests you want to do... it's just dumb and not extensible.
+        <p>
+            The features <tt>unittest</tt> <i>does</i> have are things like
+            pluggable loggers, so you can have graphical output. Who cares?
+            Maybe other people are more motivated by pretty lights, but
+            personally I am more motivated by reducing the tedium of writing
+            tests. I'm okay with writing the tests -- I like TDD, really -- but
+            I've yet to hear anyone say they really like writing tests.
+        </p>
 
-<p>
+        <p>
+            But you can't get around it -- tests are tedious, because you have
+            to think of the corner cases, the possible combinations of usage,
+            etc. At least let us get rid of the boilerplate!
+            <tt>unittest</tt> just feels like a lot of boilerplate, and methods
+            like <tt>assertEqual</tt> are useful but not compelling.
+        </p>
 
-The features <tt>unittest</tt> <i>does</i> have are things like pluggable loggers, so you can have graphical output.  Who cares?  Maybe other people are more motivated by pretty lights, but personally I am more motivated by reducing the tedium of writing tests.  I'm okay with writing the tests -- I like TDD, really -- but I've yet to hear anyone say they really like writing tests.  
+        <p>
+            I gotta find a new way to do tests. <tt>doctest</tt> is too minimal
+            -- I do need setup and teardown (but not setUp and tearDown -- I'm
+            sorry, but this is English, "setup" and "teardown" are two words,
+            not four). I would just write my own, but someone else out there
+            must have cared enough to make something Pythonic and convenient...
+        </p>
 
-<p>
+        <div class="dates" align="right">
+            Created 10 Oct '03<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            I wrote something Pythonic and minimalistic, but I'm not sure if it
+            does what you want... then again it can always be extended. It's
+            called Testipy and can be found in my download section. (<a
+                href="http://zephyrfalcon.org/download/)"
+                target="_blank"
+                >http://zephyrfalcon.org/download/)</a
+            >
+            If you want, drop me an email so we can discuss what features you
+            would find useful. If I agree, I might add them. :-)
+            <br />
 
-But you can't get around it -- tests are tedious, because you have to think of the corner cases, the possible combinations of usage, etc.  At least let us get rid of the boilerplate!  <tt>unittest</tt> just feels like a lot of boilerplate, and methods like <tt>assertEqual</tt> are useful but not compelling.
+            <br />
+            I wrote Testipy because unittest got in my way a few times, so I
+            decided to make my own little testing framework. I'm using it now
+            for some of my personal projects.
+            <div align="right">
+                <a href="https://ianbicking.org/comment73.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://zephyrfalcon.org/">Hans Nowak</a>
+            </div>
+            <hr noshade />
+            There's no credibility when you complain even about the method
+            names' case.
+            <div align="right">
+                <a href="https://ianbicking.org/comment74.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+            I'm agreed about the cruft in these unit testing frameworks. When
+            it's just easier to write a test "main program" and to use shell
+            scripts to make sense of the results, these frameworks don't really
+            seem to be hitting the spot.
+            <br />
 
-<p>
+            <br />
+            And I'm totally in agreement about the hypothetical graphical
+            progress bar cruft.
+            <div align="right">
+                <a href="https://ianbicking.org/comment75.html" rel="nofollow"
+                    >#</a
+                >
+                Paul Boddie
+            </div>
+            <hr noshade />
+            I use the Sancho testing framework,
+            <a
+                href="http://www.mems-exchange.org/software/sancho/,"
+                target="_blank"
+                >http://www.mems-exchange.org/software/sancho/,</a
+            >
+            <br />
+            instead of unittest. A useful feature is that it can optionally do
+            code coverage, so you can quickly see which branches or functions
+            aren't being exercised by the tests.
+            <div align="right">
+                <a href="https://ianbicking.org/comment76.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.amk.ca">A.M. Kuchling</a>
+            </div>
+            <hr noshade />
+            Agree.
+            <div align="right">
+                <a href="https://ianbicking.org/comment77.html" rel="nofollow"
+                    >#</a
+                >
+                Tim
+            </div>
+            <hr noshade />
+            In general I agree that the feature set is a little thin in the
+            stock module, but there is enough to get started writing tests
+            quickly. I think it depends on your perspective too. I use Python
+            for functional/system testing of other sytems (not written in
+            Python), and all my previous test harnesses have been centered
+            around data-driven test drivers (along the lines of your DecodeTest
+            example). If you look at the 'common' examples of unit testing
+            today, with JUnit for example, you almost never see it used that
+            way.
+            <br />
 
-I gotta find a new way to do tests.  <tt>doctest</tt> is too minimal -- I do need setup and teardown (but not setUp and tearDown -- I'm sorry, but this is English, "setup" and "teardown" are two words, not four).  I would just write my own, but someone else out there must have cared enough to make something Pythonic and convenient...
- <div class="dates" align="right">
-Created 10 Oct '03<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- I wrote something Pythonic and minimalistic, but I'm not sure if it does what you want... then again it can always be extended. It's called Testipy and can be found in my download section. (<a href="http://zephyrfalcon.org/download/)" target="_blank">http://zephyrfalcon.org/download/)</a> If you want, drop me an email so we can discuss what features you would find useful. If I agree, I might add them. :-)
-<br />
+            <br />
+            I did a couple of things. I made a base TestCase class for
+            data-driven tests. The parameters are passed in via __init__
+            (exactly like your DecodeTest). There's a matching SuiteBuilder that
+            can read various table formats (ODBC db tables, excel spreadsheets,
+            csv files, etc) that is used to instantiate each test. Each column
+            in the table is a different param (input,output for your example),
+            and you just add any additional columns as needed. For example, I
+            generally have a 'description' column that gets passed to all tests.
+            That get used to change the the result of shortDescription(), so the
+            tests are no longer 'anonymous'. At that point, adding new tests for
+            a particular case is just a matter of adding another line to a
+            spreadsheet (or record in a db table, whatever). Your suite builder
+            can use the extra columns to pick out a single test, or filter out
+            some number of them. Maybe unittest could have provided some of that
+            out-of-the-box, but it really wasn't that much work to tack on.
+            <div align="right">
+                <a href="https://ianbicking.org/comment78.html" rel="nofollow"
+                    >#</a
+                >
+                Chris Prinos
+            </div>
+            <hr noshade />
+            1. You don't need suites. Just add:
+            <br />
 
-<br />
-I wrote Testipy because unittest got in my way a few times, so I decided to make my own little testing framework. I'm using it now for some of my personal projects.
- <div align="right"><a href="http://blog.ianbicking.org/comment73.html" rel="nofollow">#</a> <a href="http://zephyrfalcon.org/">Hans Nowak</a></div><hr noshade>
- There's no credibility when you complain even about the method names' case.
- <div align="right"><a href="http://blog.ianbicking.org/comment74.html" rel="nofollow">#</a></div><hr noshade>
- I'm agreed about the cruft in these unit testing frameworks. When it's just easier to write a test "main program" and to use shell scripts to make sense of the results, these frameworks don't really seem to be hitting the spot.
-<br />
+            <br />
+            if __name__ == '__main__': unittest.main()
+            <br />
 
-<br />
-And I'm totally in agreement about the hypothetical graphical progress bar cruft.
- <div align="right"><a href="http://blog.ianbicking.org/comment75.html" rel="nofollow">#</a> Paul Boddie</div><hr noshade>
- I use the Sancho testing framework, <a href="http://www.mems-exchange.org/software/sancho/," target="_blank">http://www.mems-exchange.org/software/sancho/,</a>
-<br />
-instead of unittest.  A useful feature is that it can optionally do code coverage, so you can quickly see which branches or functions aren't being exercised by the tests.
- <div align="right"><a href="http://blog.ianbicking.org/comment76.html" rel="nofollow">#</a> <a href="http://www.amk.ca">A.M. Kuchling</a></div><hr noshade>
- Agree.
- <div align="right"><a href="http://blog.ianbicking.org/comment77.html" rel="nofollow">#</a> Tim</div><hr noshade>
- In general I agree that the feature set is a little thin in the stock module, but there is enough to get started writing tests quickly. I think it depends on your perspective too. I use Python for functional/system testing of other sytems (not written in Python), and all my previous test harnesses have been centered around data-driven test drivers (along the lines of your DecodeTest example). If you look at the 'common' examples of unit testing today, with JUnit for example, you almost never see it used that way.
-<br />
+            <br />
+            at the end of your file, and you can run the script and it'll find
+            all the tests and automatically run them.
+            <br />
 
-<br />
-I did a couple of things. I made a base TestCase class for data-driven tests. The parameters are passed in via __init__ (exactly like your DecodeTest). There's a matching SuiteBuilder that can read various table formats (ODBC db tables, excel spreadsheets, csv files, etc) that is used to instantiate each test. Each column in the table is a different param (input,output for your example), and you just add any additional columns as needed. For example, I generally have a 'description' column that gets passed to all tests. That get used to change the the result of shortDescription(), so the tests are no longer 'anonymous'.  At that point, adding new tests for a particular case is just a matter of adding another line to a spreadsheet (or record in a db table, whatever). Your suite builder can use the extra columns to pick out a single test, or filter out some number of them. Maybe unittest could have provided some of that out-of-the-box, but it really wasn't that much work to tack on.
- <div align="right"><a href="http://blog.ianbicking.org/comment78.html" rel="nofollow">#</a> Chris Prinos</div><hr noshade>
- 1. You don't need suites. Just add:
-<br />
+            <br />
+            2. assertEquals is useful. The reason is, if it fails, you get to
+            see what two values were, whereas "assert x == y" won't display the
+            difference. Also you should be writing multiple test cases per
+            class, not one, and using setUp and tearDown. Passing info for tests
+            in __init__ shouldn't be done. Each test should set it up itself, or
+            if its for all tests in the class, use setUp.
+            <br />
 
-<br />
-   if __name__ == '__main__': unittest.main()
-<br />
+            <br />
+            3. It is kinda limited. Twisted ended up writing an API compatible
+            system that is more powerful in many ways (and customized to our
+            needs), and has a command line test running tool, so you can say
+            "trial twisted.test" and it runs all tests in the modules in that
+            package. Zope3 has written a similar commandline tool for python's
+            unittest.
+            <div align="right">
+                <a href="https://ianbicking.org/comment79.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://itamarst.org">Itamar Shtull-Trauring</a>
+            </div>
+            <hr noshade />
+            The correct URL for Sancho is
+            <a
+                href="http://www.mems-exchange.org/software/sancho/"
+                target="_blank"
+                >http://www.mems-exchange.org/software/sancho/</a
+            >
+            .
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment80.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://python.ca/nas/">Neil Schemenauer</a>
+            </div>
+            <hr noshade />
+            Another option for a test runner (with additional functionality,
+            including coverage) is:
+            <br />
 
-<br />
-at the end of your file, and you can run the script and it'll find all the tests and automatically run them.
-<br />
+            <br />
+            <a
+                href="http://www.nullcube.com/software/pylid.html"
+                target="_blank"
+                >http://www.nullcube.com/software/pylid.html</a
+            >
+            <div align="right">
+                <a href="https://ianbicking.org/comment81.html" rel="nofollow"
+                    >#</a
+                >
+                Phil
+            </div>
+            <hr noshade />
+            Zope's test.py driver addresses some of the issues you raised. I
+            agree that unittest's main() isn't very useful and that unittest as
+            a whole is hard to extend or customize.
+            <br />
 
-<br />
-2. assertEquals is useful. The reason is, if it fails, you get to see what two values were, whereas "assert x == y" won't display the difference. Also you should be writing multiple test cases per class, not one, and using setUp and tearDown. Passing info for tests in __init__ shouldn't be done. Each test should set it up itself, or if its for all tests in the class, use setUp.
-<br />
+            <br />
+            I wrote a
+            <a
+                href="http://www.python.org/~jeremy/weblog/031014.html"
+                target="_blank"
+            >
+                <br />
+                weblog entry</a
+            >
+            about the test driver.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment82.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.python.org/~jeremy/">Jeremy Hylton</a>
+            </div>
+            <hr noshade />
+            <b>Itamar:</b> I know you can loop over the input, use setUp and
+            tearDown, etc. But it's not very convenient. Take the example from
+            <a
+                href="http://www.faqs.org/docs/diveintopython/roman_divein.html#roman.divein"
+                target="_blank"
+                >Dive Into Python</a
+            >
+            -- it tests a bunch of known integer to roman numeral conversions.
+            The unit test isn't much of a unit, because the first conversion
+            that fails causes the entire conversion test to fail. So you don't
+            see that ten of the conversions worked, but five didn't. If one
+            fails, you don't get to see if any of the later ones failed. Not a
+            big deal in roman numerals, but that's a trivial example. When you
+            are working through corner cases one by one, it's nice to be able to
+            see and rerun each failure individually, and
+            <tt>unittest</tt> doesn't give that sort of granularity. (I don't
+            want to define 100 methods to test 100 possible input/output
+            combinations either)
+            <br />
 
-<br />
-3. It is kinda limited. Twisted ended up writing an API compatible system that is more powerful in many ways (and customized to our needs), and has a command line test running tool, so you can say "trial twisted.test" and it runs all tests in the modules in that package. Zope3 has written a similar commandline tool for python's unittest.
- <div align="right"><a href="http://blog.ianbicking.org/comment79.html" rel="nofollow">#</a> <a href="http://itamarst.org">Itamar Shtull-Trauring</a></div><hr noshade>
- The correct URL for Sancho is <a href="http://www.mems-exchange.org/software/sancho/" target="_blank">http://www.mems-exchange.org/software/sancho/</a> .
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment80.html" rel="nofollow">#</a> <a href="http://python.ca/nas/">Neil Schemenauer</a></div><hr noshade>
- Another option for a test runner (with additional functionality, including coverage) is:
-<br />
+            <br />
+            <b>Chris:</b> yes, I end up adding this functionality in subclasses.
+            Unfortunately it doesn't work well with <tt>unittest.main</tt>. As
+            Jeremy notes (and I tried to imply) unittests that take arguments to
+            their <tt>__init__</tt> don't have proper names (even arbitrary
+            names), and collecting them for <tt>main()</tt> is unintuitive. They
+            work, and maybe that means that <tt>unittest.TestCase</tt> is a fine
+            class (if not perfect), but these instances don't fit into the
+            system well.
+            <br />
 
-<br />
-<a href="http://www.nullcube.com/software/pylid.html" target="_blank">http://www.nullcube.com/software/pylid.html</a>
- <div align="right"><a href="http://blog.ianbicking.org/comment81.html" rel="nofollow">#</a> Phil</div><hr noshade>
- Zope's test.py driver addresses some of the issues you raised.  I agree that unittest's main() isn't very useful and that unittest as a whole is hard to extend or customize.
-<br />
+            <br />
+            Anyway, thanks all for the suggestions. I'm downloading them and it
+            looks like there's some good stuff in these.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment83.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
 
-<br />
-I wrote a <a href="http://www.python.org/~jeremy/weblog/031014.html" target="_blank">
-<br />
-weblog entry</a> about the test driver.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment82.html" rel="nofollow">#</a> <a href="http://www.python.org/~jeremy/">Jeremy Hylton</a></div><hr noshade>
- <b>Itamar:</b> I know you can loop over the input, use setUp and tearDown, etc.  But it's not very convenient.  Take the example from <a href="http://www.faqs.org/docs/diveintopython/roman_divein.html#roman.divein" target="_blank">Dive Into Python</a> -- it tests a bunch of known integer to roman numeral conversions.  The unit test isn't much of a unit, because the first conversion that fails causes the entire conversion test to fail.  So you don't see that ten of the conversions worked, but five didn't.  If one fails, you don't get to see if any of the later ones failed.  Not a big deal in roman numerals, but that's a trivial example.  When you are working through corner cases one by one, it's nice to be able to see and rerun each failure individually, and <tt>unittest</tt> doesn't give that sort of granularity.  (I don't want to define 100 methods to test 100 possible input/output combinations either) 
-<br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment84.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+            I've had some success with <b>dynamic tests</b>, for example in my
+            <a
+                href="http://www.deadlybloodyserious.com/Python/2003/08/13.html#a1371"
+                target="_blank"
+                >self-testing test framework</a
+            >.
+            <br />
 
-<br />
-<b>Chris:</b> yes, I end up adding this functionality in subclasses.  Unfortunately it doesn't work well with <tt>unittest.main</tt>.  As Jeremy notes (and I tried to imply) unittests that take arguments to their <tt>__init__</tt> don't have proper names (even arbitrary names), and collecting them for <tt>main()</tt> is unintuitive.  They work, and maybe that means that <tt>unittest.TestCase</tt> is a fine class (if not perfect), but these instances don't fit into the system well. 
-<br />
+            <br />
+            The trick is to define self-stocking descendants of
+            <tt>unittest.TestSuite</tt> which hook <tt>__call__</tt> to fill
+            themselves with dynamically created instances of
+            <tt>unittest.FunctionTestCase</tt> (or descendants with appropriate
+            <tt>setUp</tt> methods). I defined the test functions on the fly but
+            you could use any callable or, for extra evil points,
+            <tt>lambda</tt>.
+            <div align="right">
+                <a href="https://ianbicking.org/comment85.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.deadlybloodyserious.com/Python/"
+                    >Garth T Kidd</a
+                >
+            </div>
+            <hr noshade />
+            2 points
+            <br />
 
-<br />
-Anyway, thanks all for the suggestions.  I'm downloading them and it looks like there's some good stuff in these.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment83.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- 
- <div align="right"><a href="http://blog.ianbicking.org/comment84.html" rel="nofollow">#</a></div><hr noshade>
- I've had some success with <b>dynamic tests</b>, for example in my <a href="http://www.deadlybloodyserious.com/Python/2003/08/13.html#a1371" target="_blank">self-testing test framework</a>. 
-<br />
+            <br />
+            > There's no credibility when you complain even about the method
+            names' case.
+            <br />
 
-<br />
-The trick is to define self-stocking descendants of <tt>unittest.TestSuite</tt> which hook <tt>__call__</tt> to fill themselves with dynamically created instances of <tt>unittest.FunctionTestCase</tt> (or descendants with appropriate <tt>setUp</tt> methods). I defined the test functions on the fly but you could use any callable or, for extra evil points, <tt>lambda</tt>.
- <div align="right"><a href="http://blog.ianbicking.org/comment85.html" rel="nofollow">#</a> <a href="http://www.deadlybloodyserious.com/Python/">Garth T Kidd</a></div><hr noshade>
- 2 points
-<br />
+            <br />
+            Why not? what would you say if the method was called sEtuP?
+            <br />
+            setup is one word in english. So the complaint is very legitimate.
+            <br />
 
-<br />
-> There's no credibility when you complain even about the method names' case.
-<br />
+            <br />
+            Another big complaint is its OOP only interface:
+            <br />
 
-<br />
-Why not? what would you say if the method was called sEtuP?
-<br />
-setup is one word in english. So the complaint is very legitimate.
-<br />
+            <br />
+            In many testing scenarios I simply do not want
+            classes/methods/inheritance/etc
+            <br />
 
-<br />
-Another big complaint is its OOP only interface:
-<br />
+            <br />
+            what I want is this:
+            <br />
 
-<br />
-In many testing scenarios I simply do not want classes/methods/inheritance/etc
-<br />
+            <br />
+            chk("foo of 1 correct", foo(1), value)
+            <br />
+            chk("foo of 2 correct", foo(2), value)
+            <br />
 
-<br />
-what I want is this: 
-<br />
+            <br />
+            In 99% cases that's the only thing which is needed but unittest
+            doesnot
+            <br />
+            provide it
+            <br />
 
-<br />
-chk("foo of 1 correct", foo(1), value)
-<br />
-chk("foo of  2 correct", foo(2), value)
-<br />
+            <br />
 
-<br />
-In 99% cases that's the only thing which is needed but unittest doesnot
-<br />
-provide it
-<br />
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment86.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+            I agree the OOP-only interface is a pain. Many times, I'll have a
+            large set of basic tests I'd want to include. Something like
+            <br />
 
-<br />
+            <br />
+            <tt>
+                <br />
+                for i in range(100):
+                <br />
+                for j in range(100):
+                <br />
+                self.assertEquals(my_add(i,j), i+j)
+                <br />
+            </tt>
+            <br />
 
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment86.html" rel="nofollow">#</a></div><hr noshade>
- I agree the OOP-only interface is a pain. Many times, I'll have a large set of basic tests I'd want to include. Something like
-<br />
+            <br />
+            Having all of these in a single test that either fails or succeeds
+            as one, is often not what I want.
+            <br />
 
-<br />
-<tt>
-<br />
-for i in range(100):
-<br />
-    for j in range(100):
-<br />
-        self.assertEquals(my_add(i,j), i+j)
-<br />
-</tt>
-<br />
+            <br />
+            I can hack this, like so:
+            <br />
 
-<br />
-Having all of these in a single test that either fails or succeeds as one, is often not what I want.
-<br />
+            <br />
+            <tt>
+                <br />
+                class AddTests(unittest.TestCase):
+                <br />
+                pass
+                <br />
 
-<br />
-I can hack this, like so:
-<br />
+                <br />
+                for i in range(100):
+                <br />
+                for j in range(100):
+                <br />
+                def t(self):
+                <br />
+                self.assertEqual(myadd(i,j), i+j)
+                <br />
+                setattr(AddTests, 'test_%s_%s' % (i, j), t)
+                <br />
+            </tt>
+            <br />
 
-<br />
-<tt>
-<br />
-class AddTests(unittest.TestCase):
-<br />
-    pass
-<br />
+            <br />
+            but <b>boy</b> does that feel like a hack!
+            <br />
 
-<br />
-for i in range(100):
-<br />
-    for j in range(100):
-<br />
-        def t(self):
-<br />
-            self.assertEqual(myadd(i,j), i+j)
-<br />
-        setattr(AddTests, 'test_%s_%s' % (i, j), t)
-<br />
-</tt>
-<br />
+            <br />
+            (I hope this comes out formatted OK...)
+            <div align="right">
+                <a href="https://ianbicking.org/comment87.html" rel="nofollow"
+                    >#</a
+                >
+                Paul Moore
+            </div>
+            <hr noshade />
+            Nope. Sorry - I hope it made sense. Is there any way of putting
+            properly indented code in a comment here?
+            <div align="right">
+                <a href="https://ianbicking.org/comment88.html" rel="nofollow"
+                    >#</a
+                >
+                Paul Moore
+            </div>
+            <hr noshade />
+            Doubt it.
+            <br />
 
-<br />
-but <b>boy</b> does that feel like a hack!
-<br />
+            <br />
+            I've put up an
+            <a
+                href="http://www.pycs.net/users/0000088/stories/7.html"
+                target="_blank"
+                >article about self-stocking TestSuites</a
+            >
+            on my alternate site. The technique is pretty useful. David Goodger
+            put something similar in the docutils tests...
+            <div align="right">
+                <a href="https://ianbicking.org/comment89.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.deadlybloodyserious.com/Python/"
+                    >Garth T Kidd</a
+                >
+            </div>
+            <hr noshade />
+            Hi Ian,
+            <br />
 
-<br />
-(I hope this comes out formatted OK...)
- <div align="right"><a href="http://blog.ianbicking.org/comment87.html" rel="nofollow">#</a> Paul Moore</div><hr noshade>
- Nope. Sorry - I hope it made sense. Is there any way of putting properly indented code in a comment here?
- <div align="right"><a href="http://blog.ianbicking.org/comment88.html" rel="nofollow">#</a> Paul Moore</div><hr noshade>
- Doubt it. 
-<br />
+            <br />
+            Thanks for the rant! I'm always keen to hear what people like and
+            dislike about unittest.
+            <br />
 
-<br />
-I've put up an <a href="http://www.pycs.net/users/0000088/stories/7.html" target="_blank">article about self-stocking TestSuites</a> on my alternate site. The technique is pretty useful. David Goodger put something similar in the docutils tests...
- <div align="right"><a href="http://blog.ianbicking.org/comment89.html" rel="nofollow">#</a> <a href="http://www.deadlybloodyserious.com/Python/">Garth T Kidd</a></div><hr noshade>
- Hi Ian,
-<br />
+            <br />
+            I'm not inclined to defend the spelling habits of Beck or Gamma,
+            from whom the spelling of the method names was appropriated, but I
+            can at least point out that Merriam Webster lists '<a
+                href="http://www.m-w.com/cgi-bin/dictionary?book=Dictionary&va=tear+down"
+                target="_blank"
+                >tear down</a
+            >' and '<a
+                href="http://www.m-w.com/cgi-bin/dictionary?book=Dictionary&va=set+up"
+                target="_blank"
+                >set up</a
+            >' as perfectly valid alongside their single word counterparts. Were
+            I to write the module again, I would choose a more pythonic naming
+            convention for the method names, but it's sadly rather late for that
+            now.
+            <br />
 
-<br />
-Thanks for the rant! I'm always keen to hear what people like and dislike about unittest.
-<br />
+            <br />
+            The inconvenience of testing large data sets with PyUnit is often
+            cited, and I am sympathetic to this. This style of testing diverges
+            from that of true unit testing, and is not conveniently supported by
+            JUnit either. True test-driven development typically specifies
+            behaviour incrementally in a relatively small number of pertinently
+            named and short unit test methods; unittest supports this well, I
+            believe.
+            <br />
 
-<br />
-I'm not inclined to defend the spelling habits of Beck or Gamma, from whom the spelling of the method names was appropriated, but I can at least point out that Merriam Webster lists '<a href="http://www.m-w.com/cgi-bin/dictionary?book=Dictionary&va=tear+down" target="_blank">tear down</a>' and '<a href="http://www.m-w.com/cgi-bin/dictionary?book=Dictionary&va=set+up" target="_blank">set up</a>' as perfectly valid alongside their single word counterparts. Were I to write the module again, I would choose a more pythonic naming convention for the method names, but it's sadly rather late for that now.
-<br />
+            <br />
+            Of course there is also a place for larger-scale testing with
+            extended sets of data. It seems reasonable to expect that unittest
+            <i>could</i> be turned to this purpose, and I am investigating what
+            can be done to make life easier in this regard. It could also be
+            argued that a different kind of testing framework might work better
+            for such tests or, perhaps, for your stripped-down individual needs.
+            <br />
 
-<br />
-The inconvenience of testing large data sets with PyUnit is often cited, and I am sympathetic to this. This style of testing diverges from that of true unit testing, and is not conveniently supported by JUnit either. True test-driven development typically specifies behaviour incrementally in a relatively small number of pertinently named and short unit test methods; unittest supports this well, I believe.
-<br />
-
-<br />
-Of course there is also a place for larger-scale testing with extended sets of data. It seems reasonable to expect that unittest <i>could</i> be turned to this purpose, and I am investigating what can be done to make life easier in this regard. It could also be argued that a different kind of testing framework might work better for such tests or, perhaps, for your stripped-down individual needs.
-<br />
-
-<br />
-Whatever the case, if you have concrete suggestions or further comments I'd be very happy indeed to hear from you and to do what I can to make your life easier.
- <div align="right"><a href="http://blog.ianbicking.org/comment90.html" rel="nofollow">#</a> <a href="http://advogato.org/person/purcell">Steve Purcell</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <br />
+            Whatever the case, if you have concrete suggestions or further
+            comments I'd be very happy indeed to hear from you and to do what I
+            can to make your life easier.
+            <div align="right">
+                <a href="https://ianbicking.org/comment90.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://advogato.org/person/purcell">Steve Purcell</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

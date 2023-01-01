@@ -1,114 +1,226 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Web application acceptance testing</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Web application acceptance testing</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Web application acceptance testing</h1>
 
-<div style="float: right">
-
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Web application acceptance testing</h1>
- 
-<div class="document">
-<p>Grig Gheorghiu wrote up a description of using <a class="reference" href="http://maxq.tigris.org/">MaxQ</a> to test web pages
-in <a class="reference" href="http://agiletesting.blogspot.com/2005/02/web-app-testing-with-python-part-1.html">Web app testing with Python part 1: MaxQ</a>.  I've recently been
-looking into web acceptance testing for my job, though my progress has
-stopped as I've been distracted with other things for a while.</p>
-<p>I haven't actually used MaxQ -- mostly because I find it hard to set
-up Java programs on my development systems.  Sun's unfriendly attitude
-towards Free systems is incredibly stupid and shitty, but I digress...</p>
-<p>Anyway, I also came upon MaxQ from <a class="reference" href="http://www.advogato.org/person/titus/diary.html?start=18">Titus Brown</a>, but indirectly as I
-was looking at <a class="reference" href="http://pbp.berlios.de/">PBP</a>, and saw that Titus had also written some code for
-MaxQ that generated PBP scripts instead of Jython/unittest-based
-scripts.</p>
-<p>After writing some PBP scripts, it did get boring and error-prone
-quickly.  I think the PBP-style of script would be considerably easier
-to <em>edit</em> than a Jython unittest, but MaxQ's recording feature is a
-better way to start the testing process.  But like I said, I didn't
-want to install MaxQ...</p>
-<p>Anyway, instead I installed a wonderful little Python program
-<a class="reference" href="http://hathawaymix.org/Software/TCPWatch">TCPWatch</a> -- it's a small HTTP proxy that shows you the exact stuff
-that goes over the wire (good for learning and debugging lower-level
-HTTP stuff), and also has an option to record the transactions.  It
-just dumps every request and response in a directory.</p>
-<p>This suited me nicely, because I could get an accurate recording
-without having to worry about the accuracy of my &quot;interpretation&quot; of
-the recording.  The PBP or Jython script is a heuristic of sorts -- an
-attempt to abstract out the important parts of the transaction, not to
-simply create an exact recording.  So you might see that the user went
-to <tt class="docutils literal"><span class="pre">/show_items</span></tt> first, then <tt class="docutils literal"><span class="pre">/view?id=1</span></tt> second.  But it's
-smarter if you figure out that they went to <tt class="docutils literal"><span class="pre">/show_items</span></tt> and then
-followed the first link labelled <tt class="docutils literal"><span class="pre">view</span></tt>.  But that translation isn't
-<em>correct</em>, it's just best effort -- while tcpwatch is pretty much
-&quot;correct&quot;, in that it doesn't interpret or add any commentary to its recording.</p>
-<p>Anyway, I had issues with PBP, and I don't know if it's really the
-best thing for what I want.  While interactive use is useful and
-important (I like the basic feel), you also have to have good support
-for rerunning scripts, getting concise and accurate output from those
-automated scripts, and rerunning or undoing portions of those scripts
-as you adapt them when the application changes.  Now I'm thinking that
-<a class="reference" href="http://ipython.scipy.org/">ipython</a> offers a good compromise between ease of interactive use and
-translatability to a more automated environment.</p>
-<p>TCPWatch could also use a couple more features.  The only real problem
-I found with the core was an inability to proxy HTTPS, but I imagine
-that's hard (since making that hard is the whole point of HTTPS).
-There were some other problems -- for instance, I couldn't for the
-life of me parse <tt class="docutils literal"><span class="pre">gzip</span></tt> responses from Google and other sources --
-<a class="reference" href="http://python.org/doc/current/lib/module-gzip.html">gzip</a> barfed on them no matter what I did; I think the module is
-pickier than other gzip implementations.  So it would be nice if
-TCPWatch would correct the request and remove the <tt class="docutils literal"><span class="pre">Accept:</span> <span class="pre">gzip</span></tt>
-header.  It would also be nice to extend the Tk frontend so you could
-annotate the requests (probably just a textbox that would produce a
-text file that went alongside the rest of the recording).  In that
-case you could paste strings that were important to you (and that the
-generated test script should check for), or otherwise make notes for
-use by the script generator.  These features would probably be easy to
-add -- TCPWatch is delightfully small, at just under 1000 lines of
-code, and my first run at a script generator was just 300 lines, with
-an abbreviated but reasonable number of features.</p>
-<p>I hope to be able to revisit this stack soon as a testing framework:
-TCPWatch, Mechanize, ipython, and maybe unittest or py.test (or maybe
-even doctest).  But if anyone else finds this idea interesting and
-wants to kick off an effort, I'm more than happy to jump on board.</p>
-</div>
- <div class="dates" align="right">
-Created 25 Feb '05<br>
-Modified 16 Mar '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>The Zope 3 project use something called <a class="reference" href="http://dev.zope.org/Zope3/Zope3Book/fdoctests.html">&quot;functional doctests&quot;</a>.  The idea is that you run tcpwatch and use your browser to create a functional test for your Zope 3 application.  Then you run a small Python script that converts record files produced by tcpwatch into .txt files that contain embedded doctests, and include that file into your functional test suite.</p>
-<p>We started using functional doctests for the <a class="reference" href="http://www.schooltool.org/">SchoolTool/SchoolBell project</a>.  Here's an <a class="reference" href="http://source.schooltool.org/viewcvs/trunk/schooltool/src/schoolbell/app/browser/ftests/app.txt?view=markup">example test</a>.</p>
-<p>By the way, I've found it easier to write new tests with vim by copying and modifying existing tests, rather than starting up tcpwatch and doing it with a browser, but I suppose that depends on how geeky you are...</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/web-application-acceptance-testing-comment-1.html" rel="nofollow">#</a> <a href="http://mg.b4net.lt/">Marius Gedminas</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Cool, that's just the kind of thing I was thinking of.  It seemms a tad crude -- what with the raw requests right in the code.  It seems like with a little care (plus something based on mechanize's stateful browser object) you could improve the narrative quality nicely.  For instance (from your example):</p>
-<pre class="literal-block">
+        <div class="document">
+            <p>
+                Grig Gheorghiu wrote up a description of using
+                <a class="reference" href="http://maxq.tigris.org/">MaxQ</a> to
+                test web pages in
+                <a
+                    class="reference"
+                    href="http://agiletesting.blogspot.com/2005/02/web-app-testing-with-python-part-1.html"
+                    >Web app testing with Python part 1: MaxQ</a
+                >. I've recently been looking into web acceptance testing for my
+                job, though my progress has stopped as I've been distracted with
+                other things for a while.
+            </p>
+            <p>
+                I haven't actually used MaxQ -- mostly because I find it hard to
+                set up Java programs on my development systems. Sun's unfriendly
+                attitude towards Free systems is incredibly stupid and shitty,
+                but I digress...
+            </p>
+            <p>
+                Anyway, I also came upon MaxQ from
+                <a
+                    class="reference"
+                    href="http://www.advogato.org/person/titus/diary.html?start=18"
+                    >Titus Brown</a
+                >, but indirectly as I was looking at
+                <a class="reference" href="http://pbp.berlios.de/">PBP</a>, and
+                saw that Titus had also written some code for MaxQ that
+                generated PBP scripts instead of Jython/unittest-based scripts.
+            </p>
+            <p>
+                After writing some PBP scripts, it did get boring and
+                error-prone quickly. I think the PBP-style of script would be
+                considerably easier to <em>edit</em> than a Jython unittest, but
+                MaxQ's recording feature is a better way to start the testing
+                process. But like I said, I didn't want to install MaxQ...
+            </p>
+            <p>
+                Anyway, instead I installed a wonderful little Python program
+                <a
+                    class="reference"
+                    href="http://hathawaymix.org/Software/TCPWatch"
+                    >TCPWatch</a
+                >
+                -- it's a small HTTP proxy that shows you the exact stuff that
+                goes over the wire (good for learning and debugging lower-level
+                HTTP stuff), and also has an option to record the transactions.
+                It just dumps every request and response in a directory.
+            </p>
+            <p>
+                This suited me nicely, because I could get an accurate recording
+                without having to worry about the accuracy of my
+                &quot;interpretation&quot; of the recording. The PBP or Jython
+                script is a heuristic of sorts -- an attempt to abstract out the
+                important parts of the transaction, not to simply create an
+                exact recording. So you might see that the user went to
+                <tt class="docutils literal"
+                    ><span class="pre">/show_items</span></tt
+                >
+                first, then
+                <tt class="docutils literal"
+                    ><span class="pre">/view?id=1</span></tt
+                >
+                second. But it's smarter if you figure out that they went to
+                <tt class="docutils literal"
+                    ><span class="pre">/show_items</span></tt
+                >
+                and then followed the first link labelled
+                <tt class="docutils literal"><span class="pre">view</span></tt
+                >. But that translation isn't <em>correct</em>, it's just best
+                effort -- while tcpwatch is pretty much &quot;correct&quot;, in
+                that it doesn't interpret or add any commentary to its
+                recording.
+            </p>
+            <p>
+                Anyway, I had issues with PBP, and I don't know if it's really
+                the best thing for what I want. While interactive use is useful
+                and important (I like the basic feel), you also have to have
+                good support for rerunning scripts, getting concise and accurate
+                output from those automated scripts, and rerunning or undoing
+                portions of those scripts as you adapt them when the application
+                changes. Now I'm thinking that
+                <a class="reference" href="http://ipython.scipy.org/"
+                    >ipython</a
+                >
+                offers a good compromise between ease of interactive use and
+                translatability to a more automated environment.
+            </p>
+            <p>
+                TCPWatch could also use a couple more features. The only real
+                problem I found with the core was an inability to proxy HTTPS,
+                but I imagine that's hard (since making that hard is the whole
+                point of HTTPS). There were some other problems -- for instance,
+                I couldn't for the life of me parse
+                <tt class="docutils literal"><span class="pre">gzip</span></tt>
+                responses from Google and other sources --
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-gzip.html"
+                    >gzip</a
+                >
+                barfed on them no matter what I did; I think the module is
+                pickier than other gzip implementations. So it would be nice if
+                TCPWatch would correct the request and remove the
+                <tt class="docutils literal"
+                    ><span class="pre">Accept:</span>
+                    <span class="pre">gzip</span></tt
+                >
+                header. It would also be nice to extend the Tk frontend so you
+                could annotate the requests (probably just a textbox that would
+                produce a text file that went alongside the rest of the
+                recording). In that case you could paste strings that were
+                important to you (and that the generated test script should
+                check for), or otherwise make notes for use by the script
+                generator. These features would probably be easy to add --
+                TCPWatch is delightfully small, at just under 1000 lines of
+                code, and my first run at a script generator was just 300 lines,
+                with an abbreviated but reasonable number of features.
+            </p>
+            <p>
+                I hope to be able to revisit this stack soon as a testing
+                framework: TCPWatch, Mechanize, ipython, and maybe unittest or
+                py.test (or maybe even doctest). But if anyone else finds this
+                idea interesting and wants to kick off an effort, I'm more than
+                happy to jump on board.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 25 Feb '05<br />
+            Modified 16 Mar '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    The Zope 3 project use something called
+                    <a
+                        class="reference"
+                        href="http://dev.zope.org/Zope3/Zope3Book/fdoctests.html"
+                        >&quot;functional doctests&quot;</a
+                    >. The idea is that you run tcpwatch and use your browser to
+                    create a functional test for your Zope 3 application. Then
+                    you run a small Python script that converts record files
+                    produced by tcpwatch into .txt files that contain embedded
+                    doctests, and include that file into your functional test
+                    suite.
+                </p>
+                <p>
+                    We started using functional doctests for the
+                    <a class="reference" href="http://www.schooltool.org/"
+                        >SchoolTool/SchoolBell project</a
+                    >. Here's an
+                    <a
+                        class="reference"
+                        href="http://source.schooltool.org/viewcvs/trunk/schooltool/src/schoolbell/app/browser/ftests/app.txt?view=markup"
+                        >example test</a
+                    >.
+                </p>
+                <p>
+                    By the way, I've found it easier to write new tests with vim
+                    by copying and modifying existing tests, rather than
+                    starting up tcpwatch and doing it with a browser, but I
+                    suppose that depends on how geeky you are...
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/web-application-acceptance-testing-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://mg.b4net.lt/">Marius Gedminas</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Cool, that's just the kind of thing I was thinking of.
+                        It seemms a tad crude -- what with the raw requests
+                        right in the code. It seems like with a little care
+                        (plus something based on mechanize's stateful browser
+                        object) you could improve the narrative quality nicely.
+                        For instance (from your example):
+                    </p>
+                    <pre class="literal-block">
 &gt;&gt;&gt; print http(&quot;&quot;&quot;
 ... POST /frogpond/resources/lily/edit.html HTTP/1.1
 ... Authorization: Basic mgr:mgrpw
@@ -121,56 +233,213 @@ HTTP/1.1 303 See Other
 ...
 Location: http://localhost/frogpond/resources/lily
 ...
-</pre>
-<p>Might instead be:</p>
-<pre class="literal-block">
+</pre
+                    >
+                    <p>Might instead be:</p>
+                    <pre class="literal-block">
 &gt;&gt;&gt; b.click('CANCEL')
 &gt;&gt;&gt; b.response.status
 303 See Other
 &gt;&gt;&gt; b.response.headers.location
 'http://localhost/frogpond/resources/lily'
-</pre>
-<p>Note that <tt class="literal"><span class="pre">b</span></tt> (the browser object) specifically has knowledge of the context and the last request, so in this case you are submitting a form that you just received.  I think this statefulness better represents the thing you are testing, plus doctests are sequential and narrative anyway -- might as well take advantage of it.  In general I've thought that the Zope 3 doctests I've seen seemed like they didn't have enough scaffolding; there should be more helper functions written solely for the purpose of doctesting.</p>
-<p>Anyway, it's still cool that it's useful and works for you.  The XML doctest extension I wrote might also be useful for this sort of thing -- though it still needs wildcards.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/web-application-acceptance-testing-comment-2.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
- 
-<div class="document">
-<p>Due to some code restructuring in SchoolTool/SchoolBell, the example test link is now broken.  Here's a working link to the same <a class="reference" href="http://source.schooltool.org/viewcvs/trunk/schoolbell/src/schoolbell/app/browser/ftests/app.txt?view=markup&amp;rev=3153">example test</a>.  This time I included a revision number as well, so this link should be permanent.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/web-application-acceptance-testing-comment-7.html" rel="nofollow">#</a> <a href="http://mg.b4net.lt/">Marius Gedminas</a></div><hr noshade>
-</blockquote>
- I would note that the kind of testing you're referring to (presumably making sure nothing is broken) is not what one might think of as &quot;acceptance testing&quot;. To me, after you write the program, acceptance testing is when the user makes sure the program is fast enough, usable enough, and works right to solve the problem, which is larger in scope than automated testing to find bugs.<br /><br />At my work, we've considered this sort of automated testing for some time, but there is one increasingly important part of web development that they almost completely ignore: JavaScript. What would be nice is a Firefox plugin for acceptance testing that works with the JavaScript interpreter -- almost like an old-school macro recorder. Unfortunately, this brings up the issue of testing between browsers.<br /><br />Ultimately for my money on normal-size apps, I think there's no true replacement for spending a few hours each release trying everything on your site off a todo list. We do that each with separate browsers and usually end up catching most problems.<br /><br />-Ken<br /><br />
- <div align="right"><a href="http://blog.ianbicking.org/webapplicationacceptancetestingcomment3.html" rel="nofollow">#</a> <a href="http://www.kenkinder.com/">Ken Kinder</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>True... I tend to use &quot;acceptance testing&quot; for everything that isn't &quot;unit testing&quot;, but that's probably not very accurate.  Functional testing or system testing is probably a better term.  Though Grig pointed me to this: <a class="reference" href="http://atomicobject.com/systir.page">http://atomicobject.com/systir.page</a> (a Ruby test system) which is really an acceptance test (specifying requirements at a fairly low but not obscenely low level), and that could fit into this model.  It's not a comprehensive acceptance test, but it isn't too far off.  Automated acceptance testing is possible -- FIT is an example of that sort of thing.</p>
-<p>Selenium or Pamie are options for Javascript-run tests (from Grig's article).  John Lee also put Javascript in his to-do for his stack (ClientForm, ClientCookie, Mechanize, etc); I think using Mozilla's interpreter or something.  But who knows about that...</p>
-<p>Generally I do manual Javascript testing, but that still leaves a place for automated tests.  By avoiding dynamic Javascript and making sure your app degrades properly in the absence of Javascript, you can avoid regressions in your Javascript and make the application accessible to an automated testing tool.</p>
-<p>Also, by doing this as a script you can avoid sensibility entirely -- you can jump to another page based on any calculation you choose, possibly derived from a regular expression-based parsing or whatever works.  You aren't restricted to just following links and filling in forms that you can find on the page.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/webapplicationacceptancetesting-comment-4.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Have you see <a class="reference" href="http://www.mechanicalcat.net/tech/webunit/">webunit</a>? It's not the nicest API, but it works (I've used it at three employers now).</p>
-<p>Sure beats raw HTTP requests...</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/web-application-acceptance-testing-comment-5.html" rel="nofollow">#</a> <a href="http://www.mechanicalcat.net/richard/log">Richard Jones</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>I have looked at it before, but my natural laziness with respect to function testing kept me from using it.  PBP was the first thing that really felt right.  Though now I'm also thinking positively about doctest, and I can imagine webunit and doctest being a good combination (maybe also building on the XML doctest extension I talked about earlier: <a class="reference" href="xml-and-doctest.html">http://blog.ianbicking.org/xml-and-doctest.html</a> )</p>
-<p>I guess webunit and Mechanize have similar scopes, but I haven't really thought about how they compare.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/web-application-acceptance-testing-comment-6.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-</blockquote>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                    >
+                    <p>
+                        Note that
+                        <tt class="literal"><span class="pre">b</span></tt> (the
+                        browser object) specifically has knowledge of the
+                        context and the last request, so in this case you are
+                        submitting a form that you just received. I think this
+                        statefulness better represents the thing you are
+                        testing, plus doctests are sequential and narrative
+                        anyway -- might as well take advantage of it. In general
+                        I've thought that the Zope 3 doctests I've seen seemed
+                        like they didn't have enough scaffolding; there should
+                        be more helper functions written solely for the purpose
+                        of doctesting.
+                    </p>
+                    <p>
+                        Anyway, it's still cool that it's useful and works for
+                        you. The XML doctest extension I wrote might also be
+                        useful for this sort of thing -- though it still needs
+                        wildcards.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/web-application-acceptance-testing-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        Due to some code restructuring in SchoolTool/SchoolBell,
+                        the example test link is now broken. Here's a working
+                        link to the same
+                        <a
+                            class="reference"
+                            href="http://source.schooltool.org/viewcvs/trunk/schoolbell/src/schoolbell/app/browser/ftests/app.txt?view=markup&amp;rev=3153"
+                            >example test</a
+                        >. This time I included a revision number as well, so
+                        this link should be permanent.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/web-application-acceptance-testing-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://mg.b4net.lt/">Marius Gedminas</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+            I would note that the kind of testing you're referring to
+            (presumably making sure nothing is broken) is not what one might
+            think of as &quot;acceptance testing&quot;. To me, after you write
+            the program, acceptance testing is when the user makes sure the
+            program is fast enough, usable enough, and works right to solve the
+            problem, which is larger in scope than automated testing to find
+            bugs.<br /><br />At my work, we've considered this sort of automated
+            testing for some time, but there is one increasingly important part
+            of web development that they almost completely ignore: JavaScript.
+            What would be nice is a Firefox plugin for acceptance testing that
+            works with the JavaScript interpreter -- almost like an old-school
+            macro recorder. Unfortunately, this brings up the issue of testing
+            between browsers.<br /><br />Ultimately for my money on normal-size
+            apps, I think there's no true replacement for spending a few hours
+            each release trying everything on your site off a todo list. We do
+            that each with separate browsers and usually end up catching most
+            problems.<br /><br />-Ken<br /><br />
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/webapplicationacceptancetestingcomment3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.kenkinder.com/">Ken Kinder</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        True... I tend to use &quot;acceptance testing&quot; for
+                        everything that isn't &quot;unit testing&quot;, but
+                        that's probably not very accurate. Functional testing or
+                        system testing is probably a better term. Though Grig
+                        pointed me to this:
+                        <a
+                            class="reference"
+                            href="http://atomicobject.com/systir.page"
+                            >http://atomicobject.com/systir.page</a
+                        >
+                        (a Ruby test system) which is really an acceptance test
+                        (specifying requirements at a fairly low but not
+                        obscenely low level), and that could fit into this
+                        model. It's not a comprehensive acceptance test, but it
+                        isn't too far off. Automated acceptance testing is
+                        possible -- FIT is an example of that sort of thing.
+                    </p>
+                    <p>
+                        Selenium or Pamie are options for Javascript-run tests
+                        (from Grig's article). John Lee also put Javascript in
+                        his to-do for his stack (ClientForm, ClientCookie,
+                        Mechanize, etc); I think using Mozilla's interpreter or
+                        something. But who knows about that...
+                    </p>
+                    <p>
+                        Generally I do manual Javascript testing, but that still
+                        leaves a place for automated tests. By avoiding dynamic
+                        Javascript and making sure your app degrades properly in
+                        the absence of Javascript, you can avoid regressions in
+                        your Javascript and make the application accessible to
+                        an automated testing tool.
+                    </p>
+                    <p>
+                        Also, by doing this as a script you can avoid
+                        sensibility entirely -- you can jump to another page
+                        based on any calculation you choose, possibly derived
+                        from a regular expression-based parsing or whatever
+                        works. You aren't restricted to just following links and
+                        filling in forms that you can find on the page.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/webapplicationacceptancetesting-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Have you see
+                    <a
+                        class="reference"
+                        href="http://www.mechanicalcat.net/tech/webunit/"
+                        >webunit</a
+                    >? It's not the nicest API, but it works (I've used it at
+                    three employers now).
+                </p>
+                <p>Sure beats raw HTTP requests...</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/web-application-acceptance-testing-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.mechanicalcat.net/richard/log"
+                    >Richard Jones</a
+                >
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I have looked at it before, but my natural laziness with
+                        respect to function testing kept me from using it. PBP
+                        was the first thing that really felt right. Though now
+                        I'm also thinking positively about doctest, and I can
+                        imagine webunit and doctest being a good combination
+                        (maybe also building on the XML doctest extension I
+                        talked about earlier:
+                        <a class="reference" href="xml-and-doctest.html"
+                            >https://ianbicking.org/xml-and-doctest.html</a
+                        >
+                        )
+                    </p>
+                    <p>
+                        I guess webunit and Mechanize have similar scopes, but I
+                        haven't really thought about how they compare.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/web-application-acceptance-testing-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

@@ -1,50 +1,74 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>JSLint from the Command Line</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>JSLint from the Command Line</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>JSLint from the Command Line</h1>
 
-<div style="float: right">
-
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>JSLint from the Command Line</h1>
- 
-<div class="document">
-<p>Javascript can be a finicky language, all the worse that it's often
-permissive, because different browsers are more permissive than
-others.  Annoyingly for me, Mozilla is more permissive than IE, so my
-Mozilla testing often misses things.</p>
-<p>There aren't many programs out there to check Javascript.  The only
-one I've really found is <a class="reference" href="http://jslint.com">JSLint</a>.  The hard part
-is that it is written in Javascript.  I guess it makes sense, but I
-want to do automated checking, and a browser context doesn't work for
-me.</p>
-<p>However, you can run Javascript from the command-line with
-<a class="reference" href="http://www.mozilla.org/js/spidermonkey/">Spidermonkey</a> (Mozilla's Javascript interpreter split out).  The
-command-line interface is hard to decypher.</p>
-<p>I eventually figured out I could run jslint like <a class="reference" href="http://svn.colorstudy.com/home/ianb/jslint/jslintrun.js">this</a>:</p>
-<pre class="literal-block">
+        <div class="document">
+            <p>
+                Javascript can be a finicky language, all the worse that it's
+                often permissive, because different browsers are more permissive
+                than others. Annoyingly for me, Mozilla is more permissive than
+                IE, so my Mozilla testing often misses things.
+            </p>
+            <p>
+                There aren't many programs out there to check Javascript. The
+                only one I've really found is
+                <a class="reference" href="http://jslint.com">JSLint</a>. The
+                hard part is that it is written in Javascript. I guess it makes
+                sense, but I want to do automated checking, and a browser
+                context doesn't work for me.
+            </p>
+            <p>
+                However, you can run Javascript from the command-line with
+                <a
+                    class="reference"
+                    href="http://www.mozilla.org/js/spidermonkey/"
+                    >Spidermonkey</a
+                >
+                (Mozilla's Javascript interpreter split out). The command-line
+                interface is hard to decypher.
+            </p>
+            <p>
+                I eventually figured out I could run jslint like
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/home/ianb/jslint/jslintrun.js"
+                    >this</a
+                >:
+            </p>
+            <pre class="literal-block">
 load('fulljslint.js');
 
 var body = arguments[0];
@@ -56,35 +80,76 @@ if (result) {
   print('Problems:');
 }
 print(jslint.report());
-</pre>
-<p>I can't figure out any way to access <tt class="docutils literal"><span class="pre">stdin</span></tt>, so I have to stuff the
-entire Javascript into the first argument, and I run it like:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>
+                I can't figure out any way to access
+                <tt class="docutils literal"><span class="pre">stdin</span></tt
+                >, so I have to stuff the entire Javascript into the first
+                argument, and I run it like:
+            </p>
+            <pre class="literal-block">
 $ js jslintrun.js &quot;`cat jsfile.js`&quot;
-</pre>
-<p>Eh... at least it works.  I should also use <tt class="docutils literal"><span class="pre">js</span> <span class="pre">-s</span> <span class="pre">jsfile.js</span></tt>, as
-this prints out another set of useful warnings (<tt class="docutils literal"><span class="pre">-s</span></tt> is for strict
-mode).</p>
-<p>I want to turn this into another piece of Paste middleware, checking
-all the JS as it goes past, and probably putting the report in the
-session so it can be displayed the next time the user/developer views
-an HTML page.</p>
-<p>Then I just have to interface with the <a class="reference" href="http://jigsaw.w3.org/css-validator/">CSS validator</a> (or <a class="reference" href="http://www.htmlhelp.com/tools/csscheck/">this one?</a>).</p>
-</div>
- <div class="dates" align="right">
-Created 19 Aug '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>To access stdin, you have to turn on JS_HAVE_FILE_OBJECT when building SpiderMonkey. The latest CVS versions of spidermonkey have the best file support.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/jslint-command-line-comment-1.html" rel="nofollow">#</a> <a href="http://wikitravel.org/en/User:Evan">Evan Prodromou</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+            >
+            <p>
+                Eh... at least it works. I should also use
+                <tt class="docutils literal"
+                    ><span class="pre">js</span> <span class="pre">-s</span>
+                    <span class="pre">jsfile.js</span></tt
+                >, as this prints out another set of useful warnings (<tt
+                    class="docutils literal"
+                    ><span class="pre">-s</span></tt
+                >
+                is for strict mode).
+            </p>
+            <p>
+                I want to turn this into another piece of Paste middleware,
+                checking all the JS as it goes past, and probably putting the
+                report in the session so it can be displayed the next time the
+                user/developer views an HTML page.
+            </p>
+            <p>
+                Then I just have to interface with the
+                <a class="reference" href="http://jigsaw.w3.org/css-validator/"
+                    >CSS validator</a
+                >
+                (or
+                <a
+                    class="reference"
+                    href="http://www.htmlhelp.com/tools/csscheck/"
+                    >this one?</a
+                >).
+            </p>
+        </div>
+        <div class="dates" align="right">Created 19 Aug '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    To access stdin, you have to turn on JS_HAVE_FILE_OBJECT
+                    when building SpiderMonkey. The latest CVS versions of
+                    spidermonkey have the best file support.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/jslint-command-line-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://wikitravel.org/en/User:Evan">Evan Prodromou</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

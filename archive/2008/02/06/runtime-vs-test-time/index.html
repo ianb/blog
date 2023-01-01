@@ -1,461 +1,1785 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
-<script type="text/javascript">/*<![CDATA[*/(function(a){function b(a,b){if(+a)return~a||(d.cookie=h+"=; path=/");j=d.createElement(e),k=d.getElementsByTagName(e)[0],j.src=a,b&&(j.onload=j.onerror=b),k.parentNode.insertBefore(j,k)}function c(){n.api||b(l.shift()||-1,c)}if(this.Mobify)return;var d=document,e="script",f="mobify",g="."+f+".com/",h=f+"-path",i=g+"un"+f+".js",j,k,l=[!1,1],m,n=this.Mobify={points:[+(new Date)],tagVersion:[6,0]},o=/(; |#|&|^)mobify-path=([^&;]*)/g.exec(location.hash+"; "+d.cookie);o?(m=o[2])&&!+(m=sessionStorage[h]||m)&&(l=[!0,"//preview"+g+escape(m)]):(l=a()||l,l[0]&&l.push("//cdn"+i,"//files01"+i)),l.shift()?(d.write('<plaintext style="display:none;">'),setTimeout(c)):b(l[0])})(function(){if(/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)){return[1,"//cdn.mobify.com/sites/ians-blog/production/mobify.js"]}})/*]]>*/</script>
-<!-- END MOBIFY -->
-	<title>Ian Bicking: a blog   ::  Runtime vs. Test time</title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<meta name="generator" content="WordPress 3.4.2" /><!-- LEAVE FOR STATS -->
-	<meta name="description" content="" />
-	<link rel="stylesheet" title="plaintxtSimpler" href="../../../../wp-content/themes/Barthelme-ianb/style.css" type="text/css" media="all" />
-	<link rel="start" href="../../../../index.html" title="Ian Bicking: a blog" />
-	<link rel="alternate" type="application/atom+xml" title="Ian Bicking: a blog Atom Feed" href="../../../../feed/atom/index.html" />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog RSS 2.0 Feed" href="../../../../feed/rss/index.html" />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog Comments RSS 2.0 Feed" href="../../../../comments/feed/index.html" />
-	<link rel="alternate" type="application/rdf+xml" title="Ian Bicking: a blog RSS 1.0" href="../../../../feed/rdf/index.html" />
-	<link rel="alternate" type="text/xml" title="Ian Bicking: a blog RSS 0.92 Feed" href="../../../../feed/rss/index.html" />
-	<link rel="pingback" href="../../../../xmlrpc.php" />
-	<link rel="openid.server" href="http://www.myopenid.com/server" />
-	<link rel="openid.delegate" href="http://ianb.myopenid.com" />
-        <link rel="me" type="text/html" href="http://www.google.com/profiles/ianbicking"/>
-		<link rel='archives' title='October 2012' href='../../../../2012/10/index.html' />
-	<link rel='archives' title='February 2012' href='../../../../2012/02/index.html' />
-	<link rel='archives' title='April 2011' href='../../../../2011/04/index.html' />
-	<link rel='archives' title='March 2011' href='../../../../2011/03/index.html' />
-	<link rel='archives' title='September 2010' href='../../../../2010/09/index.html' />
-	<link rel='archives' title='August 2010' href='../../../../2010/08/index.html' />
-	<link rel='archives' title='May 2010' href='../../../../2010/05/index.html' />
-	<link rel='archives' title='April 2010' href='../../../../2010/04/index.html' />
-	<link rel='archives' title='March 2010' href='../../../../2010/03/index.html' />
-	<link rel='archives' title='February 2010' href='../../../../2010/02/index.html' />
-	<link rel='archives' title='January 2010' href='../../../../2010/01/index.html' />
-	<link rel='archives' title='September 2009' href='../../../../2009/09/index.html' />
-	<link rel='archives' title='May 2009' href='../../../../2009/05/index.html' />
-	<link rel='archives' title='April 2009' href='../../../../2009/04/index.html' />
-	<link rel='archives' title='January 2009' href='../../../../2009/01/index.html' />
-	<link rel='archives' title='December 2008' href='../../../12/index.html' />
-	<link rel='archives' title='November 2008' href='../../../11/index.html' />
-	<link rel='archives' title='October 2008' href='../../../10/index.html' />
-	<link rel='archives' title='September 2008' href='../../../09/index.html' />
-	<link rel='archives' title='August 2008' href='../../../08/index.html' />
-	<link rel='archives' title='July 2008' href='../../../07/index.html' />
-	<link rel='archives' title='June 2008' href='../../../06/index.html' />
-	<link rel='archives' title='May 2008' href='../../../05/index.html' />
-	<link rel='archives' title='April 2008' href='../../../04/index.html' />
-	<link rel='archives' title='March 2008' href='../../../03/index.html' />
-	<link rel='archives' title='February 2008' href='../../index.html' />
-	<link rel='archives' title='January 2008' href='../../../01/index.html' />
-	<link rel='archives' title='November 2007' href='../../../../2007/11/index.html' />
-	<link rel='archives' title='October 2007' href='../../../../2007/10/index.html' />
-	<link rel='archives' title='September 2007' href='../../../../2007/09/index.html' />
-	<link rel='archives' title='August 2007' href='../../../../2007/08/index.html' />
-	<link rel='archives' title='July 2007' href='../../../../2007/07/index.html' />
-	<link rel="alternate" type="application/rss+xml" title="Ian Bicking: a blog &raquo; Runtime vs. Test time Comments Feed" href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/feed/" />
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="../../../../xmlrpc.php?rsd" />
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="../../../../wp-includes/wlwmanifest.xml" /> 
-<link rel='prev' title='A Simple CMS' href='../../05/a-simple-cms/index.html' />
-<link rel='next' title='PyCon Talks' href='../../../03/21/pycon-talks/index.html' />
-<meta name="generator" content="WordPress 3.4.2" />
-<link rel='canonical' href='index.html' />
-<link rel='shortlink' href='http://blog.ianbicking.org/?p=41' />
-<link rel="stylesheet" href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"  type="text/css" />	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+    <head>
+        <!-- MOBIFY - DO NOT ALTER - PASTE IMMEDIATELY AFTER OPENING HEAD TAG -->
+        <script type="text/javascript">
+            /*<![CDATA[*/ (function (a) {
+                function b(a, b) {
+                    if (+a) return ~a || (d.cookie = h + "=; path=/");
+                    (j = d.createElement(e)),
+                        (k = d.getElementsByTagName(e)[0]),
+                        (j.src = a),
+                        b && (j.onload = j.onerror = b),
+                        k.parentNode.insertBefore(j, k);
+                }
+                function c() {
+                    n.api || b(l.shift() || -1, c);
+                }
+                if (this.Mobify) return;
+                var d = document,
+                    e = "script",
+                    f = "mobify",
+                    g = "." + f + ".com/",
+                    h = f + "-path",
+                    i = g + "un" + f + ".js",
+                    j,
+                    k,
+                    l = [!1, 1],
+                    m,
+                    n = (this.Mobify = {
+                        points: [+new Date()],
+                        tagVersion: [6, 0],
+                    }),
+                    o = /(; |#|&|^)mobify-path=([^&;]*)/g.exec(
+                        location.hash + "; " + d.cookie
+                    );
+                o
+                    ? (m = o[2]) &&
+                      !+(m = sessionStorage[h] || m) &&
+                      (l = [!0, "//preview" + g + escape(m)])
+                    : ((l = a() || l),
+                      l[0] && l.push("//cdn" + i, "//files01" + i)),
+                    l.shift()
+                        ? (d.write('<plaintext style="display:none;">'),
+                          setTimeout(c))
+                        : b(l[0]);
+            })(function () {
+                if (
+                    /ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(
+                        navigator.userAgent
+                    )
+                ) {
+                    return [
+                        1,
+                        "//cdn.mobify.com/sites/ians-blog/production/mobify.js",
+                    ];
+                }
+            }); /*]]>*/
+        </script>
+        <!-- END MOBIFY -->
+        <title>Ian Bicking: a blog :: Runtime vs. Test time</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta name="generator" content="WordPress 3.4.2" />
+        <!-- LEAVE FOR STATS -->
+        <meta name="description" content="" />
+        <link
+            rel="stylesheet"
+            title="plaintxtSimpler"
+            href="../../../../wp-content/themes/Barthelme-ianb/style.css"
+            type="text/css"
+            media="all"
+        />
+        <link
+            rel="start"
+            href="../../../../index.html"
+            title="Ian Bicking: a blog"
+        />
+        <link
+            rel="alternate"
+            type="application/atom+xml"
+            title="Ian Bicking: a blog Atom Feed"
+            href="../../../../feed/atom/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog RSS 2.0 Feed"
+            href="../../../../feed/rss/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog Comments RSS 2.0 Feed"
+            href="../../../../comments/feed/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rdf+xml"
+            title="Ian Bicking: a blog RSS 1.0"
+            href="../../../../feed/rdf/index.html"
+        />
+        <link
+            rel="alternate"
+            type="text/xml"
+            title="Ian Bicking: a blog RSS 0.92 Feed"
+            href="../../../../feed/rss/index.html"
+        />
+        <link
+            rel="archives"
+            title="October 2012"
+            href="../../../../2012/10/index.html"
+        />
+        <link
+            rel="archives"
+            title="February 2012"
+            href="../../../../2012/02/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2011"
+            href="../../../../2011/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="March 2011"
+            href="../../../../2011/03/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2010"
+            href="../../../../2010/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2010"
+            href="../../../../2010/08/index.html"
+        />
+        <link
+            rel="archives"
+            title="May 2010"
+            href="../../../../2010/05/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2010"
+            href="../../../../2010/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="March 2010"
+            href="../../../../2010/03/index.html"
+        />
+        <link
+            rel="archives"
+            title="February 2010"
+            href="../../../../2010/02/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2010"
+            href="../../../../2010/01/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2009"
+            href="../../../../2009/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="May 2009"
+            href="../../../../2009/05/index.html"
+        />
+        <link
+            rel="archives"
+            title="April 2009"
+            href="../../../../2009/04/index.html"
+        />
+        <link
+            rel="archives"
+            title="January 2009"
+            href="../../../../2009/01/index.html"
+        />
+        <link
+            rel="archives"
+            title="December 2008"
+            href="../../../12/index.html"
+        />
+        <link
+            rel="archives"
+            title="November 2008"
+            href="../../../11/index.html"
+        />
+        <link
+            rel="archives"
+            title="October 2008"
+            href="../../../10/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2008"
+            href="../../../09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2008"
+            href="../../../08/index.html"
+        />
+        <link rel="archives" title="July 2008" href="../../../07/index.html" />
+        <link rel="archives" title="June 2008" href="../../../06/index.html" />
+        <link rel="archives" title="May 2008" href="../../../05/index.html" />
+        <link rel="archives" title="April 2008" href="../../../04/index.html" />
+        <link rel="archives" title="March 2008" href="../../../03/index.html" />
+        <link rel="archives" title="February 2008" href="../../index.html" />
+        <link
+            rel="archives"
+            title="January 2008"
+            href="../../../01/index.html"
+        />
+        <link
+            rel="archives"
+            title="November 2007"
+            href="../../../../2007/11/index.html"
+        />
+        <link
+            rel="archives"
+            title="October 2007"
+            href="../../../../2007/10/index.html"
+        />
+        <link
+            rel="archives"
+            title="September 2007"
+            href="../../../../2007/09/index.html"
+        />
+        <link
+            rel="archives"
+            title="August 2007"
+            href="../../../../2007/08/index.html"
+        />
+        <link
+            rel="archives"
+            title="July 2007"
+            href="../../../../2007/07/index.html"
+        />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Ian Bicking: a blog &raquo; Runtime vs. Test time Comments Feed"
+            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/feed/"
+        />
+        <link
+            rel="EditURI"
+            type="application/rsd+xml"
+            title="RSD"
+            href="../../../../xmlrpc.php?rsd"
+        />
+        <link
+            rel="wlwmanifest"
+            type="application/wlwmanifest+xml"
+            href="../../../../wp-includes/wlwmanifest.xml"
+        />
+        <link
+            rel="prev"
+            title="A Simple CMS"
+            href="../../05/a-simple-cms/index.html"
+        />
+        <link
+            rel="next"
+            title="PyCon Talks"
+            href="../../../03/21/pycon-talks/index.html"
+        />
+        <meta name="generator" content="WordPress 3.4.2" />
+        <link rel="canonical" href="index.html" />
+        <link rel="shortlink" href="https://ianbicking.org/?p=41" />
+        <link
+            rel="stylesheet"
+            href="../../../../wp-content/plugins/source-code-syntax-highlighting-plugin-for-wordpress/geshi.css"
+            type="text/css"
+        />
+        <style type="text/css">
+            .recentcomments a {
+                display: inline !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        </style>
         <style type="text/css" media="all">
-/*<![CDATA[*/
-body { font-size: 100%; }
-body { font-family: tahoma, geneva, sans-serif; }
-div.post-header, h2.post-title, p.post-date-single, h2.post-title-single, div.post-entry h1, div.post-entry h2, div.post-entry h3, div.post-entry h4, div.post-entry h5, div.post-entry h6, div.post-entry blockquote, div.post-footer, h3#comment-count, h4#comment-header, div#comments ol li p.comment-metadata, h4#respond { font-family: verdana, geneva, sans-serif; }
-div.post-entry p { text-align: left; }
-div#wrapper { width: 100%; }
+            /*<![CDATA[*/
+            body {
+                font-size: 100%;
+            }
+            body {
+                font-family: tahoma, geneva, sans-serif;
+            }
+            div.post-header,
+            h2.post-title,
+            p.post-date-single,
+            h2.post-title-single,
+            div.post-entry h1,
+            div.post-entry h2,
+            div.post-entry h3,
+            div.post-entry h4,
+            div.post-entry h5,
+            div.post-entry h6,
+            div.post-entry blockquote,
+            div.post-footer,
+            h3#comment-count,
+            h4#comment-header,
+            div#comments ol li p.comment-metadata,
+            h4#respond {
+                font-family: verdana, geneva, sans-serif;
+            }
+            div.post-entry p {
+                text-align: left;
+            }
+            div#wrapper {
+                width: 100%;
+            }
 
-/*]]>*/
-</style>
-</head>
-<body>
-
-<div id="wrapper">
-
-	<div id="header" onclick="location.href='http://blog.ianbicking.org/';" style="cursor:pointer;">
-		<h1 id="title"><a href="../../../../index.html" title="Ian Bicking: a blog">Ian Bicking: a blog</a></h1>
-		<p id="description"></p>
-	</div>
-<!-- WP Theme Credits -->
-<div style="display: none;">We can answer on question <a href="http://www.olnevhost.net/vps-hosting.html">what is VPS</a>? and
-what is <a href="http://www.olnevhost.net/dedicated-servers.html"><strong>cheap dedicated servers</strong></a>?</div>
-<!-- END HEADER -->
-<div id="container">
-	<div id="content" class="widecolumn">
-
-
-		<div id="post-41" class="post single-post">
-			<p class="post-date-single">{ 2008 02 06 }</p>
-			<h2 class="post-title-single">Runtime vs. Test time</h2>
-			<div class="post-entry">
-				<div class="document">
-<p>Defenders of static typing have long claimed that it helps them avoid bugs, the compiler providing a constant test of code consistency. Agile practitioners counter that tests do the same thing and much more.</p>
-<p>I find myself inclined to something more in the middle. I don’t care for static typing, but I think <a class="reference external" href="http://en.wikipedia.org/wiki/Design_by_contract">programming by contract</a> has a lot of validity, is more powerful and helpful than static typing, and works just as well in a dynamically typed language. Programming by contract is more a principle than a particular technology. Unit testing is not <a class="reference external" href="http://en.wikipedia.org/wiki/XUnit">xUnit</a>; that’s just one way to do it. You can do unit testing perfectly well without any framework or special infrastructure at all. Similarly programming by contract just means: state and check your up-front expectations in a piece of code, and state and check our expectations for what that code returns or does. This can be as simple as “assert isinstance(n, int)“ in your code.</p>
-<p>Programming by contract is not enough to produce quality code. While the contract is checked at runtime that only means that exceptions are raised early and bad or inconsistent data does not propagate into the system. But it only works if you go through the code paths to invoke all those contracts.</p>
-<p>Here’s where <a class="reference external" href="http://en.wikipedia.org/wiki/System_testing">functional tests</a> come in. A functional test does stuff. In a web application a functional test does a simulated HTTP request and gives you the result. Generally they are high-level and go through the entire application stack. This is in contrast to unit tests that test just one piece of code.</p>
-<p>Proponents of unit tests say that functional tests are problematic. They often give confusing output, so that you have to work harder to debug problems when you are invoking so much code. You have combinatorial problems where it can be difficult to run tests that really get to all branches of the code. Functional tests can be slow.</p>
-<p>Of course no one really claims you shouldn’t have a mixture of both functional and unit tests for your code, this is more a question of what the best balance is. Functional tests without runtime checks in your code <em>are</em> a problem. They can be fragile because people look for every detail of how the application responds to identify how specific features function. But every detail that is verified is a detail that might change and require updates to the tests.</p>
-<p>With runtime tests functional tests can be much more compact. You can do things like simply verify that a page renders, or that code completes without an exception. If you have some confidence that it won’t be complete <em>wrong</em> — wrong as in without any exception but with errors — then simply exercising to code can be sufficient. In addition to getting more use out of your functional tests, you also have some assurance that production code will act in a sane way — that is, if it <em>is</em> broken, the code will <em>act</em> broken. Given a good deployment situation, the turnaround on fixing deployed bugs can be much shorter.</p>
-</div>
-<p>Automatically generated list of related posts:</p><ol>
-<li><a href='../../../06/09/thoughts-about-the-erlang-runtime/index.html' rel='bookmark' title='Thoughts About the Erlang Runtime'>Thoughts About the Erlang Runtime</a> <small>I should preface this entire post by noting that I...</small></li>
-<li><a href='../../../../2010/03/03/toppcloud-renamed-to-silver-lining/index.html' rel='bookmark' title='toppcloud renamed to Silver Lining'>toppcloud renamed to Silver Lining</a> <small>After some pondering at PyCon, I decided on a new...</small></li>
-</ol>											</div><!-- END POST-ENTRY  -->
-			<!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            /*]]>*/
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div
+                id="header"
+                onclick="location.href='https://ianbicking.org/';"
+                style="cursor: pointer"
+            >
+                <h1 id="title">
+                    <a href="../../../../index.html" title="Ian Bicking: a blog"
+                        >Ian Bicking: a blog</a
+                    >
+                </h1>
+                <p id="description"></p>
+            </div>
+            <!-- WP Theme Credits -->
+            <div style="display: none">
+                We can answer on question
+                <a href="http://www.olnevhost.net/vps-hosting.html"
+                    >what is VPS</a
+                >? and what is
+                <a href="http://www.olnevhost.net/dedicated-servers.html"
+                    ><strong>cheap dedicated servers</strong></a
+                >?
+            </div>
+            <!-- END HEADER -->
+            <div id="container">
+                <div id="content" class="widecolumn">
+                    <div id="post-41" class="post single-post">
+                        <p class="post-date-single">{ 2008 02 06 }</p>
+                        <h2 class="post-title-single">Runtime vs. Test time</h2>
+                        <div class="post-entry">
+                            <div class="document">
+                                <p>
+                                    Defenders of static typing have long claimed
+                                    that it helps them avoid bugs, the compiler
+                                    providing a constant test of code
+                                    consistency. Agile practitioners counter
+                                    that tests do the same thing and much more.
+                                </p>
+                                <p>
+                                    I find myself inclined to something more in
+                                    the middle. I don’t care for static typing,
+                                    but I think
+                                    <a
+                                        class="reference external"
+                                        href="http://en.wikipedia.org/wiki/Design_by_contract"
+                                        >programming by contract</a
+                                    >
+                                    has a lot of validity, is more powerful and
+                                    helpful than static typing, and works just
+                                    as well in a dynamically typed language.
+                                    Programming by contract is more a principle
+                                    than a particular technology. Unit testing
+                                    is not
+                                    <a
+                                        class="reference external"
+                                        href="http://en.wikipedia.org/wiki/XUnit"
+                                        >xUnit</a
+                                    >; that’s just one way to do it. You can do
+                                    unit testing perfectly well without any
+                                    framework or special infrastructure at all.
+                                    Similarly programming by contract just
+                                    means: state and check your up-front
+                                    expectations in a piece of code, and state
+                                    and check our expectations for what that
+                                    code returns or does. This can be as simple
+                                    as “assert isinstance(n, int)“ in your code.
+                                </p>
+                                <p>
+                                    Programming by contract is not enough to
+                                    produce quality code. While the contract is
+                                    checked at runtime that only means that
+                                    exceptions are raised early and bad or
+                                    inconsistent data does not propagate into
+                                    the system. But it only works if you go
+                                    through the code paths to invoke all those
+                                    contracts.
+                                </p>
+                                <p>
+                                    Here’s where
+                                    <a
+                                        class="reference external"
+                                        href="http://en.wikipedia.org/wiki/System_testing"
+                                        >functional tests</a
+                                    >
+                                    come in. A functional test does stuff. In a
+                                    web application a functional test does a
+                                    simulated HTTP request and gives you the
+                                    result. Generally they are high-level and go
+                                    through the entire application stack. This
+                                    is in contrast to unit tests that test just
+                                    one piece of code.
+                                </p>
+                                <p>
+                                    Proponents of unit tests say that functional
+                                    tests are problematic. They often give
+                                    confusing output, so that you have to work
+                                    harder to debug problems when you are
+                                    invoking so much code. You have
+                                    combinatorial problems where it can be
+                                    difficult to run tests that really get to
+                                    all branches of the code. Functional tests
+                                    can be slow.
+                                </p>
+                                <p>
+                                    Of course no one really claims you shouldn’t
+                                    have a mixture of both functional and unit
+                                    tests for your code, this is more a question
+                                    of what the best balance is. Functional
+                                    tests without runtime checks in your code
+                                    <em>are</em> a problem. They can be fragile
+                                    because people look for every detail of how
+                                    the application responds to identify how
+                                    specific features function. But every detail
+                                    that is verified is a detail that might
+                                    change and require updates to the tests.
+                                </p>
+                                <p>
+                                    With runtime tests functional tests can be
+                                    much more compact. You can do things like
+                                    simply verify that a page renders, or that
+                                    code completes without an exception. If you
+                                    have some confidence that it won’t be
+                                    complete <em>wrong</em> — wrong as in
+                                    without any exception but with errors — then
+                                    simply exercising to code can be sufficient.
+                                    In addition to getting more use out of your
+                                    functional tests, you also have some
+                                    assurance that production code will act in a
+                                    sane way — that is, if it
+                                    <em>is</em> broken, the code will
+                                    <em>act</em> broken. Given a good deployment
+                                    situation, the turnaround on fixing deployed
+                                    bugs can be much shorter.
+                                </p>
+                            </div>
+                            <p>
+                                Automatically generated list of related posts:
+                            </p>
+                            <ol>
+                                <li>
+                                    <a
+                                        href="../../../06/09/thoughts-about-the-erlang-runtime/index.html"
+                                        rel="bookmark"
+                                        title="Thoughts About the Erlang Runtime"
+                                        >Thoughts About the Erlang Runtime</a
+                                    >
+                                    <small
+                                        >I should preface this entire post by
+                                        noting that I...</small
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="../../../../2010/03/03/toppcloud-renamed-to-silver-lining/index.html"
+                                        rel="bookmark"
+                                        title="toppcloud renamed to Silver Lining"
+                                        >toppcloud renamed to Silver Lining</a
+                                    >
+                                    <small
+                                        >After some pondering at PyCon, I
+                                        decided on a new...</small
+                                    >
+                                </li>
+                            </ol>
+                        </div>
+                        <!-- END POST-ENTRY  -->
+                        <!-- <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 			xmlns:dc="http://purl.org/dc/elements/1.1/"
 			xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
-		<rdf:Description rdf:about="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/"
-    dc:identifier="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/"
+		<rdf:Description rdf:about="https://ianbicking.org/2008/02/06/runtime-vs-test-time/"
+    dc:identifier="https://ianbicking.org/2008/02/06/runtime-vs-test-time/"
     dc:title="Runtime vs. Test time"
-    trackback:ping="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/trackback/" />
+    trackback:ping="https://ianbicking.org/2008/02/06/runtime-vs-test-time/trackback/" />
 </rdf:RDF> -->
-			<div class="post-footer">
-				<p>Posted by Ian Bicking on Wednesday, February 6th, 2008, at 10:39 pm, and filed under <a href="../../../../category/programming/index.html" title="View all posts in Programming" rel="category tag">Programming</a>.</p>
-				<p>
-				Comments have a <a href='http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/feed/'>feed</a>.</p>
-			</div><!-- END POST-FOOTER -->
-		</div><!-- END POST -->
+                        <div class="post-footer">
+                            <p>
+                                Posted by Ian Bicking on Wednesday, February
+                                6th, 2008, at 10:39 pm, and filed under
+                                <a
+                                    href="../../../../category/programming/index.html"
+                                    title="View all posts in Programming"
+                                    rel="category tag"
+                                    >Programming</a
+                                >.
+                            </p>
+                            <p>
+                                Comments have a
+                                <a
+                                    href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/feed/"
+                                    >feed</a
+                                >.
+                            </p>
+                        </div>
+                        <!-- END POST-FOOTER -->
+                    </div>
+                    <!-- END POST -->
 
-<div id="comments">
+                    <div id="comments">
+                        <h4 id="comments">10 Comments</h4>
+                        <ul class="commentlist">
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-13804"
+                            >
+                                <div
+                                    id="div-comment-13804"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/49ab3ce5a4922b4747d1d6f330784629?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://geekrant.wordpress.com"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Jake McArthur</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13804"
+                                        >
+                                            February 7, 2008 at 12:19 am</a
+                                        >
+                                    </div>
 
+                                    <p>
+                                        You have the right idea, but there is
+                                        another step you can take this. Your
+                                        contracts can be
+                                        <em>statically</em> checked!
+                                        Unfortunately, we don&#8217;t have many
+                                        (any?) general purpose programming
+                                        languages that can do this yet, but the
+                                        theory is sound, and theorem provers
+                                        (Coq, for example) already use the
+                                        technique.
+                                    </p>
 
+                                    <p>
+                                        The idea is that, in a dependently typed
+                                        language (one in which your types can
+                                        depend on the values&#8230; which sounds
+                                        weird but these <em>can</em> be
+                                        statically checked), you pass around
+                                        proofs. That is, arguments in your
+                                        functions call for propositions
+                                        (preconditions to assert), and calling
+                                        these functions will only compile if you
+                                        supply appropriate proofs of these
+                                        propositions. Likewise, the function can
+                                        return proofs (postconditions) to be
+                                        used elsewhere as well. That&#8217;s a
+                                        very rough metaphor of what you actually
+                                        do, anyway.
+                                    </p>
 
-<h4 id="comments">10 Comments</h4>
- <ul class="commentlist">
-		<li class="comment even thread-even depth-1" id="comment-13804">
-				<div id="div-comment-13804" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/49ab3ce5a4922b4747d1d6f330784629?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://geekrant.wordpress.com' rel='external nofollow' class='url'>Jake McArthur</a></cite> <span class="says">says:</span>		</div>
+                                    <p>
+                                        So design by contract isn&#8217;t really
+                                        a substitute for static typing after
+                                        all, since it can be statically checked!
+                                    </p>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13804">
-			February 7, 2008 at 12:19 am</a>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1"
+                                id="comment-13807"
+                            >
+                                <div
+                                    id="div-comment-13807"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="../../../../index.html"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Ian Bicking</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<p>You have the right idea, but there is another step you can take this. Your contracts can be <em>statically</em> checked! Unfortunately, we don&#8217;t have many (any?) general purpose programming languages that can do this yet, but the theory is sound, and theorem provers (Coq, for example) already use the technique.</p>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13807"
+                                        >
+                                            February 7, 2008 at 12:25 am</a
+                                        >
+                                    </div>
 
-<p>The idea is that, in a dependently typed language (one in which your types can depend on the values&#8230; which sounds weird but these <em>can</em> be statically checked), you pass around proofs. That is, arguments in your functions call for propositions (preconditions to assert), and calling these functions will only compile if you supply appropriate proofs of these propositions. Likewise, the function can return proofs (postconditions) to be used elsewhere as well. That&#8217;s a very rough metaphor of what you actually do, anyway.</p>
+                                    <p>
+                                        <em>Sometimes</em> a contract can be
+                                        statically checked. But as we all have
+                                        learned from statically typed languages,
+                                        this kind of language analysis can lead
+                                        to blowback for the programs,
+                                        restricting the kinds of programs you
+                                        can write in order to facilitate the
+                                        static analysis. There&#8217;s simply
+                                        <em>no</em> static analysis that is
+                                        smart enough to accept all correct
+                                        programs. This goes double for
+                                        contracts.
+                                    </p>
 
-<p>So design by contract isn&#8217;t really a substitute for static typing after all, since it can be statically checked!</p>
+                                    <p>
+                                        Of course a contract can also get kind
+                                        of expensive at runtime. E.g.,
+                                        <code
+                                            >for item in seq: assert item is
+                                            None or isinstance(item, int)</code
+                                        >. You have to consider just how far you
+                                        are willing to go to check values
+                                        up-front. But then an assert in the
+                                        middle of a function (e.g., inside a
+                                        <code>for</code> loop) can be just as
+                                        good, and often much cheaper.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1" id="comment-13807">
-				<div id="div-comment-13807" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-13808"
+                            >
+                                <div
+                                    id="div-comment-13808"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/49ab3ce5a4922b4747d1d6f330784629?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://geekrant.wordpress.com"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Jake McArthur</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13807">
-			February 7, 2008 at 12:25 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13808"
+                                        >
+                                            February 7, 2008 at 12:49 am</a
+                                        >
+                                    </div>
 
-		<p><em>Sometimes</em> a contract can be statically checked.  But as we all have learned from statically typed languages, this kind of language analysis can lead to blowback for the programs, restricting the kinds of programs you can write in order to facilitate the static analysis.  There&#8217;s simply <em>no</em> static analysis that is smart enough to accept all correct programs.  This goes double for contracts.</p>
+                                    <p>
+                                        That is true. You generally have to be
+                                        willing to sacrifice Turing completeness
+                                        in order to be able to statically check
+                                        all properties. Then again, the kinds of
+                                        contracts that would impose this
+                                        restriction could just be checked at
+                                        runtime anyway. There are not many cases
+                                        I can think of that this would be
+                                        strictly necessary though. Turing
+                                        completeness is overrated most of the
+                                        time.
+                                    </p>
 
-<p>Of course a contract can also get kind of expensive at runtime.  E.g., <code>for item in seq: assert item is None or isinstance(item, int)</code>.  You have to consider just how far you are willing to go to check values up-front.  But then an assert in the middle of a function (e.g., inside a <code>for</code> loop) can be just as good, and often much cheaper.</p>
+                                    <p>
+                                        Anyway, it&#8217;s still an open area of
+                                        research. We will have practical results
+                                        from it eventually though!
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-13808">
-				<div id="div-comment-13808" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/49ab3ce5a4922b4747d1d6f330784629?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://geekrant.wordpress.com' rel='external nofollow' class='url'>Jake McArthur</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-13825"
+                            >
+                                <div
+                                    id="div-comment-13825"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/d54ccc2693cbae16d672f9360956e87e?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://tmorris.net/"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Tony Morris</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13808">
-			February 7, 2008 at 12:49 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13825"
+                                        >
+                                            February 7, 2008 at 2:28 am</a
+                                        >
+                                    </div>
 
-		<p>That is true. You generally have to be willing to sacrifice Turing completeness in order to be able to statically check all properties. Then again, the kinds of contracts that would impose this restriction could just be checked at runtime anyway. There are not many cases I can think of that this would be strictly necessary though. Turing completeness is overrated most of the time.</p>
+                                    <p>
+                                        Please read
+                                        <a
+                                            href="http://cdsmith.twu.net/types.html"
+                                            rel="nofollow"
+                                            >http://cdsmith.twu.net/types.html</a
+                                        >
+                                        and stop spreading the Agile memetic
+                                        fallacy.
+                                    </p>
 
-<p>Anyway, it&#8217;s still an open area of research. We will have practical results from it eventually though!</p>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-13919"
+                            >
+                                <div
+                                    id="div-comment-13919"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/463a381eaf9c0c08bc130a1bea1874ee?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="http://www.voidspace.org.uk/python/weblog/"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Michael Foord</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-13825">
-				<div id="div-comment-13825" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/d54ccc2693cbae16d672f9360956e87e?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://tmorris.net/' rel='external nofollow' class='url'>Tony Morris</a></cite> <span class="says">says:</span>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13919"
+                                        >
+                                            February 7, 2008 at 6:35 am</a
+                                        >
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13825">
-			February 7, 2008 at 2:28 am</a>		</div>
+                                    <p>
+                                        Although you don&#8217;t mention it, I
+                                        wonder if you miss the point about TDD.
+                                        TDD doesn&#8217;t produce better code
+                                        because it produces more tested code, it
+                                        produces better code because it is a
+                                        better <em>design</em> process. This is
+                                        overwhelmingly my experience (based on a
+                                        massive two years worth of experience!)
+                                        and has irrevocably changed the way I
+                                        program.
+                                    </p>
 
-		<p>Please read <a href="http://cdsmith.twu.net/types.html" rel="nofollow">http://cdsmith.twu.net/types.html</a> and stop spreading the Agile memetic fallacy.</p>
+                                    <p>
+                                        Having a full test suite is a great side
+                                        effect that is very useful for
+                                        refactoring, but it is only a side
+                                        effect.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-13919">
-				<div id="div-comment-13919" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/463a381eaf9c0c08bc130a1bea1874ee?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='http://www.voidspace.org.uk/python/weblog/' rel='external nofollow' class='url'>Michael Foord</a></cite> <span class="says">says:</span>		</div>
+                                    <p>
+                                        (Your &#8216;Website&#8217; field in the
+                                        comment form doesn&#8217;t allow enough
+                                        characters by the way!)
+                                    </p>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13919">
-			February 7, 2008 at 6:35 am</a>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-13989"
+                            >
+                                <div
+                                    id="div-comment-13989"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/7c63a03cc45f763a06149d6c99cef46c?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">mike bayer</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<p>Although you don&#8217;t mention it, I wonder if you miss the point about TDD. TDD doesn&#8217;t produce better code because it produces more tested code, it produces better code because it is a better <em>design</em> process. This is overwhelmingly my experience (based on a massive two years worth of experience!) and has irrevocably changed the way I program.</p>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13989"
+                                        >
+                                            February 7, 2008 at 10:06 am</a
+                                        >
+                                    </div>
 
-<p>Having a full test suite is a great side effect that is very useful for refactoring, but it is only a side effect.</p>
+                                    <p>ian -</p>
 
-<p>(Your &#8216;Website&#8217; field in the comment form doesn&#8217;t allow enough characters by the way!)</p>
+                                    <p>
+                                        how do you deal with the performance
+                                        latency as well as source code bloat
+                                        introduced by injecting argument
+                                        checkers throughout all methods and
+                                        functions ? what I like about unit tests
+                                        is that you can get similarly good
+                                        results without weighing down the
+                                        application&#8217;s core functionality,
+                                        with the &#8220;argument checkers&#8221;
+                                        focused mainly on the public-facing API
+                                        functions. its still &#8220;design by
+                                        contract&#8221; but the contract lives
+                                        externally, with no restrictions on how
+                                        deeply and completely it can validate
+                                        functionality.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-13989">
-				<div id="div-comment-13989" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/7c63a03cc45f763a06149d6c99cef46c?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">mike bayer</cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-14211"
+                            >
+                                <div
+                                    id="div-comment-14211"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/38731286fcf0d753d66c5f4b7411ee80?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">mmj</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-13989">
-			February 7, 2008 at 10:06 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-14211"
+                                        >
+                                            February 8, 2008 at 3:17 am</a
+                                        >
+                                    </div>
 
-		<p>ian -</p>
+                                    <p>
+                                        (term &#8220;type&#8221; in this post
+                                        means anything type-checkable &#8211;
+                                        class, method, generic types, etc.)
+                                    </p>
 
-<p>how do you deal with the performance latency as well as source code bloat introduced by injecting argument checkers throughout all methods and functions ?  what I like about unit tests is that you can get similarly good results without weighing down the application&#8217;s core functionality, with the &#8220;argument checkers&#8221; focused mainly on the public-facing API functions.  its still &#8220;design by contract&#8221; but the contract lives externally, with no restrictions on how deeply and completely it can validate functionality.</p>
+                                    <p>
+                                        Tests (and similarly runtime contract
+                                        checks) are not that suitable, if you
+                                        want to enforce certain rules across the
+                                        whole code base. I learned to program by
+                                        designing types, so certain (design?)
+                                        errors that I encountered during
+                                        development are impossible (or very
+                                        hard) to express using the new types.
+                                        For example, when I find a bug, I always
+                                        think: &#8220;could the bug fix be
+                                        expressed as a type?&#8221;. If it is,
+                                        you introduce the new type and delete
+                                        the old one and the compiler will simply
+                                        flag all possible bugs (= usage of old
+                                        type) for you**.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-14211">
-				<div id="div-comment-14211" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/38731286fcf0d753d66c5f4b7411ee80?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">mmj</cite> <span class="says">says:</span>		</div>
+                                    <p>
+                                        Of course, it takes quite some practice
+                                        to design classes/functions in a way,
+                                        that bugs will actually be prevented AND
+                                        your team members will understand you
+                                        code. I do use both unit and functional
+                                        tests in addition because it is more
+                                        suitable for more localized type of
+                                        bugs, though.
+                                    </p>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-14211">
-			February 8, 2008 at 3:17 am</a>		</div>
+                                    <p>
+                                        So, the last 6 years on the project were
+                                        largely just a constant iteration (sound
+                                        familiar?:) of type modifications hugely
+                                        aided by static compiler checks.
+                                    </p>
 
-		<p>(term &#8220;type&#8221; in this post means anything type-checkable &#8211; class, method, generic types, etc.)</p>
+                                    <p>
+                                        ** Note, this isn&#8217;t just
+                                        refactoring, which is done in dynamic
+                                        languages. For example, we introduced
+                                        new multi-threading primitives, because
+                                        old ones were found to be problematic in
+                                        certain cases. You might know, that
+                                        multi-threading is simply not testable
+                                        dynamically (not with current tools at
+                                        least), you just have to enforce it
+                                        statically.
+                                    </p>
 
-<p>Tests (and similarly runtime contract checks) are not that suitable, if you want to enforce certain rules across the whole code base. I learned to program by designing types, so certain (design?) errors that I encountered during development are impossible (or very hard) to express using the new types. For example, when I find a bug, I always think: &#8220;could the bug fix be expressed as a type?&#8221;. If it is, you introduce the new type and delete the old one and the compiler will simply flag all possible bugs (= usage of old type) for you**.</p>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment odd alt thread-odd thread-alt depth-1"
+                                id="comment-14212"
+                            >
+                                <div
+                                    id="div-comment-14212"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://1.gravatar.com/avatar/38731286fcf0d753d66c5f4b7411ee80?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">mmj</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
-<p>Of course, it takes quite some practice to design classes/functions in a way, that bugs will actually be prevented AND your team members will understand you code. I do use both unit and functional tests in addition because it is more suitable for more localized type of bugs, though.</p>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-14212"
+                                        >
+                                            February 8, 2008 at 3:27 am</a
+                                        >
+                                    </div>
 
-<p>So, the last 6 years on the project were largely just a constant iteration (sound familiar?:) of type modifications hugely aided by static compiler checks.</p>
+                                    <p>
+                                        Oh, the important part &#8211; you have
+                                        to use a language with expressive type
+                                        system. I was strongly influenced by
+                                        haskell and ml, but the project is in
+                                        c++ for practical reasons. Java for
+                                        example would be too weak to express all
+                                        the types that we use. We&#8217;d
+                                        probably have to make Java
+                                        &#8220;precompiler&#8221; and insert our
+                                        own checks in the process.
+                                    </p>
 
-<p>** Note, this isn&#8217;t just refactoring, which is done in dynamic languages. For example, we introduced new multi-threading primitives, because old ones were found to be problematic in certain cases. You might know, that multi-threading is simply not testable dynamically (not with current tools at least), you just have to enforce it statically.</p>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment even thread-even depth-1"
+                                id="comment-14218"
+                            >
+                                <div
+                                    id="div-comment-14218"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/abbddf7434a6982f4790032a8b99aaad?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn">Wouter Lievens</cite>
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment odd alt thread-odd thread-alt depth-1" id="comment-14212">
-				<div id="div-comment-14212" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://1.gravatar.com/avatar/38731286fcf0d753d66c5f4b7411ee80?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">mmj</cite> <span class="says">says:</span>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-14218"
+                                        >
+                                            February 8, 2008 at 4:22 am</a
+                                        >
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-14212">
-			February 8, 2008 at 3:27 am</a>		</div>
+                                    <p>
+                                        Static typing is, imo, a subset of
+                                        design by contract: an error will be
+                                        raised when an inappropriate type is
+                                        passed to a function.
+                                    </p>
 
-		<p>Oh, the important part &#8211; you have to use a language with expressive type system. I was strongly influenced by haskell and ml, but the project is in c++ for practical reasons. Java for example would be too weak to express all the types that we use. We&#8217;d probably have to make Java &#8220;precompiler&#8221; and insert our own checks in the process.</p>
+                                    <p>
+                                        The mere fact that static typing
+                                        produces these errors at compile time is
+                                        a detail, it just means that some
+                                        contracts could (or should?) be checked
+                                        at run time.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment even thread-even depth-1" id="comment-14218">
-				<div id="div-comment-14218" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/abbddf7434a6982f4790032a8b99aaad?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn">Wouter Lievens</cite> <span class="says">says:</span>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                            <li
+                                class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1"
+                                id="comment-14985"
+                            >
+                                <div
+                                    id="div-comment-14985"
+                                    class="comment-body"
+                                >
+                                    <div class="comment-author vcard">
+                                        <img
+                                            alt=""
+                                            src="http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG"
+                                            class="avatar avatar-32 photo"
+                                            height="32"
+                                            width="32"
+                                        />
+                                        <cite class="fn"
+                                            ><a
+                                                href="../../../../index.html"
+                                                rel="external nofollow"
+                                                class="url"
+                                                >Ian Bicking</a
+                                            ></cite
+                                        >
+                                        <span class="says">says:</span>
+                                    </div>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-14218">
-			February 8, 2008 at 4:22 am</a>		</div>
+                                    <div class="comment-meta commentmetadata">
+                                        <a
+                                            href="https://ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-14985"
+                                        >
+                                            February 12, 2008 at 3:22 pm</a
+                                        >
+                                    </div>
 
-		<p>Static typing is, imo, a subset of design by contract: an error will be raised when an inappropriate type is passed to a function.</p>
+                                    <p>
+                                        Michael Foord: I agree, TDD is a useful
+                                        design methodology. But I&#8217;m
+                                        describing a difference between unit and
+                                        system and runtime tests, not test-first
+                                        and test-last. Maybe it would be helpful
+                                        to clarify that my post is much more
+                                        applicable to the maintenance and
+                                        debugging of existing software, software
+                                        that has already been designed.
+                                    </p>
 
-<p>The mere fact that static typing produces these errors at compile time is a detail, it just means that some contracts could (or should?) be checked at run time.</p>
+                                    <p>
+                                        Mike Bayer: I don&#8217;t think
+                                        it&#8217;s usually very bad in practice.
+                                        Especially for the places where runtime
+                                        checks are most applicable, which is
+                                        inside larger integration projects, as
+                                        opposed to small reusable libraries.
+                                        Though reusable libraries also should
+                                        have good checks, as it makes the
+                                        library much more pleasant to use.
+                                        So&#8230; maybe it applies to both.
+                                        Either way, I don&#8217;t think the
+                                        efficiency is a big problem, and that
+                                        it&#8217;s a good tradeoff. A simple
+                                        assertion is generally quite fast.
+                                    </p>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-		<li class="comment byuser comment-author-ianb bypostauthor odd alt thread-odd thread-alt depth-1" id="comment-14985">
-				<div id="div-comment-14985" class="comment-body">
-				<div class="comment-author vcard">
-		<img alt='' src='http://0.gravatar.com/avatar/cc8334869c9d2a9e603017f2da805eb3?s=32&amp;d=http%3A%2F%2Fblog.ianbicking.org%2Fwp-includes%2Fimages%2Fblank.gif&amp;r=PG' class='avatar avatar-32 photo' height='32' width='32' />		<cite class="fn"><a href='../../../../index.html' rel='external nofollow' class='url'>Ian Bicking</a></cite> <span class="says">says:</span>		</div>
+                                    <p>
+                                        Also, these checks are often best to put
+                                        in in response to real errors, found
+                                        during debugging (even during debugging
+                                        of code written with TDD, as TDD also
+                                        implies lots of failing tests). The
+                                        total number of errors you
+                                        <em>could</em> check for is huge, but
+                                        the number of errors that a programmer
+                                        is likely to make is much smaller. So
+                                        maybe coming back to Michael&#8217;s
+                                        post, this actually does make sense
+                                        along with TDD, as you still have lots
+                                        of bugs in a TDD process, those are just
+                                        the bugs you pre-identified using TDD,
+                                        and fixing the test and writing the code
+                                        becomes the same thing.
+                                    </p>
 
-		<div class="comment-meta commentmetadata"><a href="http://blog.ianbicking.org/2008/02/06/runtime-vs-test-time/comment-page-1/#comment-14985">
-			February 12, 2008 at 3:22 pm</a>		</div>
+                                    <div class="reply"></div>
+                                </div>
+                            </li>
+                        </ul>
 
-		<p>Michael Foord: I agree, TDD is a useful design methodology.  But I&#8217;m describing a difference between unit and system and runtime tests, not test-first and test-last.  Maybe it would be helpful to clarify that my post is much more applicable to the maintenance and debugging of existing software, software that has already been designed.</p>
+                        <div class="navigation">
+                            <div class="alignleft"></div>
+                            <div class="alignright"></div>
+                        </div>
+                    </div>
 
-<p>Mike Bayer: I don&#8217;t think it&#8217;s usually very bad in practice.  Especially for the places where runtime checks are most applicable, which is inside larger integration projects, as opposed to small reusable libraries.  Though reusable libraries also should have good checks, as it makes the library much more pleasant to use.  So&#8230; maybe it applies to both.  Either way, I don&#8217;t think the efficiency is a big problem, and that it&#8217;s a good tradeoff.  A simple assertion is generally quite fast.</p>
+                    <div class="navigation">
+                        <div class="nav-left">
+                            &laquo;
+                            <a
+                                href="../../05/a-simple-cms/index.html"
+                                rel="prev"
+                                >A Simple CMS</a
+                            >
+                        </div>
+                        <div class="nav-right">
+                            <a
+                                href="../../../03/21/pycon-talks/index.html"
+                                rel="next"
+                                >PyCon Talks</a
+                            >
+                            &raquo;
+                        </div>
+                    </div>
+                    <!-- END NAVIGATION -->
+                </div>
+                <!-- END CONTENT -->
+            </div>
+            <!-- END CONTAINER  -->
 
-<p>Also, these checks are often best to put in in response to real errors, found during debugging (even during debugging of code written with TDD, as TDD also implies lots of failing tests).  The total number of errors you <em>could</em> check for is huge, but the number of errors that a programmer is likely to make is much smaller.  So maybe coming back to Michael&#8217;s post, this actually does make sense along with TDD, as you still have lots of bugs in a TDD process, those are just the bugs you pre-identified using TDD, and fixing the test and writing the code becomes the same thing.</p>
+            <div id="sidebar">
+                <ul>
+                    <li id="home-link">
+                        <h2>
+                            <a
+                                href="../../../../index.html"
+                                title="Ian Bicking: a blog"
+                                >Home</a
+                            >
+                        </h2>
+                    </li>
+                    <li id="text-315934862" class="widget widget_text">
+                        <h2 class="widgettitle">About</h2>
+                        <div class="textwidget">
+                            Ian is a developer with Mozilla,
+                            <a href="http://ianbicking.appspot.com/projects"
+                                >Python open source developer</a
+                            >, actually uses
+                            <a
+                                href="https://plus.google.com/u/0/104537541227697934010/posts"
+                                >Google+</a
+                            >
+                            more than
+                            <a href="http://twitter.com/ianbicking">twitter</a>
+                            and lives in Minneapolis.<br />
+                            <span
+                                class="gittip-0001"
+                                gittip-username="ianbicking"
+                            ></span>
+                            <script
+                                id="gittip-0001"
+                                src="https://www.gittip.com/assets/widgets/0001.js"
+                            ></script>
+                        </div>
+                    </li>
+                    <li id="text-315934863" class="widget widget_text">
+                        <div class="textwidget">
+                            <!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> -->
+                        </div>
+                    </li>
+                    <li id="archives-2" class="widget widget_archive">
+                        <h2 class="widgettitle">Archives</h2>
+                        <ul>
+                            <li>
+                                <a
+                                    href="../../../../2012/10/index.html"
+                                    title="October 2012"
+                                    >October 2012</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2012/02/index.html"
+                                    title="February 2012"
+                                    >February 2012</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2011/04/index.html"
+                                    title="April 2011"
+                                    >April 2011</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2011/03/index.html"
+                                    title="March 2011"
+                                    >March 2011</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/09/index.html"
+                                    title="September 2010"
+                                    >September 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/08/index.html"
+                                    title="August 2010"
+                                    >August 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/05/index.html"
+                                    title="May 2010"
+                                    >May 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/04/index.html"
+                                    title="April 2010"
+                                    >April 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/03/index.html"
+                                    title="March 2010"
+                                    >March 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/02/index.html"
+                                    title="February 2010"
+                                    >February 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2010/01/index.html"
+                                    title="January 2010"
+                                    >January 2010</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/09/index.html"
+                                    title="September 2009"
+                                    >September 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/05/index.html"
+                                    title="May 2009"
+                                    >May 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/04/index.html"
+                                    title="April 2009"
+                                    >April 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2009/01/index.html"
+                                    title="January 2009"
+                                    >January 2009</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../12/index.html"
+                                    title="December 2008"
+                                    >December 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../11/index.html"
+                                    title="November 2008"
+                                    >November 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../10/index.html"
+                                    title="October 2008"
+                                    >October 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../09/index.html"
+                                    title="September 2008"
+                                    >September 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../08/index.html"
+                                    title="August 2008"
+                                    >August 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../07/index.html"
+                                    title="July 2008"
+                                    >July 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../06/index.html"
+                                    title="June 2008"
+                                    >June 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../05/index.html"
+                                    title="May 2008"
+                                    >May 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../04/index.html"
+                                    title="April 2008"
+                                    >April 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../03/index.html"
+                                    title="March 2008"
+                                    >March 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a href="../../index.html" title="February 2008"
+                                    >February 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../01/index.html"
+                                    title="January 2008"
+                                    >January 2008</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/11/index.html"
+                                    title="November 2007"
+                                    >November 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/10/index.html"
+                                    title="October 2007"
+                                    >October 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/09/index.html"
+                                    title="September 2007"
+                                    >September 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/08/index.html"
+                                    title="August 2007"
+                                    >August 2007</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../2007/07/index.html"
+                                    title="July 2007"
+                                    >July 2007</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="text-315934861" class="widget widget_text">
+                        <div class="textwidget">
+                            <a href="../../../../archive/index.html"
+                                >The Older Archives</a
+                            >
+                        </div>
+                    </li>
+                    <li id="categories-1" class="widget widget_categories">
+                        <h2 class="widgettitle">Categories</h2>
+                        <ul>
+                            <li class="cat-item cat-item-12">
+                                <a
+                                    href="../../../../category/erlang/index.html"
+                                    title="View all posts filed under Erlang"
+                                    >Erlang</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-11">
+                                <a
+                                    href="../../../../category/html/index.html"
+                                    title="View all posts filed under HTML"
+                                    >HTML</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-8">
+                                <a
+                                    href="../../../../category/javascript/index.html"
+                                    title="View all posts filed under Javascript"
+                                    >Javascript</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-15">
+                                <a
+                                    href="../../../../category/licensing/index.html"
+                                    title="View all posts filed under Licensing"
+                                    >Licensing</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-18">
+                                <a
+                                    href="../../../../category/mozilla/index.html"
+                                    title="View all posts filed under Mozilla"
+                                    >Mozilla</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-5">
+                                <a
+                                    href="../../../../category/notech/index.html"
+                                    title="View all posts filed under Non-technical"
+                                    >Non-technical</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-6">
+                                <a
+                                    href="../../../../category/olpc/index.html"
+                                    title="View all posts filed under OLPC"
+                                    >OLPC</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-14">
+                                <a
+                                    href="../../../../category/packaging/index.html"
+                                    title="View all posts filed under Packaging"
+                                    >Packaging</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-4">
+                                <a
+                                    href="../../../../category/politics/index.html"
+                                    title="View all posts filed under Politics"
+                                    >Politics</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-3">
+                                <a
+                                    href="../../../../category/programming/index.html"
+                                    title="View all posts filed under Programming"
+                                    >Programming</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-7">
+                                <a
+                                    href="../../../../category/python/index.html"
+                                    title="View all posts filed under Python"
+                                    >Python</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-10">
+                                <a
+                                    href="../../../../category/ruby/index.html"
+                                    title="View all posts filed under Ruby"
+                                    >Ruby</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-19">
+                                <a
+                                    href="../../../../category/security/index.html"
+                                    title="View all posts filed under Security"
+                                    >Security</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-16">
+                                <a
+                                    href="../../../../category/silverlining.1"
+                                    title="View all posts filed under Silver Lining"
+                                    >Silver Lining</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-20">
+                                <a
+                                    href="../../../../category/programming/testing/index.html"
+                                    title="View all posts filed under Testing"
+                                    >Testing</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-9">
+                                <a
+                                    href="../../../../category/web/index.html"
+                                    title="View all posts filed under Web"
+                                    >Web</a
+                                >
+                            </li>
+                            <li class="cat-item cat-item-13">
+                                <a
+                                    href="../../../../category/zopeplone/index.html"
+                                    title="View all posts filed under Zope/Plone"
+                                    >Zope/Plone</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="search-2" class="widget widget_search">
+                        <form
+                            id="searchform"
+                            method="get"
+                            action="../../../../index.html"
+                        >
+                            <div>
+                                <input
+                                    id="s"
+                                    name="s"
+                                    type="text"
+                                    value=""
+                                    tabindex="1"
+                                    size="10"
+                                />
+                                <input
+                                    id="searchsubmit"
+                                    name="searchsubmit"
+                                    type="submit"
+                                    value="Find"
+                                    tabindex="2"
+                                />
+                            </div>
+                        </form>
+                    </li>
+                    <li
+                        id="recent-posts-2"
+                        class="widget widget_recent_entries"
+                    >
+                        <h2 class="widgettitle">Recent Posts</h2>
+                        <ul>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=291"
+                                    title="Why doctest.js is better than Python&#8217;s doctest"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=283"
+                                    title="Python Application Package"
+                                    >Python Application Package</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=277"
+                                    title="Git-as-sync, not source-control-as-deployment"
+                                    >Git-as-sync, not
+                                    source-control-as-deployment</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=253"
+                                    title="My Unsolicited Advice For PyPy"
+                                    >My Unsolicited Advice For PyPy</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="../../../../index.html?p=250"
+                                    title="A Python Web Application Package and Format (we should make one)"
+                                    >A Python Web Application Package and Format
+                                    (we should make one)</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                    <li
+                        id="recent-comments-2"
+                        class="widget widget_recent_comments"
+                    >
+                        <h2 class="widgettitle">Recent Comments</h2>
+                        <ul id="recentcomments">
+                            <li class="recentcomments">
+                                <a
+                                    href="http://www.mirsa.com.tr"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >havalandırma</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                <a
+                                    href="http://redealmeidense.com.br/portalx/modules/"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >this website</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                Eric Pierce on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                Paul Brian on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                            <li class="recentcomments">
+                                <a
+                                    href="http://benjiyork.com"
+                                    rel="external nofollow"
+                                    class="url"
+                                    >Benji York</a
+                                >
+                                on
+                                <a
+                                    href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320"
+                                    >Why doctest.js is better than
+                                    Python&#8217;s doctest</a
+                                >
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
 
-		<div class="reply">
-				</div>
-				</div>
-		</li>
-</ul>
-
-<div class="navigation">
-<div class="alignleft"></div>
-<div class="alignright"></div>
-</div>
-
-
-
-
-</div>
-
-		<div class="navigation">
-			<div class="nav-left">&laquo; <a href="../../05/a-simple-cms/index.html" rel="prev">A Simple CMS</a></div>
-			<div class="nav-right"><a href="../../../03/21/pycon-talks/index.html" rel="next">PyCon Talks</a> &raquo;</div>
-		</div><!-- END NAVIGATION -->
-
-
-	</div><!-- END CONTENT -->
-</div><!-- END CONTAINER  -->
-
-<div id="sidebar">
-	<ul>
-		<li id="home-link">
-			<h2><a href="../../../../index.html" title="Ian Bicking: a blog">Home</a></h2>
-		</li>
-<li id="text-315934862" class="widget widget_text"><h2 class="widgettitle">About</h2>
-			<div class="textwidget">Ian is a developer with Mozilla, <a href="http://ianbicking.appspot.com/projects">Python open source developer</a>, actually uses <a href="https://plus.google.com/u/0/104537541227697934010/posts">Google+</a> more than <a href="http://twitter.com/ianbicking">twitter</a> and lives in Minneapolis.<br>
-<span class="gittip-0001" gittip-username="ianbicking"></span>
-<script id="gittip-0001"
-  src="https://www.gittip.com/assets/widgets/0001.js"></script>
-</div>
-		</li>
-<li id="text-315934863" class="widget widget_text">			<div class="textwidget"><!-- <script type="text/javascript">mbgc='f5f5f5';ww='160';mbc='cecece';bbc='3F79D5';bmobc='3b71c6';bbgc='4889F0';bmoc='3F79D5';bfc='FFFFFF';bmofc='ffffff';tlc='cecece';tc='6a6a6a';nc='6a6a6a';bc='6a6a6a';l='y';fs='16';fsb='13';bw='100';ff='4';lu='6a6a6a';pc='4889F0';wh='340';b='s'; pid='104537541227697934010';</script><script type="text/javascript" src="http://widgetsplus.com/google_plus_widget.js"></script> --></div>
-		</li>
-<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
-		<ul>
-			<li><a href='../../../../2012/10/index.html' title='October 2012'>October 2012</a></li>
-	<li><a href='../../../../2012/02/index.html' title='February 2012'>February 2012</a></li>
-	<li><a href='../../../../2011/04/index.html' title='April 2011'>April 2011</a></li>
-	<li><a href='../../../../2011/03/index.html' title='March 2011'>March 2011</a></li>
-	<li><a href='../../../../2010/09/index.html' title='September 2010'>September 2010</a></li>
-	<li><a href='../../../../2010/08/index.html' title='August 2010'>August 2010</a></li>
-	<li><a href='../../../../2010/05/index.html' title='May 2010'>May 2010</a></li>
-	<li><a href='../../../../2010/04/index.html' title='April 2010'>April 2010</a></li>
-	<li><a href='../../../../2010/03/index.html' title='March 2010'>March 2010</a></li>
-	<li><a href='../../../../2010/02/index.html' title='February 2010'>February 2010</a></li>
-	<li><a href='../../../../2010/01/index.html' title='January 2010'>January 2010</a></li>
-	<li><a href='../../../../2009/09/index.html' title='September 2009'>September 2009</a></li>
-	<li><a href='../../../../2009/05/index.html' title='May 2009'>May 2009</a></li>
-	<li><a href='../../../../2009/04/index.html' title='April 2009'>April 2009</a></li>
-	<li><a href='../../../../2009/01/index.html' title='January 2009'>January 2009</a></li>
-	<li><a href='../../../12/index.html' title='December 2008'>December 2008</a></li>
-	<li><a href='../../../11/index.html' title='November 2008'>November 2008</a></li>
-	<li><a href='../../../10/index.html' title='October 2008'>October 2008</a></li>
-	<li><a href='../../../09/index.html' title='September 2008'>September 2008</a></li>
-	<li><a href='../../../08/index.html' title='August 2008'>August 2008</a></li>
-	<li><a href='../../../07/index.html' title='July 2008'>July 2008</a></li>
-	<li><a href='../../../06/index.html' title='June 2008'>June 2008</a></li>
-	<li><a href='../../../05/index.html' title='May 2008'>May 2008</a></li>
-	<li><a href='../../../04/index.html' title='April 2008'>April 2008</a></li>
-	<li><a href='../../../03/index.html' title='March 2008'>March 2008</a></li>
-	<li><a href='../../index.html' title='February 2008'>February 2008</a></li>
-	<li><a href='../../../01/index.html' title='January 2008'>January 2008</a></li>
-	<li><a href='../../../../2007/11/index.html' title='November 2007'>November 2007</a></li>
-	<li><a href='../../../../2007/10/index.html' title='October 2007'>October 2007</a></li>
-	<li><a href='../../../../2007/09/index.html' title='September 2007'>September 2007</a></li>
-	<li><a href='../../../../2007/08/index.html' title='August 2007'>August 2007</a></li>
-	<li><a href='../../../../2007/07/index.html' title='July 2007'>July 2007</a></li>
-		</ul>
-</li>
-<li id="text-315934861" class="widget widget_text">			<div class="textwidget"><a href="../../../../archive/index.html">The Older Archives</a></div>
-		</li>
-<li id="categories-1" class="widget widget_categories"><h2 class="widgettitle">Categories</h2>
-		<ul>
-	<li class="cat-item cat-item-12"><a href="../../../../category/erlang/index.html" title="View all posts filed under Erlang">Erlang</a>
-</li>
-	<li class="cat-item cat-item-11"><a href="../../../../category/html/index.html" title="View all posts filed under HTML">HTML</a>
-</li>
-	<li class="cat-item cat-item-8"><a href="../../../../category/javascript/index.html" title="View all posts filed under Javascript">Javascript</a>
-</li>
-	<li class="cat-item cat-item-15"><a href="../../../../category/licensing/index.html" title="View all posts filed under Licensing">Licensing</a>
-</li>
-	<li class="cat-item cat-item-18"><a href="../../../../category/mozilla/index.html" title="View all posts filed under Mozilla">Mozilla</a>
-</li>
-	<li class="cat-item cat-item-5"><a href="../../../../category/notech/index.html" title="View all posts filed under Non-technical">Non-technical</a>
-</li>
-	<li class="cat-item cat-item-6"><a href="../../../../category/olpc/index.html" title="View all posts filed under OLPC">OLPC</a>
-</li>
-	<li class="cat-item cat-item-14"><a href="../../../../category/packaging/index.html" title="View all posts filed under Packaging">Packaging</a>
-</li>
-	<li class="cat-item cat-item-4"><a href="../../../../category/politics/index.html" title="View all posts filed under Politics">Politics</a>
-</li>
-	<li class="cat-item cat-item-3"><a href="../../../../category/programming/index.html" title="View all posts filed under Programming">Programming</a>
-</li>
-	<li class="cat-item cat-item-7"><a href="../../../../category/python/index.html" title="View all posts filed under Python">Python</a>
-</li>
-	<li class="cat-item cat-item-10"><a href="../../../../category/ruby/index.html" title="View all posts filed under Ruby">Ruby</a>
-</li>
-	<li class="cat-item cat-item-19"><a href="../../../../category/security/index.html" title="View all posts filed under Security">Security</a>
-</li>
-	<li class="cat-item cat-item-16"><a href="../../../../category/silverlining.1" title="View all posts filed under Silver Lining">Silver Lining</a>
-</li>
-	<li class="cat-item cat-item-20"><a href="../../../../category/programming/testing/index.html" title="View all posts filed under Testing">Testing</a>
-</li>
-	<li class="cat-item cat-item-9"><a href="../../../../category/web/index.html" title="View all posts filed under Web">Web</a>
-</li>
-	<li class="cat-item cat-item-13"><a href="../../../../category/zopeplone/index.html" title="View all posts filed under Zope/Plone">Zope/Plone</a>
-</li>
-		</ul>
-</li>
-<li id="search-2" class="widget widget_search"><form id="searchform" method="get" action="../../../../index.html">
-	<div>
-		<input id="s" name="s" type="text" value="" tabindex="1" size="10" />
-		<input id="searchsubmit" name="searchsubmit" type="submit" value="Find" tabindex="2" />
-	</div>
-</form> </li>
-		<li id="recent-posts-2" class="widget widget_recent_entries">		<h2 class="widgettitle">Recent Posts</h2>
-		<ul>
-				<li><a href="../../../../index.html?p=291" title="Why doctest.js is better than Python&#8217;s doctest">Why doctest.js is better than Python&#8217;s doctest</a></li>
-				<li><a href="../../../../index.html?p=283" title="Python Application Package">Python Application Package</a></li>
-				<li><a href="../../../../index.html?p=277" title="Git-as-sync, not source-control-as-deployment">Git-as-sync, not source-control-as-deployment</a></li>
-				<li><a href="../../../../index.html?p=253" title="My Unsolicited Advice For PyPy">My Unsolicited Advice For PyPy</a></li>
-				<li><a href="../../../../index.html?p=250" title="A Python Web Application Package and Format (we should make one)">A Python Web Application Package and Format (we should make one)</a></li>
-				</ul>
-		</li>
-<li id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widgettitle">Recent Comments</h2>
-<ul id="recentcomments"><li class="recentcomments"><a href='http://www.mirsa.com.tr' rel='external nofollow' class='url'>havalandırma</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-228633">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://redealmeidense.com.br/portalx/modules/' rel='external nofollow' class='url'>this website</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-196267">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Eric Pierce on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195322">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments">Paul Brian on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195321">Why doctest.js is better than Python&#8217;s doctest</a></li><li class="recentcomments"><a href='http://benjiyork.com' rel='external nofollow' class='url'>Benji York</a> on <a href="../../../../2012/10/02/why-doctest-js-is-better-than-pythons-doctest/comment-page-1/index.html#comment-195320">Why doctest.js is better than Python&#8217;s doctest</a></li></ul></li>
-	</ul>
-</div>
-
-	<div id="footer">
-		<p>
-			&copy; 2013 Ian Bicking<!--
+            <div id="footer">
+                <p>
+                    &copy; 2013 Ian Bicking<!--
 Does this commenting make me evil?
 			|
 			Thanks, <a href="http://wordpress.org/" title="WordPress">WordPress</a>
 			|
 			<a href="http://www.plaintxt.org/themes/barthelme/" title="Barthelme for WordPress" rel="follow">Barthelme</a> theme by <a href="http://scottwallick.com/" title="scottwallick.com" rel="follow">Scott</a>
 			| <!-- The following is a link to the theme author's sponsor. Please consider its smallness and that Scott was nice enough to make this theme publically available. -->
-			Sponsor: <a href="http://www.active-sandals.com/womreefsan.html" title="Support: Reef Sandals">Reef Sandals</a>
-			|
-			Valid <a href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1" title="Valid XHTML 1.0 Strict" rel="nofollow">XHTML</a> &amp; <a href="http://jigsaw.w3.org/css-validator/validator?uri=http://blog.ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no" title="Valid CSS" rel="nofollow">CSS</a>
-			|
-			-->
-			RSS: <a href="../../../../feed/rss/index.html" title="Ian Bicking: a blog RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Posts</a> &amp; <a href="../../../../comments/feed/index.html" title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed" rel="alternate" type="application/rss+xml">Comments</a>
-		</p>
-	</div>
+                    Sponsor:
+                    <a
+                        href="http://www.active-sandals.com/womreefsan.html"
+                        title="Support: Reef Sandals"
+                        >Reef Sandals</a
+                    >
+                    | Valid
+                    <a
+                        href="http://validator.w3.org/check?uri=http://blog.ianbicking.org&amp;outline=1&amp;verbose=1"
+                        title="Valid XHTML 1.0 Strict"
+                        rel="nofollow"
+                        >XHTML</a
+                    >
+                    &amp;
+                    <a
+                        href="http://jigsaw.w3.org/css-validator/validator?uri=https://ianbicking.org/wp-content/themes/Barthelme-ianb/style.css&amp;profile=css2&amp;warning=no"
+                        title="Valid CSS"
+                        rel="nofollow"
+                        >CSS</a
+                    >
+                    | --> RSS:
+                    <a
+                        href="../../../../feed/rss/index.html"
+                        title="Ian Bicking: a blog RSS 2.0 (XML) Feed"
+                        rel="alternate"
+                        type="application/rss+xml"
+                        >Posts</a
+                    >
+                    &amp;
+                    <a
+                        href="../../../../comments/feed/index.html"
+                        title="Ian Bicking: a blog Comments RSS 2.0 (XML) Feed"
+                        rel="alternate"
+                        type="application/rss+xml"
+                        >Comments</a
+                    >
+                </p>
+            </div>
+        </div>
+        <!-- END WRAPPER -->
 
-</div><!-- END WRAPPER -->
+        <!-- Somehow 44 queries occured in 0.993 seconds. Magic! -->
+        <!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
+        <script
+            type="text/javascript"
+            src="../../../../wp-includes/js/comment-reply.js?ver=3.4.2"
+        ></script>
 
-	<!-- Somehow 44 queries occured in 0.993 seconds. Magic! -->
-	<!-- The "Barthelme" theme copyright (c) 2006 Scott Allan Wallick - http://www.plaintxt.org/themes/ -->
-	<script type='text/javascript' src='../../../../wp-includes/js/comment-reply.js?ver=3.4.2'></script>
-
-<!-- Google Analytics -->
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script>
-
-</body>
+        <!-- Google Analytics -->
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

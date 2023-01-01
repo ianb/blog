@@ -1,94 +1,186 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Another plan: SQLObject 0.7</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>Another plan: SQLObject 0.7</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Another plan: SQLObject 0.7</h1>
 
-<div style="float: right">
-
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Another plan: SQLObject 0.7</h1>
- 
-<div class="document">
-<p>A while ago I wrote some thoughts on what <a class="reference" href="http://sqlobject.org">SQLObject</a> 0.6 <a class="reference" href="sqlobject-api-redesign.html">might look
-like</a>.  Well, a lot of those things didn't happen (actually nearly
-all of them), though the plans were pretty speculative so it's no
-surprise it didn't happen.  But I'm going through another set of
-refactoring for SQLObject 0.7 (and I'm already part way through it) so
-I can say better what will happen for that version.</p>
-<div class="section">
-<h1><a id="inheritance" name="inheritance">Inheritance</a></h1>
-<p>SQLObject normally implements <a class="reference" href="http://www.martinfowler.com/eaaCatalog/concreteTableInheritance.html">concrete table inheritance</a>, mostly
-because that was the absolute minimum I could do so that it support
-any kind of inheritance at all.  It was the best I could do to avoid
-the issue.</p>
-<p>But some people like other kinds of inheritance.  Daniel Savard
-implemented a patch to add another kind of inheritance, kind of like
-<a class="reference" href="http://www.martinfowler.com/eaaCatalog/classTableInheritance.html">class table inheritance</a> -- except that each row is actually typed
-as part of the most-parent-table.</p>
-<p>Oleg Broytmann took over the patch, and after refactoring it a bit
-it's now part of SQLObject.  You have to subclass from
-<tt class="docutils literal"><span class="pre">InheritableSQLObject</span></tt> to actually use this kind of inheritance (I
-still couldn't bear bringing this into the main class -- I just don't
-like imposing object-oriented concepts on a relational database).</p>
-</div>
-<div class="section">
-<h1><a id="extra-table-information" name="extra-table-information">Extra Table Information</a></h1>
-<p>First, I'll be implementing <a class="reference" href="http://blog.ianbicking.org/sqlobject-api-redesign.html?#extra-table-information">extra table information</a>, pretty much in
-the way I described.  This is already well along in the <a class="reference" href="http://svn.colorstudy.com/trunk/SQLObject">repository</a>,
-and looks like:</p>
-<pre class="literal-block">
+        <div class="document">
+            <p>
+                A while ago I wrote some thoughts on what
+                <a class="reference" href="http://sqlobject.org">SQLObject</a>
+                0.6
+                <a class="reference" href="sqlobject-api-redesign.html"
+                    >might look like</a
+                >. Well, a lot of those things didn't happen (actually nearly
+                all of them), though the plans were pretty speculative so it's
+                no surprise it didn't happen. But I'm going through another set
+                of refactoring for SQLObject 0.7 (and I'm already part way
+                through it) so I can say better what will happen for that
+                version.
+            </p>
+            <div class="section">
+                <h1><a id="inheritance" name="inheritance">Inheritance</a></h1>
+                <p>
+                    SQLObject normally implements
+                    <a
+                        class="reference"
+                        href="http://www.martinfowler.com/eaaCatalog/concreteTableInheritance.html"
+                        >concrete table inheritance</a
+                    >, mostly because that was the absolute minimum I could do
+                    so that it support any kind of inheritance at all. It was
+                    the best I could do to avoid the issue.
+                </p>
+                <p>
+                    But some people like other kinds of inheritance. Daniel
+                    Savard implemented a patch to add another kind of
+                    inheritance, kind of like
+                    <a
+                        class="reference"
+                        href="http://www.martinfowler.com/eaaCatalog/classTableInheritance.html"
+                        >class table inheritance</a
+                    >
+                    -- except that each row is actually typed as part of the
+                    most-parent-table.
+                </p>
+                <p>
+                    Oleg Broytmann took over the patch, and after refactoring it
+                    a bit it's now part of SQLObject. You have to subclass from
+                    <tt class="docutils literal"
+                        ><span class="pre">InheritableSQLObject</span></tt
+                    >
+                    to actually use this kind of inheritance (I still couldn't
+                    bear bringing this into the main class -- I just don't like
+                    imposing object-oriented concepts on a relational database).
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a
+                        id="extra-table-information"
+                        name="extra-table-information"
+                        >Extra Table Information</a
+                    >
+                </h1>
+                <p>
+                    First, I'll be implementing
+                    <a
+                        class="reference"
+                        href="https://ianbicking.org/sqlobject-api-redesign.html?#extra-table-information"
+                        >extra table information</a
+                    >, pretty much in the way I described. This is already well
+                    along in the
+                    <a
+                        class="reference"
+                        href="http://svn.colorstudy.com/trunk/SQLObject"
+                        >repository</a
+                    >, and looks like:
+                </p>
+                <pre class="literal-block">
 class MyTable(SQLObject):
     class sqlmeta:
         table = 'my_funny_table_name'
         style = MixedCaseStyle()
     col = StringCol()
     ...
-</pre>
-<p>So every subclass of <tt class="docutils literal"><span class="pre">SQLObject</span></tt> gets its own <tt class="docutils literal"><span class="pre">sqlmeta</span></tt> class.
-They are buddy classes, with a separate <tt class="docutils literal"><span class="pre">sqlmeta</span></tt> subclass (always
-with the same name) for each <tt class="docutils literal"><span class="pre">SQLObject</span></tt> subclass.  And they are
-buddy instances too -- <tt class="docutils literal"><span class="pre">anInstance.sqlmeta</span></tt> is an instance of
-<tt class="docutils literal"><span class="pre">ATable.sqlmeta</span></tt>.  Confusing?  Hopefully not, I think it makes sense
-when you are using it.</p>
-<p>This <tt class="docutils literal"><span class="pre">sqlmeta</span></tt> class/instance/attribute will hold much of the public
-API for SQLObject.  Your extensions will add custom methods and
-attributes (/columns) to the <tt class="docutils literal"><span class="pre">SQLObject</span></tt> subclass, but that class
-will be pretty much yours and yours alone, as all the SQLObject
-accounting is being moved to <tt class="docutils literal"><span class="pre">sqlmeta</span></tt>.</p>
-<p>With this we'll finally add stable, documented APIs for all sorts of
-introspection, like listing all the columns in a table.</p>
-<p>Backward compatibility is being maintained, with settings to control
-how many warnings you want to get about using the old style of class
-definitions and attributes.  By default there will be lots of
-warnings, so people new to SQLObject who are working off older
-documentation will be alerted to the new style early on.</p>
-</div>
-<div class="section">
-<h1><a id="simplified-metaclass" name="simplified-metaclass">Simplified Metaclass</a></h1>
-<p>SQLObject now uses a very simple metaclass:</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    So every subclass of
+                    <tt class="docutils literal"
+                        ><span class="pre">SQLObject</span></tt
+                    >
+                    gets its own
+                    <tt class="docutils literal"
+                        ><span class="pre">sqlmeta</span></tt
+                    >
+                    class. They are buddy classes, with a separate
+                    <tt class="docutils literal"
+                        ><span class="pre">sqlmeta</span></tt
+                    >
+                    subclass (always with the same name) for each
+                    <tt class="docutils literal"
+                        ><span class="pre">SQLObject</span></tt
+                    >
+                    subclass. And they are buddy instances too --
+                    <tt class="docutils literal"
+                        ><span class="pre">anInstance.sqlmeta</span></tt
+                    >
+                    is an instance of
+                    <tt class="docutils literal"
+                        ><span class="pre">ATable.sqlmeta</span></tt
+                    >. Confusing? Hopefully not, I think it makes sense when you
+                    are using it.
+                </p>
+                <p>
+                    This
+                    <tt class="docutils literal"
+                        ><span class="pre">sqlmeta</span></tt
+                    >
+                    class/instance/attribute will hold much of the public API
+                    for SQLObject. Your extensions will add custom methods and
+                    attributes (/columns) to the
+                    <tt class="docutils literal"
+                        ><span class="pre">SQLObject</span></tt
+                    >
+                    subclass, but that class will be pretty much yours and yours
+                    alone, as all the SQLObject accounting is being moved to
+                    <tt class="docutils literal"
+                        ><span class="pre">sqlmeta</span></tt
+                    >.
+                </p>
+                <p>
+                    With this we'll finally add stable, documented APIs for all
+                    sorts of introspection, like listing all the columns in a
+                    table.
+                </p>
+                <p>
+                    Backward compatibility is being maintained, with settings to
+                    control how many warnings you want to get about using the
+                    old style of class definitions and attributes. By default
+                    there will be lots of warnings, so people new to SQLObject
+                    who are working off older documentation will be alerted to
+                    the new style early on.
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a id="simplified-metaclass" name="simplified-metaclass"
+                        >Simplified Metaclass</a
+                    >
+                </h1>
+                <p>SQLObject now uses a very simple metaclass:</p>
+                <pre class="literal-block">
 class DeclarativeMeta(type):
 
     def __new__(meta, class_name, bases, new_attrs):
@@ -97,181 +189,601 @@ class DeclarativeMeta(type):
             cls.__classinit__ = staticmethod(cls.__classinit__.im_func)
         cls.__classinit__(cls, new_attrs)
         return cls
-</pre>
-<p>This is along the lines of <a class="reference" href="a-conservative-metaclass.html">a conservative metaclass</a>, and all the
-interesting logic is in <tt class="docutils literal"><span class="pre">SQLObject.__classinit__</span></tt> (a method which I
-am also trying to whittle down).  Hopefully this will make the code
-seem more accessible -- while it doesn't change much, it simplifies
-something that many people find intimidating (metaclasses) and moves
-the bulk of that logic into a much simpler method (<tt class="docutils literal"><span class="pre">__classinit__</span></tt>).</p>
-</div>
-<div class="section">
-<h1><a id="active-attributes" name="active-attributes">Active Attributes</a></h1>
-<p>Along the lines of <a class="reference" href="descriptor-nit.html">what I proposed for setonce</a> earlier,
-<tt class="docutils literal"><span class="pre">__classinit__</span></tt> will check for &quot;magic attributes&quot;.  Right now it
-looks specifically for subclasses of <tt class="docutils literal"><span class="pre">Col</span></tt> (which are column
-descriptions) and a couple other special classes.  After this change
-it will look for a special method on attributes: <tt class="docutils literal"><span class="pre">__addtoclass__</span></tt>,
-and calls that method with the class the attribute is being bound to,
-and the name it is being given.  That method can replace the
-attribute.  It gets a <em>little</em> complicated, because we usually replace
-the original object with one that is closely tied to the class it is
-being bound to -- this way the original object can be reused -- but it
-really comes down to a fairly simple
-<tt class="docutils literal"><span class="pre">soClass.addColumn(attributeWeJustCreated)</span></tt>.</p>
-<p>This will be something that other people can use to extend SQLObject.
-For instance, there's more kinds of joins, like a situation where two
-tables are related with some string indicating the type of relation
-(e.g., a person might be related to an object as an owner, author,
-watcher, etc).  I think these active attributes will be easy to write,
-and allow people to express some of the things they want to express
-without adding too many ideas and policies into SQLObject itself.</p>
-</div>
-<div class="section">
-<h1><a id="descriptors" name="descriptors">Descriptors</a></h1>
-<p>As well as becoming active attributes, column objects will become
-<a class="reference" href="http://users.rcn.com/python/download/Descriptor.htm">descriptors</a>.  This means <tt class="docutils literal"><span class="pre">property</span></tt> will be used less, and the
-dynamically-created <tt class="docutils literal"><span class="pre">lambdas</span></tt> will also go away (they are now just
-being created with <tt class="docutils literal"><span class="pre">eval()</span></tt>, a bit of a bad smell).</p>
-<p>The current way of overriding getters and setters (by defining
-<tt class="docutils literal"><span class="pre">_get_columnName</span></tt> and <tt class="docutils literal"><span class="pre">_set_columnName</span></tt>) will go away, and instead
-you'll be able to add methods to the column descriptors.  These
-methods will be a bit easier to understand and use.</p>
-<p>Descriptors will also do double-duty as <a class="reference" href="http://svn.colorstudy.com/trunk/SQLObject/sqlobject/sqlbuilder.py">sqlbuilder</a> objects, so you
-don't have to use <tt class="docutils literal"><span class="pre">MyTable.q.column</span></tt> in queries, instead you can
-just use <tt class="docutils literal"><span class="pre">MyTable.column</span></tt>.</p>
-<p>I also plan to add hooks for various events, like when a row is
-created, updated, or deleted.  So maybe a you could implement
-something where a row was always updated to indicate the last time the
-row was editor.  Or <tt class="docutils literal"><span class="pre">CASCADE</span></tt> could be implemented as a hook on the
-delete event for <tt class="docutils literal"><span class="pre">ForeignKey</span></tt>.</p>
-<p>This last stuff might not make it into 0.7; I'm still working on the
-active attributes, and some form of descriptor should happen, but the
-events might be a stretch.</p>
-<p>Anyway, that's the plan I have now, if you are curious about where
-SQLObject is going.</p>
-</div>
-</div>
- <div class="dates" align="right">
-Created 23 Feb '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>Sounds great! I'm glad you're going with full-blown descriptors, especially; it makes additional functionality that much easier for developers.</p>
-<p>You mentioned:</p>
-<blockquote>
-I also plan to add hooks for various events, like when a row is created, updated, or deleted. So maybe you could implement something where a row was always updated to indicate the last time the row was edited.</blockquote>
-<p>That's something I've been trying to finagle into the object layer in my ORM lately. The descriptors are great for firing triggers when <em>each</em> value is modified, but not useful for parallel triggers. For example, if you have, oh... let's say a project-management webapp, you want to send a notification to the project manager when a due date is changed. What happens when both the due date and the owner are changed within the same submission? Ideally, there'd be a way to do the updates first and fire any triggers second (that doesn't require the UI developer to manually serialize). I haven't yet found a good idiom for that.</p>
-<p>Of course, the &quot;last time edited&quot; could be handled when you flush the objects at the end of the request, but there are many more complicated interactions I've been running into lately...I'd be interested to hear your opinions.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-1.html" rel="nofollow">#</a> <a href="http://">Robert Brewer</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>I am using SQLObject for some weeks now and am very pleased with it. I'm happy to see that is actively being developed. Keep up the good work!</p>
-<p>would it be a big task (for me?) to create an Oracle connector?</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-4.html" rel="nofollow">#</a> <a href="http://gumuz.looze.net">Guyon Morée</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-I wouldn't think it'd be hard, but seeing that everyone starts it (or at least says they have started) but doesn't complete it, maybe there's something mysterious and hard about Oracle support.  Especially if you ignore things like <tt class="literal"><span class="pre">_fromDatabase</span></tt> (which is fine for the first version of support) it should be very easy indeed.</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-8.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
- 
-<div class="document">
-Yes, it would be a hard job. Oracle doesn't have a way to quote strings (escape special characters), so one needs to pass a list (or dictionary) of parameters along with parametrized query string. This requires changing the way SQLObject generates queries. I've started to work on this, but there is a long road in front of me. Please join if you are really interested to help.</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-12.html" rel="nofollow">#</a> <a href="http://phd.pp.ru/">Oleg Broytmann</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-While this will cause a problem for BLOBs and some other types without a SQL literal representation, Oracle <em>does</em> have literal representation of most types of data.  It's suboptimal to translate literals into SQL for Oracle to later parse, but it's doable and the way all the other database backends are working at the moment.  <em>Most</em> parts of SQLObject would be easy to implement for Oracle, with some border cases that are going to be more difficult.</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-13.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-To a degree its easier here, because SQLObject already centralizes a lot of these operations -- so the descriptors are actually thin delegates back to fixed SQLObject methods.  The triggers and events would then also be centrally managed, and would actually be registered during <tt class="literal"><span class="pre">__addtoclass__</span></tt>.  There's still some complexity to multiple triggers being fired (and then what order they get fired in, especially when one invalidates the other)... but I'll have to wait to figure that out when the infrastructure is in place to add that complexity ;)</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-9.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Maybe it's a bit late, but you already don't need to use <cite>eval</cite> for the dynamically generated lambdas.</p>
-<p>e.g. this:</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    This is along the lines of
+                    <a class="reference" href="a-conservative-metaclass.html"
+                        >a conservative metaclass</a
+                    >, and all the interesting logic is in
+                    <tt class="docutils literal"
+                        ><span class="pre">SQLObject.__classinit__</span></tt
+                    >
+                    (a method which I am also trying to whittle down). Hopefully
+                    this will make the code seem more accessible -- while it
+                    doesn't change much, it simplifies something that many
+                    people find intimidating (metaclasses) and moves the bulk of
+                    that logic into a much simpler method (<tt
+                        class="docutils literal"
+                        ><span class="pre">__classinit__</span></tt
+                    >).
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a id="active-attributes" name="active-attributes"
+                        >Active Attributes</a
+                    >
+                </h1>
+                <p>
+                    Along the lines of
+                    <a class="reference" href="descriptor-nit.html"
+                        >what I proposed for setonce</a
+                    >
+                    earlier,
+                    <tt class="docutils literal"
+                        ><span class="pre">__classinit__</span></tt
+                    >
+                    will check for &quot;magic attributes&quot;. Right now it
+                    looks specifically for subclasses of
+                    <tt class="docutils literal"
+                        ><span class="pre">Col</span></tt
+                    >
+                    (which are column descriptions) and a couple other special
+                    classes. After this change it will look for a special method
+                    on attributes:
+                    <tt class="docutils literal"
+                        ><span class="pre">__addtoclass__</span></tt
+                    >, and calls that method with the class the attribute is
+                    being bound to, and the name it is being given. That method
+                    can replace the attribute. It gets a
+                    <em>little</em> complicated, because we usually replace the
+                    original object with one that is closely tied to the class
+                    it is being bound to -- this way the original object can be
+                    reused -- but it really comes down to a fairly simple
+                    <tt class="docutils literal"
+                        ><span class="pre"
+                            >soClass.addColumn(attributeWeJustCreated)</span
+                        ></tt
+                    >.
+                </p>
+                <p>
+                    This will be something that other people can use to extend
+                    SQLObject. For instance, there's more kinds of joins, like a
+                    situation where two tables are related with some string
+                    indicating the type of relation (e.g., a person might be
+                    related to an object as an owner, author, watcher, etc). I
+                    think these active attributes will be easy to write, and
+                    allow people to express some of the things they want to
+                    express without adding too many ideas and policies into
+                    SQLObject itself.
+                </p>
+            </div>
+            <div class="section">
+                <h1><a id="descriptors" name="descriptors">Descriptors</a></h1>
+                <p>
+                    As well as becoming active attributes, column objects will
+                    become
+                    <a
+                        class="reference"
+                        href="http://users.rcn.com/python/download/Descriptor.htm"
+                        >descriptors</a
+                    >. This means
+                    <tt class="docutils literal"
+                        ><span class="pre">property</span></tt
+                    >
+                    will be used less, and the dynamically-created
+                    <tt class="docutils literal"
+                        ><span class="pre">lambdas</span></tt
+                    >
+                    will also go away (they are now just being created with
+                    <tt class="docutils literal"
+                        ><span class="pre">eval()</span></tt
+                    >, a bit of a bad smell).
+                </p>
+                <p>
+                    The current way of overriding getters and setters (by
+                    defining
+                    <tt class="docutils literal"
+                        ><span class="pre">_get_columnName</span></tt
+                    >
+                    and
+                    <tt class="docutils literal"
+                        ><span class="pre">_set_columnName</span></tt
+                    >) will go away, and instead you'll be able to add methods
+                    to the column descriptors. These methods will be a bit
+                    easier to understand and use.
+                </p>
+                <p>
+                    Descriptors will also do double-duty as
+                    <a
+                        class="reference"
+                        href="http://svn.colorstudy.com/trunk/SQLObject/sqlobject/sqlbuilder.py"
+                        >sqlbuilder</a
+                    >
+                    objects, so you don't have to use
+                    <tt class="docutils literal"
+                        ><span class="pre">MyTable.q.column</span></tt
+                    >
+                    in queries, instead you can just use
+                    <tt class="docutils literal"
+                        ><span class="pre">MyTable.column</span></tt
+                    >.
+                </p>
+                <p>
+                    I also plan to add hooks for various events, like when a row
+                    is created, updated, or deleted. So maybe a you could
+                    implement something where a row was always updated to
+                    indicate the last time the row was editor. Or
+                    <tt class="docutils literal"
+                        ><span class="pre">CASCADE</span></tt
+                    >
+                    could be implemented as a hook on the delete event for
+                    <tt class="docutils literal"
+                        ><span class="pre">ForeignKey</span></tt
+                    >.
+                </p>
+                <p>
+                    This last stuff might not make it into 0.7; I'm still
+                    working on the active attributes, and some form of
+                    descriptor should happen, but the events might be a stretch.
+                </p>
+                <p>
+                    Anyway, that's the plan I have now, if you are curious about
+                    where SQLObject is going.
+                </p>
+            </div>
+        </div>
+        <div class="dates" align="right">Created 23 Feb '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Sounds great! I'm glad you're going with full-blown
+                    descriptors, especially; it makes additional functionality
+                    that much easier for developers.
+                </p>
+                <p>You mentioned:</p>
+                <blockquote>
+                    I also plan to add hooks for various events, like when a row
+                    is created, updated, or deleted. So maybe you could
+                    implement something where a row was always updated to
+                    indicate the last time the row was edited.
+                </blockquote>
+                <p>
+                    That's something I've been trying to finagle into the object
+                    layer in my ORM lately. The descriptors are great for firing
+                    triggers when <em>each</em> value is modified, but not
+                    useful for parallel triggers. For example, if you have,
+                    oh... let's say a project-management webapp, you want to
+                    send a notification to the project manager when a due date
+                    is changed. What happens when both the due date and the
+                    owner are changed within the same submission? Ideally,
+                    there'd be a way to do the updates first and fire any
+                    triggers second (that doesn't require the UI developer to
+                    manually serialize). I haven't yet found a good idiom for
+                    that.
+                </p>
+                <p>
+                    Of course, the &quot;last time edited&quot; could be handled
+                    when you flush the objects at the end of the request, but
+                    there are many more complicated interactions I've been
+                    running into lately...I'd be interested to hear your
+                    opinions.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/another-plan-sqlobject-07-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Robert Brewer</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I am using SQLObject for some weeks now and am very
+                        pleased with it. I'm happy to see that is actively being
+                        developed. Keep up the good work!
+                    </p>
+                    <p>
+                        would it be a big task (for me?) to create an Oracle
+                        connector?
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/another-plan-sqlobject-07-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://gumuz.looze.net">Guyon Morée</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        I wouldn't think it'd be hard, but seeing that everyone
+                        starts it (or at least says they have started) but
+                        doesn't complete it, maybe there's something mysterious
+                        and hard about Oracle support. Especially if you ignore
+                        things like
+                        <tt class="literal"
+                            ><span class="pre">_fromDatabase</span></tt
+                        >
+                        (which is fine for the first version of support) it
+                        should be very easy indeed.
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/another-plan-sqlobject-07-comment-8.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="index.html">Ian Bicking</a>
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        Yes, it would be a hard job. Oracle doesn't have a way
+                        to quote strings (escape special characters), so one
+                        needs to pass a list (or dictionary) of parameters along
+                        with parametrized query string. This requires changing
+                        the way SQLObject generates queries. I've started to
+                        work on this, but there is a long road in front of me.
+                        Please join if you are really interested to help.
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/another-plan-sqlobject-07-comment-12.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://phd.pp.ru/">Oleg Broytmann</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            While this will cause a problem for BLOBs and some
+                            other types without a SQL literal representation,
+                            Oracle <em>does</em> have literal representation of
+                            most types of data. It's suboptimal to translate
+                            literals into SQL for Oracle to later parse, but
+                            it's doable and the way all the other database
+                            backends are working at the moment.
+                            <em>Most</em> parts of SQLObject would be easy to
+                            implement for Oracle, with some border cases that
+                            are going to be more difficult.
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/another-plan-sqlobject-07-comment-13.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="index.html">Ian Bicking</a>
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+
+                <div class="document">
+                    To a degree its easier here, because SQLObject already
+                    centralizes a lot of these operations -- so the descriptors
+                    are actually thin delegates back to fixed SQLObject methods.
+                    The triggers and events would then also be centrally
+                    managed, and would actually be registered during
+                    <tt class="literal"
+                        ><span class="pre">__addtoclass__</span></tt
+                    >. There's still some complexity to multiple triggers being
+                    fired (and then what order they get fired in, especially
+                    when one invalidates the other)... but I'll have to wait to
+                    figure that out when the infrastructure is in place to add
+                    that complexity ;)
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/another-plan-sqlobject-07-comment-9.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Maybe it's a bit late, but you already don't need to use
+                    <cite>eval</cite> for the dynamically generated lambdas.
+                </p>
+                <p>e.g. this:</p>
+                <pre class="literal-block">
 getter = eval('lambda self: self._SO_loadValue(%s)' % repr(instanceName(name)))
-</pre>
-<p>could be done like this:</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>could be done like this:</p>
+                <pre class="literal-block">
 getter = lambda self: self._SO_loadValue(repr(instanceName(name)))
-</pre>
-<p>or even done without using <cite>nested_scopes</cite> at all:</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    or even done without using <cite>nested_scopes</cite> at
+                    all:
+                </p>
+                <pre class="literal-block">
 getter = lambda self, name=repr(instanceName(name)): self._SO_loadValue(name)
-</pre>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-2.html" rel="nofollow">#</a> Andrew</div><hr noshade>
- 
-<div class="document">
-<p>&quot;I also plan to add hooks for various events, like when a row is created, updated, or deleted. So maybe a you could implement something where a row was always updated to indicate the last time the row was editor. Or CASCADE could be implemented as a hook on the delete event for ForeignKey.&quot;</p>
-<p>If that sort of thing really matters to your application, then wouldn't you be using a database that had native triggers anyway?</p>
-<p>Drawing the line between what you put in app logic and what you put in the database is always tricky. But I tend towards the view that basic data integrity self-defence is more reliable if done in/by the database.</p>
-<p>You might put it in the application because:
-- it's portable across databases (but how often in real life do people decide to switch the database behind a serious application that their business depends on?)
-- it works for databases that don't support those things natively (but why would you use one of those if data integrity was a serious concern?)
-- you can see and maintain all your logic in one place</p>
-<p>You might put it in the database because:
-- it's probably probably more efficient. Assume people building databases know more about how to do this sort of stuff quickly and reliably than you (for any likely value of &quot;you&quot;) do.
-- it can't be bypassed by people accessing the same database from a different client application, or even by somebody else writng a different part of the same application</p>
-<p>I notice that even MySQL might have triggers soon: <a class="reference" href="http://rootprompt.org/article.php3?article=8289">http://rootprompt.org/article.php3?article=8289</a></p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-3.html" rel="nofollow">#</a> <a href="http://www.alanlittle.org/weblog/">Alan Little</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-In general, I agree, a company probably doesn't switch databases very often.   I started my personal project using sqlite and moved over to mysql after development was under way.   All it took was a change in the connection string ( and some refactoring to use datetime instead of mx.DateTime which doesn't count ).  SQLObject's ability to easily switch backend stores helps me a lot - it makes it easier for me to develop and choose a provider when the time comes.   But this is probably true more for small efforts than corporate IT infrastructure projects.</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-5.html" rel="nofollow">#</a> <a href="http://members.nccw.net/kdahlhaus">Kevin Dahlhausen</a></div><hr noshade>
- 
-<div class="document">
-If you're writing an in-house app, or one targeted at only one DB, then putting the triggers in the DB can make sense (because you don't change databases often, as you pointed out). But if you're writing an app on top of SQLObject which you then want others to use with many different databases, it's nice to write the triggers once, rather than once for each potential target DB.</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-6.html" rel="nofollow">#</a> <a href="http://">Robert Brewer</a></div><hr noshade>
- 
-<div class="document">
-<p>Well, like other people said, SQLObject can be used at a lower level than any single deployment -- SQLObject can be part of a project which may get installed anywhere.  This just came up for a user: <a class="reference" href="http://www.crummy.com/2005/02/18/0">http://www.crummy.com/2005/02/18/0</a> -- and it will come up all the time for open source developers that distribute projects based on SQLObject.</p>
-<p>But even then, database triggers are limited; they can operate on the database, but not otherwise.  So, if your dependent object isn't a SQLObject instance then a database trigger won't accomplish anything.  E.g., if you want a <tt class="literal"><span class="pre">FileCol</span></tt> which only stores a filename in the database, and that file needs to be deleted along with the row.  Or if you have two separate databases that have dependencies across the databases.</p>
-<p>And even when you are only dealing with the database, database triggers <em>still</em> aren't sufficient, because they don't give SQLObject any feedback, so it doesn't know how to update its cache.  SQLObject, for reasons tied to its very ORMness, has problems when the database gets updated behind its back.  I'd like to fix some of those problems (and some of these features could help), but in this case SQLObject could still cache aggressively in the presence of in-process cascades.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-7.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Good points, Ian. I think I detect a fairly fundamental difference in worldview/emphasis/(don't say the p*gm word!) between:</p>
-<ol class="arabic simple">
-<li>the application as the primary thing and the db as a dumb persistence store</li>
-</ol>
-<p>versus ...</p>
-<ol class="arabic simple" start="2">
-<li>the data as the primary thing and the dbms as its primary guardian; triggers (etc) as the immune system that protect it from things malicious/miguided applications might try to get up to.</li>
-</ol>
-<p>It's a design decision about at what layer in the stack you want to have your basic data integrity defence mechanisms, with different valid answers in different circumstances. Although what you seem to be saying/implying is that SQLObject won't be able to cope if you put them anywhere other than in the app's persistence layer. I would expect that (with all due respect) to be very significantly slower and less reliable than native triggers in any mature production rdbms - especially if the app isn't running on the same machine. And even if you can live with that, what if you aren't the only application - or the only instance of the same application - that's talking to the same database?</p>
-<p>So you would appear to be limited to one instance of one application that &quot;owns&quot; the database entirely. Which of course is perfectly adequate in many circumstances, but severely limits what you can do if you want to load balance your app / run with existing production databases that already have integrity protections in place / etc.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-10.html" rel="nofollow">#</a> <a href="http://www.alanlittle.org/weblog/">Alan Little</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Martin Fowler <a class="reference" href="http://martinfowler.com/bliki/DatabaseStyles.html">called</a> one style an <em>Application Database</em> (what SQLObject prefers) vs. an <em>Integration Database</em> (where the database is authoritative and the communication medium for multiple applications).</p>
-<p>I should really write a more thorough summary of why it's hard to be reasonably efficient with an ORM while also being compatible with an Integration Database style.  Not impossible -- it's just a matter of what your expectations are.  Hmm... I've never properly written up the performance issues of an ORM; I should do that so I can refer to it at times like these...</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/another-plan-sqlobject-07-comment-11.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                >
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/another-plan-sqlobject-07-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Andrew
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    &quot;I also plan to add hooks for various events, like when
+                    a row is created, updated, or deleted. So maybe a you could
+                    implement something where a row was always updated to
+                    indicate the last time the row was editor. Or CASCADE could
+                    be implemented as a hook on the delete event for
+                    ForeignKey.&quot;
+                </p>
+                <p>
+                    If that sort of thing really matters to your application,
+                    then wouldn't you be using a database that had native
+                    triggers anyway?
+                </p>
+                <p>
+                    Drawing the line between what you put in app logic and what
+                    you put in the database is always tricky. But I tend towards
+                    the view that basic data integrity self-defence is more
+                    reliable if done in/by the database.
+                </p>
+                <p>
+                    You might put it in the application because: - it's portable
+                    across databases (but how often in real life do people
+                    decide to switch the database behind a serious application
+                    that their business depends on?) - it works for databases
+                    that don't support those things natively (but why would you
+                    use one of those if data integrity was a serious concern?) -
+                    you can see and maintain all your logic in one place
+                </p>
+                <p>
+                    You might put it in the database because: - it's probably
+                    probably more efficient. Assume people building databases
+                    know more about how to do this sort of stuff quickly and
+                    reliably than you (for any likely value of &quot;you&quot;)
+                    do. - it can't be bypassed by people accessing the same
+                    database from a different client application, or even by
+                    somebody else writng a different part of the same
+                    application
+                </p>
+                <p>
+                    I notice that even MySQL might have triggers soon:
+                    <a
+                        class="reference"
+                        href="http://rootprompt.org/article.php3?article=8289"
+                        >http://rootprompt.org/article.php3?article=8289</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/another-plan-sqlobject-07-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.alanlittle.org/weblog/">Alan Little</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    In general, I agree, a company probably doesn't switch
+                    databases very often. I started my personal project using
+                    sqlite and moved over to mysql after development was under
+                    way. All it took was a change in the connection string ( and
+                    some refactoring to use datetime instead of mx.DateTime
+                    which doesn't count ). SQLObject's ability to easily switch
+                    backend stores helps me a lot - it makes it easier for me to
+                    develop and choose a provider when the time comes. But this
+                    is probably true more for small efforts than corporate IT
+                    infrastructure projects.
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/another-plan-sqlobject-07-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://members.nccw.net/kdahlhaus"
+                        >Kevin Dahlhausen</a
+                    >
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    If you're writing an in-house app, or one targeted at only
+                    one DB, then putting the triggers in the DB can make sense
+                    (because you don't change databases often, as you pointed
+                    out). But if you're writing an app on top of SQLObject which
+                    you then want others to use with many different databases,
+                    it's nice to write the triggers once, rather than once for
+                    each potential target DB.
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/another-plan-sqlobject-07-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://">Robert Brewer</a>
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        Well, like other people said, SQLObject can be used at a
+                        lower level than any single deployment -- SQLObject can
+                        be part of a project which may get installed anywhere.
+                        This just came up for a user:
+                        <a
+                            class="reference"
+                            href="http://www.crummy.com/2005/02/18/0"
+                            >http://www.crummy.com/2005/02/18/0</a
+                        >
+                        -- and it will come up all the time for open source
+                        developers that distribute projects based on SQLObject.
+                    </p>
+                    <p>
+                        But even then, database triggers are limited; they can
+                        operate on the database, but not otherwise. So, if your
+                        dependent object isn't a SQLObject instance then a
+                        database trigger won't accomplish anything. E.g., if you
+                        want a
+                        <tt class="literal"
+                            ><span class="pre">FileCol</span></tt
+                        >
+                        which only stores a filename in the database, and that
+                        file needs to be deleted along with the row. Or if you
+                        have two separate databases that have dependencies
+                        across the databases.
+                    </p>
+                    <p>
+                        And even when you are only dealing with the database,
+                        database triggers <em>still</em> aren't sufficient,
+                        because they don't give SQLObject any feedback, so it
+                        doesn't know how to update its cache. SQLObject, for
+                        reasons tied to its very ORMness, has problems when the
+                        database gets updated behind its back. I'd like to fix
+                        some of those problems (and some of these features could
+                        help), but in this case SQLObject could still cache
+                        aggressively in the presence of in-process cascades.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/another-plan-sqlobject-07-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Good points, Ian. I think I detect a fairly
+                            fundamental difference in worldview/emphasis/(don't
+                            say the p*gm word!) between:
+                        </p>
+                        <ol class="arabic simple">
+                            <li>
+                                the application as the primary thing and the db
+                                as a dumb persistence store
+                            </li>
+                        </ol>
+                        <p>versus ...</p>
+                        <ol class="arabic simple" start="2">
+                            <li>
+                                the data as the primary thing and the dbms as
+                                its primary guardian; triggers (etc) as the
+                                immune system that protect it from things
+                                malicious/miguided applications might try to get
+                                up to.
+                            </li>
+                        </ol>
+                        <p>
+                            It's a design decision about at what layer in the
+                            stack you want to have your basic data integrity
+                            defence mechanisms, with different valid answers in
+                            different circumstances. Although what you seem to
+                            be saying/implying is that SQLObject won't be able
+                            to cope if you put them anywhere other than in the
+                            app's persistence layer. I would expect that (with
+                            all due respect) to be very significantly slower and
+                            less reliable than native triggers in any mature
+                            production rdbms - especially if the app isn't
+                            running on the same machine. And even if you can
+                            live with that, what if you aren't the only
+                            application - or the only instance of the same
+                            application - that's talking to the same database?
+                        </p>
+                        <p>
+                            So you would appear to be limited to one instance of
+                            one application that &quot;owns&quot; the database
+                            entirely. Which of course is perfectly adequate in
+                            many circumstances, but severely limits what you can
+                            do if you want to load balance your app / run with
+                            existing production databases that already have
+                            integrity protections in place / etc.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/another-plan-sqlobject-07-comment-10.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.alanlittle.org/weblog/"
+                            >Alan Little</a
+                        >
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                Martin Fowler
+                                <a
+                                    class="reference"
+                                    href="http://martinfowler.com/bliki/DatabaseStyles.html"
+                                    >called</a
+                                >
+                                one style an <em>Application Database</em> (what
+                                SQLObject prefers) vs. an
+                                <em>Integration Database</em> (where the
+                                database is authoritative and the communication
+                                medium for multiple applications).
+                            </p>
+                            <p>
+                                I should really write a more thorough summary of
+                                why it's hard to be reasonably efficient with an
+                                ORM while also being compatible with an
+                                Integration Database style. Not impossible --
+                                it's just a matter of what your expectations
+                                are. Hmm... I've never properly written up the
+                                performance issues of an ORM; I should do that
+                                so I can refer to it at times like these...
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/another-plan-sqlobject-07-comment-11.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="index.html">Ian Bicking</a>
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

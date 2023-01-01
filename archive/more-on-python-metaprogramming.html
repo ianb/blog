@@ -1,228 +1,460 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>More on Python Metaprogramming</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>More on Python Metaprogramming</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>More on Python Metaprogramming</h1>
 
-<div style="float: right">
-
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>More on Python Metaprogramming</h1>
- 
-<div class="document">
-<p><a class="reference" href="http://www.loudthinking.com/arc/000545.html">David Heinemeier Hansson has some comments</a> related to the <a class="reference" href="http://www.djangoproject.com/weblog/2005/dec/04/snakes_and_rubies/">Snakes
-and Rubies</a>
-event.  I have more I want to say in reaction to that post, and
-specifically to his comparison of Django models and Rails models.  But
-I thought I'd at least start with a simple discussion of what <em>can</em> be
-done in Python.  This is his Rails example:</p>
-<pre class="literal-block">
+        <div class="document">
+            <p>
+                <a
+                    class="reference"
+                    href="http://www.loudthinking.com/arc/000545.html"
+                    >David Heinemeier Hansson has some comments</a
+                >
+                related to the
+                <a
+                    class="reference"
+                    href="http://www.djangoproject.com/weblog/2005/dec/04/snakes_and_rubies/"
+                    >Snakes and Rubies</a
+                >
+                event. I have more I want to say in reaction to that post, and
+                specifically to his comparison of Django models and Rails
+                models. But I thought I'd at least start with a simple
+                discussion of what <em>can</em> be done in Python. This is his
+                Rails example:
+            </p>
+            <pre class="literal-block">
 class Person &lt; ActiveRecord::Base
     belongs_to :project_manager
     has_many   :milestones
     has_and_belongs_to_many :categories
 end
-</pre>
-<p>How do you implement this in Python?  Here's the Django syntax:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>
+                How do you implement this in Python? Here's the Django syntax:
+            </p>
+            <pre class="literal-block">
 class Project(meta.Model):
     project_manager = meta.ForeignKey(ProjectManager)
     milestones = meta.OneToManyField(Milestone)
     categories = meta.ManyToManyField(Category)
-</pre>
-<p>Here's the SQLObject syntax:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>Here's the SQLObject syntax:</p>
+            <pre class="literal-block">
 class Project(SQLObject):
     project_manager = ForeignKey('ProjectManager')
     milestones = MultipleJoin('Milestone')
     categories = RelatedJoin('Category')
-</pre>
-<p>To me they all look pretty similar.  So maybe it's not such a good
-example.  But anyway, here would be the direct syntactic port of
-ActiveRecord:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>
+                To me they all look pretty similar. So maybe it's not such a
+                good example. But anyway, here would be the direct syntactic
+                port of ActiveRecord:
+            </p>
+            <pre class="literal-block">
 class Person(ActiveRecord):
     belongs_to('project_manager')
     has_many('milestones')
     has_and_belongs_to_many('categories')
-</pre>
-<p>This <em>is</em> quite hard to implement in Python.  There's only two cases I
-know of that implement kind of function in a class body --
-<tt class="docutils literal"><span class="pre">implements()</span></tt> and <tt class="docutils literal"><span class="pre">advise()</span></tt> in Zope and PEAK respectively.
-Doing this involves deep tricks, including putting the interpreter
-temporarily into trace mode and changing metaclasses around.</p>
-<p>But it's still hard because <tt class="docutils literal"><span class="pre">belongs_to()</span></tt> in Python won't
-get the class as an argument (as it does in Ruby, as an implicit
-<tt class="docutils literal"><span class="pre">self</span></tt> aka <tt class="docutils literal"><span class="pre">&#64;</span></tt>).  And it's yet harder because the class doesn't
-<em>exist</em>; classes in Python only come into existance after their bodies
-are evaluated.</p>
-<p>So the <em>semantic</em> (not syntactic) equivalent of the ActiveRecord code
-would be:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>
+                This <em>is</em> quite hard to implement in Python. There's only
+                two cases I know of that implement kind of function in a class
+                body --
+                <tt class="docutils literal"
+                    ><span class="pre">implements()</span></tt
+                >
+                and
+                <tt class="docutils literal"
+                    ><span class="pre">advise()</span></tt
+                >
+                in Zope and PEAK respectively. Doing this involves deep tricks,
+                including putting the interpreter temporarily into trace mode
+                and changing metaclasses around.
+            </p>
+            <p>
+                But it's still hard because
+                <tt class="docutils literal"
+                    ><span class="pre">belongs_to()</span></tt
+                >
+                in Python won't get the class as an argument (as it does in
+                Ruby, as an implicit
+                <tt class="docutils literal"><span class="pre">self</span></tt>
+                aka
+                <tt class="docutils literal"><span class="pre">&#64;</span></tt
+                >). And it's yet harder because the class doesn't
+                <em>exist</em>; classes in Python only come into existance after
+                their bodies are evaluated.
+            </p>
+            <p>
+                So the <em>semantic</em> (not syntactic) equivalent of the
+                ActiveRecord code would be:
+            </p>
+            <pre class="literal-block">
 class Person(ActiveRecord):
     pass
 Person.belongs_to('project_manager')
 Person.has_many('milestones')
 Person.has_and_belongs_to_many('categories')
-</pre>
-<p>I think there are some Python ORMs that look like this.  Basically you
-are running some class methods, and those methods modify the class.
-This is not complicated in Python at all, but admittedly it doesn't
-look as pretty.  Some people have proposed that decorators should be
-allowed on classes, at which point this might look like:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>
+                I think there are some Python ORMs that look like this.
+                Basically you are running some class methods, and those methods
+                modify the class. This is not complicated in Python at all, but
+                admittedly it doesn't look as pretty. Some people have proposed
+                that decorators should be allowed on classes, at which point
+                this might look like:
+            </p>
+            <pre class="literal-block">
 &#64;belongs_to('project_manager')
 &#64;has_many('milestones')
 &#64;has_and_belongs_to_many('categories')
 class Person(ActiveRecord):
     pass
-</pre>
-<p>A minor change here is that <tt class="docutils literal"><span class="pre">belongs_to</span></tt> and friends will probably
-not be in the <tt class="docutils literal"><span class="pre">ActiveRecord</span></tt> class.  Also, I think if anything this
-looks worse than the last example (which unlike this one actually
-works).  Now I think I'm -1 on class decorators.</p>
-<p>Of course, neither SQLObject nor Django use these techniques.  They
-use attributes to store these relations, because in Python the only
-easy annotations you can make on a class are with attributes.
-Everything else gets thrown away.</p>
-<p>Attributes can be somewhat magic, but there is a limit in Python.
-That limit is what <a class="reference" href="http://users.rcn.com/python/download/Descriptor.htm">descriptors</a> can do, and
-basically descriptors can respond to attribute access.  They can't
-tell the class that they exist (until someone tries to access them),
-they never know what attribute name they are bound to, and they don't
-know what class they are bound to until they are accessed.  In ORMs
-this causes some problems, because classes <em>really</em> want to know what
-columns they have, and columns want to know what name they were given.</p>
-<p>Some systems use a model that's just a bunch of dead data, until a
-compilation phase that turns it into Python source code.  MiddleKit
-does that; Django used to do that but doesn't anymore.</p>
-<p>Other systems, SQLObject and now Django, use metaclasses.
-Metaclasses can be magic, but they aren't magic here.  With a
-metaclass you can trigger some code to be run everytime a class with
-that metaclass is created (and subclasses inherit the superclass's
-metaclass).</p>
-<p>In effect, it's like:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>
+                A minor change here is that
+                <tt class="docutils literal"
+                    ><span class="pre">belongs_to</span></tt
+                >
+                and friends will probably not be in the
+                <tt class="docutils literal"
+                    ><span class="pre">ActiveRecord</span></tt
+                >
+                class. Also, I think if anything this looks worse than the last
+                example (which unlike this one actually works). Now I think I'm
+                -1 on class decorators.
+            </p>
+            <p>
+                Of course, neither SQLObject nor Django use these techniques.
+                They use attributes to store these relations, because in Python
+                the only easy annotations you can make on a class are with
+                attributes. Everything else gets thrown away.
+            </p>
+            <p>
+                Attributes can be somewhat magic, but there is a limit in
+                Python. That limit is what
+                <a
+                    class="reference"
+                    href="http://users.rcn.com/python/download/Descriptor.htm"
+                    >descriptors</a
+                >
+                can do, and basically descriptors can respond to attribute
+                access. They can't tell the class that they exist (until someone
+                tries to access them), they never know what attribute name they
+                are bound to, and they don't know what class they are bound to
+                until they are accessed. In ORMs this causes some problems,
+                because classes <em>really</em> want to know what columns they
+                have, and columns want to know what name they were given.
+            </p>
+            <p>
+                Some systems use a model that's just a bunch of dead data, until
+                a compilation phase that turns it into Python source code.
+                MiddleKit does that; Django used to do that but doesn't anymore.
+            </p>
+            <p>
+                Other systems, SQLObject and now Django, use metaclasses.
+                Metaclasses can be magic, but they aren't magic here. With a
+                metaclass you can trigger some code to be run everytime a class
+                with that metaclass is created (and subclasses inherit the
+                superclass's metaclass).
+            </p>
+            <p>In effect, it's like:</p>
+            <pre class="literal-block">
 class Person(ActiveRecord):
     project_manager = belongs_to
     milestones = has_many
     categories = has_and_belongs_to_many
 # Implicitly:
 Person.setup_everything()
-</pre>
-<p>Where <tt class="docutils literal"><span class="pre">setup_everything</span></tt> looks at all the attributes for &quot;magic&quot;
-attributes, and lets those attributes modify the class.</p>
-<p>SQLObject doesn't work <em>quite</em> like this, but it's moving that way.
-Now SQLObject uses a <a class="reference" href="a-conservative-metaclass.html">simple metaclass</a> with a class method <tt class="docutils literal"><span class="pre">__classinit__</span></tt>
-that takes the place of <tt class="docutils literal"><span class="pre">setup_everything</span></tt>.  It's also (in the svn trunk)
-starting to use a convention for those magic attributes.  Up until now
-SQLObject just <em>knew</em> that <tt class="docutils literal"><span class="pre">*Col</span></tt> values were columns.  And then
-joins and indexes were also added.  I don't want to add any more new
-things, so I've made <tt class="docutils literal"><span class="pre">__classinit__</span></tt> look for any new attributes
-with a method to call like <tt class="docutils literal"><span class="pre">__addtoclass__(cls,</span> <span class="pre">attr_name)</span></tt>, and the
-attribute can in turn modify the class however it chooses.  I'd rather
-it <a class="reference" href="magic-and-backtracing-code.html">not modify the class too much</a>, but
-it's necessary at times.  The other thing that's come up is that this
-all gets hairy with subclassing (and probably does in Ruby too), and
-I've found events to be important.  But they are also more complicated
-than they should be just to fix things up on subclassing.</p>
-<p>But anyway, in the end Python can be pretty much like that
-ActiveRecord example, except just slightly inverted, and using a
-superclass that supports that kind of programming.  I would like for
-those specific techniques to become more widespread and idiomatic, and
-even better for us all to agree on some simple conventions.  But there's
-no dramatic differences here from Ruby, just like similar original sources
-make clear.</p>
-<p><strong>Update</strong>: there's another technique for ActiveRecord-like functions which I
-hadn't thought of; since it showed up three times in the comments, clearly it
-needs acknowledgement: <a class="reference" href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-1.html">a Django experiment</a>
-(wasn't actually applied to the codebase), and <a class="reference" href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-11.html">two</a> <a class="reference" href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-14.html">examples</a> with a mockup of the
-sort of code you'd write.</p>
-<p>To summarize these, they involve having the <tt class="docutils literal"><span class="pre">belongs_to</span></tt> function (and any similar functions like <tt class="docutils literal"><span class="pre">has_many</span></tt>) saving an object to some global variable.  Then when the class is actually created, it uses a metaclass to pull out any values it finds in that global variable and applies them to the class.</p>
-<p>This is distinct from Zope's <tt class="docutils literal"><span class="pre">implements()</span></tt> (and PEAK's <tt class="docutils literal"><span class="pre">advise()</span></tt>) which can operate on <em>any</em> class.  It's this ability to apply a function to a class that was not specifically designed for such application that makes it unique (and hard to implement).  But with some cooperation from the class it is not hard to implement.  Of course, it's a little funny that these two are equivalent using these recipes:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>
+                Where
+                <tt class="docutils literal"
+                    ><span class="pre">setup_everything</span></tt
+                >
+                looks at all the attributes for &quot;magic&quot; attributes,
+                and lets those attributes modify the class.
+            </p>
+            <p>
+                SQLObject doesn't work <em>quite</em> like this, but it's moving
+                that way. Now SQLObject uses a
+                <a class="reference" href="a-conservative-metaclass.html"
+                    >simple metaclass</a
+                >
+                with a class method
+                <tt class="docutils literal"
+                    ><span class="pre">__classinit__</span></tt
+                >
+                that takes the place of
+                <tt class="docutils literal"
+                    ><span class="pre">setup_everything</span></tt
+                >. It's also (in the svn trunk) starting to use a convention for
+                those magic attributes. Up until now SQLObject just
+                <em>knew</em> that
+                <tt class="docutils literal"><span class="pre">*Col</span></tt>
+                values were columns. And then joins and indexes were also added.
+                I don't want to add any more new things, so I've made
+                <tt class="docutils literal"
+                    ><span class="pre">__classinit__</span></tt
+                >
+                look for any new attributes with a method to call like
+                <tt class="docutils literal"
+                    ><span class="pre">__addtoclass__(cls,</span>
+                    <span class="pre">attr_name)</span></tt
+                >, and the attribute can in turn modify the class however it
+                chooses. I'd rather it
+                <a class="reference" href="magic-and-backtracing-code.html"
+                    >not modify the class too much</a
+                >, but it's necessary at times. The other thing that's come up
+                is that this all gets hairy with subclassing (and probably does
+                in Ruby too), and I've found events to be important. But they
+                are also more complicated than they should be just to fix things
+                up on subclassing.
+            </p>
+            <p>
+                But anyway, in the end Python can be pretty much like that
+                ActiveRecord example, except just slightly inverted, and using a
+                superclass that supports that kind of programming. I would like
+                for those specific techniques to become more widespread and
+                idiomatic, and even better for us all to agree on some simple
+                conventions. But there's no dramatic differences here from Ruby,
+                just like similar original sources make clear.
+            </p>
+            <p>
+                <strong>Update</strong>: there's another technique for
+                ActiveRecord-like functions which I hadn't thought of; since it
+                showed up three times in the comments, clearly it needs
+                acknowledgement:
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-1.html"
+                    >a Django experiment</a
+                >
+                (wasn't actually applied to the codebase), and
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-11.html"
+                    >two</a
+                >
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-14.html"
+                    >examples</a
+                >
+                with a mockup of the sort of code you'd write.
+            </p>
+            <p>
+                To summarize these, they involve having the
+                <tt class="docutils literal"
+                    ><span class="pre">belongs_to</span></tt
+                >
+                function (and any similar functions like
+                <tt class="docutils literal"
+                    ><span class="pre">has_many</span></tt
+                >) saving an object to some global variable. Then when the class
+                is actually created, it uses a metaclass to pull out any values
+                it finds in that global variable and applies them to the class.
+            </p>
+            <p>
+                This is distinct from Zope's
+                <tt class="docutils literal"
+                    ><span class="pre">implements()</span></tt
+                >
+                (and PEAK's
+                <tt class="docutils literal"
+                    ><span class="pre">advise()</span></tt
+                >) which can operate on <em>any</em> class. It's this ability to
+                apply a function to a class that was not specifically designed
+                for such application that makes it unique (and hard to
+                implement). But with some cooperation from the class it is not
+                hard to implement. Of course, it's a little funny that these two
+                are equivalent using these recipes:
+            </p>
+            <pre class="literal-block">
 belongs_to('project_manager')
 class Person(ActiveRecord): pass
-</pre>
-<p>and:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>and:</p>
+            <pre class="literal-block">
 class Person(ActiveRecord):
     belongs_to('project_manager')
-</pre>
-<p>But oh well.</p>
-</div>
- <div class="dates" align="right">
-Created 06 Dec '05<br>
-Modified 08 Dec '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>The &quot;attribute creation without assignment&quot; thing (like the implements() and advise() examples you brought up) was considered for Django, but we ended up deciding it was too much magic and could confuse experienced Python programmers. Check out <a class="reference" href="http://code.djangoproject.com/attachment/ticket/122/proof_of_concept.py">http://code.djangoproject.com/attachment/ticket/122/proof_of_concept.py</a> for the proof-of-concept implementation by Robin Munn, if only because it's an interesting hack. :)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-1.html" rel="nofollow">#</a> <a href="http://www.holovaty.com/">Adrian Holovaty</a></div><hr noshade>
- 
-<div class="document">
-<p>Pretty interesting. I'm working on some django stuff atm, and I have ended up using events (cheesy homegrown atm) and making the attributes do most of the work as well. So I think django and sqlobject will continue to be pretty similar...</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-2.html" rel="nofollow">#</a> <a href="http://robert.wittams.com/">rjwittams</a></div><hr noshade>
- 
-<div class="document">
-<p>I'd use syntax like this:</p>
-<pre class="literal-block">
+</pre
+            >
+            <p>But oh well.</p>
+        </div>
+        <div class="dates" align="right">
+            Created 06 Dec '05<br />
+            Modified 08 Dec '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    The &quot;attribute creation without assignment&quot; thing
+                    (like the implements() and advise() examples you brought up)
+                    was considered for Django, but we ended up deciding it was
+                    too much magic and could confuse experienced Python
+                    programmers. Check out
+                    <a
+                        class="reference"
+                        href="http://code.djangoproject.com/attachment/ticket/122/proof_of_concept.py"
+                        >http://code.djangoproject.com/attachment/ticket/122/proof_of_concept.py</a
+                    >
+                    for the proof-of-concept implementation by Robin Munn, if
+                    only because it's an interesting hack. :)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.holovaty.com/">Adrian Holovaty</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Pretty interesting. I'm working on some django stuff atm,
+                    and I have ended up using events (cheesy homegrown atm) and
+                    making the attributes do most of the work as well. So I
+                    think django and sqlobject will continue to be pretty
+                    similar...
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://robert.wittams.com/">rjwittams</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>I'd use syntax like this:</p>
+                <pre class="literal-block">
 class Project(ActiveRecord):
     _db_attributes = dict(
         project_manager = meta.ForeignKey(ProjectManager),
         milestones = meta.OneToManyField(Milestone),
         categories = meta.ManyToManyField(Category))
-</pre>
-<p>This makes the job of the metaclass slightly easier (and quite a bit more efficient) and satisfies EIBTI.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-3.html" rel="nofollow">#</a> <a href="http://www.c-tanzer.at/">Christian Tanzer</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>&gt;EIBTI
-Nice DETLA. ;)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-5.html" rel="nofollow">#</a> <a href="http://">Chris</a></div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>I think one of the key differences the snakes&amp;rubies brought out was David's (and by extension, Ruby's) love of DomainSpecificLanguages. Which seems to be a hot item these days, and as David says in the post you linked to about the event, not a focus of as much interest or support in Python.</p>
-<p>And part of the reason for that is highlighted in the Magic &amp; Backtracking post: backtracking and clear indication of where something came from (via namespaces etc). I'm not saying Ruby doesn't do this nicely (I have no idea), but DSLs of the ruby-style in python seem to require metaprogramming monkeying, which immediately feels &quot;unpythonic&quot;. But I'm not convinced that the ActiveRecord DSL is the only sane one for representing Database models.</p>
-<p>Say we rename &quot;ForeignKey-&gt;Is_A&quot;, &quot;OneToMany-&gt;Are_Many&quot; &quot;ManyToMany-&gt;Is_Many_And_Are_Many&quot;, ignoring the awkward is_a inheritance meaning. Now, in the case where we actually have to specify the class that a column maps to:</p>
-<p>Only slightly tortured English:</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    This makes the job of the metaclass slightly easier (and
+                    quite a bit more efficient) and satisfies EIBTI.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.c-tanzer.at/">Christian Tanzer</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>&gt;EIBTI Nice DETLA. ;)</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-on-python-metaprogramming-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://">Chris</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I think one of the key differences the snakes&amp;rubies
+                    brought out was David's (and by extension, Ruby's) love of
+                    DomainSpecificLanguages. Which seems to be a hot item these
+                    days, and as David says in the post you linked to about the
+                    event, not a focus of as much interest or support in Python.
+                </p>
+                <p>
+                    And part of the reason for that is highlighted in the Magic
+                    &amp; Backtracking post: backtracking and clear indication
+                    of where something came from (via namespaces etc). I'm not
+                    saying Ruby doesn't do this nicely (I have no idea), but
+                    DSLs of the ruby-style in python seem to require
+                    metaprogramming monkeying, which immediately feels
+                    &quot;unpythonic&quot;. But I'm not convinced that the
+                    ActiveRecord DSL is the only sane one for representing
+                    Database models.
+                </p>
+                <p>
+                    Say we rename &quot;ForeignKey-&gt;Is_A&quot;,
+                    &quot;OneToMany-&gt;Are_Many&quot;
+                    &quot;ManyToMany-&gt;Is_Many_And_Are_Many&quot;, ignoring
+                    the awkward is_a inheritance meaning. Now, in the case where
+                    we actually have to specify the class that a column maps to:
+                </p>
+                <p>Only slightly tortured English:</p>
+                <pre class="literal-block">
 A Project belongs to a project manager who is a Person.
 A Project's projectManager is a Person
 
 A Project has many Milestones which are (of) Milestone.
 A Project's milestones are many (of) Milestone.
-</pre>
-<p>(I personally think ManyToMany breaks down in both cases, because in both cases we are really specifying the attribute for this class to access via: I would rather specify just &quot;Many&quot; on both sides.):</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    (I personally think ManyToMany breaks down in both cases,
+                    because in both cases we are really specifying the attribute
+                    for this class to access via: I would rather specify just
+                    &quot;Many&quot; on both sides.):
+                </p>
+                <pre class="literal-block">
 A Project has many and belongs to many categories which are (of) Category
 A Project's categories are many (of) Category (and by the way, a Category's projects are many (of) Project
 
@@ -231,72 +463,182 @@ SQLObject: Project projectManager IsA Person
 
 Rails: Project has_many milestones (class Milestone).
 SQLObject:  Project milestones Are_Many Milestone
-</pre>
-<p>... (getting off track, leaving it in here to show my train of thought)</p>
-<p>At which point Rails people will scream DRY, and I'll probably agree, so allow the class to be derived from the name.</p>
-<p>Ok, so basically I'm saying with python we're stuck with parentheses and attributes. And because of attributes, we're somewhat stuck with = being our verb. But that just means our language for models is different:</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    ... (getting off track, leaving it in here to show my train
+                    of thought)
+                </p>
+                <p>
+                    At which point Rails people will scream DRY, and I'll
+                    probably agree, so allow the class to be derived from the
+                    name.
+                </p>
+                <p>
+                    Ok, so basically I'm saying with python we're stuck with
+                    parentheses and attributes. And because of attributes, we're
+                    somewhat stuck with = being our verb. But that just means
+                    our language for models is different:
+                </p>
+                <pre class="literal-block">
 class Project(SQLObject):
  projectManager = A(Person)
  milestones = Many()  # explicitly: Many(Milestone)
  categories = ManyAndMany() # again, from the Project side I'd ideally like if this was just Many()
-</pre>
-<p>(ie, to some extent we're getting pulled into a debate constrained by ActiveRecord's words in their DSL for models.)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-4.html" rel="nofollow">#</a> Luke Opperman</div><hr noshade>
- 
-<div class="document">
-<blockquote>
-That limit is what descriptors can do, and basically
-descriptors can respond to attribute access. They
-can't tell the class that they exist (until someone
-tries to access them)</blockquote>
-<p>I don't understand what you mean by that. Classes (and even instances) can certainly know that a descriptor exists in its own dict, like any other attribute.</p>
-<blockquote>
-...they never know what attribute name they are bound to</blockquote>
-<p>Unless they are told what name they are bound to, which is easy enough to do in the constructor. In the case when you define a descriptor in the class body, you can use a metaclass to tell the descriptor what name it's bound to, and skip repeating the name.</p>
-<blockquote>
-...and they don't know what class they are bound to until
-they are accessed.</blockquote>
-<p>Again, unless they are told, which is easy enough.</p>
-<blockquote>
-In ORMs this causes some problems, because classes really
-want to know what columns they have, and columns want to
-know what name they were given.</blockquote>
-<p>In Dejavu*, I got around the second issue (column names) by giving each descriptor a &quot;key&quot; attribute, which is either provided in the constructor or (more commonly) by the metaclass. I got around the first issue by storing a _properties dict in the owner class, of the form: {descriptor.key: instance_value}. Each instance makes a copy of that dict for itself. In this way, both the owner class and its instances know which of their attributes are UnitProperty descriptors.</p>
-<ul class="simple">
-<li><a class="reference" href="http://projects.amor.org/dejavu/browser/trunk/units.py">http://projects.amor.org/dejavu/browser/trunk/units.py</a> (the UnitProperty descriptor)</li>
-</ul>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-6.html" rel="nofollow">#</a> <a href="http://www.aminus.orgt/blogs/index.php/fumanchu">Robert Brewer</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<blockquote>
-I don't understand what you mean by that. Classes (and even instances) can certainly know that a descriptor exists in its own dict, like any other attribute.</blockquote>
-<p>The point is that the class has to do some extra stuff to find the attribute, where ActiveRecord/Ruby's technique doesn't require anything special in the class.  You can't know that a column object exists until you search your __dict__.  And follow MRO, for that matter.</p>
-<p>I <em>do</em> explain right after this how you can make a class look for these things, and give attributes access to some of that extra information.  I'd <em>like</em> for this to become a natural idiom in Python, not viewed as special magic.  So I'd like a consistent set of practices, which doesn't presuppose what kind of object you are looking for (i.e., doesn't involve looking for all column attributes).</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-7.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>Good discussion. I might add that while associations can be reasonably assigned to attributes mentally, it's harder to do something like that for acts_* and other meta-programming wrap-ups in Rails. So for example:</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    (ie, to some extent we're getting pulled into a debate
+                    constrained by ActiveRecord's words in their DSL for
+                    models.)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Luke Opperman
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <blockquote>
+                    That limit is what descriptors can do, and basically
+                    descriptors can respond to attribute access. They can't tell
+                    the class that they exist (until someone tries to access
+                    them)
+                </blockquote>
+                <p>
+                    I don't understand what you mean by that. Classes (and even
+                    instances) can certainly know that a descriptor exists in
+                    its own dict, like any other attribute.
+                </p>
+                <blockquote>
+                    ...they never know what attribute name they are bound to
+                </blockquote>
+                <p>
+                    Unless they are told what name they are bound to, which is
+                    easy enough to do in the constructor. In the case when you
+                    define a descriptor in the class body, you can use a
+                    metaclass to tell the descriptor what name it's bound to,
+                    and skip repeating the name.
+                </p>
+                <blockquote>
+                    ...and they don't know what class they are bound to until
+                    they are accessed.
+                </blockquote>
+                <p>Again, unless they are told, which is easy enough.</p>
+                <blockquote>
+                    In ORMs this causes some problems, because classes really
+                    want to know what columns they have, and columns want to
+                    know what name they were given.
+                </blockquote>
+                <p>
+                    In Dejavu*, I got around the second issue (column names) by
+                    giving each descriptor a &quot;key&quot; attribute, which is
+                    either provided in the constructor or (more commonly) by the
+                    metaclass. I got around the first issue by storing a
+                    _properties dict in the owner class, of the form:
+                    {descriptor.key: instance_value}. Each instance makes a copy
+                    of that dict for itself. In this way, both the owner class
+                    and its instances know which of their attributes are
+                    UnitProperty descriptors.
+                </p>
+                <ul class="simple">
+                    <li>
+                        <a
+                            class="reference"
+                            href="http://projects.amor.org/dejavu/browser/trunk/units.py"
+                            >http://projects.amor.org/dejavu/browser/trunk/units.py</a
+                        >
+                        (the UnitProperty descriptor)
+                    </li>
+                </ul>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.aminus.orgt/blogs/index.php/fumanchu"
+                    >Robert Brewer</a
+                >
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        I don't understand what you mean by that. Classes (and
+                        even instances) can certainly know that a descriptor
+                        exists in its own dict, like any other attribute.
+                    </blockquote>
+                    <p>
+                        The point is that the class has to do some extra stuff
+                        to find the attribute, where ActiveRecord/Ruby's
+                        technique doesn't require anything special in the class.
+                        You can't know that a column object exists until you
+                        search your __dict__. And follow MRO, for that matter.
+                    </p>
+                    <p>
+                        I <em>do</em> explain right after this how you can make
+                        a class look for these things, and give attributes
+                        access to some of that extra information. I'd
+                        <em>like</em> for this to become a natural idiom in
+                        Python, not viewed as special magic. So I'd like a
+                        consistent set of practices, which doesn't presuppose
+                        what kind of object you are looking for (i.e., doesn't
+                        involve looking for all column attributes).
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-on-python-metaprogramming-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Good discussion. I might add that while associations can be
+                    reasonably assigned to attributes mentally, it's harder to
+                    do something like that for acts_* and other meta-programming
+                    wrap-ups in Rails. So for example:
+                </p>
+                <pre class="literal-block">
 class Story &lt; ActiveRecord::Base
   belongs_to :iteration
 
   acts_as_taggable
   acts_as_list :scope =&gt; :iteration
 end
-</pre>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-8.html" rel="nofollow">#</a> <a href="http://www.loudthinking.com">David Heinemeier Hansson</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>If I were to do these in SQLObject (and someone else has started some of these), I'd do:</p>
-<pre class="literal-block">
+</pre
+                >
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.loudthinking.com"
+                    >David Heinemeier Hansson</a
+                >
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        If I were to do these in SQLObject (and someone else has
+                        started some of these), I'd do:
+                    </p>
+                    <pre class="literal-block">
 class Tag(SQLObject):
     name = StringCol(alternateID=True)
     # Assuming joins.PolyMorphic is a signifier to take the place of a class name:
@@ -317,39 +659,130 @@ i.stories.swap(0, 1)
 s = Story.get(1)
 fiction = Tag.byName('fiction')
 s.tags.add(fiction)
-</pre>
-<p>Joins in SQLObject (unlike Django, I think) are defined on both sides of the relation.  I'm okay with that for a few reasons:</p>
-<ul class="simple">
-<li>Each class is a fairly complete description, and nothing magically appears because of something else in the system.</li>
-<li><tt class="docutils literal"><span class="pre">belongs_to</span></tt> or <tt class="docutils literal"><span class="pre">has_many</span></tt>?  There's no reason to use one over the other.  I dislike forcing people to make arbitrary decisions.</li>
-<li>Each side of the join has certain options which aren't symmetrical tied to the other end.  Cascading makes sense on the ForeignKey.  Ordering makes sense on the target of the key.  You'd have to duplicate all these options to both ends for both ways of expressing the relation, but possibly with subtely different language.</li>
-<li>Less name generation means less rules.  Rails pluralization rules certainly don't seem appealing.  I get the impression from what I've heard from you and others that a lot of time has been spent on that feature and probably even more time on discussion of that feature.  So (to me) it's just as well that the code includes both <tt class="docutils literal"><span class="pre">iterations</span></tt> and <tt class="docutils literal"><span class="pre">'Iteration'</span></tt>, and both <tt class="docutils literal"><span class="pre">stories</span></tt> and <tt class="docutils literal"><span class="pre">'Story'</span></tt>.</li>
-</ul>
-<p>Generally speaking, I'd like to see functionality like the <tt class="docutils literal"><span class="pre">acts_*</span></tt> functions in SQLObject, but for each case having the functions grouped under a single attribute.  So where <tt class="docutils literal"><span class="pre">acts_as_nested_set</span></tt> adds a handful of methods, in SQLObject all those methods would live under a single attribute.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-9.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>During that part of the presentation, I was quite curious what the database generated underneath looks like for those polymorphic relationships. From the example in the presentation, how does it represent &quot;Taggings&quot;? Does it actually create:</p>
-<pre class="literal-block">
+</pre
+                    >
+                    <p>
+                        Joins in SQLObject (unlike Django, I think) are defined
+                        on both sides of the relation. I'm okay with that for a
+                        few reasons:
+                    </p>
+                    <ul class="simple">
+                        <li>
+                            Each class is a fairly complete description, and
+                            nothing magically appears because of something else
+                            in the system.
+                        </li>
+                        <li>
+                            <tt class="docutils literal"
+                                ><span class="pre">belongs_to</span></tt
+                            >
+                            or
+                            <tt class="docutils literal"
+                                ><span class="pre">has_many</span></tt
+                            >? There's no reason to use one over the other. I
+                            dislike forcing people to make arbitrary decisions.
+                        </li>
+                        <li>
+                            Each side of the join has certain options which
+                            aren't symmetrical tied to the other end. Cascading
+                            makes sense on the ForeignKey. Ordering makes sense
+                            on the target of the key. You'd have to duplicate
+                            all these options to both ends for both ways of
+                            expressing the relation, but possibly with subtely
+                            different language.
+                        </li>
+                        <li>
+                            Less name generation means less rules. Rails
+                            pluralization rules certainly don't seem appealing.
+                            I get the impression from what I've heard from you
+                            and others that a lot of time has been spent on that
+                            feature and probably even more time on discussion of
+                            that feature. So (to me) it's just as well that the
+                            code includes both
+                            <tt class="docutils literal"
+                                ><span class="pre">iterations</span></tt
+                            >
+                            and
+                            <tt class="docutils literal"
+                                ><span class="pre">'Iteration'</span></tt
+                            >, and both
+                            <tt class="docutils literal"
+                                ><span class="pre">stories</span></tt
+                            >
+                            and
+                            <tt class="docutils literal"
+                                ><span class="pre">'Story'</span></tt
+                            >.
+                        </li>
+                    </ul>
+                    <p>
+                        Generally speaking, I'd like to see functionality like
+                        the
+                        <tt class="docutils literal"
+                            ><span class="pre">acts_*</span></tt
+                        >
+                        functions in SQLObject, but for each case having the
+                        functions grouped under a single attribute. So where
+                        <tt class="docutils literal"
+                            ><span class="pre">acts_as_nested_set</span></tt
+                        >
+                        adds a handful of methods, in SQLObject all those
+                        methods would live under a single attribute.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-on-python-metaprogramming-comment-9.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            During that part of the presentation, I was quite
+                            curious what the database generated underneath looks
+                            like for those polymorphic relationships. From the
+                            example in the presentation, how does it represent
+                            &quot;Taggings&quot;? Does it actually create:
+                        </p>
+                        <pre class="literal-block">
   Person               Message
     |                     |
  PersonTaggings     MessageTaggings
 (person_id, tag_id) (message_id, tag_id)
             \      /
               Tag
-</pre>
-<p>And then Tag.taggings.collect knows all the intermediate tables to combine?</p>
-<p>Guess I have to dig into the ActiveRecord code.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-10.html" rel="nofollow">#</a> <a href="http://">Luke Opperman</a></div><hr noshade>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-<p>I don't know whether it's really desirable, but it doesn't seem to be hard to achieve the 'direct syntactic port of ActiveRecord:' using an auxilliary queue and a registration callback e.g.,:</p>
-<pre class="literal-block">
+</pre
+                        >
+                        <p>
+                            And then Tag.taggings.collect knows all the
+                            intermediate tables to combine?
+                        </p>
+                        <p>Guess I have to dig into the ActiveRecord code.</p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/more-on-python-metaprogramming-comment-10.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">Luke Opperman</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I don't know whether it's really desirable, but it doesn't
+                    seem to be hard to achieve the 'direct syntactic port of
+                    ActiveRecord:' using an auxilliary queue and a registration
+                    callback e.g.,:
+                </p>
+                <pre class="literal-block">
 _RegisterPropertyQueue = []
 
 class ActiveRecord(object):
@@ -362,7 +795,7 @@ class ActiveRecord(object):
                 obj.__register__(cls)
             del _RegisterPropertyQueue[:]
 
-            
+
 class RegisterProperty(object):
     def __new__(cls, *args, **kw):
         o = object.__new__(cls)
@@ -370,31 +803,31 @@ class RegisterProperty(object):
         return o
     def __register__(self, cls):
         raise NotImplementedError
-        
+
 class Relation(RegisterProperty):
     def __init__(self, other):
         self.other = other
-    
+
 class has_many(Relation):
     def __register__(self, cls):
         other = self.other
         cls._has_many.add(other)
         other._belongs_to.add(cls)
-        
+
 class belongs_to(Relation):
     def __register__(self, cls):
         other = self.other
         cls._belongs_to.add(other)
         other._has_many.add(cls)
-    
+
 class has_and_belongs_to_many(Relation):
     def __register__(self, cls):
         other = self.other
         other._has_and_belongs_to_many.add(cls)
-        cls._has_and_belongs_to_many.add(other)    
+        cls._has_and_belongs_to_many.add(other)
 
 
-        
+
 class ProjectManager(ActiveRecord): pass
 
 class Milestones(ActiveRecord): pass
@@ -405,20 +838,43 @@ class Person(ActiveRecord):
     belongs_to(ProjectManager)
     has_many(Milestones)
     has_and_belongs_to_many(Categories)
-            
+
 
 assert ProjectManager in Person._belongs_to
 assert Milestones in Person._has_many
 assert Person in Categories._has_and_belongs_to_many
-</pre>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-11.html" rel="nofollow">#</a> Michael Spencer</div><hr noshade>
- 
-<div class="document">
-<p>Oooh, nice Python code.  I'm really interested in how these techniques develop in the Python community.</p>
-<p>There's a third trick you can do with Ruby's metaclasses, but it depends on a block-form <tt class="docutils literal"><span class="pre">lambda</span></tt>.</p>
-<p>The following example is inspired by UnrealScript, which is a Java-like game programming language.  UnrealScript objects can be in different states, and each state can selectively override methods:</p>
-<pre class="literal-block">
+</pre
+                >
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-11.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Michael Spencer
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Oooh, nice Python code. I'm really interested in how these
+                    techniques develop in the Python community.
+                </p>
+                <p>
+                    There's a third trick you can do with Ruby's metaclasses,
+                    but it depends on a block-form
+                    <tt class="docutils literal"
+                        ><span class="pre">lambda</span></tt
+                    >.
+                </p>
+                <p>
+                    The following example is inspired by UnrealScript, which is
+                    a Java-like game programming language. UnrealScript objects
+                    can be in different states, and each state can selectively
+                    override methods:
+                </p>
+                <pre class="literal-block">
 class Monster &lt; Actor
   on :make_noise do
     &quot;Growl!&quot;
@@ -442,29 +898,64 @@ monster = Monster.new
 monster.make_noise # -&gt; &quot;Growl!&quot;
 monster.drink_warm_milk 2
 monster.make_noise # -&gt; &quot;Snore!&quot;
-</pre>
-<p>There's more syntactic clutter here than I'd like, but the code  works.  The biggest limitation is that Ruby doesn't support default values for block parameters.</p>
-<p>Is there an obvious way to approximate this in Python?  I suspect there might be something with decorators that would get pretty close.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-12.html" rel="nofollow">#</a> <a href="http://randomhacks.net/">Eric Kidd</a></div><hr noshade>
- 
-<div class="document">
-<p>Perhaps a stupid question....</p>
-<p>Can't those relations/constraints be defined right in the SQL schema?</p>
-<p>Perhaps that's too much coupling to a specific storage model? I kinda like that because sometimes you end up with multiple toolkits (in multiple languages - including command-line sql) in place that could interact with the data storage, so having one consistent set of rules with no back-door seems like a good thing....</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-13.html" rel="nofollow">#</a> <a href="http://webseitz.fluxent.com/wiki">Bill Seitz</a></div><hr noshade>
- 
-<div class="document">
-<p>It's not so hard as you'd think</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    There's more syntactic clutter here than I'd like, but the
+                    code works. The biggest limitation is that Ruby doesn't
+                    support default values for block parameters.
+                </p>
+                <p>
+                    Is there an obvious way to approximate this in Python? I
+                    suspect there might be something with decorators that would
+                    get pretty close.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-12.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://randomhacks.net/">Eric Kidd</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>Perhaps a stupid question....</p>
+                <p>
+                    Can't those relations/constraints be defined right in the
+                    SQL schema?
+                </p>
+                <p>
+                    Perhaps that's too much coupling to a specific storage
+                    model? I kinda like that because sometimes you end up with
+                    multiple toolkits (in multiple languages - including
+                    command-line sql) in place that could interact with the data
+                    storage, so having one consistent set of rules with no
+                    back-door seems like a good thing....
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-13.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://webseitz.fluxent.com/wiki">Bill Seitz</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>It's not so hard as you'd think</p>
+                <pre class="literal-block">
 # Crack fingers
 
 # File orm.py:
 belongs_to_gatherer = []
 def belongs_to(what):
     belongs_to_gatherer.append(what)
-    
+
 has_many_gatherer = []
 def has_many(what):
     has_many_gatherer.append(what)
@@ -473,21 +964,21 @@ class MetaRecord(type):
     def __new__(cls, name, bases, dictionary):
         global belongs_to_gatherer, has_many_gatherer
         Record = super(MetaRecord, cls).__new__(cls, name, bases, dictionary)
-        
+
         # Now we grab what we've gathered and run the respective methods on them:
         for i in belongs_to_gatherer:
             Record.belongs_to(i)
         belongs_to_gatherer = []
-        
+
         for i in has_many_gatherer:
              Record.has_many(i)
         has_many_gatherer = []
-        
+
         return Record
 
 class ActiveRecord(object):
     __metaclass__ = MetaRecord
-    
+
     &#64;classmethod
     def belongs_to(cls, what):
         # Set it to belong to: what
@@ -497,7 +988,7 @@ class ActiveRecord(object):
     def has_many(cls, what):
         # Set it to have many: what
         print cls, &quot;has many&quot;, what
-        
+
 __all__ = [ActiveRecord, belongs_to, has_many]
 
 # In another file:
@@ -506,60 +997,135 @@ from orm import *
 class Person(ActiveRecord):
     belongs_to('project_manager')
     has_many('milestones')
-</pre>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-14.html" rel="nofollow">#</a> brantley</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Note that all these examples (this is the third along these lines) require cooperation on the part of the class.  I hadn't really considered that, but it <em>is</em> different from Zope's <tt class="docutils literal"><span class="pre">implements()</span></tt> which can be applied to any class without any cooperation on the part of that class.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-15.html" rel="nofollow">#</a> Ian Bicking</div><hr noshade>
- 
-<div class="document">
-<p>I liked that! Pretty cool.  What about?</p>
-<dl class="docutils">
-<dt>def belongs_to_classmethod(cls, what):</dt>
-<dd>print cls.__name__, &quot; Belongs to &quot;, what</dd>
-<dt>class MetaActiveRecord(type):</dt>
-<dd><dl class="first last docutils">
-<dt>def __new__(cls, name, bases, dictionary):</dt>
-<dd><p class="first">Record = super(MetaActiveRecord, cls).__new__(cls, name, bases, dictionary)</p>
-<dl class="docutils">
-<dt>if dictionary.has_key('belongs_to'):</dt>
-<dd>Record.belongs_to_classmethod = classmethod(belongs_to_classmethod)
-Record.belongs_to_classmethod(dictionary['belongs_to'])</dd>
-</dl>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 13)</p>
-Definition list ends without a blank line; unexpected unindent.</div>
-<p class="last">return Record</p>
-</dd>
-</dl>
-</dd>
-<dt>class ActiveRecord(object):</dt>
-<dd>__metaclass__ = MetaActiveRecord</dd>
-<dt>class Person(ActiveRecord):</dt>
-<dd><p class="first">belongs_to = 'project_manager'
-def __init__(self):</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">&lt;string&gt;</tt>, line 22)</p>
-Unexpected indentation.</div>
-<blockquote class="last">
-print &quot;Person __init__&quot;</blockquote>
-</dd>
-</dl>
-<p>a = Person()</p>
-<p>prints:
-Person  Belongs to  project_manager
-Person __init__</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-17.html" rel="nofollow">#</a> Gordon Scott</div><hr noshade>
-</blockquote>
- 
-<div class="document">
-<p>By the way, Zope 3 has a few more things like 'implements' that are being used more and more as Zope 3 matures. Most commonly, these things are used on interfaces, which is the biggest in-language 'DSL' that Zope 3 has. A common thing is to make constraints about what kind of objects a container might hold, or what kind of containers an object might be placed in.</p>
-<pre class="literal-block">
+</pre
+                >
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-14.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                brantley
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Note that all these examples (this is the third along
+                        these lines) require cooperation on the part of the
+                        class. I hadn't really considered that, but it
+                        <em>is</em> different from Zope's
+                        <tt class="docutils literal"
+                            ><span class="pre">implements()</span></tt
+                        >
+                        which can be applied to any class without any
+                        cooperation on the part of that class.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-on-python-metaprogramming-comment-15.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>I liked that! Pretty cool. What about?</p>
+                    <dl class="docutils">
+                        <dt>def belongs_to_classmethod(cls, what):</dt>
+                        <dd>
+                            print cls.__name__, &quot; Belongs to &quot;, what
+                        </dd>
+                        <dt>class MetaActiveRecord(type):</dt>
+                        <dd>
+                            <dl class="first last docutils">
+                                <dt>
+                                    def __new__(cls, name, bases, dictionary):
+                                </dt>
+                                <dd>
+                                    <p class="first">
+                                        Record = super(MetaActiveRecord,
+                                        cls).__new__(cls, name, bases,
+                                        dictionary)
+                                    </p>
+                                    <dl class="docutils">
+                                        <dt>
+                                            if dictionary.has_key('belongs_to'):
+                                        </dt>
+                                        <dd>
+                                            Record.belongs_to_classmethod =
+                                            classmethod(belongs_to_classmethod)
+                                            Record.belongs_to_classmethod(dictionary['belongs_to'])
+                                        </dd>
+                                    </dl>
+                                    <div class="system-message">
+                                        <p class="system-message-title">
+                                            System Message: WARNING/2 (<tt
+                                                class="docutils"
+                                                >&lt;string&gt;</tt
+                                            >, line 13)
+                                        </p>
+                                        Definition list ends without a blank
+                                        line; unexpected unindent.
+                                    </div>
+                                    <p class="last">return Record</p>
+                                </dd>
+                            </dl>
+                        </dd>
+                        <dt>class ActiveRecord(object):</dt>
+                        <dd>__metaclass__ = MetaActiveRecord</dd>
+                        <dt>class Person(ActiveRecord):</dt>
+                        <dd>
+                            <p class="first">
+                                belongs_to = 'project_manager' def
+                                __init__(self):
+                            </p>
+                            <div class="system-message">
+                                <p class="system-message-title">
+                                    System Message: ERROR/3 (<tt
+                                        class="docutils"
+                                        >&lt;string&gt;</tt
+                                    >, line 22)
+                                </p>
+                                Unexpected indentation.
+                            </div>
+                            <blockquote class="last">
+                                print &quot;Person __init__&quot;
+                            </blockquote>
+                        </dd>
+                    </dl>
+                    <p>a = Person()</p>
+                    <p>
+                        prints: Person Belongs to project_manager Person
+                        __init__
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-on-python-metaprogramming-comment-17.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Gordon Scott
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    By the way, Zope 3 has a few more things like 'implements'
+                    that are being used more and more as Zope 3 matures. Most
+                    commonly, these things are used on interfaces, which is the
+                    biggest in-language 'DSL' that Zope 3 has. A common thing is
+                    to make constraints about what kind of objects a container
+                    might hold, or what kind of containers an object might be
+                    placed in.
+                </p>
+                <pre class="literal-block">
 from zope.interface import Interface, Attribute
 from zope.app.container.constraints import contains, containers
 from zope.app.container.interfaces import IContainer, IContained
@@ -579,9 +1145,13 @@ class IThingContained(IContained):
     An interface stating that things can be contained in thing holders.
     &quot;&quot;&quot;
     containers(IThingHolder)
-</pre>
-<p>This is much better than an older way of doing the same thing.</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    This is much better than an older way of doing the same
+                    thing.
+                </p>
+                <pre class="literal-block">
 from zope.app.container.constraints import ContainerTypesConstraint
 from zope.app.container.constraints import ItemTypePrecondition
 import zope.schema
@@ -600,9 +1170,13 @@ class IThingContained(IContained):
     __parent__ = zope.schema.Field(
         constraint=ContainerTypesConstraint(IContentContainer),
         )
-</pre>
-<p>There are other little things around that also have made life a little bit nicer, such as object adaptation.</p>
-<pre class="literal-block">
+</pre
+                >
+                <p>
+                    There are other little things around that also have made
+                    life a little bit nicer, such as object adaptation.
+                </p>
+                <pre class="literal-block">
 from zope.interface import implements
 from zope.app import zapi
 from example.interfaces import ISquarePeg, IRoundHole
@@ -619,15 +1193,32 @@ class OldSquarePegToRoundHoleAdapter(object):
 class SquarePegToRoundHoleAdapter(object):
     implements(IRoundHole)
     zapi.adapts(ISquarePeg)
-</pre>
-<p>It's a nice showcase for what is possible. What's nicest about this is that 'implements()', 'adapts()', and so on can be looked up easily in an API documentation tool. Trying to remember all of the __funny_names__ is not so easy.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/more-on-python-metaprogramming-comment-16.html" rel="nofollow">#</a> <a href="http://toulouse.amber.org/">Jeff Shell</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+</pre
+                >
+                <p>
+                    It's a nice showcase for what is possible. What's nicest
+                    about this is that 'implements()', 'adapts()', and so on can
+                    be looked up easily in an API documentation tool. Trying to
+                    remember all of the __funny_names__ is not so easy.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-python-metaprogramming-comment-16.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://toulouse.amber.org/">Jeff Shell</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

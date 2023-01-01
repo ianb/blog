@@ -1,416 +1,656 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>Code Pickiness</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
-
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
-
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
-
-<div style="float: right">
-
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
-
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>Code Pickiness</h1>
- <p>
-
-I've become increasingly picky about little details with code.  For
-instance, I really dislike code that doesn't use whitespace properly.
-By that, I mean that there's always whitespace around assignment (like
-<tt>x = 10</tt>, not <tt>x=10</tt>); but never when defining keyword
-arguments.  That there's never whitespace inside parenthesis or list
-and dictionary literals (i.e., no <tt>def func( a, b ):</tt>).  That
-there's always one space after commas.
-
-<p>
-
-These don't effect the quality of the code, but it's a kind of <a href="http://c2.com/cgi/wiki?CodeSmell">smell</a>.  I think of
-programming as a kind of craft, and a good craftsman pays attention to
-the details, even if they aren't the real goal.  If you are repairing
-a car, and you see that the last mechanic didn't put the wiring back
-in the harness, you know you have to look for other things they messed
-up.  If you are firing a pot, and you see the potter didn't clean up
-their foot, you wonder if they also have bubbles in their clay.  And
-so on.
-
-<p>
-
-I also have become wary of clever tricks.  I cringe everytime I see
-<tt>bool and true_value or false_value</tt> to simulate <tt>bool ?
-true_value : false_value</tt>, because I know the programmer was lazy.
-Or nested list comprehension.  Or combinations thereof.  Just write
-the damn loop out, and save us all some effort when we're reading.
-
-<p>
-
-For the most part, I follow <a href="http://www.python.org/peps/pep-0008.html">PEP 8</a>, and if
-there's a clever or a simple but perhaps long-winded way of doing
-something, I try to always choose the long-winded way.  This is my
-suggestion that others do the same.
- <div class="dates" align="right">
-Created 22 Sep '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- I tend to be picky about code formatting too, but I sometimes wonder where one's aesthetics came from originally. For example, I have a friend who's otherwise perfectly sane, and wants to follow style guides, but insists of writing conditionals like this: <tt>if(condition)</tt>. Icky.
-<br />
-
-<br />
-Regarding writing complicated list comprehensions as regular loops; I think this quote from Tim Peters is relevant:
-<br />
-
-<br />
-<i>Here's another technique that is faster and more obvious but that is often avoided by those who mistakenly believe that writing two lines of code where one might do is somehow sinful.</i>
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment352.html" rel="nofollow">#</a> <a href="http://weblog.hotales.org/portal/python">Jarno Virtanen</a></div><hr noshade>
- I couldn't agree more now, but I didn't always. I've written a post on how I switched from disliking white space to disliking code without it (<a href="http://www.sunsetandlabrea.com/index.py/development/53.html)." target="_blank">http://www.sunsetandlabrea.com/index.py/development/53.html).</a>
-<br />
-
-<br />
-Yes, if(condition) is horrible, I don't think I ever did that. Makes it look more like a function call.
- <div align="right"><a href="http://blog.ianbicking.org/comment353.html" rel="nofollow">#</a> <a href="http://www.sunsetandlabrea.com">Richard Chamberlain</a></div><hr noshade>
- Most of these things are oldskul whitespace rules from written language.
-<br />
-
-<br />
-Sometimes of course one might want to compress code a bit, compare:
-<br />
-for(i=0;i<32;i++)
-<br />
-
-<br />
-for(i=0; i<32; i++)
-<br />
-
-<br />
-for (i = 0; i < 32; i++)
-<br />
-(I would prefer second, first, third)
-<br />
-a=4;b=5;
-<br />
-
-<br />
-a=4; b=5;
-<br />
-
-<br />
-a = 4; b = 5;
-<br />
-
-<br />
-a = 4; 
-<br />
-b = 5;
-<br />
-
-<br />
-(I would prefer second, fourth , first, third)
-<br />
-
-<br />
-Also some things make nice oneliners in Python:
-<br />
-
-<br />
-class AbstracOne: pass
-<br />
-def reverse(a, b): return -cmp(a,b)
-<br />
-
-<br />
-When there are long table definitions I prefer 
-<br />
-[1,3,4,2,5,6,44,2,5,6,4] to
-<br />
-[1, 3, 4, 2, 5, 6, 44, 2, 5, 6, 4]
-<br />
-but it can make sense to arrange code like this:
-<br />
-[
-<br />
-1, 3, 4, 2, 
-<br />
-5, 6, 44, 2, 
-<br />
-5, 6, 4, 19
-<br />
-]
- <div align="right"><a href="http://blog.ianbicking.org/comment354.html" rel="nofollow">#</a> <a href="http://smejmoon.lv">Ìirts</a></div><hr noshade>
- Beeing picky about code is not the same as ignoring that others who don't share your style have conventions too and also take pride in proper craftsmanship.
-<br />
-
-<br />
-Anyway, this kind of "I'm right and therfore I ownz" seems to be a particulary programmer related kind of phenomenon. It has however been prooven decades ago in Newsgroups ( the thing people used before there where blogs and comments ) that any and all such discussions are completely fruitless beyond the most common sense shared by most.
- <div align="right"><a href="http://blog.ianbicking.org/comment355.html" rel="nofollow">#</a> Florian</div><hr noshade>
- There is a clear distinction between "tricky" and compact.  Compact code can be easier to read/browse because there is less to analyze.
-<br />
-
-<br />
-Compare a list comprehension with an equivalent loop.  You can do all kinds of strange stuff in a loop, including adding the current item to either end of the loop, break out of the loop (making a shorter resulting list), etc.  With a list comprehension, you know what is being done.
-<br />
-
-<br />
-I think Python desperately needs a terneray operator like C.  Then it will be obvious what the programmer is trying to do and you can mentally "skip over" it unless you are analyzing the details of that line.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment356.html" rel="nofollow">#</a></div><hr noshade>
- I'm picky about whitespace around, or nor around the equals sign. However, I like simple list comprehensions over for loops for some reason. De gustabus!
- <div align="right"><a href="http://blog.ianbicking.org/comment357.html" rel="nofollow">#</a> <a href="http://www.pycs.net/users/0000231">John P Speno</a></div><hr noshade>
- Being picky about code formatting is a good thing.  Being a snob about your own arbitrary style conventions is just, well, being a snob.  The only reasonable criterion (IMHO) for whether a given set of conventions is better or worse than another is how much it helps (or hurts) you convey the meaning of your code to the someone who's reading it, who may be you yourself, a member of your team, or anyone else.  As such, it's entirely a cultural issue, and (again, IMHO) consistency within any programming group is more important than what style conventions you adopt.  To say someone's code 'smells' because your own favorite style conventions aren't being followed carries it's own stink.
- <div align="right"><a href="http://blog.ianbicking.org/comment358.html" rel="nofollow">#</a> TomP</div><hr noshade>
- I have to differ on the whitespace inside parentheses. I always add it when it helps separate the arguments within from the outer function. The best example is calling a function that accepts a tuple as its parameter. I think that 
-<br />
-
-<br />
-function((x, y))
-<br />
-
-<br />
-is more confusing than:
-<br />
-
-<br />
-function( (x, y) )
-<br />
-
-<br />
-which IMO is unmistakably a tuple being passed. 
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment359.html" rel="nofollow">#</a> <a href="http://leafe.com">Ed Leafe</a></div><hr noshade>
- Picky, eh?
-<br />
-
-<br />
-It's "affect", not "effect", in the second paragraph.
-<br />
-
-<br />
-;-)
- <div align="right"><a href="http://blog.ianbicking.org/comment360.html" rel="nofollow">#</a> <a href="http://solar.eng.yale.edu">Andrew</a></div><hr noshade>
- No, 
-<br />
-
-<br />
-You do not know if a programmer was lazy, you may know you did that because you only do that when you are lazy?
-<br />
-You do not know why a programmer programs, it may be love, it may be money, it may be a need in helping something else.
-<br />
-You do not know if a programmer works for himself or if he is trying to be nice with the next one that picks up on the programming.
-<br />
-I don't know anything and I have never had time to be getting god at understanding psychology, sociology and otherwise the human nature, but one thing I do know, that if you have any reason to believe that you could be wrong than you shut up.
-<br />
-I'm already sorry I wrote this because I know I could be wrong.
-<br />
-By the way there are many times I prefer bool and true_value or false_value.
-<br />
-Programming alone is art and programming in a team is engineering.
-<br />
-I believe (I never know) no artist ever care about the rest when he creates unless the work is somewhat about the rest.
-<br />
-I hope (I never know) every engineer must care about the rest.
-<br />
-Picking up on an artist's work is called criticism.
-<br />
-Picking up on an engineer’s work is called along with other stuff maintenance.
-<br />
-Let's stop talking, let's stop comparing and divagating and let's start doing what we must or love or need to do ant let's not try to be heroes who wish to make a better world yet we have no tools nor we are seeking for the tools.
-<br />
-
-<br />
-From Socrates to Heidegger to Wittgenstein to Chomsky we know nothing, yet for some reason we all must talk.
-<br />
-
-<br />
-
-<br />
-I'm sorry for may "bad?" English
-<br />
-      and if you could not understand me 
-<br />
-      or if you could:
-<br />
-              I assert it is so much my problem as is also your.
-<br />
-
-<br />
-
-<br />
-
-<br />
-
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment361.html" rel="nofollow">#</a> <a href="http://www.emilas.com">Gheorghe</a></div><hr noshade>
- Maybe it's my Perl background showing through, but I like tricks that make code succinct, but not too succinct.  The and/or trick doesn't strike me as lazy, it strikes me as a way to collapse a screenful of simple if statements into a few lines.  That seems easier to read for me, and more to the point.
-<br />
-
-<br />
-But on the other hand, and this is *definitely* from my Perl background, nested list comprehensions tempt me.  :)  But I suppose I could go back to lisp if I wanted lots of madly nested insanity.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment362.html" rel="nofollow">#</a> <a href="http://www.decafbad.com">l.m.orchard</a></div><hr noshade>
- I don't think the correlation between good software and adherence to a style guide is as strong as you suggest.  In fact, I think an bit of defiance is a healthy reality check.  I know several developers who produce excellent code, yet insist that commas belong at the beginning of the next line rather than the end of the first line, like so:
-<br />
-
-<br />
-[ 'abc'
-<br />
-
-<br />
-, 'def'
-<br />
-
-<br />
-, 'ghi']
-<br />
-
-<br />
-Whether I like that or not, who am I to quibble with it?  If it helps great developers who care deeply about their craft, bring it on.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment363.html" rel="nofollow">#</a> <a href="http://hathawaymix.org">Shane Hathaway</a></div><hr noshade>
- I believe that if "affect" and "effect" are used as transitive verbs they're interchangeable.
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment364.html" rel="nofollow">#</a> <a href="http://eradman.com">Eric Radman</a></div><hr noshade>
- Well, I was joking, but since you mentioned it:
-<br />
-
-<br />
-<a href="http://dictionary.reference.com/search?q=affect" target="_blank">http://dictionary.reference.com/search?q=affect</a>
-<br />
-
-<br />
-Usage Note: Affect and effect have no senses in common. As a verb affect is most commonly used in the sense of “to influence” (how smoking affects health). Effect means “to bring about or execute”: layoffs designed to effect savings. Thus the sentence These measures may affect savings could imply that the measures may reduce savings that have already been realized, whereas These measures may effect savings implies that the measures will cause new savings to come about.
- <div align="right"><a href="http://blog.ianbicking.org/comment365.html" rel="nofollow">#</a> <a href="http://solar.eng.yale.edu">Andrew</a></div><hr noshade>
- It makes me laugh when a Perl programmer badmouths Lisp:
-<br />
-"But I suppose I could go back to lisp if I wanted lots of madly nested insanity."
-<br />
-
-<br />
-Learn Lisp before trying to badmouth it. Lisp programmers use the "loop" macro, which is much more powerful and succinct than Python list comprehension, much easier to read and maintain than Perl code, and doesn't require excessive parenthesis. 
-<br />
-
-<br />
-Lots of parenthesis don't make code hard to read or maintain: just the opposite. Good Lisp programmers use lots of white space and indentation to make the meaning of their programs quite clear. 
-<br />
-Since Lisp syntax is so regular, it's easy for text editors to intelligently edit Lisp code, auto indent, balance parens, move over logical units of code, etc. 
-<br />
-
-<br />
-What makes code hard to maintain is lots of context sensative jibber jabber punctuation like Perl uses, that text editors and humans have an extremely hard time parsing and understanding. 
-<br />
-
-<br />
-It amazes me that Perl programmers complain about Lisp's parenthesis, then they go write programs that look like line noise, on purpose. Some actually savor Perl syntax, thinking it makes them more manly. It's like voting for Bush because he puts on a macho act, even though you know that his policies are horrible and he's a liar. 
-<br />
-
-<br />
-I don't think that it's a question of taste or style or manlyness. Programs that look like random line noise are much harder to write and maintain than programs with a regular syntax that you can validate and maintain without actually executing the program in a debugger and looking up syntax quirks, precedence rules contextual nuances in a huge manual. 
-<br />
-
-<br />
-With regard to list comprehensions versus writing out loops: It's not wise to take false shortcuts that you'll have to end up backtracking later and rewriting your code. Because list comprehensions have limited functionality compared to Python loops (or Lisp loop macros), sometimes you have to rewrite them later as normal loops if you need to add features the syntax does not support, or that it does support but would strain the syntax. If you write it out as a loop in the first place, it's much easier to maintain later, because you don't have to decode and recode it into a longhand loop when it needs to grow later. 
-<br />
-
-<br />
-For the same reasons, I take the same approach to putting statements on separate lines so they're easy to edit and maintain later. When I'm programming in C-like language, I always use braces, even if there's only one statement, because later on I might want to add another statement, an assert, or a debugging printf. It's just good engineering practice. You wouldn't want a bridge builder to leave out bolts because it made the bridge lighter and let him take his lunch break earlier. 
-<br />
-
-<br />
-Taking short-sighted shortcuts to reduce the number of characters you have to type and lines of code in your program, like leaving out braces in C programs or overusing list comprehensions, is only a shortcut to writing code riddled with bugs that's hard to maintain. 
-<br />
-
-<br />
--Don
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment366.html" rel="nofollow">#</a> <a href="http://www.DonHopkins.com">Don Hopkins</a></div><hr noshade>
- Whitespacedoesn'tmatterwhatinheckareyoutalkingabout.
-<br />
-
-<br />
-I hate to be a devil advocate :p But, here is a Python example where taking away some white space may make things easier:
-<br />
-<tt>
-<br />
->>> 3*2**3 + 4*(5**2-2**2)  # grouped spaces
-<br />
-108
-<br />
->>> A=3*2**3
-<br />
->>> A 
-<br />
-24
-<br />
->>> B=4*(5**2-2**2)
-<br />
->>> B
-<br />
-84
-<br />
->>> A+B
-<br />
-108
-<br />
-</tt>
-<br />
-
-<br />
-My point here is that one needs to clearly see the left and right side. Otherwise, what <i>really</i> is meant may be obscure or lost in the details:
-<br />
-
-<br />
-<tt>
-<br />
->>> 3*2**3+4*(5**2-2**2) # no space
-<br />
-108
-<br />
->>> 3 * 2 ** 3 + 4 * ( 5 ** 2 - 2 ** 2 )    # lots o space
-<br />
-108
-<br />
-</tt>
-<br />
-
-<br />
-Of course, the cause and effect will affect the outcome. Then again, maybe being even more verbose may help some also:
-<br />
-
-<br />
-<tt>
-<br />
->>> (  3 * 2 ** 3  ) + ( 4 * ( 5 ** 2 - 2 ** 2 ) )
-<br />
-</tt>
-<br />
-
-<br />
-So, I agree, for the most part.
-<br />
-
-<br />
- <div align="right"><a href="http://blog.ianbicking.org/comment367.html" rel="nofollow">#</a> <a href="http://www.chipy.org/brianray.html">Brian Ray</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+    <head>
+        <title>Code Pickiness</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>Code Pickiness</h1>
+        <p>
+            I've become increasingly picky about little details with code. For
+            instance, I really dislike code that doesn't use whitespace
+            properly. By that, I mean that there's always whitespace around
+            assignment (like
+            <tt>x = 10</tt>, not <tt>x=10</tt>); but never when defining keyword
+            arguments. That there's never whitespace inside parenthesis or list
+            and dictionary literals (i.e., no <tt>def func( a, b ):</tt>). That
+            there's always one space after commas.
+        </p>
+
+        <p>
+            These don't effect the quality of the code, but it's a kind of
+            <a href="http://c2.com/cgi/wiki?CodeSmell">smell</a>. I think of
+            programming as a kind of craft, and a good craftsman pays attention
+            to the details, even if they aren't the real goal. If you are
+            repairing a car, and you see that the last mechanic didn't put the
+            wiring back in the harness, you know you have to look for other
+            things they messed up. If you are firing a pot, and you see the
+            potter didn't clean up their foot, you wonder if they also have
+            bubbles in their clay. And so on.
+        </p>
+
+        <p>
+            I also have become wary of clever tricks. I cringe everytime I see
+            <tt>bool and true_value or false_value</tt> to simulate
+            <tt>bool ? true_value : false_value</tt>, because I know the
+            programmer was lazy. Or nested list comprehension. Or combinations
+            thereof. Just write the damn loop out, and save us all some effort
+            when we're reading.
+        </p>
+
+        <p>
+            For the most part, I follow
+            <a href="http://www.python.org/peps/pep-0008.html">PEP 8</a>, and if
+            there's a clever or a simple but perhaps long-winded way of doing
+            something, I try to always choose the long-winded way. This is my
+            suggestion that others do the same.
+        </p>
+
+        <div class="dates" align="right">
+            Created 22 Sep '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            I tend to be picky about code formatting too, but I sometimes wonder
+            where one's aesthetics came from originally. For example, I have a
+            friend who's otherwise perfectly sane, and wants to follow style
+            guides, but insists of writing conditionals like this:
+            <tt>if(condition)</tt>. Icky.
+            <br />
+
+            <br />
+            Regarding writing complicated list comprehensions as regular loops;
+            I think this quote from Tim Peters is relevant:
+            <br />
+
+            <br />
+            <i
+                >Here's another technique that is faster and more obvious but
+                that is often avoided by those who mistakenly believe that
+                writing two lines of code where one might do is somehow
+                sinful.</i
+            >
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment352.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://weblog.hotales.org/portal/python"
+                    >Jarno Virtanen</a
+                >
+            </div>
+            <hr noshade />
+            I couldn't agree more now, but I didn't always. I've written a post
+            on how I switched from disliking white space to disliking code
+            without it (<a
+                href="http://www.sunsetandlabrea.com/index.py/development/53.html)."
+                target="_blank"
+                >http://www.sunsetandlabrea.com/index.py/development/53.html).</a
+            >
+            <br />
+
+            <br />
+            Yes, if(condition) is horrible, I don't think I ever did that. Makes
+            it look more like a function call.
+            <div align="right">
+                <a href="https://ianbicking.org/comment353.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.sunsetandlabrea.com">Richard Chamberlain</a>
+            </div>
+            <hr noshade />
+            Most of these things are oldskul whitespace rules from written
+            language.
+            <br />
+
+            <br />
+            Sometimes of course one might want to compress code a bit, compare:
+            <br />
+            for(i=0;i<32;i++)
+            <br />
+
+            <br />
+            for(i=0; i<32; i++)
+            <br />
+
+            <br />
+            for (i = 0; i < 32; i++)
+            <br />
+            (I would prefer second, first, third)
+            <br />
+            a=4;b=5;
+            <br />
+
+            <br />
+            a=4; b=5;
+            <br />
+
+            <br />
+            a = 4; b = 5;
+            <br />
+
+            <br />
+            a = 4;
+            <br />
+            b = 5;
+            <br />
+
+            <br />
+            (I would prefer second, fourth , first, third)
+            <br />
+
+            <br />
+            Also some things make nice oneliners in Python:
+            <br />
+
+            <br />
+            class AbstracOne: pass
+            <br />
+            def reverse(a, b): return -cmp(a,b)
+            <br />
+
+            <br />
+            When there are long table definitions I prefer
+            <br />
+            [1,3,4,2,5,6,44,2,5,6,4] to
+            <br />
+            [1, 3, 4, 2, 5, 6, 44, 2, 5, 6, 4]
+            <br />
+            but it can make sense to arrange code like this:
+            <br />
+            [
+            <br />
+            1, 3, 4, 2,
+            <br />
+            5, 6, 44, 2,
+            <br />
+            5, 6, 4, 19
+            <br />
+            ]
+            <div align="right">
+                <a href="https://ianbicking.org/comment354.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://smejmoon.lv">Ìirts</a>
+            </div>
+            <hr noshade />
+            Beeing picky about code is not the same as ignoring that others who
+            don't share your style have conventions too and also take pride in
+            proper craftsmanship.
+            <br />
+
+            <br />
+            Anyway, this kind of "I'm right and therfore I ownz" seems to be a
+            particulary programmer related kind of phenomenon. It has however
+            been prooven decades ago in Newsgroups ( the thing people used
+            before there where blogs and comments ) that any and all such
+            discussions are completely fruitless beyond the most common sense
+            shared by most.
+            <div align="right">
+                <a href="https://ianbicking.org/comment355.html" rel="nofollow"
+                    >#</a
+                >
+                Florian
+            </div>
+            <hr noshade />
+            There is a clear distinction between "tricky" and compact. Compact
+            code can be easier to read/browse because there is less to analyze.
+            <br />
+
+            <br />
+            Compare a list comprehension with an equivalent loop. You can do all
+            kinds of strange stuff in a loop, including adding the current item
+            to either end of the loop, break out of the loop (making a shorter
+            resulting list), etc. With a list comprehension, you know what is
+            being done.
+            <br />
+
+            <br />
+            I think Python desperately needs a terneray operator like C. Then it
+            will be obvious what the programmer is trying to do and you can
+            mentally "skip over" it unless you are analyzing the details of that
+            line.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment356.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+            I'm picky about whitespace around, or nor around the equals sign.
+            However, I like simple list comprehensions over for loops for some
+            reason. De gustabus!
+            <div align="right">
+                <a href="https://ianbicking.org/comment357.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.pycs.net/users/0000231">John P Speno</a>
+            </div>
+            <hr noshade />
+            Being picky about code formatting is a good thing. Being a snob
+            about your own arbitrary style conventions is just, well, being a
+            snob. The only reasonable criterion (IMHO) for whether a given set
+            of conventions is better or worse than another is how much it helps
+            (or hurts) you convey the meaning of your code to the someone who's
+            reading it, who may be you yourself, a member of your team, or
+            anyone else. As such, it's entirely a cultural issue, and (again,
+            IMHO) consistency within any programming group is more important
+            than what style conventions you adopt. To say someone's code
+            'smells' because your own favorite style conventions aren't being
+            followed carries it's own stink.
+            <div align="right">
+                <a href="https://ianbicking.org/comment358.html" rel="nofollow"
+                    >#</a
+                >
+                TomP
+            </div>
+            <hr noshade />
+            I have to differ on the whitespace inside parentheses. I always add
+            it when it helps separate the arguments within from the outer
+            function. The best example is calling a function that accepts a
+            tuple as its parameter. I think that
+            <br />
+
+            <br />
+            function((x, y))
+            <br />
+
+            <br />
+            is more confusing than:
+            <br />
+
+            <br />
+            function( (x, y) )
+            <br />
+
+            <br />
+            which IMO is unmistakably a tuple being passed.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment359.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://leafe.com">Ed Leafe</a>
+            </div>
+            <hr noshade />
+            Picky, eh?
+            <br />
+
+            <br />
+            It's "affect", not "effect", in the second paragraph.
+            <br />
+
+            <br />
+            ;-)
+            <div align="right">
+                <a href="https://ianbicking.org/comment360.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://solar.eng.yale.edu">Andrew</a>
+            </div>
+            <hr noshade />
+            No,
+            <br />
+
+            <br />
+            You do not know if a programmer was lazy, you may know you did that
+            because you only do that when you are lazy?
+            <br />
+            You do not know why a programmer programs, it may be love, it may be
+            money, it may be a need in helping something else.
+            <br />
+            You do not know if a programmer works for himself or if he is trying
+            to be nice with the next one that picks up on the programming.
+            <br />
+            I don't know anything and I have never had time to be getting god at
+            understanding psychology, sociology and otherwise the human nature,
+            but one thing I do know, that if you have any reason to believe that
+            you could be wrong than you shut up.
+            <br />
+            I'm already sorry I wrote this because I know I could be wrong.
+            <br />
+            By the way there are many times I prefer bool and true_value or
+            false_value.
+            <br />
+            Programming alone is art and programming in a team is engineering.
+            <br />
+            I believe (I never know) no artist ever care about the rest when he
+            creates unless the work is somewhat about the rest.
+            <br />
+            I hope (I never know) every engineer must care about the rest.
+            <br />
+            Picking up on an artist's work is called criticism.
+            <br />
+            Picking up on an engineer’s work is called along with other stuff
+            maintenance.
+            <br />
+            Let's stop talking, let's stop comparing and divagating and let's
+            start doing what we must or love or need to do ant let's not try to
+            be heroes who wish to make a better world yet we have no tools nor
+            we are seeking for the tools.
+            <br />
+
+            <br />
+            From Socrates to Heidegger to Wittgenstein to Chomsky we know
+            nothing, yet for some reason we all must talk.
+            <br />
+
+            <br />
+
+            <br />
+            I'm sorry for may "bad?" English
+            <br />
+            and if you could not understand me
+            <br />
+            or if you could:
+            <br />
+            I assert it is so much my problem as is also your.
+            <br />
+
+            <br />
+
+            <br />
+
+            <br />
+
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment361.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.emilas.com">Gheorghe</a>
+            </div>
+            <hr noshade />
+            Maybe it's my Perl background showing through, but I like tricks
+            that make code succinct, but not too succinct. The and/or trick
+            doesn't strike me as lazy, it strikes me as a way to collapse a
+            screenful of simple if statements into a few lines. That seems
+            easier to read for me, and more to the point.
+            <br />
+
+            <br />
+            But on the other hand, and this is *definitely* from my Perl
+            background, nested list comprehensions tempt me. :) But I suppose I
+            could go back to lisp if I wanted lots of madly nested insanity.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment362.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.decafbad.com">l.m.orchard</a>
+            </div>
+            <hr noshade />
+            I don't think the correlation between good software and adherence to
+            a style guide is as strong as you suggest. In fact, I think an bit
+            of defiance is a healthy reality check. I know several developers
+            who produce excellent code, yet insist that commas belong at the
+            beginning of the next line rather than the end of the first line,
+            like so:
+            <br />
+
+            <br />
+            [ 'abc'
+            <br />
+
+            <br />
+            , 'def'
+            <br />
+
+            <br />
+            , 'ghi']
+            <br />
+
+            <br />
+            Whether I like that or not, who am I to quibble with it? If it helps
+            great developers who care deeply about their craft, bring it on.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment363.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://hathawaymix.org">Shane Hathaway</a>
+            </div>
+            <hr noshade />
+            I believe that if "affect" and "effect" are used as transitive verbs
+            they're interchangeable.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment364.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://eradman.com">Eric Radman</a>
+            </div>
+            <hr noshade />
+            Well, I was joking, but since you mentioned it:
+            <br />
+
+            <br />
+            <a
+                href="http://dictionary.reference.com/search?q=affect"
+                target="_blank"
+                >http://dictionary.reference.com/search?q=affect</a
+            >
+            <br />
+
+            <br />
+            Usage Note: Affect and effect have no senses in common. As a verb
+            affect is most commonly used in the sense of “to influence” (how
+            smoking affects health). Effect means “to bring about or execute”:
+            layoffs designed to effect savings. Thus the sentence These measures
+            may affect savings could imply that the measures may reduce savings
+            that have already been realized, whereas These measures may effect
+            savings implies that the measures will cause new savings to come
+            about.
+            <div align="right">
+                <a href="https://ianbicking.org/comment365.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://solar.eng.yale.edu">Andrew</a>
+            </div>
+            <hr noshade />
+            It makes me laugh when a Perl programmer badmouths Lisp:
+            <br />
+            "But I suppose I could go back to lisp if I wanted lots of madly
+            nested insanity."
+            <br />
+
+            <br />
+            Learn Lisp before trying to badmouth it. Lisp programmers use the
+            "loop" macro, which is much more powerful and succinct than Python
+            list comprehension, much easier to read and maintain than Perl code,
+            and doesn't require excessive parenthesis.
+            <br />
+
+            <br />
+            Lots of parenthesis don't make code hard to read or maintain: just
+            the opposite. Good Lisp programmers use lots of white space and
+            indentation to make the meaning of their programs quite clear.
+            <br />
+            Since Lisp syntax is so regular, it's easy for text editors to
+            intelligently edit Lisp code, auto indent, balance parens, move over
+            logical units of code, etc.
+            <br />
+
+            <br />
+            What makes code hard to maintain is lots of context sensative jibber
+            jabber punctuation like Perl uses, that text editors and humans have
+            an extremely hard time parsing and understanding.
+            <br />
+
+            <br />
+            It amazes me that Perl programmers complain about Lisp's
+            parenthesis, then they go write programs that look like line noise,
+            on purpose. Some actually savor Perl syntax, thinking it makes them
+            more manly. It's like voting for Bush because he puts on a macho
+            act, even though you know that his policies are horrible and he's a
+            liar.
+            <br />
+
+            <br />
+            I don't think that it's a question of taste or style or manlyness.
+            Programs that look like random line noise are much harder to write
+            and maintain than programs with a regular syntax that you can
+            validate and maintain without actually executing the program in a
+            debugger and looking up syntax quirks, precedence rules contextual
+            nuances in a huge manual.
+            <br />
+
+            <br />
+            With regard to list comprehensions versus writing out loops: It's
+            not wise to take false shortcuts that you'll have to end up
+            backtracking later and rewriting your code. Because list
+            comprehensions have limited functionality compared to Python loops
+            (or Lisp loop macros), sometimes you have to rewrite them later as
+            normal loops if you need to add features the syntax does not
+            support, or that it does support but would strain the syntax. If you
+            write it out as a loop in the first place, it's much easier to
+            maintain later, because you don't have to decode and recode it into
+            a longhand loop when it needs to grow later.
+            <br />
+
+            <br />
+            For the same reasons, I take the same approach to putting statements
+            on separate lines so they're easy to edit and maintain later. When
+            I'm programming in C-like language, I always use braces, even if
+            there's only one statement, because later on I might want to add
+            another statement, an assert, or a debugging printf. It's just good
+            engineering practice. You wouldn't want a bridge builder to leave
+            out bolts because it made the bridge lighter and let him take his
+            lunch break earlier.
+            <br />
+
+            <br />
+            Taking short-sighted shortcuts to reduce the number of characters
+            you have to type and lines of code in your program, like leaving out
+            braces in C programs or overusing list comprehensions, is only a
+            shortcut to writing code riddled with bugs that's hard to maintain.
+            <br />
+
+            <br />
+            -Don
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment366.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.DonHopkins.com">Don Hopkins</a>
+            </div>
+            <hr noshade />
+            Whitespacedoesn'tmatterwhatinheckareyoutalkingabout.
+            <br />
+
+            <br />
+            I hate to be a devil advocate :p But, here is a Python example where
+            taking away some white space may make things easier:
+            <br />
+            <tt>
+                <br />
+                >>> 3*2**3 + 4*(5**2-2**2) # grouped spaces
+                <br />
+                108
+                <br />
+                >>> A=3*2**3
+                <br />
+                >>> A
+                <br />
+                24
+                <br />
+                >>> B=4*(5**2-2**2)
+                <br />
+                >>> B
+                <br />
+                84
+                <br />
+                >>> A+B
+                <br />
+                108
+                <br />
+            </tt>
+            <br />
+
+            <br />
+            My point here is that one needs to clearly see the left and right
+            side. Otherwise, what <i>really</i> is meant may be obscure or lost
+            in the details:
+            <br />
+
+            <br />
+            <tt>
+                <br />
+                >>> 3*2**3+4*(5**2-2**2) # no space
+                <br />
+                108
+                <br />
+                >>> 3 * 2 ** 3 + 4 * ( 5 ** 2 - 2 ** 2 ) # lots o space
+                <br />
+                108
+                <br />
+            </tt>
+            <br />
+
+            <br />
+            Of course, the cause and effect will affect the outcome. Then again,
+            maybe being even more verbose may help some also:
+            <br />
+
+            <br />
+            <tt>
+                <br />
+                >>> ( 3 * 2 ** 3 ) + ( 4 * ( 5 ** 2 - 2 ** 2 ) )
+                <br />
+            </tt>
+            <br />
+
+            <br />
+            So, I agree, for the most part.
+            <br />
+
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment367.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.chipy.org/brianray.html">Brian Ray</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

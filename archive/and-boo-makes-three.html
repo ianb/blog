@@ -1,142 +1,225 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>And Boo Makes Three</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>And Boo Makes Three</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>And Boo Makes Three</h1>
+        <p>
+            I just came upon <a href="http://boo.codehaus.org/">Boo</a>, a CLI
+            (.NET) language. It's statically typed, but the syntax is based on
+            Python. With
+            <a href="http://www.cosc.canterbury.ac.nz/~greg/python/Pyrex/"
+                >Pyrex</a
+            >
+            and <a href="http://www.prothon.org/">Prothon</a>, that makes three
+            recent languages inspired by Python.
+        </p>
 
-<div style="float: right">
+        <p>
+            The
+            <a href="http://boo.codehaus.org/BooManifesto.pdf">manifesto</a>
+            (PDF, ick) seems like the best description of the language.
+        </p>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+        <ol>
+            <li>
+                Timespan and regular expression literals. (Timespan seems like a
+                weird choice)
+            </li>
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>And Boo Makes Three</h1>
- <p>
+            <li>
+                String interpolation, like <tt>"Hello \$name!"</tt>. Only in
+                double-quote strings, not single-quote. I find that very
+                annoying, the equivalence of these quotes in Python is a good
+                feature. I've cursed PHP for this. Maybe in shell this makes
+                sense, but not in a normal language.
+            </li>
 
-I just came upon <a href="http://boo.codehaus.org/">Boo</a>, a CLI (.NET) language.  It's
-statically typed, but the syntax is based on Python.  With <a href="http://www.cosc.canterbury.ac.nz/~greg/python/Pyrex/">Pyrex</a>
-and <a href="http://www.prothon.org/">Prothon</a>, that makes three
-recent languages inspired by Python.
+            <li>Statically typed. <b>But...</b></li>
 
-<p>
+            <li>
+                Type inference, so you don't have to declare types too often,
+                unless you want to. Of course, you need all your code bundled up
+                before hand to do inference, where Python only looks at code on
+                an on-demand basis. But in practice all the code is usually
+                available.
+            </li>
 
-The <a href="http://boo.codehaus.org/BooManifesto.pdf">manifesto</a> (PDF, ick) seems like the best
-description of the language.
+            <li>
+                Variables are somewhat casually declared. Whenever you first use
+                a variable, use <tt>as type</tt> to indicate the type (if
+                necessary). Like <tt>def func(a as int, b as str)</tt>.
+            </li>
 
-<ol>
+            <li>
+                Duck typing, i.e., Python's typing (if it looks like a duck and
+                quacks like a duck, it must be a duck). When you really don't
+                care about type signatures.
+            </li>
 
-<li> Timespan and regular expression literals.  (Timespan seems like a
-weird choice)
+            <li>
+                Syntactic attributes. I don't fully understand the mechanism
+                here, but it's a lot like Python's decorators, and uses the
+                proposed syntax for decorators. I think it might be a little
+                more general than descriptors, perhaps in part because it may
+                work at compile time.
+            </li>
 
-<li> String interpolation, like <tt>"Hello \$name!"</tt>.  Only in
-  double-quote strings, not single-quote.  I find that very annoying,
-  the equivalence of these quotes in Python is a good feature.  I've
-  cursed PHP for this.  Maybe in shell this makes sense, but not in a
-  normal language.
+            <li>
+                Macros. They seem very complicated to implement, but basically
+                you can manipulate the compilation, inserting your own
+                transformation into the process. I don't know if this causes
+                problems with debuggability -- debuggability is frequently a
+                feature left out of languages in the early days, when it should
+                be a major concern. If used sparingly, this could be a nice
+                feature. (I bet you could make lazy introspectable expressions
+                this way!)
+            </li>
 
-<li> Statically typed.  <b>But...</b>
+            <li>
+                Some minor things. <tt>print</tt> is a function. Assignment is
+                an expression (like <tt>if (var = func()) is not None:</tt>). It
+                doesn't use <tt>self</tt> in method signatures <i>or</i> method
+                bodies. Instance variables become local variables. I don't mind
+                the signature bit, but I like using <tt>self.attr</tt> for
+                instance variables. <tt>finally:</tt> is called <tt>ensure:</tt>
+            </li>
+        </ol>
 
-<li> Type inference, so you don't have to declare types too often,
-  unless you want to.  Of
-  course, you need all your code bundled up before hand to do
-  inference, where Python only looks at code on an on-demand basis.
-  But in practice all the code is usually available.
+        <p>
+            Prothon also had another release just a week ago. The
+            <a
+                href="http://www.prothon.org/viewcvs/prothon/trunk/CHANGES.txt?rev=711&view=markup"
+                >changes</a
+            >
+            all seem pretty good -- lots of little syntactic nits in Python are
+            corrected. E.g., default values for function parameters are
+            evaluated when the function is called.
+        </p>
 
-<li> Variables are somewhat casually declared.  Whenever you first use
-  a variable, use <tt>as type</tt> to indicate the type (if
-  necessary).  Like <tt>def func(a as int, b as str)</tt>.
+        <div class="dates" align="right">
+            Created 16 Jul '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            The URLs (which seem to be missing):
+            <br />
 
-<li> Duck typing, i.e., Python's typing (if it looks like a duck and
-  quacks like a duck, it must be a duck).  When you really don't care
-  about type signatures.
+            <br />
+            Boo:
+            <a href="http://boo.codehaus.org/" target="_blank"
+                >http://boo.codehaus.org/</a
+            >
+            <br />
+            Manifesto:
+            <a href="http://boo.codehaus.org/BooManifesto.pdf" target="_blank"
+                >http://boo.codehaus.org/BooManifesto.pdf</a
+            >
+            <br />
 
-<li> Syntactic attributes.  I don't fully understand the mechanism
-  here, but it's a lot like Python's decorators, and uses the proposed
-  syntax for decorators.  I think it might be a little more general
-  than descriptors, perhaps in part because it may work at compile
-  time.
+            <br />
+            Having skimmed the manifesto briefly, there doesn't seem to be much
+            about classes and inheritance, and the type inference section on the
+            site is tantalisingly missing. However, the existence of decorators
+            and macros should fuel the debate about their introduction into
+            standard Python, and I could imagine the Twisted people finding the
+            asynchronous stuff of interest.
+            <div align="right">
+                <a href="https://ianbicking.org/comment210.html" rel="nofollow"
+                    >#</a
+                >
+                Paul Boddie
+            </div>
+            <hr noshade />
+            Great stuff. Especially the type declarations and type inference...
+            it can prove to be educational for cpython as well.
+            <br />
 
-<li> Macros.  They seem very complicated to implement, but basically
-  you can manipulate the compilation, inserting your own
-  transformation into the process.  I don't know if this causes
-  problems with debuggability -- debuggability is frequently a feature
-  left out of languages in the early days, when it should be a major
-  concern.  If used sparingly, this could be a nice feature.  (I bet
-  you could make lazy introspectable expressions this way!)
+            <br />
+            There are some perlistic warts (regex and timespan literals,
+            dostuff() while foo()), but I assume they will be removed as the
+            project matures.
+            <br />
 
-<li> Some minor things.  <tt>print</tt> is a function.  Assignment is
-  an expression (like <tt>if (var = func()) is not None:</tt>).  It
-  doesn't use <tt>self</tt> in method signatures <i>or</i> method
-  bodies.  Instance variables become local variables.  I don't mind
-  the signature bit, but I like using <tt>self.attr</tt> for instance
-  variables.  <tt>finally:</tt> is called <tt>ensure:</tt>
+            <br />
+            This project might benefit from some co-operation with IronPython...
+            <div align="right">
+                <a href="https://ianbicking.org/comment211.html" rel="nofollow"
+                    >#</a
+                >
+                Ville Vainio
+            </div>
+            <hr noshade />
+            In skimming through the example code, I felt that this was more a
+            "terse C#", rather than Pythonesque or similar..maybe it was just
+            the lack of duck typing and peppered attributes. More palitable to
+            see as an easier C#, and I'm used to the Pythonic view of C# as
+            wordy.
+            <br />
 
-</ol>
-
-<p>
-
-Prothon also had another release just a week ago.  The <a href="http://www.prothon.org/viewcvs/prothon/trunk/CHANGES.txt?rev=711&view=markup">changes</a>
-all seem pretty good -- lots of little syntactic nits in Python are
-corrected.  E.g., default values for function parameters are evaluated
-when the function is called.
- <div class="dates" align="right">
-Created 16 Jul '04<br>
-Modified 14 Dec '04</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- The URLs (which seem to be missing):
-<br />
-
-<br />
-Boo: <a href="http://boo.codehaus.org/" target="_blank">http://boo.codehaus.org/</a>
-<br />
-Manifesto: <a href="http://boo.codehaus.org/BooManifesto.pdf" target="_blank">http://boo.codehaus.org/BooManifesto.pdf</a>
-<br />
-
-<br />
-Having skimmed the manifesto briefly, there doesn't seem to be much about classes and inheritance, and the type inference section on the site is tantalisingly missing. However, the existence of decorators and macros should fuel the debate about their introduction into standard Python, and I could imagine the Twisted people finding the asynchronous stuff of interest.
- <div align="right"><a href="http://blog.ianbicking.org/comment210.html" rel="nofollow">#</a> Paul Boddie</div><hr noshade>
- Great stuff. Especially the type declarations and type inference... it can prove to be educational for cpython as well.
-<br />
-
-<br />
-There are some perlistic warts (regex and timespan literals, dostuff() while foo()), but I assume they will be removed as the project matures.
-<br />
-
-<br />
-This project might benefit from some co-operation with IronPython...
- <div align="right"><a href="http://blog.ianbicking.org/comment211.html" rel="nofollow">#</a> Ville Vainio</div><hr noshade>
- In skimming through the example code, I felt that this was more a "terse C#", rather than Pythonesque or similar..maybe it was just the lack of duck typing and peppered attributes.  More palitable to see as an easier C#, and I'm used to the Pythonic view of C# as wordy. 
-<br />
-
-<br />
-The Python acknowledgement and documentation humor are appreciated.  Thanks for the thorough technical review.
- <div align="right"><a href="http://blog.ianbicking.org/comment212.html" rel="nofollow">#</a> <a href="http://sqr.pycs.net">DeanG</a></div><hr noshade>
- OSNews reports that IronPython a .Net dynamic language has been open sourced here.  What it doesn't mention is that its creator has joined the MS CLR team as reported a little bit further down here: <a href="http://www.ironpython.com/" target="_blank">http://www.ironpython.com/</a>
- <div align="right"><a href="http://blog.ianbicking.org/comment213.html" rel="nofollow">#</a> mike</div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <br />
+            The Python acknowledgement and documentation humor are appreciated.
+            Thanks for the thorough technical review.
+            <div align="right">
+                <a href="https://ianbicking.org/comment212.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://sqr.pycs.net">DeanG</a>
+            </div>
+            <hr noshade />
+            OSNews reports that IronPython a .Net dynamic language has been open
+            sourced here. What it doesn't mention is that its creator has joined
+            the MS CLR team as reported a little bit further down here:
+            <a href="http://www.ironpython.com/" target="_blank"
+                >http://www.ironpython.com/</a
+            >
+            <div align="right">
+                <a href="https://ianbicking.org/comment213.html" rel="nofollow"
+                    >#</a
+                >
+                mike
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>

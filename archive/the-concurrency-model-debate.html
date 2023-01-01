@@ -1,190 +1,491 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-	<title>The Concurrency Model Debate</title>
-<link rel="stylesheet" href="WK/default.css" type="text/css">
-<link rel="alternate" type="application/rss+xml" title="New Posts" href="http://blog.ianbicking.org/feeds/new_pages.xml">
+    <head>
+        <title>The Concurrency Model Debate</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
 
-<link rel="openid.server" href="http://www.myopenid.com/server" />
-<link rel="openid.delegate" href="http://ianb.myopenid.com" />
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
 
-</head>
-<body color="black" bgcolor="white">
-<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+            <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+        </div>
+        <h1>The Concurrency Model Debate</h1>
 
-<div style="float: right">
+        <div class="document">
+            <p>
+                There's some discussion in the Rails world going on about
+                FastCGI and scaling:
+                <a
+                    class="reference"
+                    href="http://blogs.codehaus.org/people/tirsen/archives/001041_ruby_on_rails_and_fastcgi_scaling_using_processes_instead_of_threads.html"
+                    >pro FastCGI</a
+                >
+                and
+                <a
+                    class="reference"
+                    href="http://www.jroller.com/page/cpurdy/20050412#fastcgi_not_so_fast"
+                    >anti FastCGI</a
+                >. Python's position here is kind of vague, because it supports
+                both models reasonably well (though the
+                <a class="reference" href="gil-of-doom.html"
+                    >Horrible Global Interpreter Lock</a
+                >
+                makes the single process model slightly less scalable than it
+                might otherwise be).
+            </p>
+            <p>
+                &quot;FastCGI&quot; is a misnomer here, and both sides seem
+                rather misinformed. This is a discussion about the differences
+                between <em>threaded</em> concurrency, with a pool of worker
+                threads, and <em>multi-process</em> concurrency, with a pool of
+                worker processes. FastCGI can do either, though it has extra
+                (confusing) features for worker processes. AFAIK the only reason
+                that most Java systems don't use FastCGI is because it's a pain
+                in the ass to set it up, as the protocol is overdesigned and
+                confuses the simplest aspect (sending a request to another
+                process) with all sort of other features (sharing an error log,
+                intercepting the request without responding to it, starting,
+                restarting, and pooling worker processes, etc). Because of
+                FastCGI's flaws, people constantly create and recreate the basic
+                functionality --
+                <a
+                    class="reference"
+                    href="http://www.mems-exchange.org/software/scgi/"
+                    >SCGI</a
+                >,
+                <a
+                    class="reference"
+                    href="http://starship.python.net/crew/jbauer/persistcgi/"
+                    >PCGI</a
+                >, mod_webkit, mod_skunk,
+                <a
+                    class="reference"
+                    href="http://jakarta.apache.org/tomcat/connectors-doc/common/ajpv13a.html"
+                    >AJP</a
+                >, and no doubt a whole slew of other similar things I don't
+                know about.
+            </p>
+            <p>
+                OK, so ignore the FastCGI stuff. The issue is about concurrency.
+                Apparently some Java-heads are having a hard time believing that
+                a worker process model can be scalable. This is frankly bizarre,
+                and I fear a sign of myopia in that community. Or just a sign of
+                a few crackpots who are good typists -- probably best not to
+                condemn the community for one guy.
+            </p>
+            <p>
+                The worker model is nothing new -- it's what Apache 1.3 does
+                exclusively, and one of the concurrency options for Apache 2.
+                The concurrency model for mod_ruby is the same as their FastCGI
+                option, and mod_python if you happen to be using the worker
+                model under Apache 2. In that model, you have multiple
+                processes, and there's a queue of incoming requests -- a free
+                process picks a request off the queue, processes only that
+                request, and when finished grabs another request. In a threaded
+                model almost the exact same thing happens, except there's worker
+                threads. Not Very Different.
+            </p>
+            <p>
+                This multiprocess model has some advantages and disadvantages,
+                none of which are nearly as extreme as anyone seems to think --
+                you still have to handle concurrency and contention for shared
+                resources. Some in-process resources that are not threadsafe,
+                like database connections, are automatically isolated. But other
+                locking can be slightly harder, and generally shared resources
+                are more difficult. One advantage is that you are encouraged
+                from the beginning to share data in a way that scales across
+                multiple machines. It's not really a choice for Ruby systems,
+                because Ruby doesn't support OS-level threads, which I believe
+                means that blocking I/O will block all threads in the process
+                (among other issues).
+            </p>
+            <p>
+                In Python people go both ways. Threading seems to be more
+                common, probably because it's more obvious and is easy to scale
+                until you hit the one-process/one-machine barrier.
+                <a class="reference" href="http://zope.org">Zope</a>,
+                <a class="reference" href="http://webwareforpython.org"
+                    >Webware</a
+                >, and
+                <a class="reference" href="http://cherrypy.org">CherryPy</a> are
+                all threaded.
+                <a class="reference" href="http://skunkweb.sf.net">SkunkWeb</a>,
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-cgi.html"
+                    >CGI</a
+                >, and
+                <a class="reference" href="http://modpython.org">mod_python</a>
+                all use multiple processes (well, mod_python can use a single
+                process with multiple interpreters, but I believe requests
+                always are processed in separate interpreters).
+                <a
+                    class="reference"
+                    href="http://www.mems-exchange.org/software/quixote/"
+                    >Quixote</a
+                >
+                and now
+                <a class="reference" href="http://wsgikit.org">WSGIKit</a> are
+                fairly neutral on the matter. I'm not sure where other
+                frameworks lie. And of course there is asynchronous (event
+                driven) programming, which is non-threaded single-process. This
+                is popular on the network level --
+                <a class="reference" href="http://twistedmatrix.com/">Twisted</a
+                >,
+                <a
+                    class="reference"
+                    href="http://www.amk.ca/python/code/medusa.html"
+                    >Medusa</a
+                >,
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-asyncore.html"
+                    >asyncore</a
+                >
+                -- but relatively uncommon in higher level systems, with
+                <a class="reference" href="http://nevow.com/">Nevow</a> being
+                the exception.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 13 Apr '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>In respect of your comment:</p>
+                <blockquote>
+                    mod_python can use a single process with multiple
+                    interpreters, but I believe requests always are processed in
+                    separate interpreters
+                </blockquote>
+                <p>
+                    Creation of separate interpreters in mod_python is to do
+                    with management of your URL namespace and is nothing really
+                    to do with threading. That is, if you want web applications
+                    hosted in different parts of your URL namespace to not
+                    intefere with each other, you designate those different
+                    parts of the URL namespace as running in distinct
+                    interpreters.
+                </p>
+                <p>
+                    For a particular instance of an interpreter within a
+                    process, whether it be managing the whole URL namespace or
+                    just a part, when using a multithreaded MPM in Apache such
+                    as the default for Win32 or the worker MPM for UNIX, there
+                    can be multiple requests within distinct threads active
+                    within the same interpreter at the same time.
+                </p>
+                <p>
+                    The only catch with all of this is that there are a couple
+                    of thread bugs in mod_python which you would want to patch
+                    if wanting to seriously use threading in any way. These are
+                    currently documented at &quot;<a
+                        class="reference"
+                        href="http://www.dscpl.com.au/projects/vampire/patches.html"
+                        >http://www.dscpl.com.au/projects/vampire/patches.html</a
+                    >&quot;.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-concurrency-model-debate-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.dscpl.com.au">Graham Dumpleton</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    Thanks. I guess this means that (probably like mod_ruby,
+                    mod_php, and a bunch of others) that it's safest to keep to
+                    keep to the multiprocess model.
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/the-concurrency-model-debate-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        It is always going to be safer to avoid multithreading,
+                        but that is more to do with people not appreciating what
+                        it takes to write a robust multithreaded application and
+                        nothing to do with any fixable bugs.:-)
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/the-concurrency-model-debate-comment-5.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.dscpl.com.au">Graham Dumpleton</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
 
-<script type="text/javascript">google_ad_client = "pub-2913402032659646";
-google_ad_width = 120;
-google_ad_height = 600;
-google_ad_format = "120x600_as";
-google_ad_type = "text";
-google_ad_channel ="";
-google_color_border = "336699";
-google_color_bg = "FFFFFF";
-google_color_link = "0000FF";
-google_color_text = "000000";
-google_color_url = "008000";
-//--></script>
+            <div class="document">
+                Actually the 'worker' MPM in Apache 2 uses is mult-process and
+                multi-thhreaded... Its a combination of the traditional
+                'pre-fork' model and a purely threaded system. It has some
+                advantages, like a crash in one process will not destroy the
+                entire server, and that for the most part you get the advantages
+                of a purely-threaded server.
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-concurrency-model-debate-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://corelands.com/blog/">Paul Querna</a>
+            </div>
+            <hr noshade />
 
- <script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-</div><h1>The Concurrency Model Debate</h1>
- 
-<div class="document">
-<p>There's some discussion in the Rails world going on about FastCGI and
-scaling: <a class="reference" href="http://blogs.codehaus.org/people/tirsen/archives/001041_ruby_on_rails_and_fastcgi_scaling_using_processes_instead_of_threads.html">pro FastCGI</a> and <a class="reference" href="http://www.jroller.com/page/cpurdy/20050412#fastcgi_not_so_fast">anti FastCGI</a>.  Python's position here
-is kind of vague, because it supports both models reasonably well
-(though the <a class="reference" href="gil-of-doom.html">Horrible Global Interpreter Lock</a> makes the single
-process model slightly less scalable than it might otherwise be).</p>
-<p>&quot;FastCGI&quot; is a misnomer here, and both sides seem rather misinformed.
-This is a discussion about the differences between <em>threaded</em>
-concurrency, with a pool of worker threads, and <em>multi-process</em>
-concurrency, with a pool of worker processes.  FastCGI can do either,
-though it has extra (confusing) features for worker processes.  AFAIK
-the only reason that most Java systems don't use FastCGI is because
-it's a pain in the ass to set it up, as the protocol is overdesigned
-and confuses the simplest aspect (sending a request to another
-process) with all sort of other features (sharing an error log,
-intercepting the request without responding to it, starting,
-restarting, and pooling worker processes, etc).  Because of FastCGI's
-flaws, people constantly create and recreate the basic functionality
--- <a class="reference" href="http://www.mems-exchange.org/software/scgi/">SCGI</a>, <a class="reference" href="http://starship.python.net/crew/jbauer/persistcgi/">PCGI</a>, mod_webkit, mod_skunk, <a class="reference" href="http://jakarta.apache.org/tomcat/connectors-doc/common/ajpv13a.html">AJP</a>, and no doubt a whole
-slew of other similar things I don't know about.</p>
-<p>OK, so ignore the FastCGI stuff.  The issue is about concurrency.
-Apparently some Java-heads are having a hard time believing that a
-worker process model can be scalable.  This is frankly bizarre, and I
-fear a sign of myopia in that community.  Or just a sign of a few
-crackpots who are good typists -- probably best not to condemn the
-community for one guy.</p>
-<p>The worker model is nothing new -- it's what Apache 1.3 does
-exclusively, and one of the concurrency options for Apache 2.  The
-concurrency model for mod_ruby is the same as their FastCGI option,
-and mod_python if you happen to be using the worker model under Apache
-2.  In that model, you have multiple processes, and there's a queue of
-incoming requests -- a free process picks a request off the queue,
-processes only that request, and when finished grabs another request.
-In a threaded model almost the exact same thing happens, except
-there's worker threads.  Not Very Different.</p>
-<p>This multiprocess model has some advantages and disadvantages, none of
-which are nearly as extreme as anyone seems to think -- you still have
-to handle concurrency and contention for shared resources.  Some
-in-process resources that are not threadsafe, like database
-connections, are automatically isolated.  But other locking can be
-slightly harder, and generally shared resources are more difficult.
-One advantage is that you are encouraged from the beginning to share
-data in a way that scales across multiple machines.  It's not really a
-choice for Ruby systems, because Ruby doesn't support OS-level
-threads, which I believe means that blocking I/O will block all
-threads in the process (among other issues).</p>
-<p>In Python people go both ways.  Threading seems to be more common,
-probably because it's more obvious and is easy to scale until you hit
-the one-process/one-machine barrier.  <a class="reference" href="http://zope.org">Zope</a>, <a class="reference" href="http://webwareforpython.org">Webware</a>, and <a class="reference" href="http://cherrypy.org">CherryPy</a>
-are all threaded.  <a class="reference" href="http://skunkweb.sf.net">SkunkWeb</a>, <a class="reference" href="http://python.org/doc/current/lib/module-cgi.html">CGI</a>, and <a class="reference" href="http://modpython.org">mod_python</a> all use multiple
-processes (well, mod_python can use a single process with multiple
-interpreters, but I believe requests always are processed in separate
-interpreters).  <a class="reference" href="http://www.mems-exchange.org/software/quixote/">Quixote</a> and now <a class="reference" href="http://wsgikit.org">WSGIKit</a> are fairly neutral on the
-matter.  I'm not sure where other frameworks lie.  And of course there
-is asynchronous (event driven) programming, which is non-threaded
-single-process.  This is popular on the network level -- <a class="reference" href="http://twistedmatrix.com/">Twisted</a>,
-<a class="reference" href="http://www.amk.ca/python/code/medusa.html">Medusa</a>, <a class="reference" href="http://python.org/doc/current/lib/module-asyncore.html">asyncore</a> -- but relatively uncommon in higher level systems,
-with <a class="reference" href="http://nevow.com/">Nevow</a> being the exception.</p>
-</div>
- <div class="dates" align="right">
-Created 13 Apr '05</div>
-<hr noshade><h3 id="comments">Comments:</h3>
-<blockquote>
- 
-<div class="document">
-<p>In respect of your comment:</p>
-<blockquote>
-mod_python can use a single process with multiple interpreters, but I believe requests always are processed in separate interpreters</blockquote>
-<p>Creation of separate interpreters in mod_python is to do with management of your URL namespace and is nothing really to do with threading. That is, if you want web applications hosted in different parts of your URL namespace to not intefere with each other, you designate those different parts of the URL namespace as running in distinct interpreters.</p>
-<p>For a particular instance of an interpreter within a process, whether it be managing the whole URL namespace or just a part, when using a multithreaded MPM in Apache such as the default for Win32 or the worker MPM for UNIX, there can be multiple requests within distinct threads active within the same interpreter at the same time.</p>
-<p>The only catch with all of this is that there are a couple of thread bugs in mod_python which you would want to patch if wanting to seriously use threading in any way. These are currently documented at &quot;<a class="reference" href="http://www.dscpl.com.au/projects/vampire/patches.html">http://www.dscpl.com.au/projects/vampire/patches.html</a>&quot;.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-1.html" rel="nofollow">#</a> <a href="http://www.dscpl.com.au">Graham Dumpleton</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-Thanks.  I guess this means that (probably like mod_ruby, mod_php, and a bunch of others) that it's safest to keep to keep to the multiprocess model.</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-2.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-It is always going to be safer to avoid multithreading, but that is more to do with people not appreciating what it takes to write a robust multithreaded application and nothing to do with any fixable bugs.:-)</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-5.html" rel="nofollow">#</a> <a href="http://www.dscpl.com.au">Graham Dumpleton</a></div><hr noshade>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-Actually the 'worker' MPM in Apache 2 uses is mult-process and multi-thhreaded... Its a combination of the traditional 'pre-fork' model and a purely threaded system. It has some advantages, like a crash in one process will not destroy the entire server, and that for the most part you get the advantages of a purely-threaded server.</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-3.html" rel="nofollow">#</a> <a href="http://corelands.com/blog/">Paul Querna</a></div><hr noshade>
- 
-<div class="document">
-For me Zope, isn't the best thread example. In fact it use only a very small amout of threads, and doesn't really use it in the way everybody think. It only avoid the medusa to lock the whole suff.</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-4.html" rel="nofollow">#</a> jkx</div><hr noshade>
- 
-<div class="document">
-Well ,
-it looks to me that fastcgi is rather ubiquitous , solid fastcgi support in Python is maybe a possible way forward to seriously take python web development out of the current ghetto. Out of Apache , the ruby train appears to move forward with just that (see lighttpd...).</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-6.html" rel="nofollow">#</a> Marc</div><hr noshade>
-<blockquote>
- 
-<div class="document">
-Personally it's the Apache side of FastCGI that has always been hard for me to set up, not the Python side.  Other people are also using HTTP proxying, which is better supported still, but unfortunately doesn't have <em>quite</em> the same information as FastCGI passes through (SCRIPT_NAME and PATH_INFO particularly, but other information like REMOTE_USER is also lost -- resolveable through configuration, but then it's no longer as easy to configure).</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-7.html" rel="nofollow">#</a> <a href="index.html">Ian Bicking</a></div><hr noshade>
-<blockquote>
- 
-<div class="document">
-<p>Apache 2.1 will finally add the ability to load-balance mod_proxy requests, and I trust HTTP more than a semi-orphaned protocol like FastCGI or its clones.</p>
-<p>Until recently we were running mod_proxy on a farm of Apache 1.3 servers to funnel about 300,000 HTTP requests per day into a single multithreaded Python BaseHTTPServer process (using the PSP engine from WebWare, with the rest of WebWare ripped out), on a lowly P3/500, no less. GIL contention is probably less of an issue than many people believe in real-world applications, although it would help if there were a tool to measure it and/or something like an exponentially decaying average of the numbers of threads waiting to acquire the GIL.</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-8.html" rel="nofollow">#</a> <a href="http://www.majid.info/">Fazal Majid</a></div><hr noshade>
- 
-<div class="document">
-<p>And, just in case you didn't know, there is now a way to write WSGI capable applications that use FastCGI and any capable web server (apache and lighttpd).  I wrote a quick howto for setting up lighttpd to use it on my weblog:</p>
-<p><a class="reference" href="http://www.cleverdevil.org/computing/24/python-fastcgi-wsgi-and-lighttpd">http://www.cleverdevil.org/computing/24/python-fastcgi-wsgi-and-lighttpd</a></p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-9.html" rel="nofollow">#</a> <a href="http://www.cleverdevil.org">Jonathan LaCour</a></div><hr noshade>
-</blockquote>
-</blockquote>
- 
-<div class="document">
-<p>Back-in-the-day, I worked at fastengines, the openmarket spinoff that productized the original fastcgi.  One of the things we were very clear on is that the advantages were <em>not</em> actually about the concurrency itself, but came in a few areas:</p>
-<ul class="simple">
-<li>by &quot;prestarting&quot; processes, you could hide startup overhead</li>
-<li>you could force processes to die relatively often so as to avoid having to care about memory leaks</li>
-<li>more generally, you simply didn't have to think very hard about your development model, it was just &quot;throw a loop around your existing CGI function&quot;</li>
-<li>you could handle peak load by &quot;borrowing&quot; extra machines, instead of buying lots of mostly idle hardware</li>
-</ul>
-<p>All of this made it quite popular among people who were <em>not</em> advanced developers, who didn't have time or resources to invest in frameworks... but had just gotten an application off the ground using basic CGI :-)  So, nothing you'd mistake for &quot;high design&quot;...</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-10.html" rel="nofollow">#</a> <a href="http://www.thok.org/bloggery/">Mark Eichin</a></div><hr noshade>
- 
-<div class="document">
-<p>Just a thing, AFAICT, ruby threads does not block the whole interpreter on I/O operations, this operations are automatically multiplexed, so if a thread is locked reading on a socket or whatever, another one can still does what he wants, just try this:</p>
-<blockquote>
-<p>Thread.new {puts gets}
-while true</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">&lt;string&gt;</tt>, line 5)</p>
-Unexpected indentation.</div>
-<blockquote>
-puts &quot;working flawlessly with locked IO&quot;
-sleep 4</blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 7)</p>
-Block quote ends without a blank line; unexpected unindent.</div>
-<p>end</p>
-</blockquote>
-<p>(there are pther issues with non native threads, but not this one)</p>
-</div>
- <div align="right"><a href="http://blog.ianbicking.org/the-concurrency-model-debate-comment-11.html" rel="nofollow">#</a> <a href="http://">anonymous</a></div><hr noshade>
-</blockquote>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "UA-2442258-1";
-urchinTracker();
-</script></body>
+            <div class="document">
+                For me Zope, isn't the best thread example. In fact it use only
+                a very small amout of threads, and doesn't really use it in the
+                way everybody think. It only avoid the medusa to lock the whole
+                suff.
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-concurrency-model-debate-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                jkx
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                Well , it looks to me that fastcgi is rather ubiquitous , solid
+                fastcgi support in Python is maybe a possible way forward to
+                seriously take python web development out of the current ghetto.
+                Out of Apache , the ruby train appears to move forward with just
+                that (see lighttpd...).
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-concurrency-model-debate-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Marc
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    Personally it's the Apache side of FastCGI that has always
+                    been hard for me to set up, not the Python side. Other
+                    people are also using HTTP proxying, which is better
+                    supported still, but unfortunately doesn't have
+                    <em>quite</em> the same information as FastCGI passes
+                    through (SCRIPT_NAME and PATH_INFO particularly, but other
+                    information like REMOTE_USER is also lost -- resolveable
+                    through configuration, but then it's no longer as easy to
+                    configure).
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/the-concurrency-model-debate-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Apache 2.1 will finally add the ability to
+                            load-balance mod_proxy requests, and I trust HTTP
+                            more than a semi-orphaned protocol like FastCGI or
+                            its clones.
+                        </p>
+                        <p>
+                            Until recently we were running mod_proxy on a farm
+                            of Apache 1.3 servers to funnel about 300,000 HTTP
+                            requests per day into a single multithreaded Python
+                            BaseHTTPServer process (using the PSP engine from
+                            WebWare, with the rest of WebWare ripped out), on a
+                            lowly P3/500, no less. GIL contention is probably
+                            less of an issue than many people believe in
+                            real-world applications, although it would help if
+                            there were a tool to measure it and/or something
+                            like an exponentially decaying average of the
+                            numbers of threads waiting to acquire the GIL.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/the-concurrency-model-debate-comment-8.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.majid.info/">Fazal Majid</a>
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        <p>
+                            And, just in case you didn't know, there is now a
+                            way to write WSGI capable applications that use
+                            FastCGI and any capable web server (apache and
+                            lighttpd). I wrote a quick howto for setting up
+                            lighttpd to use it on my weblog:
+                        </p>
+                        <p>
+                            <a
+                                class="reference"
+                                href="http://www.cleverdevil.org/computing/24/python-fastcgi-wsgi-and-lighttpd"
+                                >http://www.cleverdevil.org/computing/24/python-fastcgi-wsgi-and-lighttpd</a
+                            >
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/the-concurrency-model-debate-comment-9.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.cleverdevil.org">Jonathan LaCour</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Back-in-the-day, I worked at fastengines, the openmarket
+                    spinoff that productized the original fastcgi. One of the
+                    things we were very clear on is that the advantages were
+                    <em>not</em> actually about the concurrency itself, but came
+                    in a few areas:
+                </p>
+                <ul class="simple">
+                    <li>
+                        by &quot;prestarting&quot; processes, you could hide
+                        startup overhead
+                    </li>
+                    <li>
+                        you could force processes to die relatively often so as
+                        to avoid having to care about memory leaks
+                    </li>
+                    <li>
+                        more generally, you simply didn't have to think very
+                        hard about your development model, it was just
+                        &quot;throw a loop around your existing CGI
+                        function&quot;
+                    </li>
+                    <li>
+                        you could handle peak load by &quot;borrowing&quot;
+                        extra machines, instead of buying lots of mostly idle
+                        hardware
+                    </li>
+                </ul>
+                <p>
+                    All of this made it quite popular among people who were
+                    <em>not</em> advanced developers, who didn't have time or
+                    resources to invest in frameworks... but had just gotten an
+                    application off the ground using basic CGI :-) So, nothing
+                    you'd mistake for &quot;high design&quot;...
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-concurrency-model-debate-comment-10.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.thok.org/bloggery/">Mark Eichin</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Just a thing, AFAICT, ruby threads does not block the whole
+                    interpreter on I/O operations, this operations are
+                    automatically multiplexed, so if a thread is locked reading
+                    on a socket or whatever, another one can still does what he
+                    wants, just try this:
+                </p>
+                <blockquote>
+                    <p>Thread.new {puts gets} while true</p>
+                    <div class="system-message">
+                        <p class="system-message-title">
+                            System Message: ERROR/3 (<tt class="docutils"
+                                >&lt;string&gt;</tt
+                            >, line 5)
+                        </p>
+                        Unexpected indentation.
+                    </div>
+                    <blockquote>
+                        puts &quot;working flawlessly with locked IO&quot; sleep
+                        4
+                    </blockquote>
+                    <div class="system-message">
+                        <p class="system-message-title">
+                            System Message: WARNING/2 (<tt class="docutils"
+                                >&lt;string&gt;</tt
+                            >, line 7)
+                        </p>
+                        Block quote ends without a blank line; unexpected
+                        unindent.
+                    </div>
+                    <p>end</p>
+                </blockquote>
+                <p>
+                    (there are pther issues with non native threads, but not
+                    this one)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-concurrency-model-debate-comment-11.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">anonymous</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+        <script
+            src="http://www.google-analytics.com/urchin.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript">
+            _uacct = "UA-2442258-1";
+            urchinTracker();
+        </script>
+    </body>
 </html>
