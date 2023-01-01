@@ -145,14 +145,14 @@ Some of the projects in this list are popular, some I think were influential. Se
 <dd>A form validation and conversion toolkit for web applications. It's built on the idea of a two-way validation/conversion pipeline, structuring an destructuring the content of HTML forms.  It also includes <code>formencode.htmlfill</code>, a library to rewrite forms to insert form values; a novel approach, one that I think deserved to be used more, but like much of FormEncode probably obsolete now as client-side validation is more appropriate.  Like many Hard Problems of web development in the previous decade, this hard problem is best avoided instead of solved.</dd>
 
 <dt><a href="http://lxml.de/lxmlhtml.html">lxml.html (and cssselect)</a></dt>
-<dd><p>I didn't write lxml (the general XML and HTML Python library, based on libxml2).  But I did write the HTML-specific wrapper in lxml, which exposes HTML-specific semantics.  This adds knowledge of links to lxml, and forms, and some other stuff - all of which has made lxml an excellent <a href="http://blog.ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/">screen scraping library</a></p>
+<dd><p>I didn't write lxml (the general XML and HTML Python library, based on libxml2).  But I did write the HTML-specific wrapper in lxml, which exposes HTML-specific semantics.  This adds knowledge of links to lxml, and forms, and some other stuff - all of which has made lxml an excellent <a href="https://ianbicking.org/2008/12/10/lxml-an-underappreciated-web-scraping-library/">screen scraping library</a></p>
 
 <p>I also wrote <code>lxml.cssselect</code>.  libxml2 contains an XPath parser, and cssselect translates CSS3 selectors to XPath expressions.  If you are curious what this looks like, <a href="http://css2xpath.appspot.com">css2xpath</a> is a little webapp to do those same translations.  I hope you will agree that XPath is ugly.</p></dd>
 
 <dt><a href="http://pythonpaste.org/commentary/">Commentary</a></dt>
 <dd>An experiment in commenting on web pages.  Worked as an intermediary to the web page, which turned out to be extremely fragile.  Also this was before we had good HTML parsing available, so it had to use the Old Terrible Tools (like an HTML SAX parser).  I think <a href="https://code.google.com/p/rietveld/">Rietveld's UI</a> was inspired by this.</dd>
 
-<dt><a href="http://blog.ianbicking.org/introducing-htconsole.html">htconsole</a></dt>
+<dt><a href="https://ianbicking.org/introducing-htconsole.html">htconsole</a></dt>
 <dd>This was a more ambitious take on the interactive web-based debugger.  Instead it was a generalized interactive console.  It had some clever ideas, like inline live function editing.  It exceeded by Javascript skills in some ways at the time, such that it was just a bit <em>frustrating</em> to work on, and I wasn't sure to what end I'd be using it.</dd>
 
 <dt><a href="http://sqlobject.org/">SQLObject</a></dt>
@@ -198,7 +198,7 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 <dd>A Logo interpreter written in Python.  A pretty complete implementation of the language, with a lot of support for calling into and out of Logo to Python.</dd>
 
 <dt><a href="https://github.com/ianb/apppkg">apppkg</a></dt>
-<dd>A very incomplete design of an "Application Package" for Python. Some of the motivation described <a href="http://blog.ianbicking.org/2012/02/29/python-application-package/">here</a>. The <a href="https://github.com/ianb/apppkg/blob/master/docs/spec.txt">spec</a> is probably the most interesting part.</dd>
+<dd>A very incomplete design of an "Application Package" for Python. Some of the motivation described <a href="https://ianbicking.org/2012/02/29/python-application-package/">here</a>. The <a href="https://github.com/ianb/apppkg/blob/master/docs/spec.txt">spec</a> is probably the most interesting part.</dd>
 
 <dt><a href="http://svn.pythonpaste.org/ObConfLoader/trunk/">ObConfLoader</a></dt>
 <dd>An attempt to extract a best-practice format for locating Python objects with a string, something that Paste Deploy did in a kind of half-assed way.</dd>
@@ -227,7 +227,7 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 <dt><a href="https://github.com/ianb/emailit">EmailIt</a></dt>
 <dd>A small application to email a page to a person, kind of "share by email".  Uses lxml to capture a page in a way that can be embedded in an email.</dd>
 
-<dt><a href="http://blog.ianbicking.org/2007/09/12/flatatompub/">FlatAtomPub</a></dt>
+<dt><a href="https://ianbicking.org/2007/09/12/flatatompub/">FlatAtomPub</a></dt>
 <dd>An Atompub server library.  Atompub <em>was</em> supposed to be the culmination of <a href="https://en.wikipedia.org/wiki/Representational_state_transfer">REST</a> thinking.  This was my attempt to assimilate those ideas.  No one ever actually cared about Atompub though, go figure?  This was an interesting experiment, but never useful.</dd>
 
 <dt><a href="http://pythonpaste.org/ohm/">OHM</a></dt>
@@ -314,7 +314,7 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 
 <dl>
 
-<dt><a href="http://blog.ianbicking.org/twill-in-javascript.html">Twill/Javascript</a></dt>
+<dt><a href="https://ianbicking.org/twill-in-javascript.html">Twill/Javascript</a></dt>
 <dd><a href="http://twill.idyll.org/">Twill</a> is an old timey functional testing DSL for web applications.  This was an attempt to use the same DSL in the browser for functional testing.</dd>
 
 <dt><a href="http://svn.colorstudy.com/home/ianb/WebClippy">WebClippy</a></dt>
@@ -342,7 +342,7 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 <dd>An incomplete prototype of a kind of file manager built in the browser.  Includes a small server and client library to provide Node.js APIs in the browser (which are proxied over WebSockets to the server).</dd>
 
 <dt><a href="https://github.com/ianb/git-sync">git-sync</a></dt>
-<dd>A small script to use git more like rsync for the purpose of deployment.  Motivation explained some in <a href="http://blog.ianbicking.org/2012/02/14/git-as-sync-not-source-control-as-deployment/">this post</a>.</dd>
+<dd>A small script to use git more like rsync for the purpose of deployment.  Motivation explained some in <a href="https://ianbicking.org/2012/02/14/git-as-sync-not-source-control-as-deployment/">this post</a>.</dd>
 
 <dt><a href="https://github.com/mozilla/receiptverifier">receiptverifier</a></dt>
 <dd>Not very active right now.  This is a library to do client verification of <a href="https://developer.mozilla.org/en-US/docs/Apps">Open Web App</a> receipts.  It's not very exciting, but it does do a heck of a lot of error handling. It was an exercise in thoroughness. Maintained by other people now.</dd>

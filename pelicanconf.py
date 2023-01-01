@@ -5,7 +5,7 @@ import os
 base = os.path.dirname(os.path.abspath(__file__))
 AUTHOR = "Ian Bicking"
 SITENAME = "Ian Bicking: a blog"
-SITEURL = "https://www.ianbicking.org"
+SITEURL = "https://ianbicking.org"
 # FEED_DOMAIN = "https://ianbicking.org"
 CACHE_CONTENT = True
 # ARCHIVES_SAVE_AS = 'test-archive.html'

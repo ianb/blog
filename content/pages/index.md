@@ -4,9 +4,11 @@ Slug: index
 
 You've reached my homepage on the world wide web. Hello!
 
-On the internet I'm a computer programmer. Not on the internet I am also a computer programmer, but I also have a [wife](http://emilymurphy.com) and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can't find a social media home, but I guess [Twitter](https://twitter.com/ianbicking) is what I'm re-trying lately.
+On the internet I'm a computer programmer. Not on the internet I am also a computer programmer, but I also have a [wife](http://emilymurphy.com) and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can't find a social media home, but I'm trying [Mastodon](https://hachyderm.io/@ianbicking) and still use [Twitter](https://twitter.com/ianbicking).
 
-Until recently (August 2020) I worked for [Mozilla](http://www.mozilla.org/). You can read more about what I'm doing on my [**projects page**](/projects.html).
+I worked at Mozilla for 10 years until 2020, then Meta Reality Labs until 2022. You can read more about what I'm doing on my [**projects page**](/projects.html).
+
+**I am currently looking for a job.**
 
 ## Getting in contact
 
@@ -14,6 +16,7 @@ My list of online personas:
 
 -   [ian@ianbicking.org](mailto:ian@ianbicking.org)
 -   [My blog](/blog/)
+-   [@ianbicking@hachyderm.io](https://hachyderm.io/@ianbicking) for Mastodon
 -   [@ianbicking on Twitter](https://twitter.com/ianbicking)
 -   [LinkedIn](http://www.linkedin.com/in/ianbicking)
 -   [Facebook](https://www.facebook.com/ianbicking) (personal/family, non-professional)
