@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>A Conservative Metaclass</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>A Conservative Metaclass</h1>
+        <p>
+            I use metaclasses in several of the projects I've written. In just
+            about all of the cases, the metaclasses have been very minimal (or
+            at least would be if I was clear ahead of time what I was doing),
+            but all metaclasses have an air of mystery about them.
+        </p>
+
+        <p>
+            The metaclasses I've used have been primarily to support a sort of
+            declarative style of programming. For instance, consider a
+            <a href="http://svn.colorstudy.com/trunk/Validator">validation</a>
+            schema:
+        </p>
+
+        <pre>
+class Registration(schema.Schema):
+    first_name = validators.String(notEmpty=True)
+    last_name = validators.String(notEmpty=True)
+    mi = validators.MaxLength(1)
+    class Numbers(foreach.ForEach):
+        class Number(schema.Schema):
+            type = validators.OneOf(['home', 'work'])
+            phone_number = validators.PhoneNumber()
+</pre
+        >
+
+        Hopefully you can imagine what that schema means from the class
+        statement, even if you wouldn't know exactly how to use it. In another
+        system this might look like:
+
+        <pre>
+registration = schema.Schema()
+registration.add_field(
+    'first_name', validators.String(not_empty=True))
+...
+</pre
+        >
+
+        <a href="http://python.org/doc/current/lib/module-optparse.html"
+            >optparse</a
+        >
+        is an example of this style.
+
+        <p>
+            Anyway, while metaclasses are useful here, their use is very
+            minimal. This is a metaclass you could use for something like this:
+        </p>
+
+        <pre>
+class DeclarativeMeta(type):
+    def __new__(meta, class_name, bases, new_attrs):
+        cls = type.__new__(meta, class_name, bases, new_attrs)
+        cls.__classinit__.im_func(cls, new_attrs)
+        return cls
+class Declarative(object):
+    __metaclass__ = DeclarativeMeta
+    def __classinit__(cls, new_attrs): pass
+</pre
+        >
+
+        The basic idea is just to run a function (<code>__classinit__</code>) on
+        the class when the class is created. For something like the schema, I
+        then go through the new attributes and see if any of them are "magic",
+        like:
+
+        <pre>
+class Schema(Declarative):
+    fields = {}
+    def __classinit__(cls, new_attrs):
+        cls.fields = cls.fields.copy()
+        for name, value in new_attrs.items():
+            if isinstance(value, validators.ValidatorBaseClass):
+                cls.add_field(name, value)
+
+    @classmethod
+    def add_field(cls, name, field):
+        cls.fields[name] = field
+        field.name = name
+</pre
+        >
+
+        <p>
+            Basically I'm just indexing and naming the attributes in this case,
+            which is actually all I'm likely to need to do. Also note that
+            <code>add_field</code> allows me to continue to modify the class at
+            runtime, which allows for all sorts of metaprogramming down the
+            road. In <a href="http://sqlobject.org">SQLObject</a> I use this
+            when determining columns from the database, then adding the column
+            objects using this class method.
+        </p>
+
+        <p>
+            The end result is something that I find aesthetically pleasing to
+            use, and avoids a lot of boilerplate. At the same time, I think it's
+            fairly easy to understand, without getting caught up in the
+            mysterious aspects of metaclasses.
+        </p>
+
+        <div class="dates" align="right">
+            Created 18 Nov '04<br />
+            Modified 14 Dec '04
+        </div>
+    </body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Towards a More Perfect Version Control</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Towards a More Perfect Version Control</h1>
+
+        <div class="document">
+            <p>
+                <a
+                    class="reference"
+                    href="http://log.ometer.com/2005-08.html#10"
+                    >Havoc Pennington</a
+                >
+                refers to
+                <a
+                    class="reference"
+                    href="http://log.ometer.com/2004-11.html#19"
+                    >some of his thoughts on version control</a
+                >
+                in reaction to my
+                <a class="reference" href="distributed-vs-centralized-scm.html"
+                    >last</a
+                >
+                <a class="reference" href="centralized-vs-decentralized.html"
+                    >two</a
+                >
+                posts on version control.
+            </p>
+            <p>
+                What he describes is very user-interface-oriented, from the
+                perspective of bug and patch tracking as much as version
+                control. It makes for an interesting overlap. Here's a kind of
+                use case he gives:
+            </p>
+            <blockquote>
+                <ol class="arabic simple">
+                    <li>
+                        The version control system keeps track of how to submit
+                        patches (mailing list, bugzilla, etc.) and has a
+                        &quot;submit patch&quot; command. (Prereq: the system
+                        has a concept of a patch you're working on for
+                        submission)
+                    </li>
+                    <li>
+                        The version control system tracks submitted patches for
+                        the maintainer and supports easy review and
+                        acceptance/rejection of them.
+                    </li>
+                    <li>
+                        Easy way to have a conversation about any patch (as we
+                        do now in bugzilla typically)
+                    </li>
+                    <li>
+                        Allow the maintainer to easily hack on the patch, merge
+                        their changes with it, and then bounce the patch back to
+                        the submitter for more work - I often want to just fix
+                        the nitpicks instead of writing them down, then give
+                        someone the patch back to fix the big stuff.
+                    </li>
+                    <li>
+                        Often you want to commit a number of times before you
+                        submit a patch officially (sometimes people will make a
+                        CVS branch for this). A nice feature would be to avoid
+                        the need to do this manually; just have the developer
+                        tools automatically &quot;commit&quot; every time you
+                        save from the editor, or even make the whole undo buffer
+                        persistent. Much more plausible with monotone than with
+                        CVS.
+                    </li>
+                </ol>
+            </blockquote>
+            <p>I can imagine doing this entirely within version control:</p>
+            <ol class="arabic">
+                <li>
+                    <p class="first">
+                        The version control system makes branching really easy.
+                        You start editing your checkout, and then there's a kind
+                        of &quot;commit as branch&quot; command. If it's a
+                        distributed system then there isn't really anything like
+                        a &quot;checkout&quot; (which is fine), but something
+                        more like &quot;upload as branch&quot;.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Perhaps simply by filename convention, tracking is part
+                        of the version control system. So if you wanted to
+                        submit the patch for review, maybe you'd put
+                        <tt class="docutils literal"
+                            ><span class="pre">request-review.txt</span></tt
+                        >
+                        in the system, with a note of explanation (what the
+                        branch accomplishes or fixes).
+                    </p>
+                    <p>
+                        The entire repository, with all branches, should be well
+                        indexed. It should include workflow-related concepts.
+                        This could be as simple as text tags indicating status
+                        that are manually edited.
+                    </p>
+                    <p>
+                        Thinking a little more -- tag the branch
+                        &quot;for-review&quot; (this is <em>not</em> like
+                        Subversion &quot;tags&quot;; more like setting a
+                        Subversion property). Add a property &quot;author&quot;
+                        that has your information. Another property lists people
+                        who are interested in being notified about changes to
+                        the branch. Another rule notifies maintainer(s) that
+                        something has been submitted. And an indexer displays
+                        what branches are in what states (for-review, in-review,
+                        rejected, accepted, etc).
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        The conversation takes place in more text files. Maybe
+                        the VC frontend handles the formatting. Or not,
+                        whatever.
+                    </p>
+                    <p>
+                        In addition to indexing there's notification. You can
+                        register your interest in a branch. Maybe an email
+                        gateway for these conversations, where the conversation
+                        is appended to that discussion file. It's like the
+                        <tt class="docutils literal"
+                            ><span class="pre">Talk:</span></tt
+                        >
+                        pages in Wikipedia.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Good merging tools make it easy to bring together
+                        branches.
+                    </p>
+                    <p>
+                        When you want to change a patch but submit back to the
+                        author for further changes, you just edit their branch.
+                        Non-authoritative branches (like those that are
+                        submitted by non-maintainers) are editable by everyone.
+                        You could even simply add comments inline to the code
+                        about issues you see with the changes.
+                    </p>
+                    <p>
+                        I think the ability for maintainers to edit non-trunk
+                        (and non-official-branch) code is a really important way
+                        to communicate with contributors. And for contributors
+                        to communicate with each other; this shouldn't be a
+                        wheel-and-spoke system centered around one integrator.
+                    </p>
+                </li>
+                <li>
+                    <p class="first">
+                        Autocommit is a separate issue, I think. It would be
+                        fine if an editor did this, but it's not something that
+                        screams out to me.
+                    </p>
+                    <p>
+                        History is more easily available if everything is a
+                        branch, not a patch, and branches have history and you
+                        can continue development on them without being merged
+                        into the trunk.
+                    </p>
+                </li>
+            </ol>
+            <p>
+                This doesn't really address issue trackers. Issue trackers are
+                lists of problems without solutions, and source control
+                typically holds solutions. If the version control (or maybe just
+                the tools built around it) was really powerful, then potentially
+                it could be a backend for issue tracking, where
+                &quot;issues&quot; are special files or directories. But the
+                workflow for issues is typically much more automated and
+                structured than for generic &quot;source&quot;.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 12 Aug '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    In our enterprise development one of the things that I have
+                    been working on putting together is a way that error
+                    reporting, trouble ticketing, version control, unit test
+                    coverage, and IDE are tied together.
+                </p>
+                <p>
+                    If an unexplained error happens a support person is
+                    automatically assigned a trouble ticket and emailed. Tech
+                    does initial research and closes out ticket because he could
+                    handle the problem or bucks it up to the developers with
+                    what ever information he could glean. Developer researches,
+                    resolves the issue if he can, generates additional unit
+                    testing. New trouble ticket is generated for each developer
+                    to peer review the new unit tests and the patch. Reports at
+                    the end of the month about what code was changed and who
+                    changed it, did it cause problems, what kind of problems and
+                    how was it fixed.
+                </p>
+                <p>
+                    I have been using Roundup as an issue management for a while
+                    and I do already create trouble tickets based on events in
+                    applications via email. The next step is tying in the
+                    versioning system. There has been many developments with
+                    Roundup and SVN in the last few months. So I think that this
+                    is what I need to set up next. My dream isn't too far away.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/towards-a-more-perfect-version-control-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                count0
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I think we are already most of the way there with
+                    <a class="reference" href="http://www.venge.net/monotone/"
+                        >Monotone:</a
+                    >.
+                </p>
+                <p>
+                    I have only been trying it out for a little while now, but
+                    it has a few features that could be glued (with a little bit
+                    of Python or something) to Bugzilla or any number of other
+                    development tracking tools.
+                </p>
+                <ol class="arabic simple">
+                    <li>
+                        It supports arbitrary metadata attached to submissions
+                        and changes. This could be used to track the status of a
+                        patch, where the current discussion is taking place, a
+                        bug number, etc.
+                    </li>
+                    <li>
+                        It supports multiple head revisions. So people working
+                        on the patch can simply work on a seperate head until
+                        the patch is approved, then merge it into the
+                        &quot;official&quot; head.
+                    </li>
+                    <li>
+                        It is very configurable. It uses
+                        <a class="reference" href="http://www.lua.org">Lua:</a>
+                        as its configuration language, and it has a large number
+                        of hooks that can be customized.
+                    </li>
+                    <li>
+                        It has a &quot;scripting&quot; version for its commands
+                        to make it easy to automate most tasks.
+                    </li>
+                </ol>
+                <p>
+                    I guess all that is needed is a bit of work to tie it all
+                    together. There are already a few projects that integrate
+                    with it, but I couldn't find any that integrate with bug
+                    tracking or email patch submission systems.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/towards-a-more-perfect-version-control-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Alan Falloon
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    <em
+                        >&quot;If the version control (or maybe just the tools
+                        built around it) was really powerful, then potentially
+                        it could be a backend for issue tracking, where
+                        &quot;issues&quot; are special files or
+                        directories.&quot;</em
+                    >
+                </p>
+                <p>
+                    There seems to be a bit of convergence on this idea; I know
+                    we've tossed around such stuff some in monotone, especially
+                    when we were also experimenting with using our regression
+                    test suite as a bug tracking system -- I think that's a very
+                    powerful bit of integration for such a system to include, by
+                    the way -- and Aaron Bentley's actually put together a
+                    system called
+                    <a
+                        class="reference"
+                        href="http://www.panoramicfeedback.com/opensource/"
+                        >Bugs Everywhere</a
+                    >.
+                </p>
+                <p>
+                    My biggest problem with such a scheme is that part of what
+                    issue trackers do is track discussions; and discussions do
+                    not follow branch semantics. You generally want your
+                    discussions to be global -- gathering together comments from
+                    two different branches to figure out what's been done on a
+                    bug sounds like a royal pain. OTOH, bug states (open,
+                    closed, ...) very much do follow branch semantics -- closing
+                    a bug in a branch, then having it closed on mainline when
+                    the branch is integrated, is very slick. I'm not sure what
+                    the right solution is.
+                </p>
+                <p>
+                    I'm hoping that as these systems get a little more mature
+                    we'll see a lot more work on workflow processes and stuff...
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/towards-a-more-perfect-version-control-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://venge.net/monotone/">Nathaniel Smith</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    For coupling issue (and ticket) tracking and source control
+                    I've been very impressed by
+                    <a class="reference" href="http://trac.edgewall.com"
+                        >Trac</a
+                    >
+                </p>
+                <p>
+                    We're currently using it for ad-hoc documentation, source
+                    code viewing, and ticket tracking (we started with issues
+                    but now every piece of work has an associated ticket). It's
+                    really nice being able to cross reference change sets, wiki
+                    pages and tickets in the same environment.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/towards-a-more-perfect-version-control-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.halfcooked.com/">Andy Todd</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I've used Trac as an issue tracker, and I've liked it
+                        well enough as that. I somewhat prefer Roundup for more
+                        involved issue tracking, but I think Trac has a more
+                        accessible UI for public projects. But I haven't felt
+                        any real motivation to use any of its other features (or
+                        Roundup Subversion integration for that matter). I don't
+                        need Yet Another Wiki (and worse Yet Another Wiki
+                        Markup). That's not how I want to keep my documentation.
+                        The Subversion integration might be good, but I never
+                        remember to link them up. They are too far away from
+                        each other, IMHO; web and svn client are very different
+                        modes for me.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/towards-a-more-perfect-version-control-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

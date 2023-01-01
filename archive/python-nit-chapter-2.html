@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Python nit, chapter 2</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Python nit, chapter 2</h1>
+
+        <div class="document">
+            <p>
+                Well, since my
+                <a
+                    class="reference"
+                    href="http://blog.colorstudy.com/ianb/weblog/2003/10/24.html#P20"
+                    >last</a
+                >
+                complaint was over two months ago, I guess I'm fairly happy. Now
+                I'll give something of an
+                <a
+                    class="reference"
+                    href="http://blog.colorstudy.com/ianb/weblog/2004/01/11.html#P51"
+                    >anti-poka-yoke</a
+                >
+            </p>
+            <p>Who among us has not started with a function like:</p>
+            <pre class="literal-block">
+def munger(v):
+    v = mungify(v)
+    return doublemungify(v)
+</pre
+            >
+            <p>
+                Then realized
+                <tt class="literal"><span class="pre">doublemungify</span></tt>
+                goes too far, and changes it to:
+            </p>
+            <pre class="literal-block">
+def munger(v):
+    v = mungify(v)
+</pre
+            >
+            <p>
+                But, whoops, now the function returns None. There are many ways
+                to encounter this common bug, to unintentionally return None by
+                not returning anything at all. Maybe one of the execution paths
+                doesn't have a return, or you just forgot about the return at
+                some point. It happens to me often -- but the worst part is that
+                it's not quickly detected. Often I'll collect the results of
+                <tt class="literal"><span class="pre">munger</span></tt
+                >, and the None will only cause a problem sometime later when
+                it's unclear where it came from. Python nit: functions return
+                None when you don't want them to return anything -- None is a
+                oft-used <em>real</em> value, not some
+                this-function-returns-nothing value.
+            </p>
+            <p>
+                It would be better if functions didn't return any value when no
+                return (or a bare return) when encountered. So using the second
+                <tt class="literal"><span class="pre">munger</span></tt> form in
+                an expression would cause an immediate (and informative)
+                exception. In other words, distinguishing functions from
+                procedures.
+            </p>
+            <p>
+                It <em>seems</em> like there's some sort of elegance in not
+                making that distinction, in keeping these objects uniform. Plus
+                Pascal distinguishes the two forms, and we all hate Pascal. But
+                really, what use can there be to the implicit returning of None?
+            </p>
+            <p>
+                Well, one use, usually in subclassing. Supposing
+                <tt class="literal"><span class="pre">munger</span></tt> is a
+                method, we might do:
+            </p>
+            <pre class="literal-block">
+class SafeGrinder(Grinder):
+    def munger(self, v):
+        if not self.isSafe(v):
+            raise ValueError, &quot;Unsafe: %s&quot; % v
+        return Grinder.munger(self, v)
+</pre
+            >
+            <p>
+                Because we can always treat functions as, well, functions, we
+                can blindly pass values through. Without this we'd need some
+                sort of special syntax to deal with no return value, or else a
+                way to test whether the object was a function or procedure. The
+                test would be annoying, and would require some static
+                declaration (e.g., two kinds of
+                <tt class="literal"><span class="pre">def</span></tt
+                >). The static declaration would make that pass-through function
+                even harder, because it wouldn't be sufficient to just
+                <em>test</em> whether the function returned a value, we'd also
+                have to declare whether our pass-through code was a function or
+                procedure.
+            </p>
+            <p>
+                Some other syntax might be better, like
+                <tt class="literal"
+                    ><span class="pre">(Grinder.munger(self,</span>
+                    <span class="pre">v)</span>
+                    <span class="pre">ifprocedure</span>
+                    <span class="pre">None)</span></tt
+                >, which would evaluate to None if
+                <tt class="literal"><span class="pre">Grinder.munger</span></tt>
+                was a procedure, or the return value if not. Then you might do
+                something like:
+            </p>
+            <pre class="literal-block">
+class OneOff: pass
+class SafeGrinder(Grinder):
+    def munger(self, v):
+        if not self.isSafe(v): raise ValueError, &quot;Unsafe: %s&quot; % v
+        result = Grinder.munger(self, v) ifprocedure OneOff
+        if result is not OneOff: return result
+</pre
+            >
+            <p>Or maybe even better:</p>
+            <pre class="literal-block">
+class SafeGrinder(Grinder):
+    def munger(self, v):
+        if not self.isSafe(v): raise ValueError, &quot;Unsafe: %s&quot; % v
+        try:
+            return Grinder.munger(self, v)
+        except NoReturnValue:
+            pass # and return no value
+</pre
+            >
+            <p>
+                It can be a little complicated, though only for this one case,
+                while other more common cases would be less error-prone. But
+                it's not really going to happen in this late stage. Oh well.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 13 Jan '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            Here it comes...wait for it...wait for it...unit tests would help
+            here!
+            <br />
+
+            <br />
+            If the function which previously returned something meaningful but
+            now returns None were being unit tested, the test would immediately
+            fail. Then you'd only be out about 30 seconds of your life (time
+            between test failing and realizing your mistake). Its a good start
+            at the least.
+            <br />
+
+            <br />
+            But if we're going to take the syntactic route, perhaps requiring a
+            return statement would be better. Again, hard to do this late in the
+            game. Yep, once you ship a language you're screwed :)
+            <div align="right">
+                <a href="https://ianbicking.org/comment653.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://therealadam.com">Adam Keys</a>
+            </div>
+            <hr noshade />
+            <a
+                href="http://mail.python.org/pipermail/python-list/1999-September/011120.html"
+                target="_blank"
+                >http://mail.python.org/pipermail/python-list/1999-September/011120.html</a
+            >
+            <br />
+
+            <br />
+            might interest...
+            <div align="right">
+                <a href="https://ianbicking.org/comment654.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://starship.python.net/crew/mwh/"
+                    >Michael Hudson</a
+                >
+            </div>
+            <hr noshade />
+            It strikes me that tests like this are possibly better added to a
+            tool like pychecker, rather than to the language itself.
+            <div align="right">
+                <a href="https://ianbicking.org/comment655.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://tom.idealog.info">Tom Rothamel</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

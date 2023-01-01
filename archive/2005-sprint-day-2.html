@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Sprint Day 2</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Sprint Day 2</h1>
+
+        <div class="document">
+            <p>
+                Well, it was a couple days ago, but I thought I'd follow up a
+                little on
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/error/HTTP_INTERNAL_SERVER_ERROR.html.var/pycon2005-sprint-day-1.html"
+                    >Sprint Day 1</a
+                >.
+            </p>
+            <p>
+                A couple new people came in -- Rick and Karl from
+                <a class="reference" href="http://axiomfire.com">axiomfire</a>
+                (where Tracy works). They were both new hires and new to Webware
+                (though not Python). Also Aaron Lav came in for the second half
+                of the day.
+            </p>
+            <p>
+                We (Tracy and Eric really) got the to-do application mostly
+                working. I'm afraid I left Tracy and Eric to struggle with
+                configuration issues for a while; they seemed to be working
+                together well, and I thought I'd let them go at it, but they
+                were working on some things that I could have answered more
+                quickly for them, to let them move on to more interesting
+                problems. They found a bug in
+                <a
+                    class="reference"
+                    href="http://www.owlfish.com/software/wsgiutils/"
+                    >WSGIUtils</a
+                >
+                on the way, where it didn't close the application iterator, and
+                <tt class="literal"
+                    ><span class="pre">wsgikit.session</span></tt
+                >
+                really depends on that.
+                <tt class="literal"><span class="pre">wsgikit.lint</span></tt>
+                actually caught this, but I didn't pay attention to the error --
+                because
+                <tt class="literal"><span class="pre">lint</span></tt> checks if
+                it's been closed in
+                <tt class="literal"><span class="pre">__del__</span></tt
+                >, it can't raise a real error (errors in
+                <tt class="literal"><span class="pre">__del__</span></tt>
+                methods are ignored, though a somewhat vague warning message is
+                printed).
+                <tt class="literal"><span class="pre">lint</span></tt> now
+                prints a better error message. One thing I should advertise
+                better is that
+                <tt class="literal"><span class="pre">lint</span></tt> is really
+                the best WSGI compliance test out there right now, but it only
+                tests things as they go by; something else has to be used to
+                excersize the functionality.
+                <tt class="literal"
+                    ><span class="pre">wsgikit.tests.echotest</span></tt
+                >
+                excersizes the application a little, but it's limited.
+            </p>
+            <p>
+                Aaron and Karl got the login middleware working (<tt
+                    class="literal"
+                    ><span class="pre">wsgikit.login</span></tt
+                >), which handles authentication/identification but
+                <em>not</em> authorization. I hate that authentication and
+                authorization both start with &quot;auth&quot;, because I
+                realize I match words on their first four letters. I think this
+                naming convention alone is probably a big part of why Zope 2 and
+                Apache have bad authentication layers that are mixed with
+                authorization -- if the terminology was better people wouldn't
+                accidentally fold together the two ideas.
+            </p>
+            <p>
+                Rick worked on some documentation, but unfortunately didn't get
+                it checked in -- I hope that'll come through at some point, even
+                if it isn't complete. I think it's important to get everything
+                checked in, regardless of state, because it's easy to lose
+                things on people's hard drives when the sprint is done.
+            </p>
+            <p>
+                I worked on a couple things. I started testing
+                <tt class="literal"
+                    ><span class="pre">wsgikit.urlparser</span></tt
+                >, and using TDD for the new features. That went really well. I
+                also built up a bit of a test fixture for WSGI (<tt
+                    class="literal"
+                    ><span class="pre">wsgikit.test_fixture</span></tt
+                >
+                -- which is kind of a dumping ground, but a lot of pieces will
+                probably go away --
+                <tt class="literal"><span class="pre">fake_request</span></tt>
+                is what I really used). WSGI worked really well for testing,
+                because I could test <em>only</em>
+                <tt class="literal"><span class="pre">URLParser</span></tt
+                >, by creating an &quot;incomplete&quot; stack that didn't
+                include any other components. I had to create little WSGI
+                applications, but I wrote them as plainly as I could -- the app
+                files don't even import anything.
+            </p>
+            <p>
+                I also started working on configuration (<tt class="literal"
+                    ><span class="pre">wsgikit.pyconfig</span></tt
+                >
+                and
+                <tt class="literal"
+                    ><span class="pre">wsgikit.configmiddleware</span></tt
+                >), though I haven't made use of it yet. And I put together a
+                startup script (<tt class="literal"
+                    ><span class="pre">server.py</span></tt
+                >) that makes it easy to run an app and load configuration. And
+                I put together the generic reloader (<tt class="literal"
+                    ><span class="pre">wsgikit.reloader</span></tt
+                >), for Webware-style reloading;
+                <tt class="literal"><span class="pre">server.py</span></tt>
+                actually handles the whole restart portion, so that there's no
+                shell or batch files involved -- a minor point, but it's one
+                less thing to think about. I haven't tested it with twisted --
+                maybe twisted wouldn't like me killing it quite so crudely;
+                probably
+                <tt class="literal"><span class="pre">reloader</span></tt>
+                should be extended with custom ways to terminate the process
+                (though really the process should terminate fine so long as you
+                use
+                <a
+                    class="reference"
+                    href="http://docs.python.org/lib/module-atexit.html"
+                    >atexit</a
+                >
+                properly).
+            </p>
+            <p>
+                Anyway, a lot more to talk about for Day 1, and my WSGIKit
+                presentation, but that will wait for another post.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 24 Mar '05</div>
+    </body>
+</html>

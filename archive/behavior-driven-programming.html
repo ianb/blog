@@ -1,0 +1,410 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Behavior Driven Programming</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Behavior Driven Programming</h1>
+
+        <div class="document">
+            <p>
+                I listened to
+                <a
+                    class="reference"
+                    href="http://agiletoolkit.libsyn.com/index.php?post_id=15586"
+                    >this</a
+                >
+                podcast with
+                <a
+                    class="reference"
+                    href="http://blog.daveastels.com/articles/category/behaviour-driven-development"
+                    >Dave Astels</a
+                >
+                about Behavior Driven Development and
+                <a class="reference" href="http://rspec.rubyforge.org/">RSpec</a
+                >, a system for Ruby (the
+                <a
+                    class="reference"
+                    href="http://rspec.rubyforge.org/files/TUTORIAL.html"
+                    >tutorial</a
+                >
+                is probably the best place to start looking at it). He's also
+                simultaneously developing the system for Smalltalk, I believe.
+            </p>
+            <p>
+                In the podcast Python came up briefly, and a question about
+                whether you could do the same thing in Python. From a quick
+                look, I would say no -- it involves injecting methods into
+                Object, which you cannot do in Python. I assume there are other
+                aspects to the system, but I don't understand them all.
+            </p>
+            <p>Here's a basic example from the tutorial:</p>
+            <pre class="literal-block">
+rob = Robot.new
+
+rob.should_not_be_nil
+rob.should_be_kind_of Robot
+rob.x_coordinate.should_equal 0
+rob.y_coordinate.should_equal 0
+rob.location.should_equal [0,0]
+
+rob.move_north(1).should_equal [0, 1]
+rob.move_south(5).should_equal [0, -4]
+rob.move_east(10).should_equal [10, -4]
+rob.move_west(5).should_equal [5, -4]
+</pre
+            >
+            <p>
+                While you can't implement
+                <tt class="docutils literal"
+                    ><span class="pre">.should_equal</span></tt
+                >
+                in Python, this is trivially translatable to
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-doctest.html"
+                    >doctest</a
+                >:
+            </p>
+            <pre class="literal-block">
+&gt;&gt;&gt; rob = Robot()
+&gt;&gt;&gt; rob is None
+False
+&gt;&gt;&gt; isinstance(rob, Robot)
+True
+&gt;&gt;&gt; rob.x_coordinate, rob.y_coordinate
+(0, 0)
+&gt;&gt;&gt; rob.location
+(0, 0)
+&gt;&gt;&gt; rob.move_north()
+&gt;&gt;&gt; rob.location
+(0, 1)
+&gt;&gt;&gt; rob.move_south(5)
+&gt;&gt;&gt; rob.location
+(0, -4)
+&gt;&gt;&gt; rob.move_east(10)
+&gt;&gt;&gt; rob.location
+(10, -4)
+&gt;&gt;&gt; rob.move_west(5)
+&gt;&gt;&gt; rob.location
+(5, -4)
+</pre
+            >
+            <p>
+                (I translated the
+                <tt class="docutils literal"
+                    ><span class="pre">move_*</span></tt
+                >
+                method to Python style, where actions like this typically return
+                None. <strong>Update</strong>: I realize I didn't explain what
+                this does -- at its simplest you can put that sample interaction
+                into a text file, then run
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/doctest-simple-testfile.html"
+                    >a command that replays that file</a
+                >
+                and checks that it is accurate)
+            </p>
+            <p>
+                I think doctest exemplifies this idea of &quot;behavior driven
+                programming,&quot; though it's usually referred to as
+                &quot;documentation driven programming&quot; here.
+            </p>
+            <p>
+                RSpec also adds specifications, which are just groupings,
+                xUnit-style TestCases. Nothing special there. I know how to
+                write functions and factor code already, thank you.
+            </p>
+            <p>
+                So, the advantages of RSpec over doctest? Please note them in
+                the comments, I'm not really seeing anything. Doctest can be a
+                nuisance sometimes because of an explicitness that can lead to
+                fragility -- doctest pays attention to <em>everything</em> and
+                it's not that hard to turn that off, whereas RSpec is more
+                selective. But I don't know if that makes RSpec better.
+            </p>
+            <p>The advantages of doctest over RSpec?</p>
+            <ul class="simple">
+                <li>
+                    Tests can be in independent files, RSpec style, or embedded
+                    into source docstrings.
+                </li>
+                <li>Tests in docstrings incur no overhead.</li>
+                <li>
+                    Interstitial narratives are strongly encouraged in doctest
+                    -- far moreso than just allowing comments.
+                </li>
+                <li>
+                    Typically doctests are renderable as documentation. Not all
+                    doctests are nice documentation, but many are.
+                </li>
+                <li>
+                    Conversely, doctests are a good way to test documentation
+                    (which was the original purpose).
+                </li>
+                <li>
+                    It is very simple to start using it. If you don't write
+                    tests currently, writing doctests is the best way to start.
+                    If you like the interactive prompt and play with your
+                    modules that way, then moving to doctest is practically
+                    seemless.
+                </li>
+            </ul>
+            <p>
+                Doctest is not without its flaws, though I would say most of
+                those flaws are small usability aspects -- many of which were
+                fixed in Python 2.4, but turned off by default. Doctest also
+                gets used in inappropriate places sometimes, but I think that's
+                mostly to avoid the needless complexity of
+                <tt class="docutils literal"
+                    ><span class="pre">unittest.TestCase</span></tt
+                >. Using a
+                <a
+                    class="reference"
+                    href="http://codespeak.net/py/current/doc/test.html"
+                    >good test runner</a
+                >
+                I feel much less of a desire to use doctests unless I really am
+                telling a story of some sort.
+            </p>
+            <p>
+                I think doctest is a great example of what Python gets right and
+                Smalltalk-style systems get wrong. Doctest is just a tool. It's
+                not a framework. You don't subclass anything. In Smalltalk you
+                have this nice GUI IDE that rewards subclassing, and conflates
+                the class hierarchy with other kinds of organization, and
+                punishes procedural programming when it takes the form of
+                disassociated actions. In Smalltalk it seems like everything
+                turns into a framework, whether you like it or not.
+            </p>
+            <p>
+                Doctest of course implements classes for internal use. Classes
+                are a good way to express lots of things. But they aren't a very
+                good way to share. And so doctest doesn't encourage you to use
+                any of those classes unless you are customizing the system in
+                some way. <em>Customizing</em> the system and <em>using</em> the
+                system are entirely separate (a notable difference from xUnit
+                and RSpec). Doctest is just plain good design.
+            </p>
+            <p>
+                And Behavior Driven Programming? Yep, that's a good idea, so a
+                shout out to Tim Peters for contributing that to the Python
+                community years ago.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 23 Mar '06<br />
+            Modified 23 Mar '06
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Huh. &quot;Behavior Driven&quot;? Hey, I hear those Ruby
+                    people are good at marketing, so maybe they needed a new
+                    name for unittesting? Maybe that's not a bad thing. RSpec
+                    seems like .. exactly .. py.test? I can't find the blog
+                    article mentioned (A New Look at Test Driven Development),
+                    but is there some aversion to &quot;assert&quot; in tests
+                    that I'm not aware of? Doctest is even nicer, when that's
+                    all you need, but other than the Ruby habit of using words
+                    to mean builtin things (DSL, righto) x.should_equal 0 =&gt;
+                    assert x == 0, right? I thought there must be something more
+                    I was missing, but here's the full list of expectations that
+                    I can find in the source doc on the RSpec site:
+                </p>
+                <pre class="literal-block">
+should_raise -&gt; assert py.test.raises
+should_not_raise -&gt; assert not py.test.raises
+should_be_empty -&gt; assert len(x) == 0 # couple options here, depending on what this means
+should_be_false -&gt; assert x is False
+should_be_nil -&gt; assert x is None
+should_be_same_as -&gt; assert x is y
+should_be_true -&gt; assert x is True
+should_equal -&gt; assert x == y
+should_include -&gt; assert x in y
+should_match -&gt; (not sure what this ruby means)
+</pre
+                >
+                <p>and _not_ versions of the same.</p>
+                <p>
+                    Clearly, the whole point of this <em>is</em> a test
+                    assertion DSL? Agree with you that creating this by putting
+                    methods onto Object feels much less acceptable to my
+                    non-ruby/smalltalk mind. But ok, maybe someday I'll go the
+                    rest of the way in this DSL fervor.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="behavior-driven-programming-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Luke Opperman</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Apparently they aren't willing to hack the language
+                        interpreter a little to improve their testing? py.test
+                        does some cleverness to reinterpret assert statements
+                        and capture subexpressions, and in the process solves
+                        the problem that a whole series of assertEqual/etc
+                        methods are created to solve. Doctest solves it in a
+                        slightly different way, by basically turning everything
+                        into assertEqual (though the fact that is less general
+                        can be a problem).
+                    </p>
+                    <p>
+                        RSpec is doing something else besides this, I think. The
+                        tutorial isn't completely up-to-date, so now you can
+                        actually do
+                        <tt class="docutils literal"
+                            ><span class="pre">x.should.be.foo</span></tt
+                        >
+                        which I think is entirely equivalent to
+                        <tt class="docutils literal"
+                            ><span class="pre">assert</span>
+                            <span class="pre">x.foo?</span></tt
+                        >. Since these transformations are generally pretty easy
+                        and obvious (and they are <em>supposed</em> to be easy
+                        and obvious), I'm not sure what the advantage of the
+                        RSpec style is. Maybe if I saw his presentation.
+                    </p>
+                    <p>
+                        I do think it is or can be correct that &quot;Behavior
+                        Driven Programming&quot; is different than just
+                        &quot;Test Driven&quot; or unit testing. There really is
+                        something different to starting with doctest than with
+                        starting with unittest or py.test. It's closer to
+                        acceptance testing; acceptance testing of the API, I
+                        guess. Unit testing tends to be more focused on testing
+                        the internals. By emphasizing a story, doctest is
+                        encouraging you to talk about what things look like from
+                        the outside. I expect that the style RSpec is
+                        implementing is intended to do the same. But creating a
+                        DSL for that seems like exactly the
+                        <em>wrong</em> thing, because you aren't describing
+                        something that anyone can use. When talking about an
+                        API, you should be using the API, nothing more.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="behavior-driven-programming-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Ahh, true - I tend to write my tests as &quot;this
+                            is how the API should work&quot;, so maybe I'm just
+                            an early adopter of &quot;Behavior Driven
+                            Testing&quot;? :) Although, I thought I was just
+                            doing good Test Driven Development... but my point
+                            is, TDD freaks people out almost as much as Pair
+                            Programming, so if someone wants to try a new name,
+                            I'm ok with that.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="behavior-driven-programming-comment-3.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">Luke Opperman</a>
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        <p>
+                            After watching the Google TechTalk video (
+                            <a
+                                class="reference"
+                                href="http://video.google.com/videoplay?docid=8135690990081075324&amp;pl=true"
+                                >http://video.google.com/videoplay?docid=8135690990081075324&amp;pl=true</a
+                            >
+                            ) on this I think something like this would be a
+                            nice thing in Python. Sure it's really just TDD, but
+                            it's changing the semantics to encourage good TDD
+                            practices instead of just a verification mechanism.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="behavior-driven-programming-comment-4.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Steve
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+            <p>
+                <em
+                    >Sure it's really just TDD, but it's changing the semantics
+                    to encourage good TDD practices instead of just a
+                    verification mechanism.</em
+                >
+            </p>
+
+            <p>
+                I think you hit the nail on the head there. I've messed around
+                with both TDD and BDD in Ruby, and, as you'd expect, neither
+                seems to do anything that the other can't do.
+            </p>
+
+            <p>
+                BDD just uses different language in an attempt to encourage good
+                testing practices. It's the kind of thing that's easy to
+                downplay, but of course the only difference between any two
+                general programming languages are the things that their syntaxes
+                encourage and discourage.
+            </p>
+            <div align="right">
+                <a href="behaviordrivenprogrammingcomment8.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://blog.rictic.com">Peter</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

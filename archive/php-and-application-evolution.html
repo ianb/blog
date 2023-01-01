@@ -1,0 +1,394 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>PHP and Application Evolution</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>PHP and Application Evolution</h1>
+        <p></p>
+
+        <blockquote>
+            PHP has (until 4 at least) a niche. It's great for quick development
+            of web sites that often change so quickly a whole design is not
+            possible, thus the lack of artifacts keeps you from shooting
+            yourself in the foot by closing and packaging your design too
+            quickly.
+            <i
+                >(<a
+                    href="http://www.kuro5hin.org/comments/2004/7/14/232752/474/74#74"
+                    >comment</a
+                >
+                attached to
+                <a href="http://www.kuro5hin.org/story/2004/7/14/232752/474"
+                    >Zend in the clowns?</a
+                >)</i
+            >
+        </blockquote>
+
+        This is often how I feel about object-oriented programming, and
+        somewhere where I think Python's imperative approach is a real feature.
+        Starting on an application by building objects (or doing "whole design")
+        is a bad idea, unless you know the domain well. It's better to get it
+        doing what you need to do, and think about objects along the way.
+        Somewhere you'll notice you keep passing around the same value(s) to a
+        set of functions -- those set of values are "self", and those functions
+        are methods. You'll find ways to split things into modules, etc.
+        Designing objects and modules too early and you'll have lots of circular
+        dependencies and poor metaphors. Of course, you can fix all those, but
+        it's easier to add structure to a naive project than to reshape and
+        restructure a misdeveloped project.
+
+        <p>
+            This might be more important in web applications, because this is
+            important when you are starting an application. Web application
+            developers tend to start more applications, since these applications
+            come and go, and can be developed fairly quickly compared to other
+            application domains.
+        </p>
+
+        <p>
+            In this way, PHP has the right development methodology -- you start
+            with some HTML, some forms and pages. You maybe factor out a few
+            common parts -- header and footer, say. Then you add more logic in,
+            treating the page like a script. Later in the project's life this
+            seems a bit silly. In the PHP applications I've written, I always
+            end up with a large portion of my files starting with
+            <tt>&lt;?</tt> and ending with <tt>?&gt;</tt> with no HTML literals
+            inbetween. It's also annoying to turn a PHP page into a reasonable
+            function. But the basic concept is still good, even if PHP isn't a
+            particularly good implementation of the idea.
+        </p>
+
+        <p>
+            This is something you can do in Zope 2, but the naive implementation
+            is very hard to restructure -- <i>far</i> worse than PHP. It's not
+            clear to me that Zope 3 addresses this problem. It provides many
+            tools for an advanced programmer, but what does it provide for the
+            naive developer? What path does it provide to turn a naive
+            application into something better structured? Or rather, does it
+            even allow a naive application? Zope 3 is heavy on object modeling,
+            but application development should start by developing functionality
+            and then by finding the objects in that functionality.
+        </p>
+
+        <p>
+            PHP is a very successful web development language -- and a very
+            successful language, period -- and I think this development
+            methodology (and a couple other features) are to thank for that.
+            Python remains better than PHP in many, many ways. But I don't see
+            much movement in the direction of PHP's strengths. This is
+            disappointing.
+        </p>
+
+        <div class="dates" align="right">
+            Created 29 Jul '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            A pure object-model for web development can also be difficult
+            because the requirements for a project mutate frequenly in some
+            cases. The seemingly unorganized PHP structure *may* actually help
+            in cases where the customer throws in disjointed requests. The thing
+            I love about python is that it's philosophy of operation doesn't
+            corner you like Java can, while encouraging logical structure.
+            <div align="right">
+                <a href="https://ianbicking.org/comment221.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://eradman.com">Eric Radman</a>
+            </div>
+            <hr noshade />
+            A smooth upgrade path from 'scripting' to 'structured application'
+            is also a concern of the Zope 3 developers, albeit it hasn't had
+            that much attention yet.
+            <br />
+
+            <br />
+            I don't think Zope 3 is that heavy on object modelling. Zope 3, as
+            Zope 2 has, encourages designing with objects, true, but connecting
+            a new view consisting of a page template and a few python snippets
+            to an existing content item is something I imagine a scripter will
+            want to do. I don't think that requires a large amount of modelling.
+            Customizability is what Zope 3 is all about.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment222.html" rel="nofollow"
+                    >#</a
+                >
+                Martijn Faassen
+            </div>
+            <hr noshade />
+            I feel your pain. It has recently come to my attention that Zope
+            works well for folks who live and breathe it all the time. I don't,
+            so I face the Z-shaped learning curve every time I come back to it.
+            That has stymied my abilities for years now (in hindsight). I
+            haven't built the systems I've wanted to because I always get
+            re-stuck figuring out some alien Zope syntax for doing something
+            that ought to be easy.
+            <br />
+
+            <br />
+            I think I'll continue using Zope, and possibly even Plone, for
+            simple things. Sure, Python scripts, maybe even simple extensions.
+            But my current thinking is to add Quixote (the current front runner)
+            in parallel with my Zope installation, for building "real" things,
+            because then I can use a python mindset and the programming model
+            becomes simple.
+            <div align="right">
+                <a href="https://ianbicking.org/comment223.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://mindview.net">Bruce Eckel</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    As a Python lover who also uses PHP extensively, I find that
+                    Spyce (
+                    <a class="reference" href="http://spyce.sourceforge.net"
+                        >http://spyce.sourceforge.net</a
+                    >
+                    ) is the Python web programming solution that is closest in
+                    spirit to PHP. With Spyce, all the right ingredients that
+                    made for PHP's [initial] success, such as immediacy of
+                    learning and integration into an HTML page, are made
+                    available while straying as little as possible from how you
+                    normally do Python programming (read: nothing much new to
+                    learn).
+                </p>
+                <p>
+                    Spyce's Pythonic design involves a small amount of carefully
+                    designed features which:
+                </p>
+                <blockquote>
+                    <ol class="arabic simple">
+                        <li>
+                            provides powerful HTML-integration features more on
+                            par with JSP (such as rockin' custom tags) than PHP
+                            (whose tag-related features you need to boost with
+                            outside help such as Smarty)
+                        </li>
+                        <li>retains the ease and cleanliness of basic PHP</li>
+                        <li>
+                            lets you reuse what Python already does well, with
+                            the least distraction
+                        </li>
+                        <li>
+                            allows extension with template processors (such as
+                            Cheetah)
+                        </li>
+                    </ol>
+                </blockquote>
+                <p>
+                    Spyce has been around for a while and mature and stable
+                    enough for 'heavy lifting'. It was what I settled on after
+                    evaluating roughly a dozen other Python web frameworks
+                    including CherryPy, Quixote, Skunk, Zope, and Webware, none
+                    of which, imo, offered the clarity and ease of HTML
+                    integration that PHP provides and thus were not satisfactory
+                    alternatives.
+                </p>
+                <p>
+                    Spyce can be made to run on commodity hosting that supports
+                    CGI and Python (99.9% do) easily by:
+                </p>
+                <blockquote>
+                    <ol class="arabic simple">
+                        <li>
+                            just copying over the Spyce files under a cgi-bin
+                            directory
+                        </li>
+                        <li>
+                            creating a 2-3 line .htaccess file in a directory
+                            where your .spy files will run
+                        </li>
+                    </ol>
+                </blockquote>
+                <p>
+                    Voila! You now have Spyce working together with all the
+                    features that a Python program on that server has access to
+                    (including MySQL, SMTP, etc...)
+                </p>
+                <p>
+                    Spyce can also work on top of fastCGI, mod_python as well as
+                    its own server proxying behind Apache or other web server.
+                </p>
+                <p>
+                    Oh... and before I forget... if its default [[ and ]]
+                    delimiter tags turn you off, you can use the more
+                    conventional &lt;% and %&gt; instead.
+                </p>
+                <p>
+                    The final icing on the cake is that the free SciTE (
+                    <a class="reference" href="http://www.scintilla.org"
+                        >http://www.scintilla.org</a
+                    >
+                    ) editor can beautifully highlight HTML, Javascript and
+                    Spyce code separately when you use &lt;% %&gt; and enable
+                    'asp.default.language=3' in its 'html.properties'
+                    configuration file!
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/php-and-application-evolution-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Jonathan P.
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    It is arguably an a priori reality, or stated differently,
+                    it should be obvious as being true to unbiased, alert and
+                    clear-headed observers that people who perpetuate contrived
+                    and implicitly convoluted positions in support of
+                    &quot;creationalism&quot; or &quot;creation&quot; are by
+                    default just plain dumb, i.e, exhibiting major gaps in thier
+                    comprehensive understanding of the real universe, and lost
+                    in their own erroneous beleifs and simplistic irrelevant
+                    circular thinking. In my experience, such people are
+                    typically mistaking a small modicum of progress in their own
+                    personal intelllectual development as being a sort of
+                    validation for such a position, and license to expound and
+                    obsess thereon. They seem to see their advocacy of such
+                    views as being a charitable contribution and selfless act.
+                    They seem to confuse their own self-imposed incorporation of
+                    Christian values of humble stoicism and selfless compassion
+                    as representing the elegantly simple solution for our
+                    increasingly crowded, diverse and dangerous world, which is
+                    in their view in urgent need of a return to simple
+                    Christian-style discipline, charity and restraint.
+                    Conversely, they may see &quot;science&quot; as somehow
+                    being associated with many of the world's current evils, and
+                    therefore they opt for the simple Christian dogma,
+                    amazingly, somehow uncaringly diconnected from whether or
+                    not the scenario and methodology of creation in fact
+                    &quot;happened&quot; or could happen here or anywhere.
+                </p>
+                <p>
+                    The Scientific community, inspite of being caretaker of the
+                    perpondernace of ever-evolving knowledge describing how life
+                    actually does evolve seems to unfortunately remain mostly
+                    silent on such matters where a swift rebuff of such views
+                    would seem to be vitally demanded. Outright public ridicule,
+                    including chiding, taunting of such people is unfortuntely
+                    seen as base and &quot;unprofessional&quot; and in
+                    contradiction to the right of people to speak their minds in
+                    a free society. I propose that perpetuation of such
+                    non-science and such non-sense should be differentiated and
+                    condemned every bit as much as racisism, antisemitism and
+                    pornography are. (as examples). Furtherance of such drivel
+                    is counter to the pure thinking needed to solve the
+                    emergencies that beset society today. It is blatantly
+                    perposterous to place discussions of how life evolves on the
+                    untold millions of planets exhibiting conditions capable of
+                    supporting life alongside creationist rhetoric as being
+                    balanced point-counterpoint subjects, ripe for thorough
+                    public examination. So, go ahead, quit tiptoeing; call them
+                    out, confront them for what they are: sadly DUMB. Let it be
+                    known to the young minds of today, that such absurdly
+                    dim-minded positions can not be left to stand unopposed.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/php-and-application-evolution-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Steve Franseen
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>Huh?</p>
+                    <p>
+                        I've never seen a blog entry so clearly defined and so
+                        well argued that says absolutely nothing. Ian, you must
+                        have some really cool blogbots that can spew such
+                        interesting bits of blah. ;-)
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/php-and-application-evolution-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    anonymous
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Yes, perhaps this guy should get out of his
+                            intellectual treehouse and do some wrestling in the
+                            real world. Enough trying to impress us with your
+                            extra brain cells. Where is the wisdom?
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/php-and-application-evolution-comment-4.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        anonymous
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        <p>
+                            Yes, perhaps this guy should get out of his
+                            intellectual treehouse and do some wrestling in the
+                            real world. Enough trying to impress us with your
+                            extra brain cells. Where is the wisdom?
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/php-and-application-evolution-comment-5.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        anonymous
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

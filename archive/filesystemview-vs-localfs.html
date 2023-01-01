@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>FileSystemView vs. LocalFS</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>FileSystemView vs. LocalFS</h1>
+
+        <div class="document">
+            <p>
+                From
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/zope-to-localfs-comment-1.html"
+                    >a comment</a
+                >
+                in
+                <a class="reference" href="zope-to-localfs.html"
+                    >my last post</a
+                >
+                I looked at
+                <a
+                    class="reference"
+                    href="http://www.infrae.com/download/FileSystemSite"
+                    >FileSystemView</a
+                >
+                as an alternative to
+                <a
+                    class="reference"
+                    href="http://www.easyleading.org/Downloads/"
+                    >LocalFS</a
+                >. FSView certainly feels cleaner, but I'm not 100% sure...
+                here's my initial thoughts:
+            </p>
+            <ul class="simple">
+                <li>
+                    FileSystemView doesn't seem to allow editing through the
+                    web. Well, not a big deal since I'm trying to escape that
+                    model anyway; except that I can't cut and paste things from
+                    the ZODB, which I'd like to do to migrate old code. Maybe
+                    <a
+                        class="reference"
+                        href="http://zope.org/Members/tseaver/FSDump/view"
+                        >FSDump</a
+                    >
+                    can be used for that end of the process.
+                </li>
+                <li>
+                    FileSystemView hides all extensions, and LocalFS shows all
+                    extensions. This is nice, since it means you can control
+                    your objects' names (very important for legacy projects, but
+                    even important for new projects). I hacked something into
+                    LocalFS to hide some extensions, but it makes things act
+                    weird, since it doesn't <em>always</em> hide extensions. I
+                    assume when I do use extensions in a FileSystemView object
+                    (e.g., I usually add
+                    <tt class="literal"><span class="pre">.pt</span></tt> to the
+                    templates to distinguish them from their accompanying Python
+                    Script), I can just double up the extensions (<tt
+                        class="literal"
+                        ><span class="pre">filename.pt.pt</span></tt
+                    >) -- a little ugly, but it doesn't really bother me.
+                </li>
+                <li>
+                    Files that FileSystemView doesn't understand just don't get
+                    shown. LocalFS tries to serve them anyway, usually as static
+                    files. I'm indifferent, though I dislike the
+                    <tt class="literal"><span class="pre">.svn/</span></tt>
+                    directories being shown (FSView respects a leading
+                    <tt class="literal"><span class="pre">.</span></tt> as a
+                    hidden file). Hacking LocalFS to do this would be easy.
+                </li>
+                <li>
+                    FileSystemView has a more strict idea of where files should
+                    go. In particular, they have to go in the
+                    <tt class="literal"><span class="pre">Products</span></tt>
+                    directory. That's kind of annoying; LocalFS lets you attach
+                    any directory you want.
+                </li>
+                <li>
+                    FileSystemView has properties -- objects that just hold
+                    attributes. That's kind of nice, though typically I use
+                    properties for things that are really installation-specific
+                    (i.e., configuration), so I don't know if I want them in the
+                    filesystem (or at least repository) anyway.
+                </li>
+                <li>
+                    FileSystemView has some notion of &quot;customization&quot;
+                    -- it will copy the object to another location on disk, and
+                    then allow it to be edited...? This seems interesting --
+                    e.g., you could customize templates and other items on a
+                    per-installation basis. Maybe? But the
+                    <tt class="literal"><span class="pre">README.txt</span></tt>
+                    doesn't mention anything about it, and I just get an empty
+                    <tt class="literal"><span class="pre">select</span></tt>
+                    box, so it's not functional by default. I'm guessing this a
+                    remnant of
+                    <a
+                        class="reference"
+                        href="http://zope.org/Products/CMF/index.html"
+                        >CMF</a
+                    >
+                    which might make sense to me if I knew anything about CMF.
+                </li>
+            </ul>
+            <p>
+                My conclusion: unless I'm missing something, it's mostly a wash
+                (at least given the development I've already done on LocalFS).
+                FileSystemView may have more of a future; it's not even clear
+                who is developing LocalFS at this point (though I assume the
+                <a
+                    class="reference"
+                    href="http://sourceforge.net/projects/localfs"
+                    >SF project</a
+                >
+                is defunct). FSView avoids some of LocalFS's complications by
+                being read-only; of course, filesystem permissions can make
+                LocalFS thoroughly read-only too, avoiding some potential
+                problems. FSView's policy of looking in
+                <tt class="literal"><span class="pre">Products</span></tt>
+                annoys me -- it might make sense in the context of CMF or some
+                other system or company, but it makes it more difficult to adapt
+                to our local conventions. I dislike putting policy into code;
+                internally to an organization it's probably good, but for public
+                code it's a burden.
+            </p>
+            <p>
+                There was also a
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/zope-to-localfs-comment-2.html"
+                    >suggestion</a
+                >
+                to use
+                <a class="reference" href="http://hathawaymix.org/Software/Ape"
+                    >APE</a
+                >. APE is a much larger project, but also seems to be pretty
+                actively developed. In the past it didn't seem that compelling
+                to move stuff out of the ZODB and into a database or filesystem
+                if the objects were still opaque. But apparently it has custom
+                mappings for some types (probably all the types I'm interested
+                in), which would presumably make the files pretty transparent.
+            </p>
+            <p>
+                Unfortunately APE requires Zope 2.7, and we're using Zope 2.6
+                here. There's more and more reasons we need to upgrade to 2.7...
+                but anyway, both LocalFS and FileSystemView work fine with 2.6,
+                and I don't want to delay this by adding another task to the mix
+                -- I'd rather switch products later than delay moving code into
+                the filesystem/repository. Ideally the product will allow the
+                logical placement of code on the filesystem, so that moving to a
+                different product won't be too complicated.
+            </p>
+            <p>
+                Then, just now, I get a
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/zope-to-localfs-comment-4.html"
+                    >suggestion</a
+                >
+                for
+                <a
+                    class="reference"
+                    href="http://sourceforge.net/projects/zfolder2product"
+                    >zfolder2product</a
+                >. This also requires Zope 2.7, and seems to dump ZODB objects
+                to the filesystem, then allow you to put them back into the ZODB
+                from those files -- the object that recreates those ZODB objects
+                is the &quot;product&quot; you create. I suspect the
+                synchronization is less transparent than LocalFS or FSView
+                (which are basically live views of the filesystem), but I'm not
+                able to try it yet.
+            </p>
+            <p>
+                Actually, the one thing I'm worried about is security, something
+                that has always made me uncomfortable in Zope (part of the
+                nature of its pervasive object publishing metaphor). FSView
+                doesn't allow permissions to be set at all (below the root
+                folder), and LocalFS does but it lies -- it forgets all
+                settings. This might be something to I can hack onto LocalFS,
+                but it makes me uncomfortable, and my initial experiments have
+                been painful (I blame Acquisition once again... blast you
+                Acquisition, you are my nemesis!)
+            </p>
+            <p>
+                I suspect APE supports security restrictions and all those other
+                possible annotations well, and zfolder2product can probably
+                support it with a little work because of its imperative nature
+                (you could just add another task to the end of the
+                ZODB-object-creation step that fixes up the permissions).
+            </p>
+        </div>
+        <div class="dates" align="right">Created 22 Feb '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    APE saves everything - permissions, properties, source, etc,
+                    since it is a ZODB storage layer and not some magic folder
+                    or object that reads and writes things it knows to the file
+                    system. So everything gets saved. When it serializes an
+                    object, it goes through a chain of objects that can store
+                    different pieces of it, and an event tracks what persistent
+                    attributes have been dealt with. So something with
+                    properties uses the properties serializer which writes the
+                    properties to a file (or RDBMS table, etc) in a usable
+                    format, and marks those attributes as having been dealt
+                    with. Then the next serializer might be the one responsible
+                    for storing permission settings (since those are also
+                    persistent attributes). The next might serialize the text
+                    source (Python Script, ZPT Page, etc) or binary source
+                    (file, image), etc. If after all of these serializers have
+                    been used and there are still persistent attributes
+                    remaining that haven't been stored or marked as used yet,
+                    those get written out in a pickled format. Changes made on
+                    the file system, or new files added in the file system, get
+                    picked up immediately. And because it's a ZODB storage,
+                    nothing changes in how you interact with the object in the
+                    ZMI.
+                </p>
+                <p>
+                    My terminology and specifics about how it works may not be
+                    100% correct, but that's my understanding of how it worked
+                    as of Ape 0.7. Since 0.7, the design has actually been
+                    simplified.
+                </p>
+                <p>
+                    Ape 0.7 worked with Zope 2.6, and I think I still have a
+                    copy of it. Or maybe it was Ape 0.6. If you're interested,
+                    I've put those old copies online at
+                    <a class="reference" href="http://toulouse.amber.org/share/"
+                        >toulouse.share</a
+                    >.
+                </p>
+                <p>
+                    If I recall correctly, things did get a little funny when
+                    CVS was installed (basically because all of the CVS
+                    directories and their contents show up in Zope). But it
+                    worked really really well for dumping a site to the file
+                    system, editing it on the file system, and then even copying
+                    it back into a regular FileStorage based area of the ZODB -
+                    it did it all transparently, and nothing was lost.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/filesystemview-vs-localfs-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://toulouse.amber.org/">Jeff Shell</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Thanks -- I'm trying it out now. It seems like it
+                        creates an ini file for the properties; a boring example
+                        script called
+                        <tt class="docutils literal"
+                            ><span class="pre">test</span></tt
+                        >
+                        gives me a
+                        <tt class="docutils literal"
+                            ><span class="pre">test.py</span></tt
+                        >
+                        file and a
+                        <tt class="docutils literal"
+                            ><span class="pre">.test.py.properties</span></tt
+                        >
+                        file that looks like:
+                    </p>
+                    <pre class="literal-block">
+[classification]
+class_name=Products.PythonScripts.PythonScript.PythonScript
+
+[security]
+local-role role=&quot;Owner&quot; username=&quot;ianb&quot;
+</pre
+                    >
+                    <p>
+                        That seems pretty workable. You have to edit a
+                        configuration file to make new directories available, so
+                        it can't be done purely through the ZMI (and I suspect
+                        requires a server restart).
+                    </p>
+                    <p>
+                        It looks like a pretty good basis for putting legacy
+                        ZODB code into a repository, without having to mess with
+                        the code (which would make us unwittingly turn legacy
+                        code into current code, which is what we're trying to
+                        avoid ;)
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/filesystemview-vs-localfs-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

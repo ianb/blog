@@ -1,0 +1,674 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>More on single-signon</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>More on single-signon</h1>
+
+        <div class="document">
+            <p>
+                A while back I
+                <a class="reference" href="fixing-apache-authentication.html"
+                    >talked about Apache authentication</a
+                >, with the hope that people would suggest some alternatives.
+                And they did, and for the last week or two I've been trying to
+                figure out what to do. To recap, my goals:
+            </p>
+            <ul class="simple">
+                <li>
+                    Centralize all identification at the Apache level, not at
+                    the level of individual applications.
+                </li>
+                <li>Not use HTTP Basic authentication, which I hate.</li>
+                <li>
+                    Not use any specific authentication/identification backend;
+                    we authenticate different users for different clients in
+                    different ways.
+                </li>
+                <li>
+                    Hopefully make it possible to use across servers/domains,
+                    even if it takes a bit of fiddling. IIS support is nice,
+                    just in case, but integrating with other people's systems
+                    (and we don't use IIS internally) is always a messy
+                    situation, so even with IIS support we can't expect too
+                    much.
+                </li>
+            </ul>
+            <p>
+                Anyway, a couple things were suggested. The first I looked at
+                was
+                <a class="reference" href="http://pubcookie.org">Pubcookie</a>,
+                out of the University of Washington. Supports Apache 1.3 and 2,
+                and IIS. Very focused on secure single-signon across a large
+                network. Universities typically have lots of systems
+                administered by very different groups, and often don't have a
+                high degree of shared trust. And every year there's a new batch
+                of students who learn about network sniffing. But this isn't
+                exactly my situation, but it seemed like sufficient overlap.
+            </p>
+            <p>
+                But I got Pubcookie installed, which was a little confusing at
+                times but not too bad. It has an undocumented
+                <tt class="docutils literal"
+                    ><span class="pre">verify_fork</span></tt
+                >
+                method which calls an external process, and this makes
+                username/password authentication easily pluggable (but not IP
+                authentication, for instance). It uses cookies, not HTTP Basic,
+                and a series of redirects and a CGI script for the
+                authentication process.
+            </p>
+            <p>
+                But I've been hitting a number of walls, and I don't know how
+                well it will work out. HTTPS is required for everything --
+                essentially programming policy into the tool. I'm not super
+                concerned about someone sniffing an authentication cookie that
+                is going to time out anyway, so this restriction is a little
+                annoying. Logout is really difficult to understand or implement
+                -- I think something is possible there, but I can't figure out
+                quite what that is. Also, there's a fair amount of Apache
+                configuration to change permissions around -- again, I may be
+                able to get around that using conventions, but that's
+                considerable added complexity (and I don't ultimately want to
+                reconfigure Apache very often). And finally the installation is
+                rather complicated; considering we're going to have a distinct
+                installation for every client, and that installation includes an
+                extra keyserver (who's purpose I don't quite understand) and a
+                set of configuration files and several SSL keys, this makes me
+                uncomfortable.
+            </p>
+            <p>
+                <a
+                    class="reference"
+                    href="http://www.umich.edu/~umweb/software/cosign/"
+                    >CoSign</a
+                >
+                looked almost identical, but with nicer graphical design and
+                poorer documentation. It also comes out of a university.
+            </p>
+            <p>
+                <a
+                    class="reference"
+                    href="http://www.openfusion.com.au/labs/mod_auth_tkt/"
+                    >mod_auth_tkt</a
+                >
+                was also suggested, but it took me a while to get around to
+                looking at it. This looks much more promising to me -- it's
+                fairly simple, and consists only of the identification portion.
+                It documents the cookies you have to set for authentication (and
+                provides a sample implementation, I think, but the documents are
+                more than enough for me). It doesn't have multi-server
+                single-signon out of the box, but it's not hard to figure out
+                how that would be set up (basically a set of redirects to get
+                the browser to visit all appropriate domains). It even has room
+                for extra data, like user roles. It's all based on a shared
+                secret (with signed cookies, I believe), but that's 100% okay
+                for our situation (but probably wouldn't be for Pubcookie).
+            </p>
+            <p>
+                The real bummer for me is that it's for Apache 1.3 only. I see
+                evidence of Apache 2 ports (<tt class="docutils literal"
+                    ><span class="pre">mod_auth_tkt/2.0.0b1</span></tt
+                >
+                in Apache identification strings), but none that are publically
+                available. That's really frustrating. It's another one of those
+                projects that isn't developed openly (public repository, mailing
+                list, etc), which has been frustrating me often lately -- open
+                source without open development is a terrible waste. Personally
+                I don't have the C or Apache module skills to resolve this, but
+                if we go forward with this we'd probably be willing to pay
+                someone who does.
+            </p>
+            <p>
+                I also looked at
+                <a
+                    class="reference"
+                    href="http://mod-auth-script.sourceforge.net/"
+                    >mod_auth_script</a
+                >, which is kind of interesting (though also largely abandoned).
+                It's got even less policy than mod_auth_tkt. I haven't tried it,
+                but I think you just configure an authentication URL (probably
+                internal), like
+                <tt class="docutils literal"
+                    ><span class="pre">/auth_script.cgi</span></tt
+                >
+                -- on every request that gets run, and it outputs special
+                headers that indicate who, if anyone, is logged in. You could
+                implement a signed cookie authentication, or IP-based
+                authentication, or anything on top of this. My only desire would
+                be the ability to add other environmental variables (e.g.,
+                <tt class="docutils literal"
+                    ><span class="pre">REMOTE_USER_GROUPS</span></tt
+                >). Essentially it would become a generic hook which didn't
+                involve mod_*. There's an
+                <a
+                    class="reference"
+                    href="http://sourceforge.net/tracker/index.php?func=detail&amp;aid=778283&amp;group_id=27856&amp;atid=391749"
+                    >Apache 2 patch</a
+                >, but unfortunately I'm not sure how much I trust any of it in
+                its unmaintained state.
+            </p>
+            <p>
+                I'm still shocked at how hard this is. 60% of the web servers
+                out there use Apache. This is a really, really useful feature,
+                and something I see people struggling with <em>everywhere</em>.
+                And yet I mostly see the <em>remnants</em> of work to solve
+                this, not a single robust solution or community of developers.
+                We don't need another mod_auth_another_stupid_backend. I feel
+                like I <em>must</em> be missing something?!? Sigh. Any other
+                feedback is very welcome (and I'll report back on this yet
+                again, no doubt).
+            </p>
+            <p>
+                <strong>Update:</strong> We ended up using
+                <a
+                    class="reference"
+                    href="apache-authentication-and-single-signon.html"
+                    >mod_auth_tkt</a
+                >
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 21 Apr '05<br />
+            Modified 22 Jul '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    We had much the same situation within a tomcat-hosted
+                    application. It had to support instantaneous detection of
+                    changing user privileges and authenticate against ldap,
+                    rdbms, and flatfile resources. I was astonished to find that
+                    there was no library already out there to do this; it seems
+                    like a pretty common need. I ended up writing a java Filter
+                    class to do the work of intercepting requests and checking
+                    whether they were authenticated; if not we send them to
+                    whatever resource is appropriate for authentication (a login
+                    form or a client cert in our case). Two small support
+                    classes solved the 'check arbitrary backend' issue.
+                </p>
+                <blockquote>
+                    <p>
+                        We addressed efficiency by updating a MRU role cache in
+                        memory. Adding a bit of code to update the cache
+                        externally from events (like deleting an Employee from
+                        an ldap server) took care of the last part. It works
+                        very well and I never saw the horrible performance hit I
+                        expected from filtering every request. (This situation
+                        is why I asked you whether WebWare had filters).
+                    </p>
+                    <p>
+                        Apache 2.0 has protocol Filters, which allow you to do
+                        the same thing (they're not as well documented, though).
+                        I can't see why the same approach wouldn't work well
+                        enough; you should be able to call the various mod_auth
+                        backends to do the real work, ending up with a sort of
+                        mod_meta_auth I guess.
+                    </p>
+                </blockquote>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-single-signon-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Jeff Duffy
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        The equivalent in Webware would be something in the
+                        <tt class="docutils literal"
+                            ><span class="pre">SitePage.awake()</span></tt
+                        >
+                        method, or something like
+                        <a
+                            class="reference"
+                            href="http://svn.w4py.org/LoginKit/"
+                            >LoginKit</a
+                        >
+                        which I've found flexible enough for most any
+                        authentication I've needed to do. I also have a
+                        <a
+                            class="reference"
+                            href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/login.py"
+                            >WSGI middleware</a
+                        >
+                        for this (that I haven't used much), and
+                        <a class="reference" href="http://www.pythonweb.org"
+                            >http://www.pythonweb.org</a
+                        >
+                        has something similar for WSGI.
+                    </p>
+                    <p>
+                        This is how people tend to do it... but it only works in
+                        one environment. Which is one of several reasons there's
+                        so much pressure to have a homogenous environment. But I
+                        think it should be resolvable, at least on the Apache
+                        level, without binding it to any particular language or
+                        programming environment.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-on-single-signon-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Are you trying to do authentication (checking that someone
+                    is who they say they are) or authorization (checking if user
+                    x is allowed to look at this) or both? If you're just trying
+                    to get the authentication managed in a single place,
+                    authen.py looks most of the way there to me (although it is
+                    hugely open to replay attacks unless you're changing the
+                    secret every hour or so; I'd add an expiry time and IP to
+                    the cookie and sign them with the secret too). If you're
+                    doing authorization, the implementation in authen.py doesn't
+                    seem the greatest, since you probably want more complicated
+                    rules. So where do you want to write the rules? Does each
+                    page/application manage its own authorization (assuming it
+                    can get an authenticated username), or do you want to store
+                    the authorization rules in apache's config file
+                    (&quot;require valid-user&quot;), or somewhere else entirely
+                    (like a database)?
+                </p>
+                <p>
+                    When I needed SSO for Apache2, I did pretty much the same
+                    thing as your authen.py, except I made it as an authen
+                    handler instead of a header parser and used req.requires()
+                    to let me be a bit more Apache-like in the config file (I
+                    also had an analogue of groups in my login system):
+                </p>
+                <div class="line-block">
+                    <div class="line">PythonAuthenHandler mysso</div>
+                    <div class="line">
+                        AuthType foobar # I recall having an AuthType (even a
+                        made up one) was necessary for anything to happen
+                    </div>
+                    <div class="line">Require valid-user</div>
+                    <div class="line-block">
+                        <div class="line">or Require user bob</div>
+                        <div class="line">or Require group payingCustomers</div>
+                    </div>
+                </div>
+                <p>
+                    So, the script handled both authentication and
+                    authorization, although the actual authorization rules were
+                    contained in Apache's config/.htaccess files. All the
+                    handler had to do was check that the cookie contained valid
+                    info (expiry time hadn't passed and wasn't too far in the
+                    future, user's ip was the same as the cookie-contained ip,
+                    and hash(username+group+expiration+ip+secret) matched the
+                    signature) and only shoved the username into req.user if it
+                    was valid. If req.requires() returned anything, it would
+                    also do authorization and check that whatever req.requires
+                    returned was true (groups matched or the username matched or
+                    in the case of valid_user, the username had been set).
+                </p>
+                <p>
+                    As to handling a lack of valid authorization, I just used a
+                    straight-up 307 Redirect, ignoring the 401 code -- if you
+                    aren't using http-based authentication, there's no point in
+                    sending 401. When a user wasn't logged in, it would redirect
+                    (returning apache.HTTP_TEMPORARY_REDIRECT) to the login page
+                    like
+                    <a
+                        class="reference"
+                        href="https://SecureLoginSite.InSameDomain/login?from=protectedPagesURL"
+                        >https://SecureLoginSite.InSameDomain/login?from=protectedPagesURL</a
+                    >. Obviously, the login form would redirect back to
+                    protectedPagesURL after the user logged in and got the
+                    (domain-wide) login cookie. If everything was okay, I set
+                    req.user to username (which seemed to be all I ever needed;
+                    I'm not sure what advantage writing a fake Authorization
+                    header gets you, unless it's part of some further
+                    authorization step) and returned apache.OK, which let the
+                    page load normally.
+                </p>
+                <p>
+                    The only problems with it were that it didn't gracefully
+                    handle POSTs to its protected area (ideally it would encode
+                    the POSTed data into the login URL and send a 303 See Other
+                    to redirect to the login URL, and when the login URL
+                    redirected back to it, rewrite the request into a POST with
+                    the encoded data) and presumably it didn't perform overly
+                    well, but that was never too important to me (it didn't have
+                    a great deal of load on it; heck, I was getting away with
+                    opening a file and reading the secret key from it on every
+                    request!) I also didn't like the way that everything was in
+                    trusted cookies which could be stolen, but if you restrict
+                    the expiry time to something resonable and track the IP it
+                    is at least somewhat safe.
+                </p>
+                <p>
+                    So, not general-purpose or easily dropped-in (since it
+                    required a custom login app which pulls up the groups the
+                    user belongs to, checks the password is right, creates a
+                    cookie, redirects, etc.), but it worked for me. Ideally, of
+                    course, you'd use Kerberos as an HTTP authentication method,
+                    but good luck finding browser support for that, and I
+                    suppose the user would have to remember to login as
+                    <a
+                        class="reference"
+                        href="mailto:username&#37;&#52;&#48;yourwebsite&#46;com"
+                        >username<span>&#64;</span>yourwebsite<span>&#46;</span>com</a
+                    >
+                    which might be a bit unintuitive.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-single-signon-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                anonymous
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Hmm... well, authentication and authorization are always
+                        hard for me to keep track of. Lets call it
+                        identification and authorization.
+                    </p>
+                    <p>
+                        The system has to support several possible techniques.
+                        For instance, some portions of the website are served up
+                        as static files directly, so Apache authorization needs
+                        to be used (<tt class="docutils literal"
+                            ><span class="pre">require</span>
+                            <span class="pre">valid-user</span></tt
+                        >
+                        or something), or some Apache module that gives a richer
+                        set of controls. But web applications often have
+                        shifting and eclectic permissions, so I don't want to
+                        use Apache to control those permissions (or at least not
+                        require that).
+                    </p>
+                    <p>
+                        One reason I don't like 307 is because (a) programs that
+                        already expect
+                        <tt class="docutils literal"
+                            ><span class="pre">REMOTE_USER</span></tt
+                        >
+                        usually respond with 401 (and I want to provide
+                        <tt class="docutils literal"
+                            ><span class="pre">REMOTE_USER</span></tt
+                        >), and (b) the details of the redirect are best
+                        understood by Apache, not the individual applications.
+                        But if I have to use a redirect, I'll probably put the
+                        redirect location in an environmental variable, to at
+                        least keep the configuration centralized.
+                    </p>
+                    <p>
+                        The POST thing is clearly a problem. It's one of many
+                        usability issues that POST proponents ignore. Obviously
+                        a POST-understanding redirector would be nice.
+                    </p>
+                    <p>
+                        One of the advantages of a signed cookie is that
+                        identification happens once, and need not be efficient,
+                        and only the cookie verification happens on subsequent
+                        requests (which ought to be quite fast). But I'd like
+                        this all in C (which is what tkt offers) instead of
+                        mod_python, in part because mod_python is challenging to
+                        maintain in its own right, and not Apache 1.3
+                        compatible.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/more-on-single-signon-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Have you looked at the Yale University
+                    <a
+                        class="reference"
+                        href="http://tp.its.yale.edu/tiki/tiki-index.php?page=CentralAuthenticationService"
+                        >CAS</a
+                    >? It may or may not have the features you need.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-single-signon-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Peter Zingg
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>I am also interested in mod_auth_tkt.</p>
+                <p>
+                    I didn't already try it but mod_auth_tkt seems to be THE
+                    solution I am looking for performant, secure and cheap
+                    authentication. With this solution, the authentication phase
+                    (password control) is independent of the access phase
+                    (ticket control). So you can use a normal php page to check
+                    the password, you can use your own password encryption for
+                    transmission on the net (better than basic
+                    authentication!!!) and you can put the passwords and users
+                    in a mySql database (better than .htpasswd files). No need
+                    for expensive SSL and certificate. You must just create the
+                    ticket cookie in your &quot;password check&quot; php page.
+                </p>
+                <p>
+                    BUT there are 2 problems : - no version for Apache 2 -
+                    doesn't work if &quot;servername&quot; is used in the config
+                    file. Thus I suppose it cannot be used for hosting (shared
+                    web server).
+                </p>
+                <p>
+                    If you have solutions for these 2 problems, I am interested.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-single-signon-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Regloor
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>I am also interested in mod_auth_tkt.</p>
+                <p>
+                    I didn't already try it but mod_auth_tkt seems to be THE
+                    solution I am looking for performant, secure and cheap
+                    authentication. With this solution, the authentication phase
+                    (password control) is independent of the access phase
+                    (ticket control). So you can use a normal php page to check
+                    the password, you can use your own password encryption for
+                    transmission on the net (better than basic
+                    authentication!!!) and you can put the passwords and users
+                    in a mySql database (better than .htpasswd files). No need
+                    for expensive SSL and certificate. You must just create the
+                    ticket cookie in your &quot;password check&quot; php page.
+                </p>
+                <p>
+                    BUT there are 2 problems : it doesn't work if
+                    &quot;servername&quot; is used in the config file. Thus I
+                    suppose it cannot be used for hosting (shared web server).
+                    In addition, there is not yet a version for Apache 2.
+                </p>
+                <p>
+                    If you have solutions for these 2 problems, I am interested.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-single-signon-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Regloor
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>I am also interested in mod_auth_tkt.</p>
+                <p>
+                    I didn't already try it but mod_auth_tkt seems to be THE
+                    solution I am looking for performant, secure and cheap
+                    authentication. With this solution, the authentication phase
+                    (password control) is independent of the access phase
+                    (ticket control). So you can use a normal php page to check
+                    the password, you can use your own password encryption for
+                    transmission on the net (better than basic
+                    authentication!!!) and you can put the passwords and users
+                    in a mySql database (better than .htpasswd files). No need
+                    for expensive SSL and certificate. You must just create the
+                    ticket cookie in your &quot;password check&quot; php page.
+                </p>
+                <p>
+                    BUT there are 2 problems : it doesn't work if
+                    &quot;servername&quot; is used in the config file. Thus I
+                    suppose it cannot be used for hosting (shared web server).
+                    In addition, there is not yet a version for Apache 2.
+                </p>
+                <p>
+                    If you have solutions for these 2 problems, I am interested.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-single-signon-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Regloor
+            </div>
+            <hr noshade />
+            Is there any documentation online for mod_auth_tkt. If so, could you
+            please tell me where i can find . <br /><br />Thanks <br />
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/moreonsinglesignoncomment9.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Prabu
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Can this module authenticate against active directory LDAP
+                    server. Please advise.
+                </p>
+                <p>Thanks Prabu</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-single-signon-comment-10.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Prabu</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Perhaps you ought to look more closely at cosign. I might
+                    say that it has less documentation than pubcookie because
+                    there's much less to document. Certainly it addresses some
+                    of the issues you're complaining about: it doesn't require
+                    HTTPS, logout is simple, installing the filter is quite
+                    easy. Good luck!
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-single-signon-comment-11.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://weblogin.org">Wes Craig</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Interesting site, it is well written. Registration not so
+                    was pleasant, and with scripts of a problem. Let&amp;#039;s
+                    vary references, or banners. Write, how solve
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-single-signon-comment-60.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.onlinepoker-reviews.info/">John</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>Good site. The answer</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-single-signon-comment-61.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://texas-holdem-history.info/">Liza</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

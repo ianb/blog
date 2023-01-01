@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Re: Favour Error Prevention over Error Detection</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Re: Favour Error Prevention over Error Detection</h1>
+        <p>
+            In
+            <a href="http://www.hacknot.info/hacknot/action/showEntry?eid=61"
+                >The Curse of the Despicable Dialogs</a
+            >
+            Mr Ed (<i
+                >sigh... sometimes it's too hard to find people's full names</i
+            >) gives a number of concrete suggestions about dialogs. They are
+            mostly fine, but one of the suggestions really annoys me. For date
+            input he suggests that of the three examples pictured, the third is
+            the best (i.e., better to do date input with three select boxes).
+            Maybe this wouldn't be <i>quite</i> so bad off the web, where you
+            can allow both text input and drop-down entries. But having entered
+            my birthyear several times in the last couple days using select box,
+            this is just an incredibly stupid UI decision.
+
+            <img
+                src="http://www.hacknot.info/hacknot/images/posts/favour_error_prevention.jpg"
+                align="right"
+            />
+        </p>
+
+        <p>
+            When I see select boxes in this context, I feel the programmer is
+            being lazy and depending on the widgets do error detection. A
+            similar situation is with phone-number fields, where people
+            sometimes put in three text boxes for area code, phone number
+            prefix, and then the last four numbers.
+        </p>
+
+        <p>
+            In both cases, this isn't how people think of the data. A date is a
+            single point in time, even though it is represented by three values
+            (day, month, year). When you are entering a date the entire value
+            should be entered, even if it that value is encoded in a structured
+            manner. When you edit a date, it seldom works out that you'll only
+            edit one of these fields.
+        </p>
+
+        <p>
+            Besides programmer laziness, this is also a condescension upon the
+            user. Can the user not read the instructions next to the input and
+            figure out the format? Is the user incapable of writing a check or
+            signing a document in real life, and they cannot be expected to have
+            date-writing skills on computers?
+        </p>
+
+        <p>
+            And while a calendar widget is ideal, the calendar widget should be
+            like a filename widget -- you get a text box (which like a commenter
+            said, supports copy-and-paste) and a "..." button for accessing the
+            widget. (This is the default behavior for the oddly-named
+            <a href="http://sourceforge.net/projects/jscalendar/"
+                >Coolest DHTML Calendar</a
+            >
+            [<a href="http://www.jura.ch/services/cop/extras/calendar/">demo</a>
+            --
+            <a href="http://dynarch.com/mishoo/calendar/">the real site</a> is
+            down right now])
+        </p>
+
+        <p>
+            As I deal with more complex forms, especially related to data entry
+            and databases, I feel more and more like free text is the best
+            option, and that users should develop conventions and not try to
+            encode every convention into the UI and data model. Often those
+            conventions are short-sighted -- like the phone number fields, which
+            won't support international numbers. If you have conscientious users
+            and on-screen suggestions (like including <i>mm/dd/yyyy</i> next to
+            your date input) you're doing your users a service.
+        </p>
+
+        <div class="dates" align="right">
+            Created 01 Aug '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            That reminds me I should be adding that ability to Formulator some
+            day when I have time. :)
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment225.html" rel="nofollow"
+                    >#</a
+                >
+                Martijn Faassen
+            </div>
+            <hr noshade />
+            I completely agree with your points about the date combo - its an
+            awful way to enter a date.
+            <br />
+
+            <br />
+            We recently ditched a PHP/Javascript driven popup calendar in favour
+            of a simple text box in a comercial web application of ours.
+            <br />
+
+            <br />
+            The REAL benifit of the textbox is being able to allow your user to
+            enter "english dates" (parsed using PHP's strtotime() function). Now
+            our users can set appoints for "2pm next thursday" and search for
+            items entered "last week" - much more intuative than having to dig
+            around in a calendar for the right date.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment226.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://richardathome.no-ip.com">Richard@Home</a>
+            </div>
+            <hr noshade />
+            How about an objective comparison of the UIs? A reasonable standard
+            (though not the only possible one) is to measure the number of
+            actions a user must take to enter a value. Let's count them:
+            <br />
+
+            <br />
+            First, your favorite:
+            <br />
+            Date [22/07/2004] (dd/mm/yyyy)
+            <br />
+            1. Tab into the field.
+            <br />
+            2. Type "2".
+            <br />
+            3. Type "2".
+            <br />
+            4. Type "/".
+            <br />
+            5. Type "0".
+            <br />
+            6. Type "8". (this is a typo... hey, nobody's perfect)
+            <br />
+            7. Realize mistake; type "Backspace".
+            <br />
+            8. Type "7".
+            <br />
+            9. Type "/".
+            <br />
+            10. Type "2".
+            <br />
+            11. Type "0".
+            <br />
+            12. Type "0".
+            <br />
+            13. Type "4".
+            <br />
+
+            <br />
+            Now Mr Ed's preference:
+            <br />
+            Day [22]V Month [July]V Year [2004]V
+            <br />
+            1. Tab into field.
+            <br />
+            2. Click on day dropdown.
+            <br />
+            4. Move mouse to scrollbar.
+            <br />
+            5. Drag down the scrollbar.
+            <br />
+            6. Move mouse back up scrollbar.
+            <br />
+            7. Drag down the scrollbar again.
+            <br />
+            8. Click on "22".
+            <br />
+            9. Click on month dropdown.
+            <br />
+            10. Move mouse to scrollbar.
+            <br />
+            11. Drag down the scrollbar.
+            <br />
+            12. Click on "August". (drat! I hate making mistakes!
+            <br />
+            13. Click on month dropdown.
+            <br />
+            14. Move mouse to scrollbar.
+            <br />
+            15. Drag down the scrollbar.
+            <br />
+            16. Click carefully on "July".
+            <br />
+            17. Click on the year dropdown.
+            <br />
+            18. Move mouse to scrollbar.
+            <br />
+            19. Drag down scrollbar.
+            <br />
+            20. Click on "2004".
+            <br />
+
+            <br />
+            Notice a difference? But really, I'm cheating here because when the
+            UI professionals do this, they count "muscle movements", and so
+            "Drag down scrollbar" would actually be three steps: "Press down on
+            button; move mouse; let up on button". Which more accurately
+            reflects the relative speed and ease of typing versus mousing. But
+            then I'd have had to add at least 10 more steps and I was getting
+            tired of typing.
+            <br />
+
+            <br />
+            And if the text entry box were ever so slightly flexible it might
+            suggest a "dd/mm/yyyy" format but *accept* single digits for month
+            and day ("7" instead of "07") and two digit years ("04" instead of
+            2004", with reasonable defaults for the century). Then the textbox
+            would be only 8 muscle movements (or 10 with the "mistake").
+            <br />
+
+            <br />
+            Don't use dropdowns for entering dates. Just don't. Really.
+            <br />
+
+            <br />
+            -- Michael Chermside
+            <div align="right">
+                <a href="https://ianbicking.org/comment227.html" rel="nofollow"
+                    >#</a
+                >
+                Michael Chermside
+            </div>
+            <hr noshade />
+            [reading Michael Chermside's comment]
+            <br />
+            Looks like somebody's been reading Raskin's _Humane Interface_ :)
+            <div align="right">
+                <a href="https://ianbicking.org/comment228.html" rel="nofollow"
+                    >#</a
+                >
+                Robert Brewer
+            </div>
+            <hr noshade />
+            I think muscle movements also include a movement for key down and
+            key up, so they both would actually have double that steps (though
+            certainly that's a dull thing to write out). But having tried to use
+            Raskin's LEAP, which he analytically justifies using these kind of
+            metrics, I become highly suspicious of the metrics themselves;
+            subjectively LEAP is crazy-hard to use.
+            <div align="right">
+                <a href="https://ianbicking.org/comment229.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            Your comment about phone number validation is spot on. I have had to
+            resort to typing in random numbers to get past a screen that
+            insisted on a US format number. In all probability if the
+            organisation was going to phone me it would be a real person doing
+            the dialing, so there is no need to have any form of validation. I
+            have yet to see a validation routine that can handle:
+            <br />
+            "(+44)207 123 4567 ext. 1234 during UK office hours only, or (+44)
+            7901 2345 6789
+            <br />
+            the rest of the time", but experienced phone users would have no
+            problem.
+            <br />
+
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment230.html" rel="nofollow"
+                    >#</a
+                >
+                Dave Kirby
+            </div>
+            <hr noshade />
+            Using plain text entry widgets in addition to a popup calendar also
+            has the benefit of letting you copy and paste dates.
+            <div align="right">
+                <a href="https://ianbicking.org/comment231.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+            <i
+                >In both cases, this isn't how people think of the data. A date
+                is a single point in time, even though it is represented by
+                three values (day, month, year).</i
+            >
+            <br />
+
+            <br />
+            Three values isn't quite how people think of a date either, to
+            specify a date we also think of time differences (I'm going on
+            holiday <i>in two days</i>), imminent days (tomorrow, next tuesday),
+            and how often do you think
+            "oh-two-slash-oh-one-slash-two-oh-oh-four"? A plain text box should
+            support things like "January 1st, 3rd Feb" and be able to jump to a
+            reasonable date.
+            <br />
+
+            <br />
+            And that's besides the fact that in many cases people don't have a
+            particular date in mind. Maybe we could have a "vague date" that
+            could also hold nonspecific times like "next week", "before friday",
+            "christmas", "in august" and so on. (But is that string really worth
+            validating as a date then?)
+            <br />
+
+            <br />
+            Simon Willison made a Javascript immitation of PHP's strtotime, see
+            <a
+                href="http://simon.incutio.com/archive/2003/10/06/betterDateInput"
+                target="_blank"
+                >here</a
+            >. It's a big improvement to be able to write "next tue" without
+            having to work out manually what date that is.
+            <div align="right">
+                <a href="https://ianbicking.org/comment232.html" rel="nofollow"
+                    >#</a
+                >
+                a@b.com
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

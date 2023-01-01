@@ -1,0 +1,369 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Repetition Javascript Library</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Repetition Javascript Library</h1>
+
+        <div class="document">
+            <p>
+                <a class="reference" href="http://imagescape.com"
+                    >Imaginary Landscape</a
+                >
+                open-sourced some work I did recently on a Javascript library
+                for handling repeating elements in forms. I've rewritten it more
+                than once since then, and might just rewrite it again before it
+                settles down.
+            </p>
+            <p>
+                After the last rewrite it more-or-less follows the
+                <a
+                    class="reference"
+                    href="http://www.whatwg.org/specs/web-forms/current-work/#repeatingFormControls"
+                    >WHAT-WG Web Forms 2.0</a
+                >
+                spec with respect to repeating forms. The implementation
+                practically falls out of the spec, so after I just read it
+                closely it was pretty clear how to implement it. Though, having
+                implemented it, I need to bring some questions back to the
+                WHAT-WG group -- especially related to moving repetition blocks
+                around.
+            </p>
+            <p>
+                Conveniently, the spec works very well with
+                <a class="reference" href="http://formencode.org">FormEncode</a>
+                and
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/FormEncode/trunk/formencode/variabledecode.py"
+                    >variabledecode</a
+                >
+                in particular. But it's actually expedience that made me
+                implement it in the first place. Without repeating form
+                elements, you have to have multiple complex forms, with lots of
+                add/edit/delete functionality. With repeating forms you just
+                have a single form, and the update is a single HTTP request.
+                Less templates, less things to explain, less controllers, and a
+                better user experience to boot.
+            </p>
+            <p>
+                I still have to figure out where this will go. I like
+                <a class="reference" href="http://mochikit.com">MochiKit</a>,
+                but I've ended up factoring out nearly all the MochiKit
+                dependencies (not because I was trying, it just happened). And
+                it also fits a somewhat different style -- the Javascript is
+                largely implicit, based on declarative HTML as defined in the
+                spec. A big feature of the Web Forms 2.0 spec (IMHO) is that it
+                <em>isn't</em> expressed in Javascript, and you don't have to
+                think about Javascript while using it.
+            </p>
+            <p>
+                OTOH, I have no desire to set up a separate project or deal with
+                any of that. I'd much rather glom onto someone else's project ;)
+            </p>
+            <p>
+                I've seen other implementations of portions of WHAT-WG. But they
+                all seem complicated, or tied to one browser. (Well, I haven't
+                tested on IE yet, but that's incidental.) That seems
+                unnecessary, because at least large portions of Web Forms 2.0 is
+                pretty simple Javascript. Plus I have a hard time finding them.
+            </p>
+            <p>
+                Anyway, the files are temporarily located at
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/home/ianb/repeat_form"
+                    >http://svn.colorstudy.com/home/ianb/repeat_form</a
+                >
+                and a demo at
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/examples/repeat_form/form.html"
+                    >https://ianbicking.org/examples/repeat_form/form.html</a
+                >
+            </p>
+        </div>
+        <div class="dates" align="right">Created 27 Oct '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>hi ian,</p>
+                <p>
+                    fyi, I just tried out your demo page and it doesn't work at
+                    all in ie. Not sure if you're aware of this, so I thought
+                    I'd point it out :).
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/repetition-javascript-library-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                dan
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Indeed; I just fixed some of the most obvious problems.
+                        It seems that IE returns properties as Attributes,
+                        including bound functions. Also there's no
+                        .hasAttribute() method. I'm still crashing IE when I add
+                        multiple moons, I'll have to look into that some more.
+                        Some sort of loop problem, I'm guessing.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/repetition-javascript-library-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>This looks pretty interesting.</p>
+                <p>
+                    One thing I didn't quite get about this spec was : how do
+                    you work out reordering on the serverside? Do they expect
+                    the order in the POST or query string to be
+                    preserved/examined?
+                </p>
+                <p>
+                    Maybe it needs an event so it is possible to twiddle with a
+                    hidden field on reorder or something.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/repetition-javascript-library-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://robert.wittams.com/">rjwittams</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        The spec does specify events, which this library doesn't
+                        do -- I don't understand Javascript events that much at
+                        the moment. I actually followed this post up with a
+                        <a
+                            class="reference"
+                            href="http://listserver.dreamhost.com/pipermail/whatwg-whatwg.org/2005-October/005016.html"
+                            >post to the whatwg list</a
+                        >
+                        where I mention this problem. Hopefully some resolution
+                        will come up for this; though as I was writing it
+                        occurred to me that it's not too hard to fix by putting
+                        in a field like this in the template:
+                    </p>
+                    <pre class="literal-block">
+&lt;div repeat=&quot;template&quot; id=&quot;foo&quot;&gt;
+  &lt;input type=&quot;hidden&quot; name=&quot;foo-order&quot; value=&quot;[foo]&quot;&gt;
+  ...
+&lt;/div&gt;
+</pre
+                    >
+                    <p>
+                        Then
+                        <tt class="docutils literal"
+                            ><span class="pre">foo-order</span></tt
+                        >
+                        will contain an ordered list of the indexes -- the spec
+                        specifically indicates that <em>all</em> attributes are
+                        substituted, not just input names. So if you don't think
+                        of index as representing order -- just some relatedness
+                        -- it's not so bad. I think this is a reasonable way to
+                        handle it, the more I think about it, and it's
+                        definitely something I can add to
+                        <tt class="docutils literal"
+                            ><span class="pre">variable_decode</span></tt
+                        >
+                        (so it orders the lists for you).
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/repetition-javascript-library-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>Hey Ian:</p>
+                <p>
+                    Javascript is not just for web. MochiKit has some real
+                    potential for things like string formatting functions.
+                </p>
+                <p>
+                    Does your work have some generic usefullness, as well. I
+                    mean usefull for things outside of the web world, also.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/repetition-javascript-library-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://brianray.chipy.org">Brian Ray</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        This library? No, I don't think so -- it's very closely
+                        tied to the DOM, and HTML forms. I suspect XForms
+                        already has functionality like this built into the spec.
+                        This just happens to work today, unlike XForms. I have
+                        no idea what Flash programming is like, but I assume
+                        they also don't have something similar enough to the DOM
+                        for this to matter.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/repetition-javascript-library-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Well... I really did not expect this library to be
+                            useful in this context. However, I guess what I am
+                            really wishing for is some general usable runtime
+                            functions used to create these javascript things.
+                            You see, Javascript is now showing up everywhere.
+                            It's easy to embed SpiderMonkey or WebKit's
+                            version... And there does not seem to be many
+                            libraries out there which help in doing basic
+                            operations. Instead, Javascript coders keep
+                            rewriting the same code over and over. When I saw
+                            MochiKit I had/have high hopes of abstracting out
+                            the generally usefull methods. Likewise, it would be
+                            helpful if the Repetition Javasript library used
+                            some abstraction between the web stuff which I do
+                            not know and some generally usefull Javascript
+                            methods.
+                        </p>
+                        <p>
+                            I would be happy to find more MochiKit like stuff
+                            out there but have not have had the time to look and
+                            unsure if any exists of this quality.
+                        </p>
+                        <p>
+                            On the other hand, can't everything just be written
+                            in Python.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/repetition-javascript-library-comment-7.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://brianray.chipy.org">Brian Ray</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                MochiKit could certainly be used in those other
+                                contexts; the only difficulty might be the
+                                packaging and loading system, which is quirky in
+                                Javascript, and what tools that do exist are
+                                usually tied closely to their environment, e.g.,
+                                a web browser. But MochiKit's things like
+                                iteration, adaptation, comparisons, etc., are
+                                all core Javascript things with no relation to
+                                the web.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/repetition-javascript-library-comment-8.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Ian Bicking
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    MochiKit will eventually end up getting
+                                    refactored and tested such that it works in
+                                    some non-browser environments, but that's
+                                    not an immediate plan of mine -- unless I
+                                    end up writing Yet Another Goddamned
+                                    JavaScript Unit-Testing Library.
+                                </p>
+                                <p>
+                                    Test.Simple is OK, but the implementation is
+                                    ugly, non-portable, and could behave better
+                                    in Safari. I could do better, but I really
+                                    need to look at what Dojo is doing first as
+                                    they also have their own unit test library.
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/repetition-javascript-library-comment-9.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://bob.pythonmac.org/"
+                                    >Bob Ippolito</a
+                                >
+                            </div>
+                            <hr noshade />
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

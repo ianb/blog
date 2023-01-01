@@ -1,0 +1,447 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Z SQL Rant</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Z SQL Rant</h1>
+
+        <div class="document">
+            <p>
+                I was going to just write this to the Zope-DB list, but what
+                better place to rant than a blog?!? Rants are fun to write and
+                fun to read. So I give you a big rant...
+            </p>
+            <div class="section">
+                <h1>
+                    <a id="why-z-sql-methods-suck" name="why-z-sql-methods-suck"
+                        >Why Z SQL Methods suck:</a
+                    >
+                </h1>
+                <p>
+                    To really understand why Z SQL Methods suck so much, you
+                    probably have to understand them in a societal context. I
+                    won't really provide that, but I will note that the ZODB has
+                    not known the neglect that Zope RDBMS support has known.
+                    RDBMS users are second class in the Zope world. But instead
+                    I will present you a list, with no particular order:
+                </p>
+                <p>
+                    There's several ways to write a query, depending on how many
+                    of the Z SQL features you use (e.g.,
+                    <tt class="docutils literal"
+                        ><span class="pre">dtml-and</span></tt
+                    >,
+                    <tt class="docutils literal"
+                        ><span class="pre">dtml-sqltest</span></tt
+                    >,
+                    <tt class="docutils literal"
+                        ><span class="pre">dtml-sqlgroup</span></tt
+                    >, etc). They all look quite different, and some will feel
+                    very foreign to someone who knows SQL but not Z SQL.
+                </p>
+                <p>
+                    It uses DTML, or DTML-like constructs. Most of the things
+                    that are bad about DTML for templates are also bad for DTML
+                    generating SQL. You could write entire books about why DTML
+                    is bad.
+                </p>
+                <p>
+                    Connection paths are pretty much hard-coded. You can't tell
+                    a method to use a different connection. This would be useful
+                    if you wanted to use database-level security, and so you
+                    need two separate connections with separate users. You might
+                    be able to do this with acquisition, but whole books could
+                    be written on why acquisition is bad. Well, it would
+                    probably be a chapter in the DTML book.
+                </p>
+                <p>
+                    It usually looks like normal SQL, but is far enough away
+                    from SQL to be difficult to work with in source form, since
+                    it uses &lt;dtml-sqlvar&gt; instead of parameters like ? or
+                    even %s. It's usually a long way from Z SQL source to
+                    something you can feed to EXPLAIN.
+                </p>
+                <p>
+                    It is difficult to debug. There's one poorly documented
+                    feature where you can to pass
+                    <tt class="docutils literal"
+                        ><span class="pre">src__</span></tt
+                    >
+                    in as a keyword argument to see what the SQL source actually
+                    is. That's about all the debugging you get. AFAIK, there's
+                    no good log of the SQL queries sent, how long they took, how
+                    many queries there were, etc.
+                </p>
+                <p>
+                    It has crufty parameters. Put &quot;a, b, c&quot; in , and
+                    you get parameters with names like &quot;a,&quot;,
+                    &quot;b,&quot; and &quot;c&quot;. Default parsing seems
+                    wonky too. A little error checking would be nice.
+                </p>
+                <p>
+                    It doesn't signal errors properly -- if you forget to pass
+                    in a keyword argument, it's pretty much ignored. Or if you
+                    pass in extra keyword arguments. Why have a parameter list
+                    at all?
+                </p>
+                <p>
+                    It doesn't deal with failures very well. Why not give me the
+                    SQL in the exception when there's an error? It doesn't deal
+                    with any of the hard parts of failure in general, connection
+                    failures, concurrency conflicts, etc.
+                </p>
+                <p>
+                    You can't nest or factor your methods well. This is largely
+                    DTML's fault, but Z SQL makes it worse since all methods are
+                    concrete and imply not just SQL generation, but also SQL
+                    execution. You can't save values (e.g., get an ID from a
+                    sequence then do an insert), or use control structures,
+                    etc., except using plain DTML constructs which have their
+                    own issues. For instance, consider turning a list of items
+                    into SQL for use with IN, like (<tt class="docutils literal"
+                        ><span class="pre">&lt;dtml-in</span>
+                        <span class="pre">items</span>
+                        <span class="pre">prefix=loop&gt;</span>
+                        <span class="pre">&lt;dtml-unless</span>
+                        <span class="pre">loop_start&gt;</span>
+                        <span class="pre">,</span>
+                        <span class="pre">&lt;/dtml-unless&gt;</span>
+                        <span class="pre">&lt;dtml-sqlvar</span>
+                        <span class="pre">loop_item</span>
+                        <span class="pre">type=int&gt;</span>
+                        <span class="pre">&lt;/dtml-in&gt;</span></tt
+                    >). That's lame, <em>and</em> you can't abstract out the
+                    lameness. Well, maybe with the use of
+                    <tt class="docutils literal"
+                        ><span class="pre">src__</span></tt
+                    >
+                    and other stuff, but that's it's own lameness. (Hmm... I see
+                    now there's an option to
+                    <tt class="docutils literal"
+                        ><span class="pre">dtml-sqlvar</span></tt
+                    >
+                    to handle this particular case... so many options, but I
+                    can't use any of them from the outside, nest dtml
+                    expressions, etc., so I can't build higher level structures)
+                </p>
+                <p>
+                    While we're on the subject, every issue is dealt with using
+                    another
+                    <tt class="docutils literal"
+                        ><span class="pre">dtml-sqlvar</span></tt
+                    >
+                    option or another tag, there's not a good set of complete
+                    orthogonal functions.
+                </p>
+                <p>
+                    SQL Brains are cool, if still little under powered. But they
+                    don't see updates unless you go twiddle all sorts of forms
+                    everytime you do an update. Annoying.
+                </p>
+                <p>
+                    You can't set any attributes on result rows. Even if you
+                    know why it might not be a good idea. Even if you try really
+                    hard. (Though you can add a dummy column to your query, and
+                    then reassign the column.) This is annoying particularly
+                    when using brains.
+                </p>
+                <p>
+                    Caching is stupid. You can cache, but you can't invalidate
+                    the cache. There's a product out there that provides a
+                    cacheable SQL method, but it's a whole separate product, and
+                    you can't easily switch types, or even easily upgrade.
+                </p>
+                <p>
+                    All methods return result objects with multiple rows. It's
+                    common to see:
+                </p>
+                <pre class="literal-block">
+&lt;dtml-in &quot;get_some_object(id=whatever)&quot;&gt;
+  &lt;dtml-var some_column&gt;...
+&lt;/dtml-in&gt;
+</pre
+                >
+                <p>
+                    when in fact you only expect there to be one row in the
+                    result. This is where DTML's suckiness gets involved (<tt
+                        class="docutils literal"
+                        ><span class="pre">dtml-in</span></tt
+                    >,
+                    <tt class="docutils literal"
+                        ><span class="pre">dtml-with</span></tt
+                    >, all the flattened namespaces, etc).
+                </p>
+                <p>
+                    You start needing all sorts of methods for little things.
+                    Like, say you want to fetch a value from a sequence, like
+                    <tt class="docutils literal"
+                        ><span class="pre">SELECT</span>
+                        <span class="pre">nextval('sequence_name')</span>
+                        <span class="pre">as</span>
+                        <span class="pre">seq</span></tt
+                    >. Do you create a new method for each sequence? What an
+                    annoying process! (ZMI partially at fault) And you get
+                    lameness like
+                    <tt class="docutils literal"
+                        ><span class="pre">&lt;dtml-in</span>
+                        <span class="pre"
+                            >get_sequence_name&gt;&lt;dtml-var</span
+                        >
+                        <span class="pre">seq&gt;&lt;/dtml-in&gt;</span></tt
+                    >
+                    Oh, it hurts me just to type this! Or
+                    <tt class="docutils literal"
+                        ><span class="pre"
+                            >container.get_sequence_name()[0][0]</span
+                        ></tt
+                    >. This leads to code being highly coupled. You want to put
+                    a Python Script in place of the Z SQL method for some
+                    reason? Now you have to return something like
+                    <tt class="docutils literal"
+                        ><span class="pre">[[id]]</span></tt
+                    >. Or
+                    <tt class="docutils literal"
+                        ><span class="pre">[{'seq':</span>
+                        <span class="pre">id'}]</span></tt
+                    >? Only way to find out is to seek all references... oh, the
+                    coupled pain! (This is why I keep a firm Python Script
+                    barrier between my Z SQL methods and my &quot;good
+                    code&quot; -- I don't want Z SQL cruftiness to infect
+                    everything else with it's lameness)
+                </p>
+                <p>
+                    No positional parameters. Seems like an okay idea, except
+                    for all the methods that are fetch-row-with-this-id, where
+                    positional is better. (Something else for the Python Script
+                    wrapper)
+                </p>
+                <p>
+                    SQL methods are often tightly bound to specific scripts,
+                    templates, etc. But it's hard to express binding, and they
+                    are just more cruft to search through in the ZMI. If
+                    something is tightly coupled, I want to know it, I want to
+                    know that changes effect only one place, or that I shouldn't
+                    use it from the outside. At least inline SQL gives you this.
+                </p>
+                <p>
+                    <tt class="docutils literal"
+                        ><span class="pre">dtml-sqlvar</span></tt
+                    >
+                    doesn't have any good types.
+                    <tt class="docutils literal"
+                        ><span class="pre">type=date</span></tt
+                    >
+                    please? Some attempt at a database compatibility layer would
+                    be nice. Strings and floats are easy. Solving difficult
+                    problems is actually useful, just solving easy problems is a
+                    programming cop-out.
+                </p>
+                <p>
+                    Doesn't do anything with database introspection. Again, I
+                    know it's hard, but hard is useful. And it's not
+                    <em>that</em> hard.
+                </p>
+                <p>
+                    The test tab is really lame. I won't go into all of why it's
+                    lame. It could be useful, but it's only distracting. (I
+                    might <em>think</em> I can just test a quick query in it,
+                    but I'm always wrong.) Didn't anyone <em>use</em> the test
+                    pane before calling it finished?
+                </p>
+                <p>
+                    I'd say it felt good to vent, except I'm going to have to
+                    work with Z SQL methods again tomorrow, and venting doesn't
+                    make up for that. Pity me!
+                </p>
+            </div>
+        </div>
+        <div class="dates" align="right">
+            Created 06 Apr '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            Hi Ian,
+            <br />
+
+            <br />
+            if you're seeking what sux on zope, i think you will spend a lot of
+            time. I really think, you should look at what is working fine
+            because:
+            <br />
+            - DTML
+            <br />
+            - ZSQL
+            <br />
+            - ZClass
+            <br />
+            - ZODB index
+            <br />
+            - default security ..
+            <br />
+            sux ..
+            <br />
+
+            <br />
+            so ?
+            <br />
+
+            <br />
+
+            <br />
+            Bye Bye
+            <div align="right">
+                <a href="https://ianbicking.org/comment797.html" rel="nofollow"
+                    >#</a
+                >
+                Jkx
+            </div>
+            <hr noshade />
+            A trick I use to get fast at the generated SQL query: I put a
+            "dtml-raise string" around the SQL stuff directly in the ZSQL
+            method. That throws an exception with the SQL that will be sent to
+            the database as the error value.
+            <br />
+
+            <br />
+            Another option is turning on logging in your database (easily done
+            with PostgreSQL).
+            <div align="right">
+                <a href="https://ianbicking.org/comment798.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://pyds.muensterland.org/">Georg Bauer</a>
+            </div>
+            <hr noshade />
+            you didn't even mention the way it's inferior to the existing python
+            db api (though, to be fair, it predates the dbapi) ... no smart
+            formatting of types, no manual control over transaction boundaries,
+            and as you mentioned, no .fetchone() . I'm amazed that it hasn't
+            been scrapped for a thin wrapper around the dbapi.
+            <div align="right">
+                <a href="https://ianbicking.org/comment799.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://mindlace.net">Ethan Fremen</a>
+            </div>
+            <hr noshade />
+            One way to get around the "hardcoded connection" problem would be to
+            allow a TALES expression to be evaluated to specify the connection
+            object. I remember suggesting this a while back, and promptly
+            forgetting about it because I don't really use ZSQL Methods.
+            <br />
+
+            <br />
+            I agree with your assessment. I am apparently going to be using SQL
+            on a project pretty soon, so maybe I can help try to fix some of the
+            lower-hanging problems whilst I do that if my needs become more than
+            trivial.
+            <div align="right">
+                <a href="https://ianbicking.org/comment800.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://plope.com">Chris McDonough</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        ZSQL does indeed really hurt one's soul to use, in its
+                        current state (for anything behind the most basic
+                        lookup). It hurts me to say this even, because I think
+                        it really is such a great idea: to apply a template-like
+                        solution to the problems of generating dynamic SQL. I
+                        find the concept much nicer than programmatic SQL
+                        generation (leaving aside the topic of ORMs).
+                    </p>
+                    <p>
+                        But in this case unfortunately we are stuck with DTML.
+                        And a rather limited DTML toolkit at that, as has bee
+                        noted. I could even live with the extreme ugliness of
+                        DTML if only it had the more robust expressiveness
+                        required for doing more complicated SQL generation ---
+                        as has been ranted about many places. And, as also
+                        noted, the extreme neglect that ZSQL has received. There
+                        are some good patches out there that are completely
+                        ignored.
+                    </p>
+                    <p>
+                        I have been trying to think of (and i'm not the first) a
+                        more TAL-like approach, applied to SQL. It's not so easy
+                        since SQL is a rather different beast than markup. Also
+                        one <em>does</em> (in my opinion) need to employ logic
+                        and conditionals in your SQL templates, where they
+                        should try to be avoided as much as possible in
+                        presentation templates.
+                    </p>
+                    <p>
+                        Ah well.. maybe someday someone will think of/do
+                        something.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/-comment-851.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.vex.net">Tim Middleton</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    entire books on why dtml is bad ? how so ? maybe a page
+                    sounds logical. Then again every technology has its
+                    drawbacks. man is not a perfect animal and is not known to
+                    create perfect systems.
+                </p>
+                <p>
+                    SQL methods can defenitely use some improvements though.
+                    Maybe a SQL method next gen project is overdue !
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/z-sql-rant-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="https://ianbicking.org/www.zeomega.com"
+                    >sathya rangaswamy</a
+                >
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

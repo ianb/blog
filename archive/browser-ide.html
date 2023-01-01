@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>A Browser IDE</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>A Browser IDE</h1>
+
+        <div class="document">
+            <p>
+                Here's an idea: we need an IDE experience that bridges the web
+                browser with the editing environment.
+            </p>
+            <p>
+                Doing it <em>all</em> in the browser is a bad idea. I won't go
+                into why, except perhaps that textarea remains so horribly bad
+                as to make the idea practically laughable. But I also think that
+                editing and the browser can be seen as separate experiences
+                beyond just key bindings.
+            </p>
+            <p>
+                Still, the web browser provides a compelling target in a lot of
+                ways. It kind of occurred to me when I saw
+                <a
+                    class="reference"
+                    href="http://tungwaiyip.info/software/sample_test_report.html"
+                    >this example</a
+                >
+                of
+                <a
+                    class="reference"
+                    href="http://tungwaiyip.info/software/#htmltestrunner"
+                    >HTMLTestRunner</a
+                >. Maybe I got distracted by
+                <a class="reference" href="http://fit.c2.com/">FIT</a>, which is
+                a kind of non-programmer interface. There's lots of other
+                in-between web apps, like the stuff in the
+                <a class="reference" href="http://turbogears.org/docs/toolbox/"
+                    >TurboGears toolbox</a
+                >, Paste's
+                <a class="reference" href="ajaxy-exception-catching.html"
+                    >interactive exception reporter</a
+                >, and elsewhere (as in some of the web-based interactive
+                consoles).
+            </p>
+            <p>
+                Still, there's a context switch. Yes, it's nice to see stuff in
+                a web browser -- with a simpler and often more complete UI
+                experience than an IDE -- but I still like my editor. So how to
+                bridge this?
+            </p>
+            <p>
+                I'm thinking
+                <a
+                    class="reference"
+                    href="http://plope.com/software/ExternalEditor"
+                    >Zope's ExternalEditor</a
+                >
+                is one model (particularly the
+                <tt class="docutils literal"
+                    ><span class="pre">zopeedit</span></tt
+                >
+                side). It uses WebDAV (a subset, really -- the methods it uses
+                are very limited) to open an editor. But this does lose some of
+                the experience of an actual local file. But that's relatively
+                easy to change. Either way, it involves sending some custom mime
+                type (e.g.,
+                <tt class="docutils literal"
+                    ><span class="pre">application/x-zope-edit</span></tt
+                >) that sends information about the file (auth header and URL
+                for zopeedit, maybe a host and filename would be another
+                option). And maybe other little tweaks, like a line number.
+                (E.g., click on a traceback frame to open the editor on that
+                exact point.)
+            </p>
+            <p>
+                Hmmm... something to think about, and not just for web
+                development. Maybe it's just because I'm more comfortable with
+                web programming and Ajaxy stuff, compared to GUI development,
+                but this seems much more approachable for developing an full
+                development experience (<em>not</em> integrated) than trying to
+                build or extend a traditional &quot;full&quot; IDE. Or maybe it
+                is to say that this seems more appealing than console-based
+                non-integrated development environments. For example, I think
+                the interactive debugger is way easier to use than
+                <tt class="docutils literal"><span class="pre">pdb</span></tt>
+                even if it has less features. (But again, because this is a
+                non-integrated environment, it is quite possible that you could
+                swap in a traditional GUI debugger like
+                <a
+                    class="reference"
+                    href="http://www.digitalpeers.com/pythondebugger/"
+                    >Winpdb</a
+                >).
+            </p>
+            <p>
+                Another goal I see, is that with a non-integrated environment it
+                is much easier to build framework- or application-specific tools
+                that &quot;fit&quot; into the system, if only because there's
+                such a low bar for &quot;fitting&quot;.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 14 Feb '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    I believe that a built in browser development environment
+                    could work for certain scenarios, and it has been a blue sky
+                    thought experiment of mine since around 2001 when I started
+                    hacking XUL. The textarea in a browser doesn't _have_ to be
+                    that bad. It's all about how much effort you're willing to
+                    put into javascript hacking.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/browser-ide-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://gr.ayre.st">Karl Guertin</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Having programmed in textareas for a while, it's really
+                        quite bad. Yes, you can implement search and replace,
+                        and you can do auto-saving, and in-place saves instead
+                        of resubmitting, and several other improvements. But I
+                        just can't imagine it being good for editing. For mere
+                        entry -- like what you might do at the interactive
+                        prompt -- it's redeamable.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/browser-ide-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I presume you've seen the Firefox/Javascript Selenium IDE?
+                    <a
+                        class="reference"
+                        href="http://www.openqa.org/selenium-ide/"
+                        >http://www.openqa.org/selenium-ide/</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/browser-ide-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.third-bit.com">Greg Wilson</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Maybe what you really need is an IDE with some of the UI
+                    ideas from the browser.
+                </p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://www.c2.com/cgi/wiki?ProgrammingInWiki"
+                        >http://www.c2.com/cgi/wiki?ProgrammingInWiki</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/browser-ide-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.synaesmedia.net">phil jones</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

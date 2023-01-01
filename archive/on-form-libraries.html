@@ -1,0 +1,1021 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>On form libraries</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>On form libraries</h1>
+
+        <div class="document">
+            <p>
+                Some time ago I wrote
+                <a class="reference" href="a-theory-on-form-toolkits.html"
+                    >a post on form generation</a
+                >. It mostly came from my experience with
+                <a class="reference" href="http://funformkit.sf.net"
+                    >FunFormKit</a
+                >,
+                <a
+                    class="reference"
+                    href="http://svn.formencode.org/FormEncode/branches/2004-pre-htmlfill"
+                    >early versions of FormEncode</a
+                >, and then
+                <a class="reference" href="http://formencode.org"
+                    >what FormEncode is now</a
+                >
+                (which is strictly a validation library).
+            </p>
+            <p>
+                Now there's some new form generation libraies in the works;
+                <a class="reference" href="http://toscawidgets.org/"
+                    >ToscaWidgets</a
+                >,
+                <a
+                    class="reference"
+                    href="http://www.djangoproject.com/documentation/newforms/"
+                    >Django newforms</a
+                >, and I hear rumors of a few others. I feel bad poo-pooing
+                other people's work, but I don't think this approach is a good
+                approach.
+            </p>
+            <p>
+                A form generation library is a hard library to write. You have
+                to balance complexity and features. There are a lot of potential
+                features. How do you tweak the forms? How do you control layout?
+                How do you handle repeating form elements? How do you handle
+                elements that require Javascript? Server-side resources like CSS
+                and Javascript? Server-side communication like auto-complete? A
+                simple library cannot handle a lot of these. But
+                <em>very</em> simple forms don't <em>need</em> form generation
+                libraries. So a simple library only handles a narrow band of use
+                cases. A complex library can potentially handle all these cases,
+                but can be difficult to use for the most common cases.
+            </p>
+            <p>
+                I will assert that as the libraries are usually designed, there
+                is no good balance. Not all problems have feasible solutions.
+                Form generation libraries are one such problem, but they don't
+                <em>seem</em> to be such a problem.
+            </p>
+            <p>
+                There's a cycle going on in the library development. A developer
+                has certain requirements. Usually they also hate HTML, and may
+                very well be working with an awkward templating language, and
+                maybe they aren't very excited about the task at hand and
+                building a library is a pleasant diversion. But anyway, they Do
+                The Right Thing (or so they think) and try an existing library.
+                It's complex, it doesn't match the way they think about the
+                problem, the bugs in their code are hard to figure out, and
+                adjusting the things they (or their boss or client) cares about
+                is difficult.
+            </p>
+            <p>
+                And they think &quot;I can do this so much more simply!&quot;
+                The developer is kind of right. They know exactly what they want
+                to do (<em>now</em>), and they can improve their productivity
+                some.
+            </p>
+            <p>
+                The problem is that no library ends there. It <em>can't</em> end
+                there. Because someone <em>uses</em> the library, and the code
+                must be maintained. Form generation is a hard thing to maintain,
+                because it has to be actively maintained. New fields are added.
+                New cases and exceptions come into being. Anything that touches
+                UI can be redefined in weird and unexpected ways. Good UI is
+                usually eclectic and nonsensical from the perspective of a
+                programmer. UI should be consistent with the
+                <em>user's</em> notion of the domain, not the program's internal
+                modeling of the domain, and it is uncommon that the two really
+                match up.
+            </p>
+            <p>
+                So you get new requirements over time. A straight list of
+                checkboxes used to be reasonable, but then the number of options
+                expanded too far and now you need two columns of checkboxes. So
+                you add in a little bit of code, both in the library and the
+                application, to handle that case. You want to have a text field
+                that contains its own label when its empty. The validation
+                becomes increasingly complex. Maybe you have a multi-screen
+                form, or maybe a form with optional fields, or who knows. So you
+                add code to the library and the application each time (<em
+                    >if</em
+                >
+                you control both of them). It gets more and more complex while
+                <em>at the same time</em> the developer's familiarity with the
+                library code becomes more and more remote. And that's not even
+                to mention when a non-programmer wants to tweak the HTML, or
+                there is developer turnover, or when you don't control the
+                library at all...
+            </p>
+            <p>
+                It's a mess. And so someone comes along and says &quot;I can do
+                this so much more simply!&quot; and it starts all over again.
+            </p>
+            <p>
+                The problem domain is wrong. I think there's a better approach,
+                but I'm too lazy to finish it. So I'll lay down the design here,
+                with little expectation that anything will happen because of it,
+                but just maybe this will connect with someone. (Ideally someone
+                who will write code ;)
+            </p>
+            <p>
+                First, validation: I like how FormEncode works, I think it's the
+                right model. Validation completely separate from the rest of the
+                system, and you can programmatically construct the validation so
+                you can embed it in other systems if you want (and embedding it
+                is probably a good idea).
+            </p>
+            <p>
+                Second: forms. First, the simplest model: write it in a normal
+                template. <em>But this is annoying</em> people will cry. Why?
+            </p>
+            <ol class="arabic simple">
+                <li>
+                    Filling in defaults is annoying. You have to do this little
+                    dance: is the value in the request (e.g., resubmission)?
+                    Then use that. Is it passed in through some defaults? Then
+                    use that. Otherwise? Maybe another default, or blank.
+                </li>
+                <li>
+                    Filling in errors is annoying. Similar dance to defaults.
+                </li>
+                <li>
+                    The
+                    <tt class="docutils literal"
+                        ><span class="pre">&lt;label&gt;</span></tt
+                    >
+                    tag is somewhat annoying to generate, which is perhaps why
+                    many very high-traffic websites <em>still</em> don't
+                    properly do labels.
+                </li>
+                <li>
+                    I suppose the HTML is annoying in general, though it's only
+                    slightly more verbose than the programming code that might
+                    replace it.
+                </li>
+                <li>
+                    Javascript can be annoying, and many web developers
+                    <em>still</em> aren't comfortable with Javascript.
+                </li>
+                <li>
+                    Getting all the right Javascript and CSS files in place, and
+                    linking them up with the appropriate fields is awkward.
+                </li>
+                <li>Ajax callbacks are really annoying.</li>
+                <li>
+                    Nested and repeating fields compound every other kind of
+                    annoying.
+                </li>
+                <li>It's hard to reuse any of this.</li>
+            </ol>
+            <p>
+                My response is that these issues can be resolved without form
+                generation libraries.
+                <a class="reference" href="http://formencode.org/htmlfill.html"
+                    >formencode.htmlfill</a
+                >
+                addresses 1 and 2. It's not perfect, but it's usable. Things
+                like
+                <a class="reference" href="http://pylonshq.com/WebHelpers/"
+                    >WebHelpers</a
+                >
+                can help with 4. Neither of these needs to be
+                <em>the</em> implementation, and both could be improved. But
+                while remaining in their scope they can only be improved a
+                <em>little</em>, which is important. They will not become
+                endless time sinks.
+            </p>
+            <p>
+                <a
+                    class="reference"
+                    href="http://en.wikipedia.org/wiki/Unobtrusive_JavaScript"
+                    >Unobtrusive Javascript</a
+                >
+                solves 5 quite well. I think a tool for solving 6 -- the proper
+                inclusion of dependent CSS and Javascript -- could be handy. I
+                imagine
+                <tt class="docutils literal"
+                    ><span class="pre">&lt;input</span>
+                    <span class="pre">type=&quot;date&quot;</span>
+                    <span class="pre"
+                        >js-require=&quot;DateInput&quot;&gt;</span
+                    ></tt
+                >
+                calling some code that figures out where
+                <tt class="docutils literal"
+                    ><span class="pre">DateInput</span></tt
+                >
+                is (probably building on something like
+                <a
+                    class="reference"
+                    href="http://www.openjsan.org/documentation/dists.html"
+                    >JSAN package metadata</a
+                >) and puts the appropriate code in the head of the page.
+            </p>
+            <p>
+                7 and 8 are addressed quite nicely by the
+                <a
+                    class="reference"
+                    href="http://www.whatwg.org/specs/web-forms/current-work/"
+                    >Web Forms 2.0</a
+                >
+                <a class="reference" href="http://www.whatwg.org">WHAT-WG</a>
+                specification, and tools building on those models would be
+                excellent.
+            </p>
+            <p>
+                And once you have all this, I think 9 is much more approachable.
+                Because you don't need a framework, you just need stuff that
+                generates blank HTML that also uses a few of these simple
+                conventions.
+            </p>
+            <p>
+                Notably, these techniques <em>embrace</em> the abstractions HTML
+                and Javascript already allow. Also, each tool can be useful on
+                its own, and can be used, not used, or reimplemented on its own.
+                The hard part is that any one tool seems terribly simple and
+                lacking features compared to a form generation framework. But if
+                slow and steady can win the race it might not matter; the other
+                form generation frameworks will suffer the churn of the
+                reimplementation cycle while these simpler and duller tools will
+                better stand the test of time. And even if they don't, unlike a
+                framework the healthy decoupled set of tools can suffer the
+                failure of one piece (in design, maintenance, or implementation)
+                without compromising the entire stack.
+            </p>
+            <p>
+                Now someone please go build the missing pieces, because I'm
+                trying really hard not to start more projects.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 28 Mar<br />
+            Modified 11 Apr
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>Ian Bicking: The code libertarian.</p>
+                <p>
+                    Besides that (ahem) gem, I pick a nit: nonsensicle =&gt;
+                    nonsensical.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/on-form-libraries-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://billmill.org">Bill Mill</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    What's your take on WYSIWYG form builders and related
+                    libraries in Java and ASP.NET?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/on-form-libraries-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Scott Tsai
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I've never tried them or even seen them. It seems
+                        reasonable, I suppose, though any framework integration
+                        would set off a warning bells. Insofar as you are adding
+                        custom attribute to the form elements, it's reasonable.
+                        At least what I've seen in ASP.NET seems to do this.
+                        What I <em>don't</em> like in the examples I've seen is
+                        that it seems to also do control flow through the form
+                        itself. That's awful. Templates are good, but they
+                        aren't good for control flow. And putting control flow
+                        in form libraries is the kiss of death IMHO.
+                    </p>
+                    <p>
+                        I think form generators aren't all bad, and potentially
+                        something less general than a full templating language
+                        could be called for when generating large forms (though
+                        of course any templating language can be used to
+                        programmatically create forms -- there's doesn't need to
+                        be any dichotomy between generated and hand-written
+                        forms if other tools work on the markup and not any
+                        underlying models).
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/on-form-libraries-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            I was just contemplating writing a set of HTMLish
+                            widgets for Glade as I read this. They would produce
+                            HTML or Mako or something like that. My personal
+                            view is that if there were decent UI form designers
+                            for HTML, people wouldn't become obsessed with
+                            building this particular magic bullet.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/on-form-libraries-comment-14.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://unpythonic.blogspot.com/">Ali</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Agreed on the form generation vs. validation front. I spent
+                    the last couple weeks working with ToscaWidgets and while it
+                    clearly has an answer for any form I can imagine, it's
+                    incredibly frustrating to re-learn how to write a simple
+                    HTML form that ends up looking far more elegant in its
+                    native markup syntax. Django's newforms was much less
+                    frustrating for me, but I dislike the generation aspect in
+                    general.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/on-form-libraries-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://blog.case.edu/bmb12">Brian Beck</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I am in total agreement about form generation libraries, and
+                    this was something i didnt like about early FormEncode. This
+                    is because ive been building forms with all kinds of server
+                    side languages for a really long time, and have many times
+                    gone down the road of building &quot;generic form
+                    generation&quot; systems, as well as using a lot of the
+                    early losers like ATG dynamo and stuff like that. its the
+                    same 80% solution tune that plays all day long...or at least
+                    80% of the time.
+                </p>
+                <p>
+                    Fortunately for me, I always worked in environments where
+                    the non-feasability of form generators was always
+                    super-obvious: id get handed enormous HTML redesigns of my
+                    forms from designers and had to work around that.
+                </p>
+                <p>
+                    Still, the need to have the ability to just say, &quot;text
+                    input element!&quot; somewhere on a page without going
+                    through the motions of the repeating the individual HTML and
+                    site-specific customizations of that element, is very
+                    important. thats why I was so apeshit over HTML::Mason, and
+                    then Myghty, and upon Myghty crumbling under its own weight
+                    I reimplemented it as Mako:
+                    <strong
+                        >you need to be able to make custom, reusable, nested,
+                        inter-aware widgets, in straight templated HTML,
+                        immediately</strong
+                    >.
+                </p>
+                <p>
+                    so ill keep saying it like i always do: the
+                    &quot;templating&quot; part is not so hard. With Mako, you
+                    create any number of templates containing your widgets as
+                    &lt;%defs&gt;, and then you can &lt;%call&gt; them, using
+                    whatever nesting schemes you desire. It really works
+                    frigging great...its the model ive used for years and
+                    component-call-with-content is the &quot;killer
+                    feature&quot; of these systems. Its the ability to create
+                    custom nestable tags
+                    <strong>without any python code or external modules</strong
+                    >. no other template lang ive seen in python can really do
+                    this (except myghty of course).
+                </p>
+                <p>
+                    I have been playing with toscawidgets for a gig recently,
+                    and its OK but its the same thing. Theyre making me put HTML
+                    in my source code, making me dispatch it through confusing
+                    classes and datastructures...and thats just not where it
+                    belongs.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/on-form-libraries-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">mike bayer</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Mike, care to add a howto to docs.pythonweb.org about
+                        form generation with Mako?
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/on-form-libraries-comment-18.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://maxischenko.in.ua">Max Ischenko</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I'm really a fan of treating form libraries as sets of
+                    macros. There are higher level macros (perhaps a macro that
+                    can output an entire label and field) and lower level macros
+                    (just a checkbox, or just the code to output an error). By
+                    treating the system this way, the user can get super custom
+                    if he needs to (by using the low level macros or even
+                    straight HTML), or he can whip stuff out really quickly (by
+                    using the high level macros). Need something different? Add
+                    more macros based on the lower level macros.
+                </p>
+                <p>
+                    I've used this approach before at multiple companies in
+                    developing the common look-and-feel library that is used by
+                    several applications. It's a simple idea, but it works out
+                    well.
+                </p>
+                <p>
+                    By the way, I too tend to keep form generation separate of
+                    form validation. I'm not tied to that idea, but it's worked
+                    out well for me in the past.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/on-form-libraries-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://jjinux.blogspot.com">Shannon -jj Behrens</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I don't really have much of a point with this, just some
+                    observations.
+                </p>
+                <p>
+                    One is that a form generation library can have independently
+                    evolving components. Let's take the Zope 3 has a form
+                    generation library. I'm sure you don't like it. :) It has
+                    multiple components that work together:
+                </p>
+                <ul class="simple">
+                    <li>
+                        a schema library taking care of definition and
+                        validation
+                    </li>
+                    <li>
+                        a widget library taking care of display and conversion
+                        of input
+                    </li>
+                    <li>
+                        a formlib library taking care of putting the widgets
+                        together with the data.
+                    </li>
+                    <li>
+                        the actual objects implementing a schema that
+                        maintain/store the data
+                    </li>
+                </ul>
+                <p>
+                    These components can evolve by themselves. formlib for
+                    instance is reasonably new, replacing another system for
+                    putting a form together that didn't work as well. It's built
+                    on the existing schema system and widget systems, however,
+                    so those weren't rewritten. It would also be possible to
+                    revise the way the widget system work without an enormous
+                    impact on the other pieces, though formlib would likely need
+                    some adaptation.
+                </p>
+                <p>
+                    There are two very different extremes of dealing with forms.
+                    One is schema-driven, the other HTML driven. Most systems
+                    fall in the middle somewhere (which probably creates some of
+                    the muddle); Zope 3's system leans fairly heavily towards
+                    schemas (which introduces its own limitations). I see
+                    benefits in both approaches: HTML driven is very good at
+                    being able to adapt to a wide variety of real-world forms.
+                    Schema-driven is good at producing lots of forms from small
+                    descriptions of data and encourages widget reuse.
+                </p>
+                <p>
+                    It appears that to you the tradeoffs weigh in favor of HTML
+                    driven forms. To me, it depends in what you're trying to
+                    accomplish.
+                </p>
+                <p>
+                    Note by the way that ToscaWidgets is not necessarily a form
+                    generation system. It's a way to package and reuse bundles
+                    of python, HTML, CSS and javascript at its core. It has a
+                    form library built on top of it.
+                </p>
+                <p>
+                    Finally, I have the suspicion that any set of abstractions
+                    that helps you deal with complex real world scenarios in any
+                    domain will be vulnerable to your criticism of form
+                    generation libraries, including your own proposal on how to
+                    handle this particular problem domain. :)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/on-form-libraries-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Martijn Faassen
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        There are two very different extremes of dealing with
+                        forms. One is schema-driven, the other HTML driven. Most
+                        systems fall in the middle somewhere (which probably
+                        creates some of the muddle); Zope 3's system leans
+                        fairly heavily towards schemas (which introduces its own
+                        limitations). I see benefits in both approaches: HTML
+                        driven is very good at being able to adapt to a wide
+                        variety of real-world forms. Schema-driven is good at
+                        producing lots of forms from small descriptions of data
+                        and encourages widget reuse.
+                    </blockquote>
+                    <p>
+                        I'm not really <em>opposed</em> to creating forms
+                        programmatically. I just think it should be a simpler
+                        task than what most form generation libraries have
+                        bitten off. It should look a lot more like templating,
+                        and a lot less like programming. It shouldn't include
+                        things like filling in defaults, filling in errors,
+                        collecting Javascript and CSS, and maybe not layout (or
+                        at least very simple layout). Once the definition is
+                        sufficiently limited you can get away with a very simple
+                        and transparent library for form generation. And
+                        certainly that is important, since lots of domains
+                        require form generation -- stuff like Django's CMS, or
+                        user-driven models generally.
+                    </p>
+                    <p>
+                        As to formlib, I'm afraid I don't really know much. I've
+                        seen Zope Schemas, and I think they are fine, though as
+                        I remember they did validation without conversion, and I
+                        think two-way conversion is integral. Combining
+                        validation with widgets and worse data bindings is a
+                        really bad path, and you didn't go down that. I'm a
+                        little wary of data bindings in general, as it puts the
+                        logic in the framework and I hate that; it makes my head
+                        hurt. But if it's done really well it's possible -- as
+                        long as you aren't squeezing it into a normal web app
+                        framework design. I suppose
+                        <tt class="docutils literal"
+                            ><span class="pre">htmlfill</span></tt
+                        >
+                        is a kind of data binding library; but it's very clearly
+                        a library. Anyway, no one will accuse Zope 3 of being a
+                        normal web app framework design, so no problem there ;)
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/on-form-libraries-comment-10.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            I'm sympathetic with your general idea that much
+                            that is now done inside widget libraries should be
+                            pulled out into independent systems. It will need
+                            some thought on my end.
+                        </p>
+                        <p>Ian:</p>
+                        <blockquote>
+                            As to formlib, I'm afraid I don't really know much.
+                            I've seen Zope Schemas, and I think they are fine,
+                            though as I remember they did validation without
+                            conversion, and I think two-way conversion is
+                            integral.
+                        </blockquote>
+                        <p>
+                            Zope 3's design considers two-way conversion the
+                            responsibility of the widget, as it's part of
+                            viewing logic. Conversion might be quite different
+                            if the data is coming from another source than the
+                            web, or is going to another target than the web,
+                            after all (an int might already be an int).
+                        </p>
+                        <p>Ian:</p>
+                        <blockquote>
+                            Combining validation with widgets and worse data
+                            bindings is a really bad path, and you didn't go
+                            down that. I'm a little wary of data bindings in
+                            general, as it puts the logic in the framework and I
+                            hate that; it makes my head hurt. But if it's done
+                            really well it's possible -- as long as you aren't
+                            squeezing it into a normal web app framework design.
+                            I suppose htmlfill is a kind of data binding
+                            library; but it's very clearly a library. Anyway, no
+                            one will accuse Zope 3 of being a normal web app
+                            framework design, so no problem there ;)
+                        </blockquote>
+                        <p>
+                            Zope 3's more normal than it looks like, it's just
+                            not presenting itself well. :)
+                        </p>
+                        <p>
+                            As to data binding, what you mean by this is the
+                            code that gets the data to display in the form from
+                            somewhere and then gets it back from the web into
+                            the application, right? I believe in Zope 3 that's
+                            scattered a bit between formlib and the widget
+                            system. It'd be nice if it were a more coherent
+                            library. It's quite powerful in the sense that it
+                            handles nested and/or composite form values well
+                            (which can be expressed with Zope 3 schema).
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/on-form-libraries-comment-13.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Martijn Faassen
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I think unobtrusive JavaScript should solve numbers 5, 6 and
+                    7. The form should be in no way dependent on JavaScript to
+                    function, so that should not be a part of any for generation
+                    library (apart from giving the form and its fields sane
+                    <tt class="docutils literal"
+                        ><span class="pre">#ids</span></tt
+                    >
+                    or
+                    <tt class="docutils literal"
+                        ><span class="pre">.classes</span></tt
+                    >
+                    to use as hooks from the unobtrusive JavaScript).
+                </p>
+                <p>
+                    Once you've got the form created, you can swoop in and make
+                    the form turn cartwheels (including AJAX cartwheels) using
+                    JavaScript, which can be included in the
+                    <tt class="docutils literal"
+                        ><span class="pre">&lt;head&gt;</span></tt
+                    >
+                    of the document from whatever template the form will be
+                    sitting in.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/on-form-libraries-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="https://ianbicking.org/overloaded.org">Will</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I'm actually pretty lazy when it comes to Javascript
+                        fallback. This perhaps is a personal failure. But as an
+                        example of how I would deal with date inputs, I'd just
+                        throw this in:
+                        <tt class="docutils literal"
+                            ><span class="pre">&lt;input</span>
+                            <span class="pre"
+                                >type=&quot;date&quot;&gt;</span
+                            ></tt
+                        >. Let the Javascript figure that out (which is easy
+                        enough). If the Javascript doesn't figure it out, you
+                        get a text input and rely on server-side validation. A
+                        &quot;fancier&quot; system just <em>knows</em> you don't
+                        have Javascript date inputs, and it falls back on select
+                        boxes. Which probably don't make anyone any happier than
+                        the text box, but somehow it feels like you are trying
+                        hard instead of being lazy.
+                    </p>
+                    <p>
+                        In other cases, like repeating elements, handling that
+                        server-side makes my head hurt. It can be done, yes, but
+                        it's going to hurt. You'll have to take control from the
+                        normal controller and do lots of fancy things behind the
+                        scenes. The alternative is not writing the form anything
+                        like that, and forcing another half-dozen clicks by the
+                        user to do the same thing. That's not a compromise I get
+                        excited about either.
+                    </p>
+                    <p>
+                        I'm not sure <em>exactly</em> why you should make forms
+                        that are usable by people without Javascript. I don't
+                        think it's accessibility -- I believe
+                        &quot;accessible&quot; browsers also interpret
+                        Javascript. How well, I'm not sure, but I don't get the
+                        impression they really feel like Lynx. If it's to make
+                        your site accessible to the Googlebot, well I don't
+                        really care about forms. If it's because some people are
+                        just stubborn and turn off Javascript, eh. I'm not sure
+                        it's worth it.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/on-form-libraries-comment-11.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            &quot;I'm not sure exactly why you should make forms
+                            that are usable by people without Javascript.&quot;
+                        </p>
+                        <p>
+                            Strong words, and quite shocking in certain ways,
+                            too. Many of the JavaScript-only Web applications
+                            I've seen aren't likely to be very accessible, and
+                            what about people disabling JavaScript for security
+                            or usability reasons? To me, JavaScript (and AJAX,
+                            which is where a lot of the JavaScript goes these
+                            days) is a bonus for those who want a bonus, not a
+                            minimum requirement that excludes a number of people
+                            for reasons not fully considered by the developer.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/on-form-libraries-comment-15.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Paul Boddie
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <blockquote>
+                                Many of the JavaScript-only Web applications
+                                I've seen aren't likely to be very accessible
+                            </blockquote>
+                            <p>
+                                That doesn't mean that you need to bar
+                                Javascript in order to be accessible.
+                            </p>
+                            <blockquote>
+                                and what about people disabling JavaScript for
+                                security or usability reasons?
+                            </blockquote>
+                            <p>
+                                I don't think that makes any sense in the modern
+                                web. I don't see any reason to aggressively make
+                                things harder for these people, and lots of
+                                things should work without problem, but I don't
+                                think that's a user choice that I'm going to
+                                work to support. There's lots of choices users
+                                can make, I can't account for all of them.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/on-form-libraries-comment-17.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Ian Bicking
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I'd like to make a quick edit on the post and some comments
+                    to get the package names right ;)
+                </p>
+                <p>
+                    <tt class="docutils literal"
+                        ><span class="pre">s/ToscaWidgets/twForms/g</span></tt
+                    >
+                </p>
+                <p>
+                    I find rather disappointing that one of the points I try to
+                    get through in the scarce TW documentation (actually, the
+                    description of the package) rarely gets through as intended.
+                    ToscaWidgets <em>does not</em> handle form generation.
+                </p>
+                <p>It only aspires to:</p>
+                <ul class="simple">
+                    <li>
+                        bundle resources needed to build a web widget (as
+                        defined in this
+                        <a
+                            class="reference"
+                            href="http://en.wikipedia.org/wiki/Widget_(computing)"
+                            >wikipedia entry</a
+                        >). That is, it's (X)HTML markup (could also be template
+                        in any language that implements a Buffet plugin that
+                        generates it programatically), it's styling metadata
+                        (aka CSS) and it's client-side scripting.
+                    </li>
+                    <li>
+                        Serve those static resources using the WSGI protocol so
+                        it's pluggable in any compliant app/framework.
+                    </li>
+                    <li>
+                        Provide an interface between all this and the rest of
+                        the application. That is, a Widget subclass that can be
+                        pinitialized and configured in Python. Including a
+                        simple and non-ambitious bridge between Python an
+                        Javascript that generates a js call to initialize the
+                        client-side part (converting parameters from python to
+                        js using a JSON representation if needed).
+                    </li>
+                    <li>Allow widget composition to create complex widgets.</li>
+                    <li>
+                        Provide infrastructure to package all this into a
+                        setuptools egg for easier reuse.
+                    </li>
+                </ul>
+                <p>
+                    I actually believe it's flexible and powerful enough to
+                    serve as a good base to build the dream form library you're
+                    sketching out if twForms doesn't satisfy you :)
+                </p>
+                <p>(I really need to get some docs out soon...)</p>
+                <p>Alberto</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/on-form-libraries-comment-9.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Alberto Valverde
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I've used FormEncode and the associated htmlfill for some
+                    time now and have been really really happy with how it works
+                    out. When you do complex applications, and you need to be
+                    hand editing your html page for specific layout/javascript
+                    interaction and it's a godsend when the framework for
+                    validation and loading defaults on the page (#1 &amp; #2)
+                    just stay out of the way.
+                </p>
+                <p>
+                    htmlfill does a really good job of putting default values on
+                    the forms; and formencode is a great way to validate and get
+                    those validation errors back on the page (along with setting
+                    appropriate display classes on the page). It really
+                    understands html as it should, and doesn't mind if it
+                    happens to be html that comes through some other framework
+                    or page templating language. It's almost like they are just
+                    tools and not a framework at all, because they don't ever
+                    get in your way when you want to do complex things; they
+                    make the complex possible. Personally i use Zope Page
+                    Templates to generate my pages (#8) and that helps put some
+                    of the dynamic elements on the page; but formencode does
+                    quite a bit of heavy lifting; and it is quite up to the
+                    task.
+                </p>
+                <p>
+                    ...all that said, HTML, Javascript <em>and</em> CSS (#4 #5
+                    and #6) can be annoying until you really have a strong grasp
+                    of all three and are comfortable with them all. When you
+                    reach that level things start to fall into place, and you
+                    realize that HTML, Javascript and CSS <em>are</em> powerful
+                    frameworks for doing their respective pieces, and that they
+                    can be easier to use directly instead of with some clumsy
+                    middle man between the keyboard and the screen
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/on-form-libraries-comment-12.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://jehiah.cz/">Jehiah</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    We have been using
+                    <a
+                        class="reference"
+                        href="http://www.avand.com.au/technical.asp"
+                        >Zope at at Avand as the basis of our document
+                        management system</a
+                    >
+                    since 2000, and we have a mature widget system which does
+                    client-side and server-side validation (including spell
+                    checking as a client-side validation module), handles
+                    javascript dependencies (so that scripts aren't imported
+                    multiple times), creates complex widgets ... see screenshot
+                </p>
+                <img
+                    alt="http://www.avand.com.au/user_images/clip_image002_011.jpg"
+                    src="http://www.avand.com.au/user_images/clip_image002_011.jpg"
+                />
+                <p>
+                    The widgets rendered are the XP style list on the left, the
+                    two lists on the main panel, the Display options
+                    pseudo-dropdown(which persists user preferences as cookies).
+                </p>
+                <p>
+                    I haven't checked out Tosca, but there might be some
+                    potential to cross polinate ideas. The code is fairly
+                    tailored towards our needs, and probably not suitable for
+                    reuse outside our own project.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/on-form-libraries-comment-16.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.avand.com.au/">Chui</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

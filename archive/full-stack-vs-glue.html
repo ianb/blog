@@ -1,0 +1,928 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Full Stack vs. Glue</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Full Stack vs. Glue</h1>
+
+        <div class="document">
+            <p>
+                In a
+                <a
+                    class="reference"
+                    href="http://www.b-list.org/weblog/2007/02/19/python-framework-design"
+                    >recent post on Framework design</a
+                >
+                James Bennett describes as a fundamental dichotomy in framework
+                design &quot;full-stack&quot; vs. &quot;glue&quot;. In this
+                case, Django (which James works on) as a full-stack framework,
+                and TurboGears and Pylons as glue frameworks. This is not a good
+                way to describe the differences.
+            </p>
+            <p>
+                Both TurboGears and Pylons have glue. They have taken existing
+                components and put them together. Both also include substantial
+                work in the form of fully decoupled components -- components
+                which were <em>written for</em> those frameworks but are not
+                tied to the frameworks. And TurboGears <em>is</em> a full-stack
+                framework, providing a cohesive and complete story about how you
+                create applications within its domain. This doesn't make
+                TurboGears more or less glue than Pylons; there is nothing
+                exclusive about full-stack and glue.
+            </p>
+            <p>
+                There's also awkward glue and easy glue. This often has a lot to
+                do with whether you are using the pieces as intended. To extend
+                the metaphor inappropriately, there are pre-measured pieces with
+                pre-drilled holes, there are erector sets with a large number of
+                holes, and there are piles raw wood. Sometimes components are
+                intended to go together <em>just one way</em>, and if you use
+                them together that way then everything works great. Sometimes
+                there's components meant to be used all sorts of ways, capable
+                of being attached to any sort of system, but you have to figure
+                out what you want. Then there's just raw code, recipes, all the
+                hand-coded stuff. The metaphor is horribly strained here,
+                because most things are a bit of all of these. At some point
+                <em>someone</em> wrote some code by hand. Usually there's
+                strongly opinioned and constrained interfaces which are still
+                public, things that are entirely private and internal, and stuff
+                which is explicitly built to be flexible, and all these parts
+                coexist within the same package.
+            </p>
+            <p>
+                All of which to say, there's many ways to look at program
+                design. There's glue, there's standards, there's conventions,
+                there's community knowledge. And there's a lot of pieces, all of
+                which have to fit together, and this is just as true in the
+                small as in the large.
+            </p>
+            <p>
+                An example of what formal and explicit interfaces give you:
+                right now both TurboGears and Pylons are in the process of
+                changing their preferred templating languages (TurboGears from
+                <a class="reference" href="http://kid-templating.org/">Kid</a>
+                to
+                <a class="reference" href="http://genshi.edgewall.org/"
+                    >Genshi</a
+                >, Pylons from
+                <a class="reference" href="http://www.myghty.org/">Myghty</a> to
+                <a class="reference" href="http://www.makotemplates.org/"
+                    >Mako</a
+                >). The process for both is the same -- they both support the
+                <a
+                    class="reference"
+                    href="http://projects.dowski.com/projects/buffet"
+                    >Buffet</a
+                >
+                API for templating languages, and have supported alternate
+                templating languages for a while now. When someone decides to
+                write a new templating language, they implement that API -- they
+                don't ask about design choices, they don't have to worry that
+                they'll be accessing an API that is subject to change. The new
+                language can achieve some design maturity this way. If a
+                framework wants to change languages, they don't have to force
+                anyone -- each developer can choose to move slower or faster
+                than the framework. This also gives developers a way to do
+                rewrites without causing breakage. In the case of Myghty and
+                Mako, Michael Bayer wrote both -- but because of loose coupling
+                he didn't need to use his relation to Myghty to force his
+                changes or cleanup into that existing project. Forking makes
+                rewrites easy -- but it only works when you build choice into
+                your framework.
+            </p>
+            <p>
+                So instead of &quot;full-stack&quot; and &quot;glue&quot;
+                frameworks, I would describe the difference as
+                &quot;coupled&quot; and &quot;decoupled&quot; frameworks.
+                Decoupling is generally harder, and leaves more potential open
+                loops, and can sometimes be misused to avoid making important
+                decisions. But it's <em>much</em> easier to maintain and test,
+                and this applies not just to individual projects but for the
+                larger set of projects that makes up anything approaching
+                &quot;full-stack&quot;.
+            </p>
+            <p>
+                Maybe it's not entirely fair -- <em>coupled</em> and
+                <em>decoupled</em> are not very neutral terms (at least since
+                Agile terminology has caught on). Django people will claim to
+                have a decoupled framework, but then they've never put their
+                money where their mouth is -- they've never actually decoupled
+                anything from the framework in the form of an extraction that
+                they use. So I turn it around because calling these other
+                frameworks &quot;glue&quot; frameworks isn't really fair -- they
+                wrote much of what they are gluing to. Gluing together things
+                you wrote yourself is called simply &quot;software
+                development&quot;; that you introduce greater discipline on
+                yourself to create something that is independently useful
+                doesn't mean you've necessarily created something less cohesive
+                and complete.
+            </p>
+            <p>
+                (There's other ways to describe differences in frameworks, of
+                course. But I think Django's developers could make a better
+                argument based on development methodologies and community
+                development than they can on engineering principles.)
+            </p>
+        </div>
+        <div class="dates" align="right">Created 20 Feb</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>Summarizing a comment I made in reply to you on my blog:</p>
+                <p>
+                    The full-stack/glue distinction is very real, and can be
+                    revealed by a couple of practical tests; the best one is to
+                    ask where a bug report for a major component goes -- if it
+                    gets directed to a third-party project, then you're glue. If
+                    you handle it yourself, then you're full-stack. Again, it's
+                    the difference between supporting code that helps other
+                    things work together, and supporting a full set of
+                    components.
+                </p>
+                <p>
+                    And Django doesn't claim to be <em>decoupled</em>, it claims
+                    that its components are <em>loosely coupled</em>. That may
+                    seem like semantic hair-splitting, but it is a significant
+                    difference -- while we obviously don't go out of our way to
+                    make it hard to swap components, having &quot;plug and
+                    play&quot; core components is not one of our design goals;
+                    instead we focus on the components we have, on making them
+                    better and making them work better together. That is, again,
+                    the difference between full-stack and glue in a nutshell: is
+                    your goal to primarily provide and support one set of
+                    components, or is your goal to primarily provide and support
+                    ways to hook arbitrary sets of components together? For
+                    Django it's the former and so we're full-stack. For Pylons
+                    it seems to be largely the latter, and so Pylons is glue.
+                </p>
+                <p>
+                    The coupled/decoupled alternative also really feels like the
+                    same thing in different words: the primary difference is,
+                    again, whether you're aiming to support a single set of
+                    components together, or to support swapping and
+                    interchanging of many components and sets of components.
+                    I'll admit &quot;glue&quot; can be something of a loaded
+                    word in the Python community (I guess it reminds us too much
+                    of Perl -- which is a shame, because good glue code is some
+                    of the most insanely useful stuff out there), but
+                    &quot;coupled&quot; is, as you've said, going to suffer from
+                    the same problem. We need to come up with some better
+                    terminology, I think...
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/full-stack-vs-glue-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.b-list.org/">James Bennett</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Could the difference between a 'glue' and 'full stack'
+                        framework be summarised as ... If, as a framework
+                        representative I find a third party module that does
+                        something significantly better;
+                    </p>
+                    <ul class="simple">
+                        <li>
+                            If I were a &quot;glue&quot; framework I would use
+                            it
+                        </li>
+                        <li>
+                            if I were a &quot;full stack&quot; framework I
+                            wouldn't
+                        </li>
+                    </ul>
+                    <p>
+                        Or would it be OK to use the third party module as long
+                        as it becomes a component part of the &quot;full
+                        stack&quot; framework..
+                    </p>
+                    <p>
+                        Or! If MochiKit, Kid, CherryPy and SQLObject all shared
+                        a single svn repository and all prefixed their project
+                        names with 'TG' would it then become a &quot;Full
+                        Stack&quot; framework?
+                    </p>
+                    <p>If so then the definition is virtually meaningless..</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/full-stack-vs-glue-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="https://ianbicking.org/www.pollenation.net"
+                        >Tim Parkin</a
+                    >
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Tim, personally I think it comes down to development
+                            focus: does the framework primarily focus on a
+                            single set of components, and provide support and
+                            maintenance for those components and for the code it
+                            uses to hook them together? If so, it's full-stack
+                            (&quot;coupled&quot; in Ian's terminology), and you
+                            don't <em>have</em> to develop all your components
+                            in-house to do that -- you could, for example, use
+                            someone else's open-source components and distribute
+                            patched versions which work with the rest of your
+                            framework (and to be a good citizen you'd submit
+                            those patches back to the original project, of
+                            course). On the other hand, you can primarily focus
+                            on developing interfaces and adapters which aren't
+                            meant for any specific component or set of
+                            components, but rather to be generic enough to plug
+                            any component into any slot in the framework; that's
+                            what I mean when I say &quot;glue&quot; and what I
+                            think Ian means when he says &quot;decoupled&quot;.
+                            And you don't have to use only third-party stuff as
+                            your default set -- you could develop an ORM,
+                            template system, etc. and offer them as the default
+                            set.
+                        </p>
+                        <p>
+                            Either way it's a lot of work -- supporting a
+                            specific component stack is non-trivial, and neither
+                            is developing a full WSGI system with the necessary
+                            support and adapters to truly support &quot;plug and
+                            play&quot; components. I'm incredibly glad there are
+                            dedicated people on both sides who are willing to
+                            put in the time and effort to give the Python
+                            community the embarrassment of riches we have in the
+                            web-dev sector now, because I remember all too well
+                            the days when I desperately wanted to use Python on
+                            the web but couldn't because Zope was the only
+                            option and wouldn't fit in my head :)
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/full-stack-vs-glue-comment-5.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.b-list.org/">James Bennett</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>This is where things get confusing.</p>
+                            <p>
+                                TurboGears does, as a simple matter of fact,
+                                pull together a single set of components, and
+                                encourage their use. We are trying to tell a
+                                unified story about how everything works
+                                together, and we've had help from CherryPy, Kid,
+                                and other components in bringing everything
+                                together in the way we want.
+                            </p>
+                            <p>
+                                Let's look at the way we work with templating
+                                systems. We clearly aren't distributing a
+                                patched version of Kid, but the Kid maintainer
+                                is doing it because he uses it in TurboGears.
+                                When you use a kid template you just specify the
+                                name of the template in the &#64;expose
+                                decorator, and everything &quot;just
+                                works.&quot;
+                            </p>
+                            <p>
+                                So far we are just like Django and the Django
+                                templating system. Simple defaults, and easy
+                                configuration make life good. But we do have a
+                                differnt philsophy. The maintainers of Kid
+                                understand that some people will want to use Kid
+                                in other ways -- outside of the framework -- and
+                                they work to support that.
+                            </p>
+                            <p>
+                                At the same time we also understand that some
+                                people have hundreds of thousands of lines of
+                                template code written with Cheetah and we
+                                support them if they want to use TurboGears. So,
+                                we've allowed them to define the engine they
+                                want used as well as the template name in the
+                                &#64;expose decorator.
+                            </p>
+                            <p>
+                                And that's the difference between the TG/Pylons
+                                way and the Django way. It's not Glue VS Full
+                                Stack (TurboGears at least tries very hard to be
+                                Full Stack). It's about code reuse. We are open
+                                to pulling in code from outside and working with
+                                those developers to get what we need from their
+                                components, and we are open to the idea that
+                                others will want to use some of our components
+                                outside of our world.
+                            </p>
+                            <p>
+                                Of course this is a trade-off, we're dependent
+                                on the good judgement of the people who work on
+                                Kid, unless of course we want to fork the
+                                project.
+                            </p>
+                            <p>
+                                Now, I think TurboGears is doing the right thing
+                                here, but I also think there is a benefit to the
+                                centralized control that the Django guys have.
+                            </p>
+                            <p>
+                                The documentation story in TurboGears is harder,
+                                because we have to pull together a clean story
+                                that includes each of the components we use. And
+                                because those projects all have a lot of
+                                internal innovation going on, it's a lot harder
+                                to keep up with all the cool new stuff that's
+                                coming in. We're definitely struggling with how
+                                to do that in the best way.
+                            </p>
+                            <p>
+                                So, I recognize that we're traiding away some
+                                control of our own destiny, and inviting extra
+                                documentation and bug-tracking work, in order to
+                                get better code-reuse, cleaner decoupling, and
+                                more end-user freedom.
+                            </p>
+                            <p>
+                                As Jacob once said, &quot;it's trade-offs all
+                                the way down.&quot; I'm happy with the
+                                trade-offs we make, even though there is a cost.
+                            </p>
+                            <p>
+                                I'm sure you're happy with the trade-offs you
+                                make. But you should admit that there is a real
+                                cost there too.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/full-stack-vs-glue-comment-13.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a
+                                href="https://ianbicking.org/www.compoundthinking.com/blog"
+                                >Mark Ramm</a
+                            >
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+
+                <div class="document">
+                    <p>you know what reminds me of Perl ? this:</p>
+                    <blockquote>
+                        <pre class="doctest-block">
+&gt;&gt;&gt; from django.template import Context
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+  [...snip...]
+EnvironmentError: Environment variable DJANGO_SETTINGS_MODULE is undefined.
+</pre
+                        >
+                    </blockquote>
+                    <p>
+                        theres nothing &quot;loose&quot; about that, id
+                        characterize it more as &quot;arc-welded to a hardcoded
+                        idea of runtime configuration&quot;.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/full-stack-vs-glue-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    mike bayer
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>NOOO! not the P-word, NOOOOO!</p>
+                        <p>at the same this this is a straw-man argument,</p>
+                        <p>
+                            seriously do you think it would be difficult to load
+                            the config from another file? As of now very few
+                            people would want to use the Django templating
+                            system outside of Django. And since there are
+                            already lots of settings needed to run a webapp, why
+                            not keep them in the same python file as the rest.
+                            Is your problem that the setting are in a python
+                            file? That is a different issue altogether and many
+                            would prefer Python to some kind of configuration
+                            mini-language.
+                        </p>
+                        <p>
+                            In the end this whole discussion comes down the
+                            argument of the whole being more valuable than the
+                            sum of parts. For any subpart of Django there is a
+                            python module/package that is &quot;better&quot;.
+                            Yet no one has put together a whole package like
+                            Django did.
+                        </p>
+                        <p>
+                            Here is another tidbit, the stuff works, I used
+                            cherrypy, paste whatever and you know what, over the
+                            long term eventually each had shown some very
+                            serious problems, that come from them being more
+                            about the concept rather than a program that you
+                            need to make a living off. It will take years to
+                            iron out those kinds of problems.
+                        </p>
+                        <p>
+                            Django works, it will hold up in traffic, it will
+                            not blow up in your face. That quality it is far
+                            superior to any other. Interoperability, reuse,
+                            decoupling are fine in theory, in practice adhering
+                            to them too strictly just makes life more difficult.
+                        </p>
+                        <p>PixieDust</p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/full-stack-vs-glue-comment-16.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        PixieDust
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                if i read you correctly, you agree with my
+                                sentiment that django's components are not very
+                                loosely coupled, your argument being
+                                essentially, &quot;so what ? it works.&quot;
+                                that is completely fine, and im glad django is
+                                there, running very well, and attracting lots of
+                                new people to Python. its just that, there are
+                                definite advantages to componentized and
+                                environment-agnostic architectures, and im glad
+                                the community has now accepted that there will
+                                always be multiple web framework approaches (in
+                                constrast to the calls for &quot;one true
+                                framework&quot; a couple of years ago) so that
+                                those of us who want them can choose to use our
+                                own frameworks like Pylons which make this a
+                                priority.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/full-stack-vs-glue-comment-17.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="http://">mike bayer</a>
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+
+                <div class="document">
+                    <blockquote>
+                        The full-stack/glue distinction is very real, and can be
+                        revealed by a couple of practical tests; the best one is
+                        to ask where a bug report for a major component goes --
+                        if it gets directed to a third-party project, then
+                        you're glue. If you handle it yourself, then you're
+                        full-stack.
+                    </blockquote>
+                    <p>
+                        Like I said, I think Django's choices are easier to
+                        justify based on development methodologies and community
+                        building, for reasons like this. It's clear who responds
+                        to bugs. Django is never stuck when they really want to
+                        make a change in something, but the upstream maintainer
+                        doesn't agree or doesn't have the same priorities.
+                        Django can provide a very concise and clear set of
+                        documentation, and activity is all centralized around
+                        one basic set of metaphors, mailing lists, bug trackers,
+                        etc. And I actually like
+                        <a
+                            class="reference"
+                            href="distributed-vs-centralized-scm.html"
+                            >centralized development</a
+                        >, so I'm quite sympathetic to these arguments. (Though
+                        as a counterexample: Mozilla is a single project, and
+                        it's hardly easy to navigate as a developer.)
+                    </p>
+                    <p>
+                        As an <em>engineering principle</em> I don't think this
+                        distinction is meaningful. That is, from an engineering
+                        perspective you can get to the same solution but with
+                        slightly different names, and based on names one
+                        solution is &quot;full-stack&quot; while the other is
+                        &quot;glue&quot;. And I don't think that's a reasonable
+                        distinction to make. But of course from a
+                        mathematical/symbolic point of view names don't mean
+                        much, but for humans names do mean a lot.
+                    </p>
+                    <blockquote>
+                        Again, it's the difference between supporting code that
+                        helps other things work together, and supporting a full
+                        set of components.
+                    </blockquote>
+                    <p>
+                        But see, there you start drifting. This is
+                        <em>not</em> the difference. You can achieve this
+                        regardless of how the packages are laid out.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/full-stack-vs-glue-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            I agree that the package layout doesn't necessarily
+                            impact it (see my other reply in this thread -- it's
+                            certainly possible, for example, to be
+                            &quot;coupled&quot; while using third-party
+                            components, and &quot;decoupled&quot; while using
+                            in-house components as the default). And I still
+                            agree wholeheartedly that we don't have a good way
+                            to talk about this, because the terms that come to
+                            mind are all loaded with connotations from other
+                            things. I do think there's a clear difference in
+                            focus between Django and some of the other
+                            frameworks, though -- we are focused pretty much
+                            exclusively (partly for historical reasons and
+                            partly because of available developer time) on our
+                            single stack of components, while other frameworks
+                            focus much more on adaptability and
+                            interchangeability. And I still think that's a
+                            choice which will end up affecting every part of a
+                            framework, and that it's not possible for most
+                            projects to pull off an equal focus on both, because
+                            both routes require major investments of developer
+                            time and effort.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/full-stack-vs-glue-comment-7.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.b-list.org/">James Bennett</a>
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        <p>
+                            Yea, the Django people have a lot easier time with
+                            documentation than we do. On many mornings I find
+                            myself envying them.
+                        </p>
+                        <p>
+                            Which is not to say that I'd give up the code-reuse
+                            paradigm in order to make my life writing
+                            documentation easier.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/full-stack-vs-glue-comment-14.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.compoundthinking.com/blog"
+                            >Mark Ramm</a
+                        >
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Hmm, no capitalists in the debate? I guess &quot;let the
+                    market decide&quot; isn't the favored approach? Or are we
+                    trying to save the folks wandering in from making a terrible
+                    wrong decision?
+                </p>
+                <p>
+                    Concept-wise I tend to fall towards the [&quot;Thou that
+                    shall not be named&quot;] WSGI-ish style of Pylons, but in a
+                    practical sense (there's some place for that, right?), the
+                    WSGI-ish approach really needs a project as approachable and
+                    documented and &quot;polished&quot; (at least for basic
+                    stuff and beginners) as Django to be able to argue on a
+                    level playing field. At least if the point of all these
+                    debates (that look like developer pissing contests) is to
+                    educate people new to python webdev. It's a bit detached
+                    from reality to argue you're 10x better technically but then
+                    not have the average newcomer able to figure out how to use
+                    your kit. Though again, this is rampant in technology.
+                </p>
+                <p>
+                    Also rather than the Windows/Mac, fullstack/glue analogies
+                    mentioned, it looks a lot to me like Windows webdev vs Java
+                    webdev (wherein the java flavor is say Spring + Hibernate +
+                    23 other libs from diff vendors or groups compared to the
+                    all-MS tools on the other side). &quot;Single-source&quot;
+                    vs. &quot;multi-vendor&quot;? I guess thousands of people
+                    still fight over those two also, but it doesn't seem like an
+                    ideal use of energies.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/full-stack-vs-glue-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                ToddG
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        Hmm, no capitalists in the debate? I guess &quot;let the
+                        market decide&quot; isn't the favored approach?
+                    </blockquote>
+                    <p>
+                        The market is made up of individuals making informed and
+                        conscious decisions with many factors that are
+                        ultimately weighed intuitively. Discussions like this
+                        inform those decisions, and inform the market. As a
+                        result I think deferring to the market is a little
+                        silly: we <em>are</em> the market, this <em>is</em> the
+                        market working, there's nothing external to be deferred
+                        to. And programmers are uniquely positioned to be both
+                        consumers and producers, and to frequently make
+                        decisions about what role they want to play in a certain
+                        circumstance.
+                    </p>
+                    <p>
+                        For instance, it would be an entirely valid choice for
+                        someone to use a piece of Django that they take from the
+                        framework; to choose decoupling whether or not the
+                        framework encourages it. It would be valid to
+                        <a
+                            class="reference"
+                            href="http://svn.pythonpaste.org/Paste/DjangoPaste/trunk/"
+                            >wrap Django against its will</a
+                        >, though you have to remember that it will also be
+                        fragile (and that package is almost certain to be broken
+                        right now as a result). The choices we have are
+                        infinite, and not just in theory but in practice. With
+                        so many choices, how is someone supposed to make a good
+                        choice without substantial amounts of discussion?
+                    </p>
+                    <blockquote>
+                        It's a bit detached from reality to argue you're 10x
+                        better technically but then not have the average
+                        newcomer able to figure out how to use your kit.
+                    </blockquote>
+                    <p>
+                        I didn't actually say the decoupled approach is
+                        &quot;better&quot;, though of course it's generally
+                        accepted that decoupled is better than coupled. But
+                        that's only true when everything else is equal, and I am
+                        not claiming everything else is equal, or even that
+                        coupling is a free variable when considering other
+                        important attributes. But <em>decoupled</em> and
+                        <em>coupled</em> are fairly objective terms, so I feel
+                        justified using them clearly in this context;
+                        <em>better</em> and <em>worse</em> are highly subjective
+                        and contextual.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/full-stack-vs-glue-comment-9.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <blockquote>
+                            <p>
+                                Discussions like this inform those decisions,
+                                and inform the market.
+                            </p>
+                            <p>...</p>
+                            <p>
+                                we are the market, this is the market working,
+                                there's nothing external to be deferred to. And
+                                programmers are uniquely positioned to be both
+                                consumers and producers, and to frequently make
+                                decisions about what role they want to play in a
+                                certain circumstance.
+                            </p>
+                        </blockquote>
+                        <p>
+                            Well sorta -- I think the number of people involved
+                            at low levels with the projects in question
+                            (variable) is a tiny part of the overall
+                            &quot;market&quot; in this case -- the handful of
+                            people doing (at least publicly) WSGI stuff and/or
+                            core Django devs is (I hope) a very small part of
+                            the overall userbase. But certainly it's still an
+                            example of the market working, even if it seems
+                            weighted towards the producer end of things. I was
+                            casually dropping the market comment in relation to
+                            &quot;the masses&quot; (we can hope!).
+                        </p>
+                        <p>
+                            It seems to me the fact that programmers are often
+                            &quot;consumers and producers&quot; is often a
+                            reason many projects become opaque and
+                            unapproachable to people who aren't as deeply
+                            involved -- that is the &quot;occasional&quot;
+                            consumers or new consumers who are at a totally
+                            different level of &quot;consumer&quot; than the
+                            producers. This of course doesn't negate any sound
+                            reasoning in design or whatever, but many projects
+                            fail to successfully address these consumers. Often
+                            on this point a more &quot;packaged&quot; or
+                            &quot;designed to all seamlessly work together&quot;
+                            solution has an inherent headstart, as it's a much
+                            simpler story to tell.
+                        </p>
+                        <p>
+                            In other words, until the solution you (and myself
+                            to my more limited abilities) support can
+                            demonstrate the ability to retain (build on) its
+                            technical strengths but still appeal to
+                            non-&quot;producers&quot; and more casual users and
+                            make _those_ things equal, the endless technical
+                            ping-pong might be unecessary(?)
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/full-stack-vs-glue-comment-10.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">ToddG</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+
+                <div class="document">
+                    <p>
+                        &quot;Hmm, no capitalists in the debate? I guess
+                        &quot;let the market decide&quot; isn't the favored
+                        approach?&quot;
+                    </p>
+                    <p>
+                        I don't necessarily regard myself as a capitalist, but I
+                        decided to ignore the &quot;debate&quot; and do my own
+                        thing, although this isn't news in any sense.
+                    </p>
+                    <p>
+                        Most of what I've been reading is just advocacy dressed
+                        up as methodology: framework A is doing &quot;the right
+                        thing&quot; because of the perceived attitudes of their
+                        developers, the architectural choices, the ease of use
+                        (delete as appropriate), whereas framework B is doing
+                        &quot;the wrong thing&quot; because it does something
+                        different for all those things, all according to
+                        someone's sense of taste (or lack thereof).
+                    </p>
+                    <p>
+                        Really, the TurboGears and Pylons tendencies to
+                        seemingly mix and match with varying levels of readiness
+                        obviously provides benefits, although you're still
+                        buying into someone's vision of Web programming, and
+                        although there's a book out for the former (has the code
+                        even reached 1.0 yet?) the documentation may not convey
+                        that vision effectively. Meanwhile, Django evolved in
+                        relative isolation, although one of its creators
+                        seemingly attempted early on to further the Python Web
+                        standards effort (with few results), but you've got to
+                        buy into the vision a little bit more, although there's
+                        a possibility of slightly better documentation about
+                        that vision.
+                    </p>
+                    <p>
+                        Frequently, people who don't know how to start writing
+                        their Web application want to buy into a vision. Once
+                        sold, they'll produce any amount of hot air to justify
+                        their choices. That there's a technological disconnect
+                        between various communities says enough about people's
+                        willingness to produce hot air instead of working on the
+                        things they should all have in common.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/full-stack-vs-glue-comment-11.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Paul Boddie
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <blockquote>
+                            Most of what I've been reading is just advocacy
+                            dressed up as methodology: framework A is doing
+                            &quot;the right thing&quot; because of the perceived
+                            attitudes of their developers, the architectural
+                            choices, the ease of use (delete as appropriate),
+                            whereas framework B is doing &quot;the wrong
+                            thing&quot; because it does something different for
+                            all those things, all according to someone's sense
+                            of taste (or lack thereof).
+                        </blockquote>
+                        <p>
+                            As someone who writes software and discusses
+                            software, obviously advocacy and methodology mix. I
+                            program with the methodology I think is right. I
+                            advocate the methodology I think is right. I
+                            advocate the framework that implements the
+                            methodology I think is right. It's not dressing one
+                            thing up as the other thing -- it's the two faces of
+                            thoughtfully pursuing the craft.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/full-stack-vs-glue-comment-12.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Ian Bicking
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Projects can become very difficult to maintain when you
+                    throw in a lot of third party libraries/software. On the
+                    other hand, the effect of this is no different than having
+                    your web framework releasing backwards incompatible APIs. I
+                    don't want to have to worry about the future. I want the
+                    python web framework that provides me with the most
+                    confidence -- the one that won't break my code when I need
+                    to update for a bug fix (or enhancement need) in the web
+                    framework.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/full-stack-vs-glue-comment-15.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Bryan
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

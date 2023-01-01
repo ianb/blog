@@ -1,0 +1,1166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>The Challenge Of Metaprogramming</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>The Challenge Of Metaprogramming</h1>
+
+        <div class="document">
+            <p>
+                I wanted to bring together some ideas from my posts
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/because-unanswered-problems-are-always-hard"
+                    >Because Unanswered Problems Are Always Hard</a
+                >
+                and
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/respecting-the-programmer"
+                    >Respecting The Programmer</a
+                >.
+            </p>
+            <p>
+                Lisp deserves its place as the first high-level programming
+                language. There were other languages of the time which let
+                programmers work at a higher level than they had before, but
+                they did it by putting higher level concepts into the language.
+                Lisp was the first that made it possible to <em>add</em> higher
+                level concepts. It placed power in the hands of the programmer,
+                instead of leaving it in the hands of the language designer.
+            </p>
+            <p>
+                So if it was so hot, why aren't we all coding Lisp now? Those
+                were days when resources were much more limited, but that didn't
+                stop Lisp, and it still should have been ready when the
+                computing resources became available. Lisp should have been
+                poised to take over the world (and a lot of people thought it
+                would). There's lots of
+                <a
+                    class="reference"
+                    href="http://www.paulgraham.com/iflisp.html"
+                    >different</a
+                >
+                <a
+                    class="reference"
+                    href="http://www.dreamsongs.com/WorseIsBetter.html"
+                    >theories</a
+                >
+                about why this didn't happen, but I'll offer one more.
+            </p>
+            <p>
+                Lisp makes good programmers really productive, more than they
+                could be in another language. Paul Graham talks about this in
+                <a class="reference" href="http://www.paulgraham.com/avg.html"
+                    >Beating the Averages</a
+                >. He made great software and sold it for a bundle to Yahoo. But
+                now it's been reimplemented in C++_. Why, oh why?
+            </p>
+            <p>
+                It's easy to blame stupid people for this sort of thing, except
+                that it keeps happening over and over. Metaprogramming is
+                powerful, and was central to Viaweb (20-25% of the code,
+                according to Graham). I think this is an example of Common
+                Lisp's fatal flaw (and since Common Lisp is the standard bearer
+                for all Lisps, it is Lisp's fatal flaw).
+            </p>
+            <p>
+                Lisp metaprogramming is hard. All metaprogramming is hard. But
+                if you can make due with, say, 75% less code due to
+                metaprogramming, and the code is only 100% harder to understand,
+                the net result is that the code is half as hard to understand in
+                its entirety.
+            </p>
+            <p>
+                Except Lisp metaprogramming scales wrong. For a really good Lisp
+                programmer, the result may be a lot better than 0.25 x 2.00
+                (i.e., 25% of the code, 200% as hard to understand, end result
+                is 0.50 times as difficult). But for someone who doesn't know
+                Lisp it's like 0.25 x 10.00 (25% of the code, 1000% as hard to
+                understand = 2.5 times as hard, net; and often it's worse than
+                that), because even after they learn Lisp, they have to learn
+                the macros, and for many (most?) people macros are going to be
+                <em>really really hard</em>.
+            </p>
+            <p>
+                Quoting from
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/respecting-the-programmer"
+                    >Respecting The Programmer</a
+                >:
+            </p>
+            <blockquote>
+                We talk about how Python is also easy to learn and maintain, and
+                that's still true, but it doesn't mean that it evens out the
+                differences in productivity between programmers. In fact, quite
+                the opposite, it makes those most productive programmers more
+                productive and more valuable. That Python is easy to learn and
+                maintain means that there's less risk in using a highly skilled,
+                highly productive programmer. In other languages you risk being
+                left with a program that only another highly skilled programmer
+                can maintain, and that's less likely to occur with Python (for
+                an appropriate definition of &quot;highly skilled&quot;).
+            </blockquote>
+            <p>
+                The risk I'm talking about is exactly the trap that the Viaweb
+                code fell into. Maybe the Yahoo manager that moved to C++ was
+                still dumb, but dumb managers happen. Don't create a situation
+                where a dumb manager invalidates your entire implementation. And
+                you have to reward every programmer, no matter what experience
+                they bring in; you should reward the experienced programmer most
+                of all, because why else become experienced? But if you punish
+                the beginner, it's hard to make friends. Code made up of 20%
+                macros is a punishing experience even for an experienced
+                programmer.
+            </p>
+            <p>
+                So I think it's really important that we approach
+                metaprogramming with caution. I think Guido has been right to
+                resist macros. Not because they are <em>necessarily</em> wrong,
+                but because we haven't yet figured out how to do them right. And
+                maybe we never will, maybe source code simply isn't the right
+                level for abstractions. I think it's good that Python doesn't do
+                tail-call elimination; it seems like a nice feature, but in
+                subtle ways it makes the language harder. And I think
+                continuations could lead to bad things. There <em>are</em> wrong
+                paths on the road to higher-level programming. (Though in some
+                ways I also feel the opposite: <em>tell</em> us not to shoot
+                ourselves in the foot, and expect us to listen, don't assume
+                we'll abuse every feature that exists; there's always a tension
+                in these design choices.)
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 17 Dec '04<br />
+            Modified 09 Jan '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Metaprogramming may be hard but using the results of
+                    metaprogramming is supposed to be much easier than doing
+                    without them (or else you wouldn't do a macro!). So I can't
+                    see the hardness as a justification of not introducing
+                    macros to any language. Just let the better programmers do
+                    the macros and have less experienced programmers use them.
+                    Only few people understand the template metaprogramming
+                    magic happening in Boost/Python but many still use it
+                    merrily. Newbies don't need to read and understand it's
+                    implementation. All they need to know is the interface.
+                </p>
+                <p>
+                    What I do agree with is this: &quot;we haven't yet figured
+                    out how to do them right.&quot; Indeed, for Python, making
+                    powerful macros right is a big problem. The syntax just
+                    resists it unlike in Lisp. I don't know how they did macros
+                    in Dylan but the language never got popular..
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                bob
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Dylan's macros were a kludge, sadly. I doubt more than a
+                        dozen people ever actually understood how the standard
+                        Dylan 'for'-loop macro actually worked.
+                    </p>
+                    <p>
+                        Basically, I've never seen really good macros in an
+                        infix language, and I sincerely doubt good macros can be
+                        retrofitted to an existing infix language. (I strongly
+                        suspect that a new infix language <em>could</em> have
+                        good macros, but you would need to make a few
+                        simplifying assumptions when designing the language's
+                        grammar.)
+                    </p>
+                    <p>
+                        Macros are far easier to understand than C++ template
+                        metaprogramming, and plenty of popular C++ libraries
+                        make extensive use of template metaprogramming. So I
+                        don't think the difficulty of writing macros is a
+                        barrier to including them in a language.
+                    </p>
+                    <p>
+                        Using macros, on the other hand, can be extremely easy,
+                        even for novice programmers. At work, we have scripters
+                        who routinely build complex, nearly-bug-free
+                        model-view-controller (MVC) systems using a few tiny
+                        macros. MVC and many other high-level architectural
+                        patterns are punishingly difficult for novice
+                        programmers. But write a few simple macros and a short
+                        tutorial, and novice programmers can reliably use tricky
+                        design patterns.
+                    </p>
+                    <p>
+                        I think that programmatic macros are a simpler and more
+                        powerful abstraction than C++ template metaprogramming.
+                        But I don't expect to see them in a mainstream language
+                        for quite a few years, because of the difficulty of
+                        implementing them well in an infix language.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    EK
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Dylan macros aren't as much of a kludge as it is
+                            suggested above. They're in fact quite powerful, not
+                            harder to write and read than, say, CL macros, and
+                            tremendously useful. What's missing in the standard
+                            is a procedural macro facility, but there's a draft
+                            available that provides this (google for DEXPRs).
+                        </p>
+                        <p>
+                            The reason Dylan hasn't become successful is
+                            probably that the implementations suffered severe
+                            blows just before they were done (Apple downsized
+                            the Cambridge Labs, Harlequin went bankrupt). Now
+                            that the former Harlequin implementation went Open
+                            Source, there's hope Dylan will gain momentum. In
+                            fact, we have about 200 users of the pre-alpha
+                            snapshot right now.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-8.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.andreas.org/">Andreas Bogk</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                Hi, Andreas! I worked with you in the early
+                                years of the open-source Gwydion Dylan project,
+                                and I'm glad to see you're making so much
+                                progress. Dylan is still one of my favorite
+                                languages.
+                            </p>
+                            <p>
+                                I stand by the argument that Dylan macros are a
+                                kludge. They work fine for relatively simple
+                                source-to-source transformations--largely thanks
+                                to a lot of &quot;do what I mean&quot; magic in
+                                the spec--but as soon as you try to do anything
+                                complicated, they're at least an order of
+                                magnitude harder than creating LALR(1) grammars.
+                                Look at how the pattern &quot;var :: type =
+                                expr&quot; actually binds; it defaults in
+                                helpful ways, but it's incredibly arbitrary and
+                                ad-hoc. These individual kludges add up, and by
+                                the time you're building a large, novel macro,
+                                they become pretty overwhelming.
+                            </p>
+                            <p>
+                                (I'll have to take a look at the dexpr proposal.
+                                It sounds quite promising, but I imagine it
+                                still has a few kludgy issues with Dylan's
+                                low-level pattern grammar.)
+                            </p>
+                            <p>
+                                I think the best macro system, to date, is the
+                                combination of Scheme R(n)RS high-level macros
+                                and the Chez Scheme low-level macro system. It
+                                has all the hygiene Common LISP lacks, and it's
+                                only <em>slightly</em> harder to write
+                                programmatic macros in Chez Scheme than in
+                                Common Lisp.
+                            </p>
+                            <p>
+                                I think the answer for truly good infix macros
+                                requires an extensible grammar system. However,
+                                every extensible grammar system I've examined to
+                                date has been ugly. That's because they all
+                                allowed programmers to extend an underlying
+                                LALR(1)-style grammar (or something similar).
+                                LALR(1)-style grammars, unfortunately, are
+                                tricky and--most importantly--completely
+                                non-modular. You can't easily combine multiple
+                                macros from different modules, you can't produce
+                                good error messages, and you can't formally
+                                explain why certain things work and other things
+                                don't.
+                            </p>
+                            <p>
+                                Basically, I think the key to good infix macros
+                                is to replace LALR(1) with a different,
+                                more-modular parsing model, and then adapt as
+                                much of the LISP/Scheme approach as possible.
+                                LALR(1), quite frankly, is a clever kludge, and
+                                you can almost certainly get by with something a
+                                lot simpler if you make a couple of assumptions.
+                                I'd be delighted to discuss those assumptions
+                                with you in e-mail.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-9.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Eric Kidd
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>Hi Eric!</p>
+                                <p>
+                                    Didn't hear of your for quite a while... If
+                                    you have the time, please visit us at IRC
+                                    channel #dylan, on irc.freenode.net. I'm
+                                    sure we have much to discuss.
+                                </p>
+                                <p>
+                                    But yes, implementing infix macros by adding
+                                    rules to the grammar is a thought that has
+                                    crossed my mind. This would be much more
+                                    straightforward to implement, and give
+                                    better error reporting.
+                                </p>
+                                <p>
+                                    In case you haven't seen it yet, take a look
+                                    at Peter Housel's Monday project (<a
+                                        class="reference"
+                                        href="http://monday.sf.net"
+                                        >http://monday.sf.net</a
+                                    >). It contains a nice extensible parser
+                                    framework.
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-16.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://www.andreas.org/"
+                                    >Andreas Bogk</a
+                                >
+                            </div>
+                            <hr noshade />
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I think you're lumping a lot of things together that don't
+                    have to be. I'm not sure if meta-programming is as
+                    intrinsically hard as you think it is. It
+                    <em>would</em> take a lot of work to convince me that macros
+                    could be done cleanly for Python. The distance between lisp
+                    code and the AST is very small, which limits the
+                    textual/structural disonance. Python lacks that advantage.
+                </p>
+                <p>
+                    I am sure you're dead wrong on tail-call elimination. It's a
+                    compiler/interpreter optimization that removes a penalty for
+                    recursive expression. I'm at a loss for why you think it
+                    makes the language harder, unless you feel that the forms
+                    people use to take advantage of it are obfuscating.
+                    Certainly, nobody's code is going to stop working because of
+                    it.
+                </p>
+                <p>
+                    Continuations are a little harder, but they're not rocket
+                    science. They're certainly not as challenging as complex
+                    macros can be. Scheme Call/CC is named &amp; structured to
+                    be intuitive for somebody who already understands CPS.
+                    Python's implementation could be designed differently.
+                </p>
+                <p>
+                    I disagree with your take on LISP's failure to capture the
+                    mainstream. LISP's biggest failure was timing. It's been
+                    around too long. Everyone has some opinion about the
+                    language's failures that is based in something that was true
+                    at one time. The Lisp community is never going to overcome
+                    that. In some sense, your analysis is the flip side of the
+                    Paul Graham Languages-for-Smart-People position that I hate
+                    so much. I do agree that the PERCEPTION created by that has
+                    hurt LISP. But it's only perception. I don't think that
+                    there is any risk of Python failing because it requires you
+                    to be too smart. Or failing because it lets smart people do
+                    things that mortals can't understand. Or even failing
+                    because of that perception. If Python fails, it will be for
+                    completely different reasons that you are blind to now.
+                </p>
+                <p>
+                    I love Lisp. It's quick and easy for a wide variety of
+                    things. As far as general purpose languages go, It's my
+                    first choice for numerically intense applications (largely
+                    due to Guy Steele's amazing effort in making sure that
+                    Common Lisp did math right). I'm currently designing a DSL
+                    for a project I'm working on. In some ways, it would be easy
+                    to use LISP as the basis for it. But I know that adding the
+                    &quot;Lisp Stigma&quot; will hurt the commercial prospects
+                    of my project. So, the DSL will have a lot of LISPy features
+                    but it won't look like LISP.
+                </p>
+                <p>
+                    My point is that Lisp did not fail because of its strengths,
+                    which seems to be the core of your argument. It didn't fail
+                    because it was hard to learn. It failed because people
+                    thought it was slow. It failed because people thought it was
+                    just for AI. It failed because people thought it didn't do
+                    OO.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Reilly Hayes
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I am sure you're dead wrong on tail-call elimination.
+                        It's a compiler/interpreter optimization that removes a
+                        penalty for recursive expression. I'm at a loss for why
+                        you think it makes the language harder, unless you feel
+                        that the forms people use to take advantage of it are
+                        obfuscating. Certainly, nobody's code is going to stop
+                        working because of it.
+                    </p>
+                    <p>
+                        There's two problems I see with tail-call elimination:
+                    </p>
+                    <p>
+                        First, it messes up tracebacks; you lose frames that,
+                        for debugging, contain useful information. This was the
+                        justification for not adding tail-call elimination to
+                        Squeak Smalltalk, which is where I originally became
+                        suspicious of it (since I very much respect the opinions
+                        and guidance of the Squeak Smalltalk people; e.g., Dan
+                        Ingalls and Alan Kay).
+                    </p>
+                    <p>
+                        Second, it is unpredictable unless you understand it
+                        well. Tail-call elimination can be used to create
+                        functions that simply <em>won't work</em> in its
+                        absence, because of stack limits. Why something will or
+                        will not work is somewhat confusing; adding a
+                        seemingly-innocuous function call to the end of a
+                        recursive function can break the function. For example:
+                    </p>
+                    <pre class="literal-block">
+def munge_items(lst, done=[]):
+    if not lst:
+        return done+lst
+    return munge_items(lst[1:], done+[munge(lst[0])])
+</pre
+                    >
+                    <p>
+                        That's okay with tail-call elimination. But this isn't:
+                    </p>
+                    <pre class="literal-block">
+def munge_items(lst):
+    if not lst:
+        return lst
+    return [munge(list[0])] + munge_items(lst[1:])
+</pre
+                    >
+                    <p>Heck, even this isn't:</p>
+                    <pre class="literal-block">
+def munge_items(lst, done=[]):
+    if not lst:
+        return done+lst
+    result = munge_items(lst[1:], done+[munge(lst[0])])
+    return result
+</pre
+                    >
+                    <p>
+                        How could you understand that without understanding the
+                        underlying process? In isolation, are you really going
+                        to know that tail-call elimination is an essential part
+                        of an algorithm someone else wrote? Little things can
+                        break tail-call elimination, and that's no good. OK,
+                        maybe that's just bad programming to depend on it; it's
+                        par for the course in Lisps, but let's agree it wouldn't
+                        be in Python. But if it isn't something you depend upon,
+                        will the performance gains really be worth it? I used to
+                        do a fair amount of Scheme programming, and in a
+                        functional style that made a lot of use of recursion. I
+                        didn't dislike it at the time, but I don't miss it
+                        either. I just don't see a compelling need for something
+                        that enables more use of recursion.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            I realized that this was your objection after I made
+                            my post. It doesn't change my opinion, but does give
+                            me something concrete to prepare an argument
+                            against. Your example hinged on a few &quot;not
+                            quite a tail-call&quot; cases and the idea that you
+                            would have to understand the underlying
+                            implementation to be able figure out why one runs
+                            out of memory and the other doesn't. I doubt it
+                            would take long to find several examples like those
+                            ALREADY IN THE LANGUAGE. The fact that Python is
+                            iteration-friendly and recursion-hostile is
+                            something that developers have to understand today.
+                        </p>
+                        <p>
+                            Every language implementation has correct programs
+                            that run so poorly that they fail or effectively
+                            fail due to running out of space or time (an
+                            &quot;infinite loop&quot; is merely one that exceeds
+                            the patience of the developer/user). By your logic,
+                            any optimization that would make one of these
+                            correct programs run acceptably is suspect.
+                        </p>
+                        <p>
+                            The funny thing is, I'm opposed to cluttering up
+                            Python. I'm not sure it was a good idea to add
+                            decorators to the language. It's certainly going to
+                            make for more challenging code than tail-call
+                            elimination ever will.
+                        </p>
+                        <p>
+                            BY THE WAY: The stack trace problem is not
+                            intractable:
+                        </p>
+                        <p>
+                            In debugging mode, when the interpreter makes a
+                            tail-call, it could push a debugging frame onto the
+                            stack. The debugging frame contains a pointer to a
+                            circular list in which each entry represents a
+                            parameter set for a tail call. Subsequent tail-calls
+                            would use the existing frame (as long as it is at
+                            the top of the stack) and place their parameter sets
+                            on the list. The circular list is of finite size and
+                            wraps around when that limit is reached,
+                            incrementing a counter of abridged calls.
+                        </p>
+                        <p>
+                            If a non-tail-call is made, it makes use of the
+                            stack as normal. Note that the debugging frame is
+                            now no longer at the top of the stack. A subsequent
+                            tail-call will push a new debugging frame onto the
+                            stack (as above).
+                        </p>
+                        <p>
+                            The return through the frame &quot;returns&quot; to
+                            code which cleans up the circular list and returns
+                            to the context calling the context that made the
+                            tail-call just liek it should.
+                        </p>
+                        <p>
+                            The stack trace display function needs to know about
+                            the debugging frames and how to read the circular
+                            lists. If the circular list was not exhausted, then
+                            the trace will be no different than for
+                            non-optimized tail-calls. If it was, it will need to
+                            say something like &quot; ... 95 Calls abridged ...
+                            &quot;. Frankly, I think this will make the stack
+                            traces MORE readable for deeply recursive code.
+                        </p>
+                        <p>
+                            Note1: Due to co-recursion the circular list has to
+                            support multiple parameter set signatures (A tcalls
+                            B tcalls A tcalls B ...). Note2: I would keep the
+                            initial parameter set for the tail-call creating the
+                            frame, overwriting tail calls 2 thru N (where N is
+                            the maximum size of the circular list). This would
+                            have the advantage that the &quot;abridgement&quot;
+                            would be bracketed nicely.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-5.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Reilly Hayes
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        I forgot one major point. I don't really care about
+                        tail-recursion from a performance point of view. I care
+                        because there is a large set of problems for which the
+                        recursive code is MUCH clearer than the iterative
+                        version.
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-6.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Reilly Hayes
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        why the third definition should not be tail recursive? I
+                        don't think that assignment to a local variable would
+                        hinder the compiler to not notice the tail recursion..
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-7.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        anonymous
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            Good point. The third example <em>is</em> eligible
+                            for tail-call elimination.
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-11.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Reilly Hayes
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+
+                    <div class="document">
+                        <p>
+                            &quot;The distance between lisp code and the AST is
+                            very small, which limits the textual/structural
+                            disonance.&quot;
+                        </p>
+                        <p>
+                            Very well put, as I like to say in Lisp the syntax
+                            is the semantics. This feature of Lisp is profound
+                            and it makes Lisp unlike any other language. Lisp
+                            and her pretty sister Scheme are essentially sugared
+                            lambda calculus. They blur the distinction between
+                            program and data. Since a program is itself just
+                            data this makes Metaprogramming easy. Using these
+                            for DSLs is imho the best approach to higher level
+                            programming.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-10.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://bitdiddle.blogspot.com">Bob Dionne</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            I think Tcl is has a surprisingly unified syntactic
+                            model, based on strings and quoting roles, instead
+                            of lists and symbols.
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-12.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="index.html">Ian Bicking</a>
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    Yes, but it's also the source of some of its
+                                    biggest problems. Parameter passing is a
+                                    MESS. I used Tcl heavily at one point
+                                    (starting when it was pretty much the only
+                                    game in town for embedding into C). We built
+                                    some neat stuff that was easily extensible.
+                                </p>
+                                <p>
+                                    One measure of a language is what happens
+                                    when a program/system approaches the
+                                    complexity limits of the language. In most
+                                    languages, development gradually gets more
+                                    difficult. Each feature takes more time to
+                                    develop. In Tcl, users hit the wall HARD
+                                    when those limits get near. This is mostly
+                                    because of the string substitution model and
+                                    its impact on program structure.
+                                </p>
+                                <p>
+                                    I'd still use Tcl for some things, but only
+                                    when I KNEW that Tcl would only be used to
+                                    express very simple programs.
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-13.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                Reilly Hayes
+                            </div>
+                            <hr noshade />
+                        </blockquote>
+                    </blockquote>
+
+                    <div class="document">
+                        Personally, I understood how to make proper tail calls
+                        long before I understood the underlying mechanism, or at
+                        least before I understood it well. In Scheme/Lisp, all
+                        you have to know is that to make things efficient, you
+                        should put your recursive call not surrounded by any
+                        other function. In Python, it's just as simple: make the
+                        thing after return be a recursive function call, and
+                        don't use anything to operate on the result of that
+                        recursive call.
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-14.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Daniel Ehrenberg
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    You write &quot;don't create a situation where a dumb
+                    manager invalidates your entire implementation.&quot; This
+                    to me seems a very low priority. Macros did what mattered,
+                    which was to win in the market and get us bought by Yahoo.
+                    What the generic corporate programmers who inherited the
+                    code after we sold it to them did with it is of minuscule
+                    importance by comparison.
+                </p>
+                <p>
+                    Your advice is equivalent to: write novels that Hollywood
+                    writers won't need to change to turn into screenplays.
+                </p>
+                <p>
+                    If some Hollywood script doctor tacks a happy ending onto
+                    your novel, does that &quot;invalidate&quot; it?
+                </p>
+                <p>
+                    I'm glad you guys are at least <em>talking</em> about macros
+                    though. Ten years ago the mainstream programming world
+                    wasn't even aware of the concept.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-18.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://paulgraham.com">Paul Graham</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Extending your metaphor, your advice is: write good
+                        novels. But that's not a viable plan for working
+                        writers, anymore than it is for working programmers.
+                        Working writers write things like magazine articles and
+                        manuals and brochures, and Steven King doesn't get hired
+                        to write even <em>really important</em> brochures. So,
+                        you've got a plan to become a Steven King; but we all
+                        know that's not a practical goal for the industry.
+                    </p>
+                    <p>
+                        Yahoo Stores showed that a small group of really good
+                        programmers, using powerful tools, could create
+                        something good, fast, and innovative all at once. Small
+                        groups of really good programmers should pay attention.
+                        But that applies to very, very few people -- including
+                        very few really good programmers! And so it isn't a very
+                        good showcase for Lisp either.
+                    </p>
+                    <p>
+                        If we talk about creating powerful tools that allow us
+                        to extend the state of the art -- the &quot;us&quot;
+                        that includes the entire open source community, or the
+                        entire IT industry -- then we need to think a little
+                        more democratically about these things. We should have a
+                        system where programmers with a diversity of skills can
+                        all participate usefully in a project, even if at
+                        different levels of productivity.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-19.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            I've made extensive use of Scheme macros on a
+                            project with many novice coders. The macros define a
+                            domain-specific language, and have been largely
+                            responsible for the success of the project to date
+                            (i.e., asking our coders to use a general purpose
+                            language for domain-specific problems would almost
+                            certainly have been a disaster).
+                        </p>
+                        <p>
+                            We seriously evaluated using Python for this
+                            project, and reached two conclusions:
+                        </p>
+                        <ol class="arabic simple">
+                            <li>
+                                Python was a far easier language to learn than
+                                Scheme.
+                            </li>
+                            <li>
+                                There was no good way to represent our problem
+                                domain in Python. Users would be forced to add
+                                gratuitous levels of class structure and
+                                indenting, and they're have to do it right
+                                <em>every time</em>. Unfortunately, some of the
+                                defining characteristics of novice programmers
+                                are that they don't reliably follow
+                                style-guides, they don't understand complex
+                                coding conventions, and they don't deal well
+                                with extra levels of indentation.
+                            </li>
+                        </ol>
+                        <p>
+                            So we wrote ten pages of fairly complex macro code
+                            which massively reduced the complexity of hundreds
+                            of pages of domain code. Management knows how hard
+                            it will be to hire someone to maintain the macro
+                            code, and they still consider it an acceptable
+                            tradeoff--we gain so much elsewhere that a small
+                            amount of guru-level code is OK.
+                        </p>
+                        <p>
+                            I've contributed to largish Python projects
+                            (including Zope) and these problems do occur
+                            elsewhere. The Zope security system, in particular,
+                            requires programmers to add security
+                            &quot;declarations&quot;, which are actually fiddly
+                            little snippets of executable code, each of which
+                            needs to be in almost exactly the correct place, and
+                            few of which are meaningfully error-checked. If
+                            Python had a decent macro system--or even C#-style
+                            class and method adjectives--Zope's security system
+                            could be made completely declarative, which I think
+                            would be a win. Pythonistas may disagree, of course.
+                        </p>
+                        <p>
+                            I'm not arguing that Python should include macros,
+                            not even simple and elegant ones (if such are
+                            possible). After all, language design is an art, and
+                            Guido needs to balance many competing factors to
+                            make a widely accessible language.
+                        </p>
+                        <p>
+                            I <em>am</em>, however, arguing that on certain
+                            real-world projects, Python's lack of macros
+                            cripples it so badly that even as esoteric a
+                            language as Scheme can ultimately be more usable for
+                            novice programmers. Python is a general-purpose
+                            notation--perhaps the best I've ever seen--but a
+                            general-purpose notation can be significantly harder
+                            to apply than a good domain-specific notation.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-20.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        EK
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                I think &quot;cripple&quot; is a little extreme.
+                                But I do agree that we need good metaprogramming
+                                constructs, and I'm really very interested in
+                                that, I'm just not that psyched about some
+                                particular techniques.
+                            </p>
+                            <p>
+                                And there's a <em>lot</em> more opportunities to
+                                do metaprogramming now than there were a few
+                                years ago -- in part because of changes in the
+                                language (mostly Python 2.2), and in part
+                                because we're learning better techniques to use
+                                those features. There are a lot of avenues for
+                                exploration, most of which are probably a bad
+                                idea ;) And we have what I'm guessing is the
+                                same as method adjectives in Python, I believe
+                                at the bequest of Zope people, though it was too
+                                late for them to use them -- functions can have
+                                arbitrary attributes with arbitrary values
+                                (since Python 2.0 or 2.1?) And of course classes
+                                have always had this ability. Or maybe you are
+                                thinking of something else?
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-21.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="index.html">Ian Bicking</a>
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Your essay reminds me of an old Lisp saying: &quot;Lisp is
+                    hard, let's go shopping!&quot;
+                </p>
+                <p>
+                    Yeah, macros are a little harder to write. But not much. A
+                    macro is just more Lisp code, so you already know the
+                    language of macros. And the output of your macro is also
+                    Lisp code, the code you want to see run. And you are already
+                    writing code to run at run time, so the only thing new is
+                    that you are writing code to write your code for you. And
+                    that is just a matter of figuring out the pattern in the
+                    boilerplate demanded by some API (including APIs you build
+                    yourself).
+                </p>
+                <p>
+                    Yes, macros do more for the master than for the apprentice.
+                    If one does not notice the higher order pattern, one never
+                    conceives never mind can appreciate the opportunity to
+                    improve code. But any good tool benefits the expert more
+                    than the novice. I have seen structured programming,
+                    relational design, and OO design all misapplied by
+                    entusiasts.
+                </p>
+                <p>
+                    No, macros do not make code harder to read. Why do you think
+                    we write them? We write macros to make code easier to read
+                    and write. That is why we are not dissuaded by the prospect
+                    of having to think a little more deeply.
+                </p>
+                <p>
+                    And yes, easier also means shorter. A Macro hides repetitve
+                    syntax that obscures meaning, illuminating the semantics of
+                    an algorithm. Making code easier to read.
+                </p>
+                <p>
+                    The analogy is that I am in a field of knee-deep mud trying
+                    to reach a goal a mile away. I look a hundred yards to my
+                    right and see a nice paved sidewalk leading right to the
+                    same goal. I'll have to climb a twenty-foot cliff I see
+                    between me and the path, but the cliff looks reasonable, I
+                    have climbed a lot, I actually like the challenge of
+                    climbing...
+                </p>
+                <p>
+                    Look at it another way. You have a mixed bag of talent on a
+                    team anyway, some good, some great. The great ones are bored
+                    to tears churning out boilerplate. Lisp lets you reward
+                    better programmers with more challenging work, and lets you
+                    get more out of them, because their efforts will make the
+                    other folks insanely more productive (it's in the macro
+                    writer's job description). Shucks, you can even pay them
+                    more, enough to keep them because no one else can afford to
+                    pay them so much to churn out Java line noise.
+                </p>
+                <p>kenny</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-30.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.tilton-technology.com/">kenny</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    If you think Lisp macros are hard you should try writing a
+                    system for load-time code-generation in Python, Perl or
+                    Ruby. It's not that you can't do it. You certainly can. It's
+                    that the result is a horrific mess.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-31.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://wolf.southoftheclouds.net/">Aminorex</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        &quot;You certainly can. It's that the result is a
+                        horrific mess.&quot;
+                    </p>
+                    <p>What sort of things are you thinking of?</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-32.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="https://ianbicking.org/www.synaesmedia.net"
+                        >phil jones</a
+                    >
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        In Python you shouldn't be doing code generation. You
+                        can generally accomplish the same things in other ways
+                        in Python. Of course, in some cases people do code
+                        generation, most commonly templating languages, but I
+                        don't know that Lisp macros really apply there either.
+                        But otherwise code generation is used in a limited way,
+                        without actually losing the power of code generation.
+                    </p>
+                    <p>
+                        That isn't to say that macros aren't useful, and that
+                        syntactic extensions aren't something that Python
+                        programmers could make use of, but that's a somewhat
+                        separate issue from code generation as a technique for
+                        implementing syntactic extensions.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-33.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    So you say that metaprogramming is hard? Did you really
+                    think through that statement? Have you ever sat down and
+                    pondered what generally makes programming hard?
+                </p>
+                <p>
+                    LISP macros are practically equivalent to subroutines, as
+                    far as difficulty goes.
+                </p>
+                <p>
+                    What if you were in 3rd grade learning how to do short
+                    division? Would you say that we shouldn't learn short
+                    division, but only long division, just because it is harder
+                    for you?
+                </p>
+                <p>
+                    Everyone has their strengths and weak areas. Am I wrong to
+                    assume that programmers have intellect? Learning curves are
+                    overcome, so who really cares about learning curves! Its how
+                    productive you will be in the end that matters. Come on!
+                    Let's think long-term about what language we use.
+                </p>
+                <p>
+                    If you take your arguments into account, I am afraid LISPs
+                    advantages outweigh them by far.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-23.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Max
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

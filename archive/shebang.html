@@ -1,0 +1,367 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Shebang</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Shebang</h1>
+
+        <div class="document">
+            <p>
+                I thought I was all clever because I figured out a good
+                technique of making configuration files executable with
+                <tt class="docutils literal"><span class="pre">#!</span></tt
+                >. But apparently I was not so clever.
+            </p>
+            <p>On FreeBSD I got this working nicely:</p>
+            <pre class="literal-block">
+#!/usr/bin/env paster exe serve
+</pre
+            >
+            <p>
+                The
+                <tt class="docutils literal"><span class="pre">exe</span></tt>
+                told
+                <tt class="docutils literal"
+                    ><span class="pre">paster</span></tt
+                >
+                that it should expect the shebang setup (config file follows,
+                etc). And while putting
+                <tt class="docutils literal"
+                    ><span class="pre">paster</span></tt
+                >
+                itself as the command didn't work,
+                <tt class="docutils literal"
+                    ><span class="pre">/usr/bin/env</span></tt
+                >
+                parsed everything nicely for me (and since
+                <tt class="docutils literal"
+                    ><span class="pre">paster</span></tt
+                >
+                itself uses a shebang line to be executable, only
+                <tt class="docutils literal"
+                    ><span class="pre">/usr/bin/env</span></tt
+                >
+                was willing to recursively interpret that).
+            </p>
+            <p>
+                <tt class="docutils literal"
+                    ><span class="pre">paster</span></tt
+                >
+                would then end up seeing an argv like
+                <tt class="docutils literal"
+                    ><span class="pre">['paster',</span>
+                    <span class="pre">'exe',</span>
+                    <span class="pre">'serve',</span>
+                    <span class="pre">config_file,</span>
+                    <span class="pre">extra_args...]</span></tt
+                >
+                where
+                <tt class="docutils literal"
+                    ><span class="pre">extra_args</span></tt
+                >
+                were any arguments you passed on the command line. The
+                environmental variable
+                <tt class="docutils literal"><span class="pre">_</span></tt>
+                would be set to config_file.
+            </p>
+            <p>
+                Usually something that seems sensible on FreeBSD will work on
+                Linux; in comparison to BSD tools, the GNU tools (standard on
+                Linux) generally favor sensibility over backward compatibility,
+                and FreeBSD seems very sensible in this case. I could only
+                expect more sensibility on Linux, right?
+            </p>
+            <p>
+                Sadly, no.
+                <tt class="docutils literal"
+                    ><span class="pre">/usr/bin/env</span></tt
+                >
+                parses that as a request to run
+                <tt class="docutils literal"
+                    ><span class="pre">&quot;paster</span>
+                    <span class="pre">exe</span>
+                    <span class="pre">serve&quot;</span></tt
+                >
+                -- i.e., a file with embedded spaces. Sigh. It does still set
+                <tt class="docutils literal"><span class="pre">_</span></tt
+                >, and passes extra arguments. But I still want to know
+                <em>when</em> I'm in a shebang environment, so paster can
+                respond accordingly, and I'm not sure how to detect that. When
+                <tt class="docutils literal"
+                    ><span class="pre">environ['_']</span>
+                    <span class="pre">!=</span>
+                    <span class="pre">sys.argv[0]</span></tt
+                >? Is that reliable? Is there another way to detect this? Any
+                hints for MacOS (like FreeBSD?) and/or Solaris (like stupid
+                Linux?)
+            </p>
+        </div>
+        <div class="dates" align="right">Created 07 Nov '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    See
+                    <a
+                        class="reference"
+                        href="http://svn.eby-sarna.com/PEAK/INSTALL.txt?view=markup"
+                        >http://svn.eby-sarna.com/PEAK/INSTALL.txt?view=markup</a
+                    >
+                    under the heading &quot;SCRIPTS, BATCH FILES, AND
+                    '#!'&quot;:
+                </p>
+                <blockquote>
+                    <tt class="docutils literal"
+                        ><span class="pre">invoke</span></tt
+                    >
+                    allows an arbitrary number of space-separated arguments to
+                    be passed to the command it invokes, thus working around
+                    various Unixes'
+                    <tt class="docutils literal"
+                        ><span class="pre">#!</span></tt
+                    >
+                    parsing problems, as well as the &quot;can't use a script as
+                    an interpreter&quot; problem. It also searches the system
+                    PATH for the specified command. You may find this useful for
+                    non-PEAK script interpreters as well.
+                </blockquote>
+                <p>
+                    In short, you can use PEAK's &quot;invoke&quot; command (a
+                    simple C program) to work around this and various other
+                    cross-platform
+                    <tt class="docutils literal"
+                        ><span class="pre">#!</span></tt
+                    >
+                    issues. PEAK has been doing executable config files for
+                    rather a long time, so we've run into this before.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/shebang-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://dirtSimple.org">Phillip J. Eby</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        It sounds like
+                        <tt class="docutils literal"
+                            ><span class="pre">invoke</span></tt
+                        >
+                        works like
+                        <tt class="docutils literal"
+                            ><span class="pre">/usr/bin/env</span></tt
+                        >
+                        does on FreeBSD (but not everywhere). That's nice;
+                        though the one issue I see is that
+                        <tt class="docutils literal"
+                            ><span class="pre">/usr/bin/env</span></tt
+                        >
+                        is pre-installed into that exact location on most modern
+                        systems (and if it isn't, then the sysadmin should fix
+                        that, because it's a common idiom). If I can live with
+                        env's lowest-common denominator (which maybe I can),
+                        then it seems preferable. I already support moving the
+                        <tt class="docutils literal"
+                            ><span class="pre">server</span></tt
+                        >
+                        argument into the main configuration file, so if
+                        <tt class="docutils literal"
+                            ><span class="pre">exe</span></tt
+                        >
+                        isn't necessary then I should be set.
+                    </p>
+                    <p>
+                        Incidentally, I probably thought about adding this
+                        feature of executable configuration files to paster
+                        because I'd seen it PEAK.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/shebang-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            It's not
+                            <tt class="docutils literal"
+                                ><span class="pre">env</span></tt
+                            >
+                            that's the problem. It's the operating system. Linux
+                            is passing only one argument to
+                            <tt class="docutils literal"
+                                ><span class="pre">env</span></tt
+                            >, so even if you used the exact same
+                            <tt class="docutils literal"
+                                ><span class="pre">env</span></tt
+                            >
+                            program, it would make no difference.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/shebang-comment-5.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://dirtSimple.org">Phillip J. Eby</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                Then
+                                <tt class="docutils literal"
+                                    ><span class="pre">env</span></tt
+                                >
+                                should have fixed that by splitting the
+                                arguments itself! Especially since the
+                                <tt class="docutils literal"
+                                    ><span class="pre">env</span></tt
+                                >
+                                installed by the system should already be
+                                customized for the system (and whatever flaws it
+                                might have).
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/shebang-comment-6.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Ian Bicking
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    Um, no. That's not what env is even for. Env
+                                    is a command to &quot;run a program in a
+                                    modified environment&quot;. The fact that
+                                    env is often used in
+                                    <tt class="docutils literal"
+                                        ><span class="pre">#!</span></tt
+                                    >
+                                    lines as a convenient hack to make
+                                    <tt class="docutils literal"
+                                        ><span class="pre">#!</span></tt
+                                    >
+                                    pay attention to
+                                    <tt class="docutils literal"
+                                        ><span class="pre">PATH</span></tt
+                                    >
+                                    has nothing to do with env's specified and
+                                    intended behavior. If env were to do what
+                                    you're suggesting, it would be violating its
+                                    own documentation and the normal argument
+                                    processing conventions for Unix commands.
+                                    See also &quot;man env&quot;.
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/shebang-comment-7.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://dirtSimple.org"
+                                    >Phillip J. Eby</a
+                                >
+                            </div>
+                            <hr noshade />
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Also, see
+                    <a
+                        class="reference"
+                        href="http://homepages.cwi.nl/~aeb/std/shebang/"
+                        >http://homepages.cwi.nl/~aeb/std/shebang/</a
+                    >
+                    for information on various platforms'
+                    <tt class="docutils literal"
+                        ><span class="pre">#!</span></tt
+                    >
+                    handling, including some test code you can use to find out
+                    what particular way(s) a given platform is borked.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/shebang-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://dirtSimple.org">Phillip J. Eby</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    In my recollection, older Solaris systems had
+                    <tt class="docutils literal"
+                        ><span class="pre">/bin/env</span></tt
+                    >
+                    rather than
+                    <tt class="docutils literal"
+                        ><span class="pre">/usr/bin/env</span></tt
+                    >. This was a simple matter to fix with a symlink, but it
+                    limited script portability.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/shebang-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://serpentaddiction.blogspot.com">Jeff Bauer</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

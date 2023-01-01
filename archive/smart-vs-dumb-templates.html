@@ -1,0 +1,569 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Smart vs. Dumb Templates</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Smart vs. Dumb Templates</h1>
+        <p>
+            Sometimes people think that layout is simple. You need a big, smart
+            language like Python to do programming -- but something more limited
+            will do for the layout and rendering. In fact, there's usually a
+            little arrogance in there -- the templating language
+            <i>should</i> be simple, and it <i>should</i> be underpowered,
+            because you want to hobble the template writers lest they escape
+            into the Dark Forest of Programming, taking maintainability with
+            them.
+        </p>
+
+        <p>
+            At first it seems like this would work. But all programs start out
+            simple (at least if you are writing them correctly). I think people
+            believe layout can be simple because rendering is sloppy. Good
+            rendering doesn't lead to "You have 0 message(s)" (and if you're
+            going to be sloppy, at least make it obvious by saying "Messages: 0"
+            -- use natural language right, or just don't use it at all).
+        </p>
+
+        <p>
+            There's lots of other layout issues. Many pages render improperly
+            when the content is too short, or has long lines, and so on. And
+            these are problems just for rendering relatively static material, as
+            opposed to interactive web applications.
+        </p>
+
+        <p>
+            Okay... so people do sloppy programming, that's fine. Sloppy output
+            is a much smaller sin than other kinds of programmer sloppiness. But
+            a templating language should be able to stay with you from
+            sloppiness to refinement. If your template language is underpowered
+            you're putting up a future barrier.
+        </p>
+
+        <p>
+            And instead, layout starts creeping back into the "control" code.
+            You have to provide the template with partially rendered input, or
+            precalculate values for consumption only by your templates. You can
+            separate hard programming from easy programming, or you can separate
+            logic from layout, but you cannot do both.
+        </p>
+
+        <p>
+            Things become even worse if you are dealing with an interactive web
+            application. A web UI is a subtle thing, and prone to overall
+            suckiness. (It is ironic that I am a web programmer, yet I rather
+            dislike web interfaces) "Layout" and "display" become very
+            complicated -- if you are writing your UI well! A simple display
+            gives people only small snippets of information at a time, leads to
+            low-content interstitial pages, forces information traversal instead
+            of nested display, and lacks helpful or predictive direction. A good
+            UI involves all sorts of little rules, exceptions, warnings,
+            qualified feedback and compound screens. Wimpy template languages
+            are not up to the job. Though you might ask: are any template
+            langauges up to the job?
+        </p>
+
+        <p>
+            <a href="http://pyds.muensterland.org/">PyDS</a> (which I use to
+            publish this weblog) uses
+            <a href="http://cheetahtemplate.org/">Cheetah Templates</a> for much
+            of its display. Cheetah is a full-featured templating language
+            (perhaps the most full featured of Python templating options, though
+            <a href="http://www.alcyone.com/software/empy/">empy</a> might be
+            close). PyDS uses quite a few templates to control the process --
+            but they are very dense. Some sorts of layout control
+            <i>should</i> be easy, like rearranging elements or tweaking the
+            granuarity of CSS classes. But reading the PyDS templates isn't
+            easy, they are dense with code and difficult to understand. So I'm
+            not sure, should template languages be powerful, or should we leave
+            them dumb and couple them with Python code?
+        </p>
+
+        <p>
+            (I might add: PyDS templates, or other complex templates, might be
+            simpler to work with if they used Cheetah's inheritance features; a
+            Cheetah editor would also be neat ;)
+        </p>
+
+        <div class="dates" align="right">
+            Created 31 Oct '03<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            Actually I tried to use the Cheetah inheritance feature in the start
+            of PyDS. I failed miserably - don't know wether it was a bug or my
+            stupidity or both, though ;-)
+            <br />
+
+            <br />
+            There were some weird things about the inheritance that got me to
+            change over to the way I now do it. The templates are actually quite
+            simple - there are *Template.tmpl files, that describe your desktop.
+            There are *Rendering.tmpl files that describe your clould. There are
+            Base*.tmpl files that describe your outer layout (where to place
+            what). All other templates are for tools and carry the tool name in
+            their filename.
+            <br />
+
+            <br />
+            Templates are in a very simple way: the tools push their contents
+            into the tool template. What comes out goes into the base template.
+            The rest is just pushing around objects and prefilling the template
+            namespace.
+            <br />
+
+            <br />
+            So for layout changes you mostly work on the Base*.tmpl files, as
+            they define your layout. The others are more "push this out of the
+            code" templates. But the template situation is still a bit weird
+            with PyDS, as not all areas are templated (many tools don't use
+            templates but could make use of them: for example the aggregator
+            should be changed to templates one day, so you could influence your
+            aggregator layout better).
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment539.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://pyds.muensterland.org/">Georg Bauer</a>
+            </div>
+            <hr noshade />
+            I'm on the fence when it comes to templating. My first instinct is
+            to say that presentation layers should only wory about presentation.
+            i.e., where bits should go and how they should look. Everything else
+            should be code, because it involves data processing and
+            non-presentation logic. Thus, one does not have to work in two (or
+            more!) distinct programming languages and deal with the inevitable
+            impedence mismatches that result. So by this argument, template
+            languages should be a fancy syntax for nothing more than simple
+            string concatination and replacement engines.
+            <br />
+
+            <br />
+            However, the flaw in this seems to be that many people view a
+            templating language as a vehicle for non-programmers to act like
+            programmers without getting into too much trouble when they make
+            mistakes. So this mind set uses wants template languages to be a way
+            of adding safe, managed code to projects by potentially unsafe
+            developers.
+            <br />
+            And down that path seems to be maddness.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment540.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.theopalgroup.com/">Kevin Jacobs</a>
+            </div>
+            <hr noshade />
+            But my entire point was that a simple templating language isn't up
+            to the task of presentation. If you want the templating language to
+            handle presentation, it must be a powerful and complete language,
+            because presentation isn't an easy problem. I don't think tools
+            should be crippled in order to keep people from doing what they
+            shouldn't -- carrots are better than sticks.
+            <br />
+
+            <br />
+            PHP, for instance, has "powerful" templates, with nothing
+            <i>except</i> templates. So stuff gets all mixed up. But the problem
+            isn't that the templates in PHP are too powerful. Rather they lack
+            the carrot to keep people from putting code in templates. In Zope
+            DTML was a mess, but that had a lot to do with the lack of Python
+            Scripts. You still get growth issues, but those are refactoring
+            issues. When things get messy you refactor them -- that's the
+            natural development process, and messiness is an inevitable
+            side-effect of development. But those things should be fixed -- the
+            dumb template alternative is to avoid messiness and refactoring by
+            keeping people from doing anything at all, or by forcing them to
+            create sub-standard presentations.
+            <div align="right">
+                <a href="https://ianbicking.org/comment541.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            After many attempts I would say: reduce templates to a minimun. In
+            the past I've tried ASP.NET, XSLT and Cheetah (with Webware) to
+            separate code and layout, but I always ended up to have a mess in
+            the (X)HTML. So recently i started experimenting with XHTML and DOM
+            manipulation.
+            <br />
+
+            <br />
+            Most of the times what I really need is a "Master Page" concept that
+            hold common elements shared among site pages and a way to children
+            pages to replace blocks in the mater pages with specilized content.
+            This is what Cheetah does, but it should really stop there.
+            <br />
+
+            <br />
+            For example in Python it's very easy to generate a [select] and
+            [options] fields plus-item-currently-selected with a list
+            comprehension, but in Cheetah it'is not that compact, you have to
+            use a #for, an #if/#else but doing this broke the WYSIWYG HTML
+            editor. So you have a language that looks quite like Python but
+            lacks of the most advanced (and useful) features. I don't like it.
+            <br />
+
+            <br />
+            Also delegate all the presentation to CSS helps a lot. You can
+            changes fonts, background colors and, sometimes, elements position
+            via CSS bypassing XHTML altogether.
+            <br />
+
+            <br />
+            To my knownledge there are a couple similar approaches in Python:
+            <a href="http://www.entrian.com/PyMeld/" target="_blank">PyMeld </a>
+            and
+            <a
+                href="http://freespace.virgin.net/hamish.sanderson/htmltemplate.html"
+                target="_blank"
+                >HTMLTemplate</a
+            >.
+            <br />
+
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment542.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.deelan.com/">dee</a>
+            </div>
+            <hr noshade />
+            FYI: there's a useful analysis of templates at
+            <a
+                href="http://wact.sourceforge.net/index.php/TemplateView"
+                target="_blank"
+                >http://wact.sourceforge.net/index.php/TemplateView</a
+            >
+            <div align="right">
+                <a href="https://ianbicking.org/comment543.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.phppatterns.com">Harry Fuecks</a>
+            </div>
+            <hr noshade />
+            I've worked with non-Python programmers and templating systems in
+            the past. And I see your point about sufficient power in the
+            templating system.
+            <br />
+
+            <br />
+            There are a number of considerations involving templating languages
+            that do not have to do with power.
+            <br />
+
+            <br />
+            One is the nature to do a form of round trip. Can a template be
+            given back to a designer (or designer's software) and can this
+            designer then make adjustments without getting hopelessly confused
+            or breaking the logic of the template all the time? Both ZPT and
+            Twisted Woven are attempts in this direction. Lots of program code
+            in a template can break this.
+            <br />
+
+            <br />
+            The other, which is a recent insight I'm still exploring, is how
+            much of the program has to be exposed to the template designer at
+            all. Most templating systems allow calling into the program's API,
+            which can have a complex object model below it. This has two
+            problems:
+            <br />
+
+            <br />
+            * the template designer can be exposed to lots of aspects of the API
+            that this designer has nothing to do with. It's not clear whether
+            the designer needs most of this information; the designer may get
+            confused or the designer may cause parts of the program to be called
+            that were not intended to be called from the template directly at
+            all.
+            <br />
+
+            <br />
+            * Bugs in the software are exposed to the template designer. The
+            template designer can create perfect template logic, and be exposed
+            to errors in the software that have nothing to do with his own
+            performance as a template designer. The template
+            <br />
+            designer is exposed to complex error messages in the application
+            logic.
+            <br />
+
+            <br />
+            I think that a template designer needs enough power but should not
+            have to deal with the junk in the underlying system so much. I also
+            suspect the template language does not need *that* much power if the
+            data that is fed into the template already is prepared for various
+            circumstances; i.e. Python logic on a view.
+            <br />
+
+            <br />
+            I don't mind if the designer writes parts of the view code (outside
+            the template), too. It will probably result in better factored
+            templates as common expressions can disappear into simple view
+            methods.
+            <br />
+
+            <br />
+            Most view systems are 'pull models'; API calls pull the information
+            from
+            <br />
+            the object model. The problems I mentioned above are hard to avoid
+            in those. There are also view systems with aspects of a 'push
+            model'; information is pushed outside the application into a bundle
+            that can be easily accessed by the view, and which only contains the
+            information needed by the views. Bugs in application logic will
+            often be exposed in the push phase, not afterwards. Streams of data
+            will be combined before they reach the view, so it's not the job of
+            the view to query various part of the program directly, only what is
+            produced by the first phase.
+            <br />
+
+            <br />
+            What is pushed out can be strictly defined. XML pipeline
+            <br />
+            models such as in cocoon have push properties, and are therefore
+            interesting in this respect. The stage before the view template
+            produces an XML
+            <br />
+            document with the relevant information to display the view.
+            Programmers
+            <br />
+            can debug what appears in this stage without bothering the view
+            <br />
+            developer, who only has access to the output of this stage.
+            <br />
+
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment544.html" rel="nofollow"
+                    >#</a
+                >
+                Martijn Faassen
+            </div>
+            <hr noshade />
+            Have you looked at Zope Page Templates
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment545.html" rel="nofollow"
+                    >#</a
+                >
+                David Sumner
+            </div>
+            <hr noshade />
+            A case can be made that most of these so-called "underpowered"
+            templates are actually 1) *overpowered*, and 2) based on the wrong
+            paradigm.
+            <br />
+
+            <br />
+            By contrast, check out the templating in PSO (Python Service
+            Objects), Twisted's Woven, and my own peak.web.templates. Each is
+            based on the idea of designating portions of output as being
+            rendered by Python components. But, the components aren't
+            responsible for generating actual output markup. That is, the Python
+            components don't know anything about markup language, they simply
+            manipulate markup provided to them as parameters.
+            <br />
+
+            <br />
+            From this approach, you can do anything that a typical templating
+            language does, but you're forced to do it modularly, in Python. The
+            end result is that there's no code in your template, and no template
+            in your code. Instead, UI developers simply choose from available
+            structural manipulations to apply to the markup. The result is
+            VB-like, in that you just add controls and parameterize them (with
+            markup). If new controls are needed, you write them in Python,
+            producing the best of both worlds.
+            <div align="right">
+                <a href="https://ianbicking.org/comment546.html" rel="nofollow"
+                    >#</a
+                >
+                Phillip J. Eby
+            </div>
+            <hr noshade />
+            i've been using the perl templating module
+            <a href="http://html-template.sourceforge.net/" target="_blank"
+                >HTML::Template</a
+            >, for years and have never felt at all limited by it, even though
+            it probably falls closer to the Dumb end of the spectrum.
+            <br />
+
+            <br />
+            as i've started working more in python, i discovered an
+            underappreciated benefit of HTML::Template: language independence.
+            the template syntax itself isn't tied to perl or any other language
+            and clones exist for
+            <a
+                href="http://htmltmpl.sourceforge.net/python.html"
+                target="_blank"
+                >python</a
+            >,
+            <a href="http://htmltmpl.sourceforge.net/php.html" target="_blank"
+                >php</a
+            >,
+            <a href="http://html-tmpl-java.sourceforge.net/" target="_blank"
+                >java</a
+            >, and probably other languages. so the designers i work with
+            haven't had to learn a new template syntax just because i've changed
+            to a new application language, and i've been able to successfully
+            port apps from perl to python without touching the template files.
+            <br />
+
+            <br />
+            also, perrin harkins has a pretty good discussion of various
+            templating systems (perl oriented but the basic ideas carry over):
+            <a
+                href="http://www.perl.com/pub/a/2001/08/21/templating.html"
+                target="_blank"
+                >http://www.perl.com/pub/a/2001/08/21/templating.html</a
+            >
+            <div align="right">
+                <a href="https://ianbicking.org/comment547.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://thraxil.org/">anders</a>
+            </div>
+            <hr noshade />
+            We've discussed this internally many times and I personally have
+            come to the conclusion that your system should have an API that your
+            delivery layer calls. The delivery layer is the combined code and
+            templates needed to render the componenent that goes onto the
+            screen. Each of these components then gets called/included/whatever
+            to place it onto the screen framework.
+            <br />
+
+            <br />
+            so we get
+            <br />
+
+            <br />
+            1) Code to handle data
+            <br />
+            2) Code to convert data into form ready for displaying (date
+            formats, ordering, paging whatever)
+            <br />
+            3) Markup to render the converted data
+            <br />
+            4) Page build that combined different componenets together
+            <br />
+
+            <br />
+            Tim
+            <div align="right">
+                <a href="https://ianbicking.org/comment548.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://pollenation.net/journal">Tim Parkin</a>
+            </div>
+            <hr noshade />
+            All of my new projects use a very smooth combination of XSLT and
+            CSS, and I like it a lot. Most of the logic is in my PHP code, but
+            then some of the display logic can just be handled using XSLT stuff.
+            XSLT may not be useful to graphic designers, but it's perfect for
+            programmers.
+            <div align="right">
+                <a href="https://ianbicking.org/comment549.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.manuzhai.nl/">Manuzhai</a>
+            </div>
+            <hr noshade />
+            Check out
+            <br />
+            <a
+                href="http://www.cs.usfca.edu/~parrt/papers/mvc.templates.pdf"
+                target="_blank"
+                >Enforcing ModelView Separation in Template Engines</a
+            >, a recently-posted paper fro Terence Parr, author of ANTLR
+            (ANother Tool for Language Recognition, formerly PCCTS) and
+            co-founder of
+            <a href="http://jguru.com/" target="_blank">jGuru</a> (and a former
+            boss of mine, by way of jGuru).
+            <div align="right">
+                <a href="https://ianbicking.org/comment550.html" rel="nofollow"
+                    >#</a
+                >
+                Tripp Lilley
+            </div>
+            <hr noshade />
+            Argh. Want. Editable. Comments.
+            <div align="right">
+                <a href="https://ianbicking.org/comment551.html" rel="nofollow"
+                    >#</a
+                >
+                Tripp Lilley
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    &quot;you want to hobble the template writers lest they
+                    escape into the Dark Forest of Programming, taking
+                    maintainability with them.&quot; - What a nice saying, Ian!
+                    ROFL!!!
+                </p>
+                <p>
+                    &quot;You can separate hard programming from easy
+                    programming, or you can separate logic from layout, but you
+                    cannot do both.&quot; - Aha! Now I understand why the
+                    problems of template languages is one of the most painful
+                    problem I know. Thank you!
+                </p>
+                <p>
+                    BTW, I use CheetahTemplate for rendereing
+                    <a class="reference" href="http://phd.pp.ru/"
+                        >http://phd.pp.ru/</a
+                    >
+                    , and I use the full power of inheritance. See
+                    <a
+                        class="reference"
+                        href="http://phd.pp.ru/about/technical.html"
+                        >http://phd.pp.ru/about/technical.html</a
+                    >
+                    . Look at the templates for an every page.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/smart-vs-dumb-templates-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://phd.pp.ru/">Oleg Broytmann</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

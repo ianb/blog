@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Python nit, chapter 3</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Python nit, chapter 3</h1>
+
+        <div class="document">
+            <p>
+                Man, I'm just
+                <a
+                    class="reference"
+                    href='https://ianbicking.org/href="http://blog.colorstudy.com/ianb/weblog/2004/01/13.html#P52'
+                    >belting them out</a
+                >
+                now. Whine, whine whine...
+            </p>
+            <p>Today, iterable strings. E.g.:</p>
+            <pre class="literal-block">
+&gt;&gt;&gt; for item in &quot;list&quot;: print item
+l
+i
+s
+t
+</pre
+            >
+            <p>
+                While this is the occasional enabler of a cute answer on
+                comp.lang.python, in reality this is a total non-feature; no one
+                needs to iterate over strings.
+            </p>
+            <p>
+                But it's worse than that! Who among us has not accidentally
+                passed in a string where a list is expected, then puzzled over
+                the odd results that occur when the function thinks it has
+                received a list of single-character values? This has been the
+                source of great annoyance for me. One of the important design
+                features of a dynamically typed language is that operations not
+                be ambiguous. If two different types of objects have the method
+                <tt class="docutils literal"><span class="pre">foo</span></tt
+                >, that's okay -- if they both do the conceptually same thing!
+                If they both have a method by the same name, and they do
+                conceptually different things, then you set yourself up for the
+                Dark Side of dynamic typing -- when type errors silently
+                insinuate themselves into the depths of your program, resulting
+                in disconnected errors, or even worse in no error but incorrect
+                results. In this case, iteration is supported by strings, but
+                strings are not collections (at least, that's not how anyone
+                uses them), and they shouldn't implement something that makes
+                them pretend to be collections.
+            </p>
+            <p>
+                The reason why strings do this is probably because it seemed
+                natural. Especially before Python had a formal notion of
+                iteration,
+                <tt class="docutils literal"><span class="pre">for</span></tt>
+                used to just use
+                <tt class="docutils literal"
+                    ><span class="pre">__getitem__</span></tt
+                >
+                with an increasing index -- and strings have a
+                <tt class="docutils literal"
+                    ><span class="pre">__getitem__</span></tt
+                >
+                which returns characters (which are themselves strings, thus
+                being an infinitely recursively iterative structure). It would
+                have taken a special rule to keep strings from being iterable.
+                And such a rule should have been written, but it wasn't. Now
+                that
+                <tt class="docutils literal"
+                    ><span class="pre">__iter__</span></tt
+                >
+                covers this specific instance, such a rule could more easily be
+                implemented:
+            </p>
+            <pre class="literal-block">
+class goodstr(str):
+    def __iter__(self):
+        raise TypeError, &quot;iteration over a non-sequence&quot;
+</pre
+            >
+            <p>
+                Of course, this string subclass does me no good, because no one
+                (including myself) would bother to use it. Maybe in Python 3...
+                though I'd be curious -- I suspect if this was changed even now,
+                very little code would be effected, because iterating over
+                strings just doesn't make much sense, though
+                <tt class="docutils literal"
+                    ><span class="pre">list(s)</span></tt
+                >
+                is probably more common than using a string in a
+                <tt class="docutils literal"><span class="pre">for</span></tt>
+                loop (e.g.,
+                <tt class="docutils literal"
+                    ><span class="pre">urllib.quote</span></tt
+                >), and works by way of iterability.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 23 Jan '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            Well, you could book up a patch that made str.__iter__ and
+            unicode.__iter__ signal a warning.
+            <br />
+
+            <br />
+            I would guess that there is *some* code out there that relies on
+            this, but not terribly much.
+            <div align="right">
+                <a href="https://ianbicking.org/comment666.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://starship.python.net/crew/mwh/"
+                    >Michael Hudson</a
+                >
+            </div>
+            <hr noshade />
+            But Strings _are_ iterable. They are just a sequence of chars, but
+            they are sequences. Everybody used to languages from the Lisp family
+            or from Smalltalk will agree :-)
+            <br />
+
+            <br />
+            If you just keep in mind that Strings are just sequences of chars,
+            you don't see any ambiguity. Passing in the wrong types to functions
+            is something else - that has much more to do with people unwilling
+            to use the nice assert statement than with language problems :-)
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment667.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://pyds.muensterland.org/">Georg Bauer</a>
+            </div>
+            <hr noshade />
+            I just used iterating over a string yesterday to walk through a
+            string representing a potential Hardware Address (aka MAC address)
+            one digit at a time. I was checking for valid digits. I had a regex
+            solution working, but I always look for ways to avoid them when
+            possible.
+            <br />
+
+            <br />
+            So yeah, I think they're useful, but I don't know if I really "need"
+            them or not. In this case, I thought it was the easiest to
+            understand.
+            <div align="right">
+                <a href="https://ianbicking.org/comment668.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.pycs.net/users/0000231">John P Speno</a>
+            </div>
+            <hr noshade />
+            What about iterating over a string to make sure all the characters
+            are in a certain charset?
+            <br />
+
+            <br />
+            Though I'd personally just do a try/except ... seems more Pythonic.
+            <div align="right">
+                <a href="https://ianbicking.org/comment669.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.joegrossberg.com">Joe Grossberg</a>
+            </div>
+            <hr noshade />
+            Georg, Joe: yes, a string is sometimes useful to see as a sequence
+            of characters, though that's relatively uncommon. It's much more
+            likely that a string is an atomic entity, as when it's used as an
+            identifier, or a sequence of non-character strings, like a sequence
+            of words, or a sequence of colon-delimited hex-encoded numbers (a
+            MAC address). Python sure could use a standard idiom for
+            tokenizing... but that's another issue.
+            <br />
+
+            <br />
+            And unlike many other languages, Python does not have a character
+            object, so strings are not a sequence of characters. They are a
+            sequence of... strings? It just doesn't make much sense. (I
+            <i>do</i> think that it was the right decision to avoid character
+            objects -- in part because I don't think it's a particularly useful
+            metaphor)
+            <div align="right">
+                <a href="https://ianbicking.org/comment670.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            how about len(str)? That's one that I have used quite often. And
+            it's a sequence-type behaviour, and is considered a basic string
+            operation.
+            <br />
+
+            <br />
+            Maybe that is the pain of this -- we are used to standard string
+            operations (from C, anyway), so they needed to be implemented
+            somehow. The implementation may not have been the best way, but at
+            least we have all the operations that most languages have.
+            <br />
+
+            <br />
+            That said, I've also known the pain of accidently iterating over a
+            string instead of a list, and seen the pain that causes. The
+            debugging for it can suck.
+            <div align="right">
+                <a href="https://ianbicking.org/comment671.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://users.binary.net/thehaas/cgi-haas/blosxom.cgi"
+                    >Mike Hostetler</a
+                >
+            </div>
+            <hr noshade />
+            I agree with the original point, and I can well imagine myself using
+            slice/array notation and indexes with strings rather than directly
+            iterating over the "characters", although I typically avoid
+            character manipulation and try and use string methods wherever
+            possible. Indeed, because of various stated benefits of using lists
+            for such manipulations, one could legitimately argue that people
+            should convert to lists, do their stuff, and then convert back to
+            strings afterwards, all without having "string iteration". Moreover,
+            if one does anything to a string when iterating over it, one has to
+            store the transformed characters somewhere other than the original
+            string anyway, due to its immutability.
+            <br />
+
+            <br />
+            If you consider the C-style motivation for this feature, which is
+            iterating over a character array using pointers, I'd claim that such
+            antics borders on the "un-Pythonic", although that claim might only
+            stick because of the primitive syntax in C for iterating in such a
+            way: the ++ and -- operators. But non-const character arrays in C
+            are at least mutable and do justify such trickery when being
+            modified in place.
+            <div align="right">
+                <a href="https://ianbicking.org/comment672.html" rel="nofollow"
+                    >#</a
+                >
+                Paul Boddie
+            </div>
+            <hr noshade />
+            I use "if a in b" a lot to test if a is the substring of b and I
+            find it's very readable and convenient. I think it's probably one
+            benefit of iterable string.
+            <div align="right">
+                <a href="https://ianbicking.org/comment673.html" rel="nofollow"
+                    >#</a
+                >
+                Haifeng Wang
+            </div>
+            <hr noshade />
+            'I use "if a in b" a lot to test if a is the substring of b and I
+            find it's very readable and convenient. I think it's probably one
+            benefit of iterable string.'
+            <br />
+
+            <br />
+            But that's not iterating the string, it's testing for membership
+            (__contains__).
+            <br />
+
+            <br />
+            The point isn't that strings don't have list-like properties, but
+            that iterating over strings is a Python "feature" that gives no real
+            benefits, yet leads to common coding errors.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment674.html" rel="nofollow"
+                    >#</a
+                >
+                Graham Fawcett
+            </div>
+            <hr noshade />
+            Really hope they dont change it, at least four of the programs i've
+            writen lattly would need editing and end up looking less tidy (maybe
+            ;)).
+            <br />
+
+            <br />
+            I just really like it, seems natural i guess. And it makes it very
+            easy to do something for every char in a string (not that
+            list(string) is hard, but then thats not the point).
+            <div align="right">
+                <a href="https://ianbicking.org/comment675.html" rel="nofollow"
+                    >#</a
+                >
+                Mark Lee Smith
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    &gt; Who among us has not accidentally passed in a string
+                    where a list is expected, then puzzled over the odd results
+                    that occur when the function thinks it has received a list
+                    of single-character values?
+                </p>
+                <p>Me :)</p>
+                <p>
+                    I've been using Py for two years now - admittedly, not very
+                    long - but as far as I'm concerned it makes perfect sense to
+                    have strings an iterable container, and it's a nonsense to
+                    suggest otherwise.
+                </p>
+                <p>
+                    As you mention, a string is a list of single character
+                    values, thus a string and a list are conceptually the same
+                    thing. While in all cases they may not be literally
+                    identical, for the most part they are and Python takes
+                    advantage of this by design.
+                </p>
+                <p>
+                    Much of the Py code I author is responsible for data
+                    verifcation, and often involves iteration over a string
+                    sequence, so it's a feature I'd not happily lose,
+                    particularly when your argument stems from the fact that it
+                    simply makes programmer error more annoying.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/python-nit-chapter-3-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Clay
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

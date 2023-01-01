@@ -1,0 +1,386 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Paste 1.0</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Paste 1.0</h1>
+
+        <div class="document">
+            <p>
+                I am happy to announce the release of Paste 1.0. This release
+                includes all the major components: Paste (core), Paste Script,
+                Paste Deploy, and Paste WebKit.
+            </p>
+            <p>
+                In all honesty Paste passed the 0.x stage a long time ago. But
+                now it's official: Paste is really stable. How stable? A lot
+                stable. APIs won't be shifting without due warning, and only if
+                there's a good reason. The scope of Paste is also going to be
+                more constrained -- new work should happen outside of Paste.
+                I've already started this a while ago, making most new projects
+                of mine independent packages. This is fine for Paste, because
+                Paste does not encourage integration, and a module under the
+                <tt class="docutils literal"><span class="pre">paste</span></tt>
+                namespace has no special abilities or privilege.
+            </p>
+            <p>
+                Of course, <em>some</em> work will continue in Paste, but the
+                focus will be on expanding and polishing what's already there,
+                while larger work may take the form of extracting pieces from
+                Paste (this may very well happen for
+                <tt class="docutils literal"
+                    ><span class="pre">paste.exceptions</span></tt
+                >,
+                <tt class="docutils literal"
+                    ><span class="pre">paste.evalexception</span></tt
+                >
+                and
+                <tt class="docutils literal"
+                    ><span class="pre">paste.auth</span></tt
+                >)
+            </p>
+            <p>
+                I realize I haven't tried to explain What Paste Is for a long
+                time. It used to be a hobby of mine to misexplain it. Maybe it's
+                time to try again.
+            </p>
+            <div class="section">
+                <h1>
+                    <a id="what-is-paste" name="what-is-paste"
+                        >What Is Paste?</a
+                    >
+                </h1>
+                <p>
+                    Three entirely different things. Maybe more. These form some
+                    sort of unified strategy in my mind -- though only an
+                    incomplete strategy -- but there's no reason you should even
+                    worry about that.
+                </p>
+                <div class="section">
+                    <h2><a id="paste-core" name="paste-core">Paste core</a></h2>
+                    <p>
+                        This is the main
+                        <tt class="docutils literal"
+                            ><span class="pre">Paste</span></tt
+                        >
+                        package. This is a bunch of WSGI components. It does all
+                        sorts of nice little things. There's an HTTP server in
+                        there. There's an HTTP proxying setup. There's a
+                        exception catcher. There's something like Apache's
+                        ErrorDocument. There's a system for doing internal
+                        subrequests. There's some URL parsing. There's static
+                        file serving. There are a variety of debugging tools.
+                        There's several library routines to handle particular
+                        situations in WSGI, like parsing form variables, reading
+                        headers, generating error responses, etc.
+                    </p>
+                    <p>
+                        You can use all of these, though that's unlikely. You
+                        can use several. You can use just one. Not much buy-in
+                        is really required.
+                    </p>
+                    <p>
+                        Several of these pieces are kind of low-level. Often a
+                        higher-level framework like
+                        <a class="reference" href="http://pylonshq.com"
+                            >Pylons</a
+                        >
+                        or
+                        <a class="reference" href="http://www.cleverharold.com/"
+                            >CleverHarold</a
+                        >
+                        will wrap these pieces up in a more tasty and cohesive
+                        package. Some actually are more deployment-related, like
+                        the prefix-based routing in
+                        <tt class="docutils literal"
+                            ><span class="pre">paste.urlmap</span></tt
+                        >, and so you might use them directly.
+                    </p>
+                    <p>
+                        You can even write your own web framework with Paste.
+                        It's really quite easy, you should totally give it a
+                        try.
+                    </p>
+                </div>
+                <div class="section">
+                    <h2>
+                        <a id="paste-deploy" name="paste-deploy"
+                            >Paste Deploy</a
+                        >
+                    </h2>
+                    <p>
+                        Paste Deploy is a <em>concept</em>, and an
+                        <em>implementation</em>.
+                    </p>
+                    <p>
+                        The <em>concept</em> is that you can represent pieces of
+                        a WSGI stack with some simple functions. Each part is
+                        pretty simple:
+                        <tt class="docutils literal"
+                            ><span class="pre">paste.app_factory</span></tt
+                        >
+                        is a factory that builds WSGI applications.
+                        <tt class="docutils literal"
+                            ><span class="pre"
+                                >paste.filter_app_factory</span
+                            ></tt
+                        >
+                        is a factory that wraps applications with middleware.
+                        <tt class="docutils literal"
+                            ><span class="pre">paste.server_runner</span></tt
+                        >
+                        is a function that runs a server with your application.
+                        Each kind of function has a particular kind of
+                        signature, and if you can wrap your
+                        app/middleware/server in that kind of function then
+                        other people can handle it in a consistent way.
+                    </p>
+                    <p>
+                        The <em>implementation</em> is a system that builds a
+                        stack of apps, middleware, and a server using an
+                        INI-style configuration file.
+                    </p>
+                </div>
+                <div class="section">
+                    <h2>
+                        <a id="paste-script" name="paste-script"
+                            >Paste Script</a
+                        >
+                    </h2>
+                    <p>
+                        Paste Script is some command-line glue, and some bits
+                        and pieces.
+                    </p>
+                    <p>
+                        As command-line glue, it lets you do things like load a
+                        config file (with Paste Deploy), then actually run it.
+                        And little things like change the user ID, daemonize,
+                        etc.
+                    </p>
+                    <p>
+                        It also has stuff to build the file layout for new
+                        projects.
+                    </p>
+                    <p>It also has some stuff to do application deployment.</p>
+                </div>
+                <div class="section">
+                    <h2><a id="conclusion" name="conclusion">Conclusion</a></h2>
+                    <p>
+                        So that's Paste. If you think you Don't Really Get It,
+                        it's probably because you think there's more to it than
+                        there is.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="dates" align="right">Created 22 Oct '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Congratulations Ian! Way too many projects never make it to
+                    1.0 and most of the rest are not really 1.0 quality when
+                    they get there.
+                </p>
+                <p>
+                    Paste reminds me of Python in its excellent technology and
+                    difficult product description. The problem is that people
+                    better understand descriptions in terms of what problems the
+                    code can solve for them. Consider the difference between:
+                    &quot;Python is a general purpose object oriented scripting
+                    language popular for rapid prototyping, application
+                    building, scientific use and many other things.&quot;
+                    Compare to: &quot;Ruby is a general purpose programming
+                    language most often used to very rapidly build highly
+                    mainainable Web sites through its Web Application Framework
+                    Rails.&quot;
+                </p>
+                <p>
+                    I don't mean to reopen the whole Web Application Framework
+                    question but merely offer an analogy. The next time you
+                    describe Paste it would help if you would explain in one
+                    sentence what problem I would have that would lead me to use
+                    it. Is it three different things because it solves three
+                    different problems? If so, why does it have a single name?
+                    Or is it three different things that solve the same problem?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/paste-1-0-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Paul Prescod
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>Best misexplanation yet :-)</p>
+                <p>Paste is great. Keep up the good work.</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/paste-1-0-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.dowski.com">Christian Wyglendowski</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Paste was easy to understand once I realized what WSGI
+                    enables. (Ben Bangert's Google Tech Talk gives a pretty nice
+                    explanation on WSGI.)
+                </p>
+                <p>
+                    The only real problem I see is that most Python web
+                    developers don't know that they <em>can</em> ask the
+                    questions that Paste is the answer to.
+                </p>
+                <p>
+                    Also, while I don't know whether this WSGI middleware
+                    business is exactly &quot;rocket science&quot;, I do think
+                    that a lot of programmers don't really care about the stuff
+                    WSGI and Paste (etc) solve. They should care, of course, but
+                    they don't. (PHP is the ultimate proof of this. Not to say
+                    that PHP is inherently evil, though.)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/paste-1-0-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://weblog.hotales.org/portal/python"
+                    >Jarno Virtanen</a
+                >
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    How about &quot;Paste is a package of python modules for
+                    working with HTTP requests and responses.&quot;?
+                </p>
+                <p>Anyhow, Mazel Tov.</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/paste-1-0-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.joegrossberg.com">Joe Grossberg</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    wow already 1.0 :) I just discovered Paste like 1 week ago
+                </p>
+                <p>
+                    And I got tons of questions about it, is there a way to
+                    contact you or a discussion forum about Paste ?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/paste-1-0-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                zwetan
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Yes, there's a mailing list:
+                        <a
+                            class="reference"
+                            href="http://pythonpaste.org/community/mailing-list.html"
+                            >http://pythonpaste.org/community/mailing-list.html</a
+                        >
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/paste-1-0-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    How about a screencast? That might be better at explaining
+                    how it works.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/paste-1-0-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Sean
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    What I found most interesting about this page is that at the
+                    time I looked at it there were four Google ads, all of them
+                    related to Ruby on Rails (well, the first one was an
+                    &quot;alternative to RoR&quot; (Java-based)). So, if anyone
+                    clicks, Ian, you're making money off of the competition! :-)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/paste-1-0-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Joe
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

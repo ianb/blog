@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>More on Multimethods</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>More on Multimethods</h1>
+
+        <div class="document">
+            <p>
+                I think Guide is thinking about typing and whatnot a lot lately,
+                now with a post one
+                <a
+                    class="reference"
+                    href="http://www.artima.com/weblogs/viewpost.jsp?thread=101605"
+                    >multimethods</a
+                >, which mostly the same as double-dispatch. I.e., you choose a
+                function implementation based on the type of the arguments.
+            </p>
+            <p>
+                However, Guido uses a global registry of functions by name. I
+                like Phillip's technique for
+                <a
+                    class="reference"
+                    href="http://www.python.org/pycon/2005/papers/53/img0.html"
+                    >generic functions</a
+                >, which is to give these a functions a richer interface that
+                includes a decorator. Here's an example of Guido's code
+                converted to that:
+            </p>
+            <pre class="literal-block">
+&#64;multimethod
+def div(a, b):
+    &quot;div a by b&quot;
+    return a / b
+class rational(object):
+    def __init__(self, num, denom):
+        self.num, self.denom = num, denom
+    def __repr__(self):
+        return '%s/%s' % (self.num, self.denom)
+&#64;div.types(rational, int)
+def div_rat_int(r, i):
+    return rational(r.num, r.denom*i)
+&#64;div.types(int, rational)
+def div_int_rat(i, r):
+    return rational(r.denom * i, r.num)
+&#64;div.types(rational, float)
+def div_rat_float(r, f):
+    return r.num / (r.denom*f)
+&#64;div.types(float, rational)
+def div_float_rat(f, r):
+    return f * r.denom / r.num
+&#64;div.types(rational, rational)
+def div_rat_rat(r1, r2):
+    return rational(r1.num * r2.denom, r1.denom * r2.num)
+</pre
+            >
+            <p>Here's how it looks:</p>
+            <pre class="literal-block">
+&gt;&gt;&gt; half = rational(1, 2)
+&gt;&gt;&gt; half
+1/2
+&gt;&gt;&gt; third = rational(1, 3)
+&gt;&gt;&gt; div(half, third)
+3/2
+&gt;&gt;&gt; div(half, 2)
+1/4
+&gt;&gt;&gt; div(half, 0.5)
+1.0
+&gt;&gt;&gt; div(1, 2)
+0
+&gt;&gt;&gt; div(1, half)
+2/1
+</pre
+            >
+            <p>
+                And here's the implementation (it's actually simpler than
+                Guido's):
+            </p>
+            <pre class="literal-block">
+class multimethod(object):
+    def __init__(self, default):
+        self.default = default
+        self.name = default.__name__
+        self.__doc__ = default.__doc__
+        self.typemap = {}
+    def __call__(self, *args):
+        types = tuple(arg.__class__ for arg in args) # a generator expression!
+        function = self.typemap.get(types, self.default)
+        return function(*args)
+    def types(self, *types):
+        def decorator(func):
+            if types in self.typemap:
+                raise TypeError(&quot;duplicate registration&quot;)
+            self.typemap[types] = func
+            if func.__name__ == self.name:
+                # to avoid confusion by overwriting the multimethod function
+                return self
+            else:
+                return func
+        return decorator
+</pre
+            >
+            <p>
+                The module is located online at
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/home/ianb/recipes/multimethod.py"
+                    >http://svn.colorstudy.com/home/ianb/recipes/multimethod.py</a
+                >
+            </p>
+            <p>
+                <strong>Update</strong>: some people have mistakenly called this
+                implementation a generic function, or a reimplementation as a
+                generic function. It's not generic (aka predicate-dispatch)
+                functions at all -- those are much more general (and powerful),
+                and this version is just a slightly different factoring of
+                Guido's code. Thankfully
+                <a
+                    class="reference"
+                    href="http://bob.pythonmac.org/archives/2005/03/30/five-minute-multimethods-in-python-using-dispatch/"
+                    >Bob Ippolito does it right</a
+                >
+                and shows how to implement multimethods with generic functions.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 01 Apr '05<br />
+            Modified 04 Apr '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Just an FYI, but if the user imports
+                    <tt class="docutils literal"
+                        ><span class="pre">div</span></tt
+                    >
+                    &quot;as&quot; another name, this code won't catch that and
+                    return
+                    <tt class="docutils literal"
+                        ><span class="pre">self</span></tt
+                    >. The technique I use in PyProtocols is to check whether
+                    the decorated function's
+                    <tt class="docutils literal"
+                        ><span class="pre">__name__</span></tt
+                    >
+                    in the caller's f_locals is self. So you could do something
+                    like:
+                </p>
+                <pre class="literal-block">
+if sys._getframe(1).f_locals.get(func.__name__) is self:
+    return self
+else:
+    return func
+</pre
+                >
+                <p>
+                    Then it doesn't depend on the original generic function's
+                    definition being only accessible via its original name, in
+                    order to prevent such confusion.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/more-on-multimethods-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://dirtSimple.org">Phillip J. Eby</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

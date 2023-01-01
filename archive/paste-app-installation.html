@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Paste App Installation</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Paste App Installation</h1>
+
+        <div class="document">
+            <p>
+                I just made a first run at some tools in
+                <a class="reference" href="http://pythonpaste.org/script"
+                    >Paste Script</a
+                >
+                for installing web applications.
+            </p>
+            <p>
+                The idea is a two-phase installation; first you install the
+                package distribution and ask it to write out a sample
+                configuration. Then you edit the configuration. Then you ask the
+                application to set itself up (maybe setting up databases, making
+                directories, etc).
+            </p>
+            <p>
+                This is not unlike a fancier-seeming system where there's a web
+                interface or GUI or whatnot; except all that interaction is
+                encapsulated in editing a text configuration file. I think this
+                is a good technique because (a) it much much easier to
+                implement, (b) it is consistent with later maintenance, (c) it
+                uses a powerful native UI that many people are comfortable with
+                (the text editor), and (d) it requires very little work for an
+                application to support.
+            </p>
+            <p>So, in the trunk you can do:</p>
+            <pre class="literal-block">
+$ paster prepare-app \
+  -f http://pythonpaste.org/package_index.html \
+  PasteHelloWorld helloworld.ini
+$ edit helloworld.ini
+$ paster setup-app helloworld.ini
+</pre
+            >
+            <p>You can also combine this all into:</p>
+            <pre class="literal-block">
+$ paster prepare-app \
+  --edit --setup \
+  -f http://pythonpaste.org/package_index.html \
+  PasteHelloWorld helloworld.ini
+</pre
+            >
+            <p>
+                Which will immediately open the configuration file in your
+                editor, and when you are done editing it will set up the
+                application. (And
+                <tt class="docutils literal"
+                    ><span class="pre">prepare-app</span></tt
+                >
+                also installs the application with easy_install, so it really
+                can be just one step).
+            </p>
+            <p>
+                This is a pretty early prototype, really, so I'm still very
+                interested in feedback on even the most minor details. Like,
+                what should these commands be called?
+            </p>
+            <p>
+                Also, people lay out their systems differently. I have a vague
+                concept of a &quot;system configuration&quot; which will
+                determine some basics about what goes where. But it's very
+                vague. Ideally I'm hoping that hosting companies could setup
+                such a configuration so that everything Just Works for users,
+                including system hooks to be run on installation and whatnot.
+                Now that I think about it, that probably means entirely new
+                system-specific command-line options as well.
+            </p>
+            <p>
+                I've also written a simple class for setting up applications, so
+                that you can add this to your application's
+                <tt class="docutils literal"
+                    ><span class="pre">setup.py</span></tt
+                >:
+            </p>
+            <pre class="literal-block">
+setup(...
+    entry_points=&quot;&quot;&quot;
+    [paste.app_install]
+    main = paste.script.appinstall:Installer
+    &quot;&quot;&quot;)
+</pre
+            >
+            <p>
+                This will look for a template configuration file in
+                <tt class="docutils literal"
+                    ><span class="pre"
+                        >MyPackage.egg-info/paste_deploy_config.ini_tmpl</span
+                    ></tt
+                >
+                (a Cheetah template, actually), and run
+                <tt class="docutils literal"
+                    ><span class="pre"
+                        >mypackage.websetup.setup_config()</span
+                    ></tt
+                >
+                on setup, and probably more things over time.
+            </p>
+            <p>
+                At some point I also plan to add such a generic setup class to
+                SQLObject, so that a SQLObject-using application will be able to
+                automatically set up its database on installation, as well as
+                upgrade its database later (these classes should be reentrant,
+                so you can run
+                <tt class="docutils literal"
+                    ><span class="pre">paster</span>
+                    <span class="pre">setup-app</span>
+                    <span class="pre">config_file.ini</span></tt
+                >
+                at any time to confirm and apply any new things to be setup).
+            </p>
+        </div>
+        <div class="dates" align="right">Created 30 Dec '05</div>
+    </body>
+</html>

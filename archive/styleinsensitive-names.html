@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Style-insensitive names</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Style-insensitive names</h1>
+
+        <div class="document">
+            <p>
+                An interesting feature of the
+                <a
+                    class="reference"
+                    href="http://mozart-dev.sourceforge.net/xl.html"
+                    >XL language</a
+                >
+                (found via
+                <a
+                    class="reference"
+                    href="http://zephyrfalcon.org/weblog/arch_d7_2004_01_24.html#e466"
+                    >Hans Nowak</a
+                >) is the idea of style-insensitive names. To quote the
+                <a
+                    class="reference"
+                    href="http://mozart-dev.sourceforge.net/xl_features.html#namestyle"
+                    >features</a
+                >:
+            </p>
+            <blockquote>
+                <p>
+                    To most non-programmers, JohnSmith, john_smith and
+                    JOHN_SMITH all denote the same person. As programmers, we
+                    unlearn this identity to make them different. When looking
+                    up a name, XL ignores case and separating underscore '_'
+                    characters (two consecutive underscores are not allowed).
+                </p>
+                <pre class="literal-block">
+// There is only one 'file' and one 'open_file' below
+function OpenFile(string Name, Mode) return file
+FILE F := open_file(&quot;foo.dat&quot;, &quot;r&quot;)
+</pre
+                >
+                <p>
+                    On the other hand, name overloading allows you to reuse the
+                    same name for different entities when the name will not be
+                    used in the same context.
+                </p>
+                <pre class="literal-block">
+type rectangle
+function Rectangle(integer X, Y, Width, Height) return rectangle
+rectangle Rectangle := Rectangle(10, 10, 20, 20)
+</pre
+                >
+                <p>
+                    In addition, XL, like any Mozart-based language, requires a
+                    renderer, which can be used to present code to programmers
+                    with their preferred style.
+                </p>
+                <p>
+                    <strong>Why?</strong> Style preferences cause religious
+                    reaction from many otherwise reasonable programmers. Style
+                    insensitivity allows reuse of libraries while maintaining a
+                    consistent style in your own code.
+                </p>
+                <p>
+                    <strong>Cons:</strong> Entities that would be distinguished
+                    by case in the real world can no longer be distinguished
+                    this way. For instance, V for volume and v for speed in
+                    physics. This is common and reasonable practice.
+                </p>
+            </blockquote>
+            <p>
+                An interesting idea, indeed. Python's lack of a naming style
+                annoys me a great deal -- I'd be happy to use any naming style,
+                if there were any reason to pick one over the other. Even the
+                standard library has nothing approaching a standard naming style
+                (there's even
+                <a
+                    class="reference"
+                    href="file:///usr/share/doc/python2.2/html/lib/module-xml.parsers.expat.html"
+                    >capitalized method names</a
+                >).
+            </p>
+            <p>
+                But there is no reason to pick one over the other. The only
+                standard we have is CamelCase class names, and (except for the
+                very occasional exception) method names start with lower case
+                letters. After that all bets are off.
+            </p>
+            <p>
+                Anyway, style insensitivity seems like a cool way to deal with
+                it. Maybe it would be annoying if there wasn't contextual names
+                (like the in the
+                <tt class="docutils literal"
+                    ><span class="pre">rectangle</span></tt
+                >
+                example). But maybe not so bad either.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 25 Jan '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            To me it seems consistent enough, if I look to PHP, but for inside
+            project more consistency would be better.
+            <br />
+
+            <br />
+            I would like underscored_module_names for readability. No
+            UpperCaseModuleNames becouse of different filesystems.
+            <br />
+
+            <br />
+            ClassNames are still CamelCase and functionsAndMethods start with
+            lower case letter.
+            <br />
+
+            <br />
+            And probably it all makes more sense if we consider that in Python
+            there are lots of C wraps, together with names and influences.
+            <br />
+
+            <br />
+            Do you see any major problem there?
+            <div align="right">
+                <a href="https://ianbicking.org/comment688.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://smejmoon.lv">Ìirts</a>
+            </div>
+            <hr noshade />
+            Hmmm... yes, interacting with case sensitive code would be a
+            problem. Many interfaces fix C naming weirdness (except for thin
+            wrappers like expat -- but expat itself can be wrapped with a normal
+            Python SAX interface). Anyway, it's easier to fix that naming in
+            Python, but it would be hard if the system was case- and
+            underscore-insignificant, because we couldn't even express the
+            different naming schemes (and most insensitivity uses folding, not
+            real insensitivity, and that's hard to calculate in an external
+            interface).
+            <div align="right">
+                <a href="https://ianbicking.org/comment689.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            There's somewhat of a style, or at least a style that's been growing
+            in recent years. A lot of Python's standard library is old, and has
+            been written by many individuals.
+            <br />
+
+            <br />
+            The style that I'm seeing, and is advocated in Guido's style guide,
+            is to keep package and module names lower case, which I like. Zope 2
+            has the terrible example 'DateTime.DateTime.DateTime', and I think
+            that in the __init__.py of the DateTime package, there is (or was) a
+            'from DateTime import DateTime'
+            <br />
+
+            <br />
+            Zope 3, Twisted, and Docutils all use the lowered path/module style,
+            and I find that makes them a lot easier to navigate and to use as a
+            developer, because it's much easier to follow an import statement to
+            a source file.
+            <br />
+
+            <br />
+            As for underscored module names - I think it's better to structure
+            packages and modules so that module names are short but still
+            meaningful. 'zope.security' is better than 'zope_security'.
+            <br />
+
+            <br />
+            As for enforcing anything - I still like that Python doesn't enforce
+            anything, or put any magic on inferring meaning from
+            spelling/capitalization. Ruby, if I remember correctly, turns
+            anything that's ALL_CAPS into a constant. I like to use that as a
+            guide, but not a rule (some constants tent not to be so constant ;).
+            <br />
+
+            <br />
+            The guides used now for modules and packages to be accepted into
+            Python are:
+            <br />
+
+            <br />
+            <a href="http://www.python.org/peps/pep-0007.html" target="_blank"
+                >http://www.python.org/peps/pep-0007.html</a
+            >
+            (C)
+            <br />
+            <a href="http://www.python.org/peps/pep-0008.html" target="_blank"
+                >http://www.python.org/peps/pep-0008.html</a
+            >
+            (Python)
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment690.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://toulouse.amber.org/">Jeffrey Shell</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

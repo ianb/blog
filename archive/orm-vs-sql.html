@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>ORM vs. SQL</title>
+<link rel="stylesheet" href="WK/default.css" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="New Posts" href="https://ianbicking.org/feeds/new_pages.xml">
+
+
+</head>
+<body color="black" bgcolor="white">
+<h1 id="header"><a href="index.html">Ian Bicking: the old part of his blog</a></h1>
+
+<div style="float: right">
+
+<script type="text/javascript">google_ad_client = "pub-2913402032659646";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//--></script>
+
+
+</div><h1>ORM vs. SQL</h1>
+ <p>
+I've been working with a system lately that has no database
+abstraction (besides Z SQL methods, which is close enough to no
+abstraction to qualify).  The worst problem I see with it is the tight
+coupling between various pieces of code as they pass around result
+sets, or method signatures created from result sets.  Let's say we're
+dealing with a shopping cart application, and the particular example
+of adding an item to the cart.  You'd probably expect an interface
+like <tt>addItem(itemID)</tt>.  But perhaps <tt>addItem</tt> wants to
+recalculate the total, so it has to fetch information about the item.
+Just as likely, the code that called <tt>addItem</tt> may have had to
+fetch information about the item because it was finding related items,
+or validating that this item is available, or any number of
+things. We have redundancy - they are both fetching information about
+an item, but failing to pass that information through.
+
+<p>
+So, maybe the signature should be <tt>addItem(item)</tt> where
+<tt>item</tt> is a result set.  Then we fetch the information early
+on, and keep passing it around.  Except, what <i>is</i> <tt>item</tt>?
+Is it the results of <tt>SELECT * FROM item WHERE id = X</tt>?
+That would be simple.  But everything probably isn't stored in the
+<tt>item</tt> table, so there's probably a join or two in there.
+Hopefully all pieces of the program can agree on exactly which joins
+are appropriate.
+
+<p>
+But what if the item came from another source than our standard
+SELECT?  Maybe we are getting all the items from a category.  Do we
+want to do all the joins necessary to get all the information about
+the item?  Probably not - maybe all we want is a is a brief
+description of the item, and we don't want to pull in five different
+tables we won't use.
+
+<p>
+Then maybe you stop passing result sets around, and make it explicit,
+e.g. <tt>displayItem(itemTitle, itemDescription,
+itemImageHeight,...)</tt>.  Okay, nevermind that.  The explicit
+signatures make it clear what sort of information each function needs,
+but that's just way too painful.  Plus even given such a signature,
+you may be tempted to find just the right SELECT statement that gets
+you the needed values but no more.  Your SQL fragments explode.
+
+<p>
+This is when things start to not fit together very well.  Perhaps you
+want to reuse your category search in the administration screen, but
+you need just one more join, so you add it.  Or maybe you now want to
+be able to iterate through that search result and do things like
+<tt>addItem</tt> on each row.  But your result sets don't quite match
+up.  Resolution?  Well, you can just pass what you have, and maybe
+<tt>addItem</tt> won't need them after all, and if it does it will
+refetch the row.  Maybe you can find the rows you want, then refetch
+them before passing them to <tt>addItem</tt>.  It gets worse over the
+web, where you have to go back to passing IDs around.  You don't
+<i>have</i> to pass IDs around, but then you are just asking for a
+world of pain (think <tt>addItem?itemTitle=Tickle+Me+Elmo &itemID;=40&parentCategory;=Toys &parentCategoryID;=30&...</tt>).
+
+<p>
+Maybe the answer is to let the database do the work (ala <a href="http://openacs.org/">ACS</a>).  Instead of an <tt>addItem</tt>
+function at all, just do the SQL right there.  Is it really that much
+harder to do <tt>INSERT INTO cart_items (cart_id, item_id) VALUES (20,
+15)</tt>?  Maybe write or use a nice little SQL wrapper to make it a
+bit easier (<a href="http://dustman.net/andy/python/SQLDict">SQLDict</a>, for
+instance).  Your database schema is your API.  If things get a little
+un-relational, throw in some stored procedures, triggers, and whatever
+else you need.  This might work okay (though there is considerable
+debate on the matter), but it only works for a while.  Eventually you
+are going to want to deal with something not in the database - a web
+service, data in the filesystem, whatever, and you'll have conflicting
+APIs.  Not to mention the other maintenance difficulties and tight
+coupling to your database.
+
+<p>
+After going down that path (if only hypothetically), maybe it seems
+best to sacrifice a little of the speed for a bit more sanity.  You
+make all your interfaces ID-based, back to <tt>addItem(itemID)</tt>.
+But at that point you are doing a large number of unnecessary
+queries.
+
+<p>
+So after working without an ORM, I remain firmly convinced that's the
+wrong way to work with a database.  Without an ORM you can have good
+performance, or you can have simple method and function signatures,
+but I doubt you can get both without writing your own ad hoc ORM.
+Without an ORM mostly you will get bad performance <i>and</i> hard to
+read code.
+
+<p>
+True, an ORM typically can't deal with every query you might write in
+SQL (<a href="http://sqlobject.org/docs/FAQ.html#how-can-i-do-a-left-join">LEFT
+JOIN</a> being the most common query that typically does not have an
+ORM equivalent), so your custom-written queries will - when viewed in
+isolation - run faster, but in a <i>system</i> the ORM will both be
+easier to use, <i>and</i> faster.  Because the ORM deals with specific
+sets of information (a single row from a single table, typically) it
+can more easily cache database results.  The data is easier to deal
+with because there's only as many kinds of data as there are tables in
+the database (more or less), where with ad hoc queries you have as
+many kinds of data as there are queries.
+
+<p>
+That said, ad hoc ORMs are neither uncommon (even if the authors don't
+realize what they've created) nor are they necessarily bad.  A little
+tedious to write, perhaps, but an ORM isn't magic.
+
+<p>
+(Whether you should use an RDBMS at all is another question.  Perhaps
+another day?  In you are interested in an ORM for Python you might
+want to look at the <a href="http://www.python.org/cgi-bin/moinmoin/HigherLevelDatabaseProgramming">Python
+Wiki page</a> on the subject, or <a href="http://sqlobject.org">SQLObject</a>, by me.  But it's free, so
+this essay isn't meant to sell SQLObject to you, I swear.)
+ <div class="dates" align="right">
+Created 18 Sep '03<br>
+Modified 14 Dec '04</div>
+<hr noshade><h3 id="comments">Comments:</h3>
+<blockquote>
+ your object is clearly not (or in a real RDBMS application, <i>shouldn't be</i>) simply a single row.  why not have objects defined at the scripting level and cache there?  perhaps your object crosses five tables.  fine.  the first time you need it, read it (all of it, in one maybe monstrous join), cache it for five minutes, and use it in any function that needs it.  no more database calls necessary.  if you write to the object (any of those five tables), mark the data as dirty or remove it from memory.
+<br />
+
+<br />
+keep the databse clean and simple.  write an object oriented layer in your scripting language of choice.  then use that abstraction in the per-page scripts you write.  your pages will be much simpler and your web app will be much more powerful for it.
+<br />
+
+<br />
+--one of the original oacs guys
+ <div align="right"><a href="https://ianbicking.org/comment792.html" rel="nofollow">#</a></div><hr noshade>
+</blockquote>
+</body>
+</html>

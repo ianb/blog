@@ -1,0 +1,1250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Best of the web app test frameworks?</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Best of the web app test frameworks?</h1>
+
+        <div class="document">
+            <p>
+                What are the best web application test frameworks people have
+                seen? Any language, though I'm thinking more about unit tests,
+                not as much about through-HTTP acceptance testing.
+            </p>
+            <p>
+                I'm curious mostly because I want to see other useful features
+                for me to borrow. Right now the
+                <a
+                    class="reference"
+                    href="http://pythonpaste.org/testing-applications.html"
+                    >test framework in Paste</a
+                >
+                is pretty simple, but IMHO in a good way.
+            </p>
+            <p>
+                There's some other features I've seen that I'm unsure of. For
+                instance, the
+                <a
+                    class="reference"
+                    href="http://ibofobi.dk/blog/archive/2005/11/08/django-doctest/"
+                    >ibofobi framework for Django</a
+                >
+                uses
+                <a
+                    class="reference"
+                    href="http://www.crummy.com/software/BeautifulSoup/"
+                    >Beautiful Soup</a
+                >
+                for extracting response strings for testing. Do people think
+                this is useful? Personally I'm happy enough testing for the
+                simple existence of strings, without caring about where in the
+                structure of the document they appear. Also it works better for
+                negative assertions, i.e., asserting that a string doesn't
+                appear <em>anywhere</em> in the document; I do a lot of these in
+                my tests.
+            </p>
+            <p>
+                Also, what do people think about
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-doctest.html"
+                    >doctest</a
+                >
+                in this context? I started out using that, but ended up
+                reverting to
+                <a
+                    class="reference"
+                    href="http://codespeak.net/py/current/doc/test.html"
+                    >py.test</a
+                >
+                because my tests quickly became more complicated than doctest
+                could really handle elegantly. Doctest still <em>worked</em>, I
+                just wasn't using any of the features that make it convenient
+                (and I was missing the py.test features). Note that
+                <tt class="docutils literal"
+                    ><span class="pre">paste.fixture</span></tt
+                >
+                doesn't really <em>require</em>
+                py.test, since py.test is a kind of null framework; I just don't
+                go out of my way to add any special unittest hooks (like, say, a
+                custom
+                <tt class="docutils literal"
+                    ><span class="pre">TestCase</span></tt
+                >
+                subclass).
+            </p>
+            <p>
+                I haven't looked closely at
+                <a
+                    class="reference"
+                    href="http://www.idyll.org/~t/www-tools/twill.html"
+                    >Twill</a
+                >
+                since shortly after it split from PBP. I like in-process tests a
+                lot, so Twill doesn't really test in the way I'd want it to.
+                Though I bet I could tweak it to test in-process too... anyway,
+                a feature it has is how it fills in forms nicely. I just added
+                <a
+                    class="reference"
+                    href="http://pythonpaste.org/testing-applications.html#id1"
+                    >form filling to Paste</a
+                >, but it's very rough still. And I feel bad that I'm using
+                regexes and not
+                <a
+                    class="reference"
+                    href="http://wwwsearch.sourceforge.net/mechanize/"
+                    >Mechanize</a
+                >
+                or something similar. One thing Paste can do is require
+                reasonably well-formed markup, because it's not intended for
+                testng applications you can't control (but I'm not willing to
+                require XHTML, just reasonably unambiguous HTML 4).
+            </p>
+            <p>
+                Zope 3 emphasizes testing, but I have to admit that I am
+                unimpressed by the
+                <a
+                    class="reference"
+                    href="http://www.zope.org/Wikis/DevSite/Projects/ComponentArchitecture/Zope3Book/ftests.html"
+                    >functional testing</a
+                >
+                (and
+                <a
+                    class="reference"
+                    href="http://www.zope.org/Wikis/DevSite/Projects/ComponentArchitecture/Zope3Book/fdoctests.html"
+                    >doctest functional testing</a
+                >) there. It seems long-winded. There might also be better
+                systems people have set up there. Paste creates a wrapper around
+                the &quot;application,&quot; which seems much better than the
+                kind of manual request setup I see for many frameworks (like in
+                <a
+                    class="reference"
+                    href="http://turbogears.org/docs/testing.html"
+                    >TurboGears</a
+                >).
+            </p>
+            <p>
+                One thing I've done in
+                <tt class="docutils literal"
+                    ><span class="pre">paste.fixture</span></tt
+                >
+                is to expect success unless told otherwise. So you don't confirm
+                a request returned a 200 status code -- it's an error if it
+                doesn't, unless you explicitly say you expect something else. I
+                think explicitly checking for a 200 status code is crazy.
+            </p>
+            <p>
+                What about patterns for matching markup? I test strings against
+                a normalized form of the page (mostly whitespace normalized),
+                but sometimes you do want to test the structure, and I want to
+                avoid fragile tests that test for more than they should (and
+                will fail, for example, due to small design changes). Regular
+                expressions aren't good here; instead it's good to have
+                something that knows about the structure of markup, knows to
+                ignore attribute order, knows when to ignore whitespace (and
+                where not to), etc. I've
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/FormEncode/trunk/formencode/doctest_xml_compare.py"
+                    >played with this before</a
+                >, but I'd be very happy if there was someone else's code I
+                could use here.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 10 Nov '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Do you tried Selenium? I have not tried it but read some
+                    reviews etc about it and tried the online demo. Looked
+                    really useful for Browser tests which I still think a decent
+                    test is 8or maybe was) lacking...
+                </p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://agiletesting.blogspot.com/2005/02/articles-and-tutorials.html"
+                        >http://agiletesting.blogspot.com/2005/02/articles-and-tutorials.html</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                chris
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        meant &quot;did you try&quot; of course but was just
+                        typing away...
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://">chris</a>
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        I have, and we'll probably use it on some level, but it
+                        doesn't really apply to unit-style testing, or even what
+                        I would classify as functional testing. It's much more
+                        about acceptance and regression testing. I find the
+                        tests too verbose to write by hand; there's a nice
+                        Firefox extension for recording, but you can only record
+                        after the application is written.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            i also have a cherrypy filter that i wrote that lets
+                            me write Selenium tests in a much less verbose
+                            syntax (no ugly html table code). i could share it
+                            if anyone's interested.
+                        </p>
+                        <p>
+                            i still use py.test for most of my testing but for
+                            acceptance testing of web apps, Selenium has proven
+                            itself extremely useful. there's something extremely
+                            comforting about seeing that everything works
+                            together from end to end all the way to the browser.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-7.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.columbia.edu/~anders/">anders</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>Ian-</p>
+                <p>
+                    You might want to check out TestGen4Web (<a
+                        class="reference"
+                        href="http://developer.spikesource.com/wiki/index.php?title=Projects:TestGen4Web"
+                        >http://developer.spikesource.com/wiki/index.php?title=Projects:TestGen4Web</a
+                    >) which is a firefox extension for capturing browser
+                    activity. You can save your script as xml and then use
+                    adapters to change that xml into testcases for
+                    testframeworks. There are currently translaters for
+                    simpletest (php) and httpunit (java).
+                </p>
+                <p>matt</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://panela.blog-city.com">matt harrison</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        That project has an awesome schematic! It seems like an
+                        interesting project, and after playing around with
+                        several recorders the translation seems very reasonable
+                        -- capturing higher-level information than just HTTP
+                        requests is useful, and best done at a browser level,
+                        but it doesn't need to be that closely attached to the
+                        target test framework.
+                    </p>
+                    <p>
+                        However, like I mentioned in the Selenium comment, this
+                        doesn't really feel right for unit testing IMHO, and
+                        certainly doesn't work well for TDD.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>From the article:</p>
+                <pre class="literal-block">
+Zope 3 emphasizes testing, but I have to admit that I am unimpressed by the functional testing
+</pre
+                >
+                <p>
+                    Zope 3.2 will include zope.testbrowser which is a much nicer
+                    way to do functional tests. See
+                    <a
+                        class="reference"
+                        href="http://svn.zope.org/Zope3/trunk/src/zope/testbrowser/README.txt?rev=40035&amp;view=markup"
+                        >http://svn.zope.org/Zope3/trunk/src/zope/testbrowser/README.txt?rev=40035&amp;view=markup</a
+                    >
+                    for example usage.
+                </p>
+                <p>
+                    It is also usable outside of Zope, and I hope on packaging
+                    up a stand-alone version around the time 3.2 is released
+                    (December). If I get time I'd also like to do a WSGI
+                    version.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://benjiyork.com">Benji York</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        zope.testbrowser looks like it has a nicer API than
+                        mechanize, at least for testing (speaking as the author
+                        of mechanize), and I see Stephan Richter is hoping to
+                        implement the same API using Selenium -- cool.
+                    </p>
+                    <p>BTW, mechanize should support</p>
+                    <p>easy_setup mechanize==dev</p>
+                    <p>
+                        properly as soon as the latest setuptools is released...
+                        would be nice to fetch zope.testbrowser the same way
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    John Lee
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        Yes, that's much better indeed. Now I can't remember
+                        quite why I wrapped my application in an object, instead
+                        of using a browser object as the central metaphor. In
+                        the end it's not that much different, except that some
+                        things like &quot;back&quot; don't exist for an
+                        application, and it's not as stateful (which has pluses
+                        and minuses).
+                    </p>
+                    <p>
+                        It looks like zope.browser actually uses HTTP requests?
+                        WSGI would definitely be nice, as it would allow
+                        in-process requests, something that I have found very
+                        convenient. Seeing the framework's nice-formatted HTTP
+                        exception reports is not particularly useful when you
+                        are running automated tests. I also like that I can send
+                        out-of-band information; for instance, I use REMOTE_USER
+                        to set the username (or sometimes put it in
+                        test-specific configuration), instead of simulating a
+                        full login. Then I don't need fake logins, or to put my
+                        password in the tests, etc.
+                    </p>
+                    <p>
+                        Another feature that I added to paste.fixture -- in part
+                        after looking at Rails' and CherryPy's tests -- is the
+                        <a
+                            class="reference"
+                            href="http://pythonpaste.org/testing-applications.html#framework-hooks"
+                            >framework hooks</a
+                        >
+                        which allow frameworks to record internal information
+                        into the response object. This means you can
+                        simultaneously test the full-stack rendering and
+                        response, and internal details like what variables were
+                        passed to the template. Obviously you can only do this
+                        in-process.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-19.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <pre class="literal-block">
+It looks like zope.[test]browser actually uses HTTP requests?
+</pre
+                        >
+                        <p>
+                            For Zope 3 it directly communicates with the
+                            in-process publisher. Not only is it much faster
+                            that way, you can have non-testbrowser code do other
+                            types of tests (as you mention below). There's also
+                            a generic browser object you can use that makes
+                            connections over the wire for testing
+                            &quot;remote&quot; applications or doing non-testing
+                            tasks.
+                        </p>
+                        <p>
+                            I intend on integrating the same way with WSGI;
+                            zope.testbrowser would actually be a WSGI server
+                            into which you would plug the application(s) under
+                            test.
+                        </p>
+                        <p>
+                            Of course this fits into my desire to make Zope 3
+                            paste.deploy compatible.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-20.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://benjiyork.com">Benji York</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Twill exports functions named the same as the twill
+                    commands, so I guess that's your &quot;in process&quot;
+                    requirement ticked...
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-9.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">John Lee</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        In-process would mean that it calls an application in
+                        the same process, instead of generating an HTTP request.
+                        So an exception in the application would go all the way
+                        up to the command runner (py.test, unittest, etc).
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-13.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>Oh, I see, seems you're right.</p>
+                        <p>
+                            You'd need a urllib2.HTTPHandler that does what you
+                            want instead of real HTTP, then subclass
+                            mechanize.Browser to override the handler_classes
+                            attribute, and persuade twill to use your Browser
+                            subclass.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-16.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">John Lee</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                It would be a clever hack to monkeypatch
+                                urllib2.HTTPHandler to override requests to
+                                certain hosts and instead send them to
+                                in-process WSGI applications. That would mean
+                                that any urllib2-using Python app should be able
+                                to work this way, including Twill or whatever
+                                else.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-18.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Ian Bicking
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    That's what I meant, but no
+                                    &quot;monkeypatch&quot; is required: you
+                                    just use a different handler instead of
+                                    urllib2.HTTPHandler.
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-22.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://">John Lee</a>
+                            </div>
+                            <hr noshade />
+                            <blockquote>
+                                <div class="document">
+                                    <p>
+                                        ...oh, see what you mean -- it's the
+                                        &quot;persuade twill (or whatever) to
+                                        use it&quot; part that's troublesome.
+                                        Sorry for spamming your blog so much ;-)
+                                    </p>
+                                </div>
+                                <div align="right">
+                                    <a
+                                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-23.html"
+                                        rel="nofollow"
+                                        >#</a
+                                    >
+                                    <a href="http://">John Lee</a>
+                                </div>
+                                <hr noshade />
+                            </blockquote>
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Form-filling in mechanize, twill (assuming Titus starts
+                    using the new code), and zope.testbrowser will all get nicer
+                    when the latest ClientForm is released in a stable version
+                    (soon I guess, since it's been released for some time
+                    labelled 'alpha'), thanks to Benji York &amp; Gary Posters
+                    improvements for zope.testbrowser.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-10.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">John Lee</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Correction: zope.testbrowser already has these
+                        improvements.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-17.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://">John Lee</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I think doctest + (twill or zope.testbrowser) look like a
+                    nice combination.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-11.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">John Lee</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    One feature that I really like, and that I haven't seen
+                    elsewhere is the
+                    <a
+                        class="reference"
+                        href="http://manuals.rubyonrails.com/read/chapter/26"
+                        >fixture</a
+                    >
+                    support found in RubyOnRails. This allows you to have a YAML
+                    file that loads data into your db <em>for each test</em>,
+                    and then removes it when the test is complete. Very helpful
+                    for testing models.
+                </p>
+                <p>
+                    I haven't looked closely enough at paste to see if unit test
+                    stubs are autogenerated for models, controllers etc when the
+                    respective code is generated. That might be a nice touch too
+                    if you don't have it already.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-12.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.inkdroid.org">Ed Summers</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I did
+                        <a
+                            class="reference"
+                            href="http://pythonpaste.org/archives/message/20051109.222605.d8fa49ca.en.html"
+                            >add something recently</a
+                        >
+                        for loading data into SQLObject classes with a CSV file.
+                        However, actually populating a database for a test is a
+                        somewhat separate concern. Right now I'm doing that in
+                        some ad hoc
+                        <tt class="docutils literal"
+                            ><span class="pre">setup_module()</span></tt
+                        >
+                        functions (which py.test invokes), but a complete stack
+                        should handle pulling all these things together.
+                    </p>
+                    <p>
+                        I like having
+                        <tt class="docutils literal"
+                            ><span class="pre">paster</span>
+                            <span class="pre">create</span></tt
+                        >
+                        templates build space for tests, but that this time I'm
+                        -0 on actually creating things for each controller and
+                        model. It seems excessive; I'd rather just add another
+                        function to a file. And I'd rather keep the boilerplate
+                        down, so that adding a test for a new controller just
+                        means:
+                    </p>
+                    <pre class="literal-block">
+def test_view():
+    res = app.get('/view')
+</pre
+                    >
+                    <p>
+                        Which isn't something that needs generating, IMHO. (I do
+                        generate a test for
+                        <tt class="docutils literal"
+                            ><span class="pre">app.get('/')</span></tt
+                        >, but that's more of an example than anything).
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-14.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Re the firefox Selenium recorder extension: httpunit is
+                    noteworthy for JS support, IIRC. Not sure if it's actually
+                    useful, though.
+                </p>
+                <p>Other firefox Selenium recorder extensions:</p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://www.mail-archive.com/selenium-devel&#64;lists.public.thoughtworks.org/msg00099.html"
+                        >http://www.mail-archive.com/selenium-devel&#64;lists.public.thoughtworks.org/msg00099.html</a
+                    >
+                </p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://www.augure.com/dev/SeleniumEditor.xpi"
+                        >http://www.augure.com/dev/SeleniumEditor.xpi</a
+                    >
+                </p>
+                <p>and:</p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://seleniumrecorder.mozdev.org/"
+                        >http://seleniumrecorder.mozdev.org/</a
+                    >
+                </p>
+                <p>
+                    Related: twill has maxq support for recording tests from a
+                    browser. Not extension-based, though -- it just uses a
+                    proxy, so there's less info there to work from.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-15.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">John Lee</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>A couple quick comments re testing &amp; twill.</p>
+                    <p>
+                        I'm starting to use 'nose' for unit testing, and it's
+                        great.
+                    </p>
+                    <p>
+                        In conjunction with my 'nose' unit tests, I've also just
+                        added a fairly simple interface for specifying (a) an
+                        app to run and (b) a twill script to use to test that
+                        app. Watch planetpython for my blog post on that.
+                    </p>
+                    <p>
+                        The maxq recorder for twill sucks. Or should that be
+                        Sucks? I'm hoping to get some work done on it soon, but
+                        right now it's not terribly useful. (Ironic, given that
+                        one of the reasons I wrote twill was so that I could
+                        play back recorded tests.)
+                    </p>
+                    <p>
+                        I'm intrigued by John's opinion of zope.testbrowser. I
+                        liked the look of it too, but it'd be a big change for
+                        twill and I'm not feeling that energetic right now ;).
+                    </p>
+                    <p>
+                        Why not define a new URI scheme, e.g. 'wsgi://', and
+                        then put in a urllib2-like WsgiHandler or some such?
+                        That could potentially be a simpler way to do &quot;in
+                        process&quot; tests than monkeypatching urllib... either
+                        way, I like the idea of getting twill/mechanize/* to
+                        talk to things without going through HTTP.
+                    </p>
+                    <p>
+                        John -- I promise I'll start using the new mechanize
+                        code soon ;). Right now I'm a bit overwhelmed, but it's
+                        on my TODO list.
+                    </p>
+                    <p>--titus</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-21.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.idyll.org/~t/www-toosl/twill.html"
+                        >Titus Brown</a
+                    >
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            <em
+                                >Why not define a new URI scheme, e.g.
+                                'wsgi://', and then put in a urllib2-like
+                                WsgiHandler or some such?</em
+                            >
+                        </p>
+                        <p>
+                            Lots of code expects a constrained set of URI
+                            schemes.
+                            <tt class="docutils literal"
+                                ><span class="pre">http</span></tt
+                            >
+                            and
+                            <tt class="docutils literal"
+                                ><span class="pre">https</span></tt
+                            >, in particular; I know I don't generally write
+                            code with extensible schemes in mind. And either
+                            way, I think a WSGI app would have to be mounted
+                            into place... though I perhaps automatic mounting
+                            would be possible, where you did
+                            <tt class="docutils literal"
+                                ><span class="pre"
+                                    >wsgi://path.to.module/object</span
+                                ></tt
+                            >
+                            or something like that. And I suppose Paste Deploy
+                            has URIs, though the specific schemes it uses are a
+                            bit ambiguous in this case.
+                        </p>
+                        <p>
+                            I don't think the monkeypatching would be
+                            <em>hard</em>. I guess it's just a question of
+                            whether it is <em>wise</em>. But it seems as good as
+                            anything to me.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-24.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Ian Bicking
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                At the risk of repeating myself, no
+                                monkeypatching is required to add wsgi: URL
+                                support -- urllib2 is designed so that adding
+                                new URL schemes and behaviour is easy iff you
+                                have access to the OpenerDirector instance (the
+                                thing you call .open(urlOrRequest) on). Titus,
+                                as the author of twill, clearly does have such
+                                access, though I don't know if it's also exposed
+                                as part of the twill API.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-27.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="http://">John Lee</a>
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    Point taken -- rather than breakage with
+                                    wsgi:// (which I thought might be clean) I
+                                    will look at subverting urllib2. The goal
+                                    will be to produce a WSGI-compliant server
+                                    interface into which any WSGI app can be
+                                    plugged &amp; played.
+                                </p>
+                                <p>
+                                    This is a good direction for twill, IMO, so
+                                    I'm moderately enthusiastic about
+                                    implementing it, too.
+                                </p>
+                                <p>A few additional comments:</p>
+                                <p>
+                                    zope.testbrowser looks nice, but it's
+                                    unclear to me what the compelling advantage
+                                    is. I've got to look at it more before I
+                                    make my life more complicated by trying to
+                                    switch to it... ;)
+                                </p>
+                                <p>
+                                    the twill API doesn't provide direct access
+                                    to anything mechanize-tic, but the full
+                                    mechanize interface is of course accessible
+                                    to extension functions, which are just
+                                    Python (of course!).
+                                </p>
+                                <p>
+                                    Finally, even if twill becomes WSGI-aware,
+                                    writing the tests is going to be a huge
+                                    pain. (Hmm, maybe if I get the BickingBot
+                                    entangled in twill he'll write a WSGI
+                                    recorder!)
+                                </p>
+                                <p>--titus</p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-31.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a
+                                    href="http://www.idyll.org/~t/www-toosl/twill.html"
+                                    >Titus Brown</a
+                                >
+                            </div>
+                            <hr noshade />
+                            <blockquote>
+                                <div class="document">
+                                    <p>
+                                        Simple (but working) implementation of
+                                        in-process testing with twill: &lt;a
+                                        href=&quot;<a
+                                            class="reference"
+                                            href="http://www.advogato.org/person/titus/diary.html?start=119"
+                                            >http://www.advogato.org/person/titus/diary.html?start=119</a
+                                        >&quot;&gt;discussed here&lt;/a&gt;.
+                                    </p>
+                                </div>
+                                <div align="right">
+                                    <a
+                                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-32.html"
+                                        rel="nofollow"
+                                        >#</a
+                                    >
+                                    <a
+                                        href="http://www.idyll.org/~t/www-toosl/twill.html"
+                                        >Titus Brown</a
+                                    >
+                                </div>
+                                <hr noshade />
+                            </blockquote>
+                        </blockquote>
+                    </blockquote>
+
+                    <div class="document">
+                        <p>
+                            I don't imagine there'd be much purpose in
+                            re-writing twill for zope.testbrowser, would there?
+                            Would just introduce an unneccesary extra layer of
+                            complexity.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-25.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        anonymous
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                oops, that last comment about twill /
+                                zope.testbrowser was me.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-26.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="http://">John Lee</a>
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+
+                    <div class="document">
+                        <p>
+                            Why invent the 'wsgi:' scheme, when you can just
+                            reimplement urllib2.HTTPHandler?
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-30.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        anonymous
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    When I wrote my webapp framework last year, I too found that
+                    Zope testing was inadequate, and I still do. I ended up
+                    writing my own app end-to-end (I could not bear without an
+                    autoreload feature for the source code, and all Zope3
+                    facilities for fast development were broken, couldn't use
+                    webdav to upload files, had to restart server on every
+                    change, there was no way I was going to work like that), and
+                    using mechanize for testing it. IMO best testing for the web
+                    should be done from a browser's perspective to really be
+                    effective. I have found so many problems that would have
+                    slipped by without my tests.
+                </p>
+                <p>
+                    One useful idea that I introduced in my app was to return
+                    custom meta fields in the head, that reflect some of the
+                    internal state of the server app, for example, the currently
+                    logged in user, and a return status string. These only show
+                    up when the app is in debug mode, and the tests assert that
+                    the return statii are what is expected.
+                </p>
+                <p>
+                    Another idea was to add extra test resources/pages in debug
+                    mode. For example, when my app sends email to other users,
+                    well, in debug mode, it doesn't really send, rather, it puts
+                    the emails in a DB table (only the last email for each user)
+                    and then the tests can recuperate the last email sent for a
+                    particular user, whose contents it then validates. I can
+                    parse the email to get some links with tokens, etc. Just
+                    trying to do as close to the real processes as possible.
+                </p>
+                <p>cheers,</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-28.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://furius.ca">Martin Blais</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>paste.fixture does both of these:</p>
+                    <ul class="simple">
+                        <li>
+                            There's a special key for putting values for use in
+                            tests (<tt class="docutils literal"
+                                ><span class="pre"
+                                    >paste.testing_variables</span
+                                ></tt
+                            >), which takes the place of headers. It's
+                            out-of-band with respect to any HTTP information,
+                            and values needn't be serialized to strings.
+                        </li>
+                        <li>
+                            There's also ways to detect when you are in a
+                            debugging environment (<tt class="docutils literal"
+                                ><span class="pre">paste.testing</span></tt
+                            >) -- some people think this is really bad, but I
+                            think those people are just scarred from having
+                            someone abuse that feature to put workarounds in the
+                            code for the tests. The rule of consenting adults
+                            say, to me, that the variable belongs there. Though,
+                            I suppose, those people want to set up all the mock
+                            objects ahead of time using a complicated setup
+                            process (e.g., dependency injection). A boolean is
+                            easier.
+                        </li>
+                    </ul>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-33.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I have been playing around with Turbo Gears and the first
+                    thing I wanted to do from the begining was write web tests.
+                    TurboGears testing simillar to Paste. However the one thing
+                    I missed alot was testing forms, this is usually what I want
+                    to test in my webpages.
+                </p>
+                <p>
+                    Also, if you give some semantics to your html, like use
+                    classes you can extract more data out of it and, with the
+                    aid of BeautifulSoup, match the number of, let's say divs
+                    with the class 'product_entry' exist in the page and compare
+                    it with your model representation.
+                </p>
+                <p>
+                    Here are the posts I wrote about the functions I mentioned:
+                </p>
+                <blockquote>
+                    <ul class="simple">
+                        <li>
+                            Post 1:
+                            <a
+                                class="reference"
+                                href="http://s1x.homelinux.net/node/150"
+                                >http://s1x.homelinux.net/node/150</a
+                            >
+                            talks about <cite>form_fill</cite>,
+                            <cite>form_to_dict</cite> and
+                            <cite>browse_url</cite>
+                        </li>
+                        <li>
+                            Post 2:
+                            <a
+                                class="reference"
+                                href="http://s1x.homelinux.net/node/149"
+                                >http://s1x.homelinux.net/node/149</a
+                            >
+                            talks about <cite>form_encode</cite>
+                        </li>
+                    </ul>
+                </blockquote>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-36.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://s1x.homelinux.net/">Tiago Cogumbreiro</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Have you checked out PyMeld and family? Although they
+                    require XHTML, I think.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-38.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">sureshvv</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    have you tried
+                    <a class="reference" href="http://funkload.nuxeo.com"
+                        >Funkload</a
+                    >
+                    ?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-39.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://funkload.nuxeo.com">Tarek</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Web surfing is fun, but many tasks are repetitious: Checking
+                    on the same sites everyday, remembering passwords,
+                    submitting to search engines or testing web sites over and
+                    over again. With iMacros you record these tasks once and
+                    then let the iMacros software execute them whenever you need
+                    them. Any combination of browsing, form filling, clicking
+                    and information gathering can be recorded into a macro and
+                    the iMacros software assists you during the recording with
+                    visual feedback. Do you need to extract price lists, stock
+                    information or any other data from websites?
+                </p>
+                <p>
+                    iOpus Internet Macros can help you:
+                    <a
+                        class="reference"
+                        href="http://www.yaodownload.com/internet-tools/browsers/iopusinternetmacros/"
+                        >http://www.yaodownload.com/internet-tools/browsers/iopusinternetmacros/</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-29.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                joe
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Check out WatiN. It's an open source project which enables
+                    (unit) testing through internet exploer in any .Net
+                    langauge. For more info visit
+                    <a class="reference" href="http://watin.sourceforge.net"
+                        >http://watin.sourceforge.net</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/best-of-the-web-app-test-frameworks-comment-41.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://watin.sourceforge.net">Jeroen van Menen</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

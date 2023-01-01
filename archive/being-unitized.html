@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Being Unitized</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Being Unitized</h1>
+
+        <div class="document">
+            <p>
+                I was interested to read
+                <a
+                    class="reference"
+                    href="http://www.theserverside.com/blogs/printfriendly.tss?id=Unitized"
+                    >Don't Let Yourself Get Unitized</a
+                >, I guess because he refers to problems with JUnit, and
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-unittest.html"
+                    >unittest</a
+                >
+                is based on JUnit, and
+                <a class="reference" href="unittest-rant.html"
+                    >I don't like unittest that much</a
+                >.
+            </p>
+            <p>
+                But the article turns into a curmudgeonly rant and his
+                underlying resentment of unit testing comes out:
+            </p>
+            <blockquote>
+                <p>Consider the goals and tenents of unit testing:</p>
+                <ul class="simple">
+                    <li>Very small &quot;units&quot; are tested</li>
+                    <li>
+                        Testing is almost always done of individual components
+                        in isolation from other components
+                    </li>
+                    <li>Mocking strengthens the isolation aspect</li>
+                    <li>
+                        The code and the tests are almost always written by the
+                        same person
+                    </li>
+                </ul>
+                <p>
+                    Taken together this means that unit tests are testing the
+                    lowest level pieces of your code, each in turn and in
+                    isolation from all other pieces, and the definition of the
+                    tests and the code are done by the same person.
+                </p>
+                <p>
+                    This sort of testing catches what I consider &quot;low
+                    hanging fruit&quot;. It catches problems-in-the-small. It'll
+                    find individual methods or classes which don't match what
+                    the unit tests say should happen.
+                </p>
+                <p>
+                    This is a good thing and provides very valuable feedback on
+                    the correctness of your code. But keep in mind it _only_
+                    catches low hanging fruit. By design, unit testing is
+                    supposed to be easy, and to consider individual small pieces
+                    of a system in isolation. Because of this, by its very
+                    nature, unit testing does not consider the _composition_ of
+                    a system, only its individual parts. Unit tests never check
+                    the interconnections of an application, it never checks how
+                    they are wired together.
+                </p>
+                <p>
+                    In my experience, the interconnections and
+                    &quot;wiring&quot; of an app is where most of the complexity
+                    of the application lies. The wiring defines your design, and
+                    if considered at a high enough level it can even be
+                    considered to capture your architecture. How information
+                    flows across many software layers and between many
+                    components really define what an application does. And the
+                    very definition of Unit Testing is that it does not test
+                    these aspects of an application. Unit testing ignores
+                    information flow across software layers and components,
+                    ignores how classes and objects are interrelated and are put
+                    together into larger designs and architecture. This means
+                    that unit tests can catch simple errors in individual pieces
+                    of code, but says nothing whatsoever about your system's
+                    design or architecture. And what makes or breaks an
+                    application really is the overall design and architecture.
+                    The design and architecture captures your system's
+                    performance, it's memory use, the &quot;end-to-end&quot;
+                    correctness from the user's inputs out to whatever servers
+                    you might be using, and the round trip back again. How all
+                    the wiring interconnects shows the true system behavior, and
+                    it is in this area where the toughest bugs and problems lie,
+                    and where people sweat blood to get things right. Writing
+                    individual components in isolation is easy. It's hooking
+                    them together into a cohesive whole that's hard - and unit
+                    tests only pass judgement on the individual parts in
+                    isolation, not the whole.
+                </p>
+                <p>
+                    Getting one component to act &quot;correctly&quot; in a
+                    system is almost always a pretty trivial exercise. Writing
+                    one component in isolation is not the difficult part of
+                    computer programming. Any single small component of a system
+                    is generally easy to code. The hard part of development
+                    comes in getting all of the components of a system to work
+                    together - to get the wiring right. Unit tests can verify
+                    that each of your individual components does what you the
+                    developer thinks it should do. But by its very definition,
+                    unit testing cannot check the more complex
+                    &quot;wiring&quot; - and the wiring is where most of our
+                    design, development, and debugging time goes into.
+                </p>
+            </blockquote>
+            <p>
+                There's also some weird digs at
+                <a class="reference" href="http://www.martinfowler.com/"
+                    >Martin Fowler</a
+                >
+                (and I guess all consultants), which seems out of the blue and a
+                little mean. The guy has a chip on his shoulder. But anyway,
+                I'll respond with my thinking on unit tests.
+            </p>
+            <p>
+                First:
+                <em
+                    >Getting one component to act &quot;correctly&quot; in a
+                    system is almost always a pretty trivial exercise.</em
+                >
+                Sure, getting it to act &quot;correctly&quot; is easy. Getting a
+                component to act correctly <em>without</em>
+                <a
+                    class="reference"
+                    href="http://www.informatics.susx.ac.uk/doc/punctuation/node31.html"
+                    >scare quotes</a
+                >
+                is much harder. If your component acts correctly all that wiring
+                will work correctly too (by definition). When he's talking about
+                &quot;correctly&quot; I think he really means &quot;according to
+                some spec that was delivered to the programmer.&quot; This is a
+                symptom of defensive programming, where the programmer isn't at
+                fault if there's a bug in the spec, or a bug in the larger
+                design, or what-have-you. A responsible programmer cares about
+                the success of the larger project, and judges correctness based
+                on the utility and reliability of their code in that larger
+                project, so there is no &quot;correct&quot; that does not
+                include the system.
+            </p>
+            <p>
+                But another error is in how he views &quot;units&quot;. A unit
+                test is small and isolated, and tests a small amount of code.
+                But a &quot;small amount of code&quot; is a matter of
+                perspective. I shudder to think about the amount of code
+                involved in the Python expression
+                <tt class="docutils literal"
+                    ><span class="pre">a</span> <span class="pre">=</span>
+                    <span class="pre">some_dict.copy()</span></tt
+                >. There's the Python compiler, and VM, and the dictionary
+                implementation, and the code behind classes and types, and
+                underneath that is libc and the kernel and who knows what. And
+                the combinations! Most of those pieces have multiple
+                implementations; alternate dictionary-like objects, alternate
+                VMs, many underlying platforms. We have created ourselves a
+                Tower of Babel, an incredible monument to abstraction. But God
+                hasn't struck us down... well, we have been &quot;cursed&quot;
+                with a multitude of languages, but our efforts have not
+                collapsed.
+            </p>
+            <p>
+                And yet despite all that underlying code, that one line is
+                <em>too small</em> to be unit tested. So how did we get there?
+                For the purpose of what we're testing we ignore the code and
+                trust the abstractions. All those pieces underneath it are
+                mature and well tested, having undergone years of development
+                and testing by a large number of developers.
+            </p>
+            <p>
+                When I create a system, I have to build those same kinds of
+                abstractions, reliable pieces that I can trust. When I later
+                create code that depends on those libraries, I test that code, I
+                do not test the library.
+            </p>
+            <p>
+                But unlike foundational code like libc, I can't put years of
+                effort into building my abstractions. I have deadlines, and
+                anyway I don't actually <em>want</em> to work on a single
+                project for years at a time, all the way through to some
+                time-based maturity, suffering through an unreliable interim and
+                using QA departments and other systems that require bureaucracy.
+            </p>
+            <p>
+                Unit testing is in this way circular. Unit testing allows me to
+                bring something to maturity faster, to practically
+                <em>will it</em> to maturity. Along the way I have to make
+                compromises -- I have to keep my code decoupled, and I have to
+                write for testability. But I make those compromises because they
+                allow me to move <em>beyond</em> my code, to build up things
+                that don't need to be constantly revisited and retested
+                according to context.
+            </p>
+            <p>
+                This is circular, because only with this foundation can I move
+                to testing higher-level code in &quot;isolation&quot;. Because
+                of the
+                <a
+                    class="reference"
+                    href="http://c2.com/cgi/wiki?StableDependenciesPrinciple"
+                    >Stable Dependencies Principle</a
+                >, I can't build something reliable and mature on top of
+                something that is unreliable and immature. I can only make my
+                code &quot;isolated&quot; if I have real trust that my
+                underlying code is well defined and functional, that I can
+                ignore it the way I ignore libc and the virtual machine. And I
+                can only do that with unit tests.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 21 Apr '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    I agree with most of what you have to say - I think most
+                    people who use unit-tests realize that you can't use them
+                    instead of having a well-understood QA process. Also, it's
+                    my understanding that unit tests are quite good at prevents
+                    previously found bugs from showing up again. When a defect
+                    is reported, _if
+                    <span class="nowiki"
+                        >possible<a
+                            class="wiki reference"
+                            href="https://ianbicking.org/possible.html"
+                            >?</a
+                        ></span
+                    >, you write a test for it and then it's added to the
+                    regression cycle.
+                </p>
+                <p>
+                    I suspect a lot of people shudder when they hear the idea of
+                    programmers writing tests. But one of the benefits
+                    <em>has</em> to be that as a programmer, you really have to
+                    think about what you're doing before you do it. What is this
+                    one thing supposed to do. Before unit testing was popular,
+                    we required our developers to write function 'tombstones'
+                    (documentation about the name, who wrote it when, what it
+                    does, valid results, etc. etc.) before writing the code so
+                    that one would consider the atomic parts necessary. It
+                    helped.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/being-unitized-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.planetshwoop.com/blog/">brian</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    ill agree that Spille shoots himself in the foot by ranting
+                    heavily and slathering on the quasi-ad-hominem stuff, but I
+                    like the points he makes at the end for integration tests,
+                    regression tests, and non-functional tests. I think we dont
+                    hear so much about those things on the one hand because they
+                    are so &quot;old school&quot; and we supposedly all know
+                    them already, but I think moreso because
+                    <em>those techniques are hard</em> and cant be easily
+                    transmitted into one-page soundbyte-types of articles and
+                    tutorials. and the rule of the day seems to be the
+                    technologies and techniques that can be learned by any
+                    newbie in half a day are the only ones that gain any kind of
+                    popularity.
+                </p>
+                <p>
+                    the testing style i am familiar with on pretty much an
+                    intuitive basis, is a couple of unit tests just for highly
+                    algorithmic units of code, such as elaborate data structures
+                    or synchronization objects, and after that a lot of
+                    integration testing, functional testing, and regression
+                    testing, with a varied mix of automated test runners and
+                    manual tests, as is appropriate. so far, ive never felt so
+                    inclined to write unit tests for all those components that
+                    are obviously trivial (trivial to me, that is), which pretty
+                    much prove their functionality after i inspect their
+                    progress within some full-system tests (i.e. components
+                    where if they had any kind of flaw, theres no way the app
+                    could possibly work).
+                </p>
+                <p>
+                    But, I am trying to &quot;see the light&quot; for a more
+                    unit-testing-fundamental approach and beginning to
+                    semi-begrudgingly write some unit tests for code i usually
+                    wouldnt bother with, and in fact it did reveal some dumb
+                    little non-bug-but-not-quite-correct behavior almost right
+                    out of the gate. But I'm also inclined to throw into the
+                    testing framework a combination of unit tests and the more
+                    integrative tests Ive already written, like multithreaded
+                    load-killer type tests and other front-to-back types of
+                    stuff. Since unittest, being minimal (and yes not that great
+                    i agree) just gives you &quot;testXXXX&quot;, why even call
+                    it &quot;unittest&quot; ? you can put whatever kinds of
+                    tests you want in there.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/being-unitized-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                mike bayer
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I had this impression.. let me state it: this is a java guy.
+                </p>
+                <p>
+                    I don't mean he is using java I mean he is committed to the
+                    idea that if a thing is simple it is not valuable. The
+                    problem with unittest in python is a different beast, people
+                    actually want it to be more simple. Go figure.
+                </p>
+                <p>
+                    On the second part of the article, the one you quote, I
+                    wonder: what the hell he's trying to say? If I can't unit
+                    test the composition of components, how am I supposed to
+                    check if something work? Should I automate my tests by
+                    getting some slave who endlessly type the same input or
+                    should I use some kind of automated interface..mh.. like..
+                    well.. a xUnit framework?
+                </p>
+                <p>
+                    Also, he clearly states that unit testing &quot;says nothing
+                    whatsoever about your system's design or architecture&quot;,
+                    which imo is wrong. The ease of testing is a direct heir of
+                    good design.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/being-unitized-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">gabriele renzi</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

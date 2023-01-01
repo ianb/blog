@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>minimock</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>minimock</h1>
+
+        <div class="document">
+            <p
+                style="
+                    border: 2px solid #000;
+                    background-color: #ffc;
+                    padding: 1em;
+                "
+            >
+                <b>Update:</b> MiniMock's main site is the
+                <a href="http://pypi.python.org/pypi/MiniMock"
+                    >PyPI MiniMock page</a
+                >, and it has a
+                <a href="http://groups.google.com/group/minimock-dev"
+                    >Google Group</a
+                >.
+            </p>
+
+            <p>
+                At the last
+                <a class="reference" href="http://chipy.org">ChiPy</a> meeting
+                there was a presentation by Fawad Halim on the
+                <a class="reference" href="http://python-mock.sourceforge.net/"
+                    >python-mock</a
+                >
+                mock object library.
+            </p>
+            <p>
+                While I usually abhor complex mock libraries, that one actually
+                looked quite good and sufficiently simple. But I also thought it
+                could be a lot simpler using
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-doctest.html"
+                    >doctest</a
+                >.
+            </p>
+            <p>
+                So after the meeting I whipped up
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/home/ianb/recipes/minimock.py"
+                    >minimock</a
+                >. Here's what a test looks like; first some setup:
+            </p>
+            <pre class="literal-block">
+&gt;&gt;&gt; smtplib.SMTP = Mock('smtplib.SMTP')
+&gt;&gt;&gt; smtplib.SMTP.mock_returns = Mock('smtp_connection')
+</pre
+            >
+            <p>Then the test:</p>
+            <pre class="literal-block">
+&gt;&gt;&gt; send_email('ianb&#64;colorstudy.com', 'joe&#64;example.com',
+...            'Hi there!', 'How is it going?')
+Called smtplib.SMTP('localhost')
+Called smtp_connection.sendmail(
+    'ianb&#64;colorstudy.com',
+    ['joe&#64;example.com'],
+    'To: joe&#64;example.com\nFrom: ianb&#64;colorstudy.com\nSubject: Hi there!\n\nHow is it going?')
+Called smtp_connection.quit()
+</pre
+            >
+            <p>
+                It's about 25 lines of actual code and I believe supports all
+                the patterns that python-mock supports. Almost all features are
+                actually implicit features of doctest. You really want to set
+                the ELLIPSIS
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/doctest-options.html"
+                    >option</a
+                >
+                (which I prefer to use in all my doctests).
+            </p>
+            <p>
+                Why people don't implement doctest in other language, I have no
+                idea. It's
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/docs/jsdoctest/demo.html"
+                    >totally translatable</a
+                >
+                and it's so damn simple. You don't have to understand all sorts
+                of ideas; the ideas just <em>fall out</em> of doctest (like this
+                mocking). Maybe it's too simple for anyone to feel proud of
+                porting it. It's not a
+                <a class="reference" href="http://behaviour-driven.org/"
+                    >whole new concept in testing</a
+                >
+                (*cough<a
+                    class="reference"
+                    href="behavior-driven-programming.html"
+                    >yagni</a
+                >cough*). It's just a simple idea that, once you figure it out,
+                feels like it should have been obvious all along.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 18 Nov '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    I have to say, this is by far the simplest mock
+                    implementation I have ever seen, and complexity is usually
+                    the biggest factor standing in the way of greater use of
+                    mocks. It would be worth porting doctests to Java simply to
+                    enable the use of something like this. Bravo.
+                </p>
+                <p>Also, that's the best captcha I've ever seen.</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/minimock-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Alec Munro
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>Wow, that cool, and ridiculously short. I love Python.</p>
+                <p>
+                    I'm fairly new to unit tests, doctests, et al and I was
+                    having a lot of problems with my objects doing things that
+                    were difficult/impossible to capture in regular tests
+                    (kernel calls on MS Windows and printing out funky escape
+                    characters on *nix systems). This is exactly what I need.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/minimock-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://terminate.sf.net">Alan Trick</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I was wondering what the license was on minimock? Any chance
+                    adding it to the cheese shop or the cook book?
+                </p>
+                <p>
+                    I don't feel up to adding this to the Wikipedia doctest
+                    entry myself. Maybe you could mention it in the talk section
+                    at
+                    <a
+                        class="reference"
+                        href="http://en.wikipedia.org/wiki/Talk:Doctest"
+                        >http://en.wikipedia.org/wiki/Talk:Doctest</a
+                    >
+                    ?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/minimock-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="https://ianbicking.org/paddy3118.blogspot.com/"
+                    >Paddy McCarthy</a
+                >
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

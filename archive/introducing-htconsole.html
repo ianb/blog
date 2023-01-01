@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Introducing HTConsole</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Introducing HTConsole</h1>
+
+        <div class="document">
+            <p>
+                After reading some discussions on
+                <a
+                    class="reference"
+                    href="http://www.python.org/community/sigs/current/edu-sig/"
+                    >edu-sig</a
+                >, and with a little inspiration from
+                <a class="reference" href="http://tryruby.hobix.com/"
+                    >Try Ruby</a
+                >, I've been playing around more with a web-based console,
+                <a
+                    class="reference"
+                    href="http://cheeseshop.python.org/pypi/HTConsole"
+                    >HTConsole</a
+                >. (Like several people now, I am lazily using the Cheese Shop
+                page as the homepage.) (I should note also, I'm not really
+                trying to recreate the publically-available interpreter aspect
+                of Try Ruby, it's more that I'm trying to further explore the
+                HTML-based interpreter that the later parts of the Try Ruby
+                tutorial introduces)
+            </p>
+            <p>
+                This isn't intended to be Yet Another Python Console; I'm really
+                thinking more about this as a learning tool. And since I haven't
+                really thought about the security implications, you'll have to
+                install it yourself to try it. Maybe some of
+                <a
+                    class="reference"
+                    href="http://www.mired.org/home/mwm/try_python/"
+                    >this</a
+                >
+                later.
+            </p>
+            <p>
+                But really, the idea isn't to duplicate (or even improve ala
+                <a class="reference" href="http://ipython.scipy.org/">ipython</a
+                >) the console experience (ignoring the name), except to use
+                that as a starting point.
+            </p>
+            <p>
+                So far I've mostly just achieved that starting point, but if you
+                poke around there's a couple places where I'm expanding on that.
+                If you add something to the local scope (e.g., through an import
+                or assignment), it shows up in a table at the bottom of the
+                screen. (Though I'm going to have to figure out how to keep the
+                screen from getting too long.) Objects can also be displayed in
+                an interactive manner. A function, for instance, has an edit
+                button; if you hit it, you can edit the function in place. I
+                want to add self-editing features to more objects. Well, at
+                least to classes and functions. And dicts. And lists too I
+                guess. And
+                <tt class="docutils literal"
+                    ><span class="pre">property</span></tt
+                >. So, okay, a bunch of things.
+            </p>
+            <p>
+                On edu-sig there's also been talk of doctesting, and that's
+                another thing I want to add, just to select a doctest and run it
+                against the environment.
+            </p>
+            <p>
+                Anyway, it's kind of fun I think, and thoroughly non-enterprise;
+                not even suitable for serious programming. That lends a sense of
+                freedom. You install it like:
+            </p>
+            <pre class="literal-block">
+easy_install htconsole
+... lots of junk passes by ...
+htconsole
+... web browser pops up with console ...
+</pre
+            >
+            <p>
+                At least, I think this is all it should take to install.
+                <strong>Note:</strong> I'm pretty sure you'll need the latest
+                version of setuptools to get it to install nicely (with support
+                for
+                <tt class="docutils literal"
+                    ><span class="pre">dependency_links</span></tt
+                >) -- grab
+                <a
+                    class="reference"
+                    href="http://peak.telecommunity.com/dist/ez_setup.py"
+                    >ez_setup.py</a
+                >
+                and run it to get the latest version.
+            </p>
+            <p>
+                Now to figure out some of the tricky Python magic to edit more
+                objects in place...
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 27 Apr '06<br />
+            Modified 28 Apr '06
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    How come you wrote your own serializeJSON, when MochiKit
+                    already has one?
+                </p>
+                <p>
+                    The keyboard handling code would be a lot cleaner and more
+                    correct if you used the MochiKit.Signal API. Check the
+                    latest interpreter example sources.
+                </p>
+                <p>
+                    It's also kind of weird that you're using the exported
+                    functions for base and async stuff, but fully qualified DOM
+                    functions. I'd pick one or the other style and stick to it.
+                </p>
+                <p>
+                    Could definitely use a status indicator and a way to
+                    interrupt.. I guess via some kind of trace func of a C
+                    extension to send exceptions across threads.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/introducing-htconsole-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pythonmac.org/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        How come you wrote your own serializeJSON, when MochiKit
+                        already has one?
+                    </blockquote>
+                    <p>
+                        Because I could not find it. I have a really hard time
+                        finding things in MochiKit sometimes.
+                    </p>
+                    <blockquote>
+                        Could definitely use a status indicator and a way to
+                        interrupt.. I guess via some kind of trace func of a C
+                        extension to send exceptions across threads.
+                    </blockquote>
+                    <p>
+                        I haven't particularly noticed that, but then there's
+                        lots of conditions I haven't tried. Was there a
+                        particular thing you were doing that caused a problem
+                        (something I might be able to reproduce)?
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/introducing-htconsole-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            How can the MochiKit docs change such that you'd
+                            have an easier time finding things? I mean shit, if
+                            you had looked for a function named serializeJSON
+                            you'd have found it... you picked the same name I
+                            did.
+                        </p>
+                        <p>
+                            I did &quot;while True: pass&quot; to see how it
+                            would be handled.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/introducing-htconsole-comment-3.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://bob.pythonmac.org/">Bob Ippolito</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                Huh, yeah it's right in Base. I guess I have a
+                                problem figuring out what module things are in
+                                -- specifically Base, Format, and Async, though
+                                Base and Iter are also hard to tell apart at
+                                times. Now that I look at it, I realize I could
+                                just expand all the function lists on the front
+                                page of the documentation; instead I kept
+                                looking on individual pages. Maybe an
+                                &quot;expand list of all available
+                                functions&quot; link on the front page would
+                                help?
+                            </p>
+                            <p>
+                                For the while True thing... damn, stopping a
+                                runaway thread is hard. Certainly on the client
+                                side some indication of
+                                command-sent-waiting-for-response can be added
+                                easily enough, but unfortunately I don't know
+                                how to actually handle the problem of infinite
+                                loops.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/introducing-htconsole-comment-4.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Ian Bicking
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    There are two ways to handle an infinite
+                                    loop.. you can set a trace func that checks
+                                    some variable to see if it should raise an
+                                    exception or not, or you can hack into some
+                                    semi-private C API which lets you send an
+                                    exception to another thread. The former is
+                                    probably better for this.
+                                </p>
+                                <p>
+                                    I'll see about adding that expand all
+                                    button, should be easy enough.
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/introducing-htconsole-comment-6.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://bob.pythonmac.org/"
+                                    >Bob Ippolito</a
+                                >
+                            </div>
+                            <hr noshade />
+                            <blockquote>
+                                <div class="document">
+                                    <p>
+                                        Keep in mind that Turing proved (before
+                                        computers existed in fact) that it is
+                                        impossible to accurately detect infinte
+                                        loops -- it's called the 'Halting
+                                        problem' FYI.
+                                    </p>
+                                </div>
+                                <div align="right">
+                                    <a
+                                        href="https://ianbicking.org/introducing-htconsole-comment-8.html"
+                                        rel="nofollow"
+                                        >#</a
+                                    >
+                                    Silas Snider
+                                </div>
+                                <hr noshade />
+                            </blockquote>
+                        </blockquote>
+
+                        <div class="document">
+                            <p>
+                                A single page with the entire documentation
+                                would also help (easier to search). On the topic
+                                of docs, links to the implementations from the
+                                documentation would also be really nice; the
+                                docs can be a little terse at times, but usually
+                                the implementation is clear enough.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/introducing-htconsole-comment-5.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Ian Bicking
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    I'd rather fix the doc bugs than try and
+                                    link to the source from the docs
+                                    (non-trivial). Please file tickets when you
+                                    find documentation that is insufficient.
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/introducing-htconsole-comment-7.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://bob.pythonmac.org/"
+                                    >Bob Ippolito</a
+                                >
+                            </div>
+                            <hr noshade />
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

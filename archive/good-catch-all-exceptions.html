@@ -1,0 +1,555 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Good catch all exceptions</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Good catch all exceptions</h1>
+
+        <div class="document">
+            <p>
+                In
+                <a
+                    class="reference"
+                    href="http://ischenko.blogspot.com/2005/01/exception-based-code-antipatterns.html"
+                    >Exception-based code antipatterns</a
+                >
+                Max Ischenko argues that this kind of error checking is bad:
+            </p>
+            <pre class="literal-block">
+try:
+    # do something
+except Exception, e:
+    # handle it
+</pre
+            >
+            <p>
+                It's essentially equivalent to using
+                <tt class="literal"><span class="pre">except:</span></tt>
+                without specifying any exception class at all, meaning that it
+                will catch <em>all</em> exceptions. Generally it's better to
+                only catch the exceptions you are expecting, e.g.,
+                <tt class="literal"><span class="pre">KeyError</span></tt> or
+                <tt class="literal"
+                    ><span class="pre">(IOError,</span>
+                    <span class="pre">OSError)</span></tt
+                >. I don't disagree with him, but there are a number of cases
+                where this kind of exception handling is good, though often left
+                out.
+            </p>
+            <p>
+                The most obvious case: it's not bad at all to catch all
+                exceptions if you re-raise them. In Python you can re-raise the
+                last exception by using
+                <tt class="literal"><span class="pre">raise</span></tt> without
+                any arguments. Basically you are saying
+                <em
+                    >if (and only if) something goes wrong, do this, but still
+                    signal that something went wrong</em
+                >. This case shouldn't be confused with
+                <tt class="literal"><span class="pre">finally:</span></tt
+                >, which indicates code that should always be called, error or
+                no error. An example of
+                <tt class="literal"><span class="pre">except:</span></tt
+                >:
+            </p>
+            <pre class="literal-block">
+try:
+    cursor.execute(&quot;INSERT INTO table VALUES (%s, %s)&quot;, (a, b))
+    obj.setValues(a, b)
+except:
+    cursor.rollback()
+    raise
+</pre
+            >
+            <p>
+                And one for
+                <tt class="literal"><span class="pre">finally:</span></tt
+                >:
+            </p>
+            <pre class="literal-block">
+conn = pscyopg.connect('dbname=testdb')
+try:
+    run_transaction(conn)
+finally:
+    conn.close()
+</pre
+            >
+            <p>
+                But there's other cases. Anytime you won't be there to babysit a
+                process, you need to handle unexpected exceptions. For a
+                command-line utility, you can read the exception when it occurs,
+                no big deal. But for a long-running or batch process you need to
+                intelligently deal with exceptions. Also for processes that are
+                run by non-developers: you want to capture the error information
+                so a developer can look at it, and then try to keep going if you
+                can.
+            </p>
+            <p>
+                In these cases you usually want to be careful about putting in
+                <tt class="literal"><span class="pre">except:</span></tt> blocks
+                like the
+                <tt class="literal"
+                    ><span class="pre">cursor.rollback()</span></tt
+                >
+                example above -- these attempt to clean things up when something
+                unexpected goes wrong, so that the process isn't left in an
+                inconsistent state. Then at some fairly high level you actually
+                handle (and <em>don't</em> re-raise) the exception. Most
+                &quot;frameworks&quot; do this for you -- e.g., Tkinter,
+                Webware, Zope,
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-cgitb.html"
+                    >cgitb</a
+                >, etc. If you don't have a framework, you have to do it
+                yourself. Here's a really simple handler that uses the
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-traceback.html"
+                    >traceback</a
+                >
+                module:
+            </p>
+            <pre class="literal-block">
+def catch_exceptions(func, *args, **kw):
+    try:
+        # We could return the result of the function, but it's
+        # a bad idea to make use of that return value since it's
+        # undefined when there's an exception; it's better for the
+        # function to set a flag or write to some persistent
+        # structure when it finishes successfully.
+        func(*args, **kw)
+    except Exception, e:
+        f = open(log_file, 'a')
+        f.write('-'*60 + '\n')
+        traceback.print_exc(file=f)
+        f.close()
+</pre
+            >
+            <p>
+                The
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-logging.html"
+                    >logging</a
+                >
+                module also has an
+                <tt class="literal"><span class="pre">exception</span></tt>
+                function just for this case.
+            </p>
+            <p>
+                I'm always very careful about situations where a traceback or
+                error message goes to a black hole. Also, it's annoying for
+                everyone when these error messages have to be handed back to
+                developers from users; expecting a user to copy and email an
+                error message from a web page is unreliable all around. Lastly,
+                it's annoying to lose the result of a long process because you
+                encounter an error. That came up recently with a coworker when
+                he tried to use
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-HTMLParser.html"
+                    >HTMLParser</a
+                >
+                to spider web pages -- unfortunately HTMLParser doesn't work
+                well on badly-formed HTML (I'd advise using
+                <a
+                    class="reference"
+                    href="http://www.crummy.com/software/BeautifulSoup/"
+                    >BeautifulSoup</a
+                >,
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-re.html"
+                    >regular expressions</a
+                >, or running the code through
+                <a class="reference" href="http://utidylib.berlios.de/">tidy</a>
+                first). So the process would run for a while, then fail and die
+                when it found a novel kind of malformed HTML. This
+            </p>
+            <p>
+                is the kind of unexpected exception that should be expected, and
+                you should write your program knowing you haven't foreseen all
+                the problems you'll encounter.
+            </p>
+            <p>
+                (BTW, I've been
+                <a
+                    class="reference"
+                    href="http://mail.python.org/pipermail/python-list/2005-January/259255.html"
+                    >wanting</a
+                >
+                a <em>really</em> good generic library to handle unexpected
+                exceptions, but still haven't found it... anyone know of one?)
+            </p>
+        </div>
+        <div class="dates" align="right">Created 25 Jan '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>You wrote:</p>
+                <pre class="literal-block">
+try:
+    cursor.execute(&quot;INSERT INTO table VALUES (%s, %s)&quot;, (a, b))
+    obj.setValues(a, b)
+except:
+    cursor.rollback()
+    raise
+</pre
+                >
+                <p>
+                    Beware - there is a subtle bug here which cost me a few
+                    hours of debugging time. If the rollback raises an exception
+                    then the first exception is silently ignored. For example if
+                    the database connection has been lost (triggering the first
+                    exception) the cursor.rollback() will also fail, but all you
+                    will see is an exception arising from the rollback. Better
+                    to log something about the first exception before trying the
+                    rollback.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/good-catch-all-exceptions-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Mark Russell
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        some usefull exception-handling routine here:
+                        <a
+                            class="reference"
+                            href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52215"
+                            >http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52215</a
+                        >
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/good-catch-all-exceptions-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Denis
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I often end up doing something like the following,
+                    especially while debugging/printlining:
+                </p>
+                <pre class="literal-block">
+try:
+    munge(value)
+except Exception, x:
+    x.args += (value,)
+    raise x
+</pre
+                >
+                <p>
+                    When used in a framework that logs exceptions, it's handy.
+                    Unfortunately, it loses any traceback from the munge() call
+                    on down. :(
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/good-catch-all-exceptions-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Robert Brewer</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    If you use just
+                    <tt class="literal"><span class="pre">raise</span></tt>
+                    (instead of
+                    <tt class="literal"
+                        ><span class="pre">raise</span>
+                        <span class="pre">x</span></tt
+                    >) it should still work, but you won't lose the traceback
+                    (at least that's what my brief testing indicates).
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/good-catch-all-exceptions-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/goodcatchallexceptionscomment3.txt"
+                    >source</a
+                >
+            </div>
+            <pre>
+footnote: &quot;except Exception&quot; doesn't really catch all exceptions:
+
+&gt;&gt;&gt; class Foo:
+...     pass
+...
+&gt;&gt;&gt; try:
+...     raise Foo
+... except Exception, e:
+...     print &quot;got it&quot;
+...
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 2, in ?
+__main__.Foo: &lt;__main__.Foo instance at 0x00B35FA8&gt;
+</pre
+            >
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/goodcatchallexceptionscomment3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://effbot.org">Fredrik</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    Were people talking about fixing that, i.e., disallowing
+                    exceptions that weren't subclasses of
+                    <tt class="literal"><span class="pre">Exception</span></tt
+                    >? (Except string exceptions, which are a separate special
+                    case.)
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/goodcatchallexceptions-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/goodcatchallexceptionscomment9.txt"
+                            >source</a
+                        >
+                    </div>
+                    <pre>
+In Python 3000, sure.  I don't see how you could possibly
+change this before that...
+</pre
+                    >
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/goodcatchallexceptionscomment9.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://effbot.org">Fredrik</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            Really? What kind of crazy/annoying people make
+                            alternate exception hierarchies that don't subclass
+                            from
+                            <tt class="literal"
+                                ><span class="pre">Exception</span></tt
+                            >? There's no good reason for it, and it's really
+                            easy to fix if you have done it.
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/goodcatchallexceptions-comment-10.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="index.html">Ian Bicking</a>
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/goodcatchallexceptionscomment6.txt"
+                    >source</a
+                >
+            </div>
+            <pre>
+&gt; BTW, I've been wanting a really good generic library to handle unexpected exceptions
+
+I've had really good luck with Mongoose (http://themongoose.sourceforge.net/).  You register exception handlers for uncaught
+exceptions.  It comes with one that does logging, one that emails, etc.  One other interesting feature is that it hashes the
+exception type, file name, function name, and other stuff to generate a &quot;Mongoose Incident Identifier(TM)&quot; so you
+(theoretically) have a unique identifier for each independent bug.
+</pre
+            >
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/goodcatchallexceptionscomment6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    Cool -- I hadn't seen Mongoose before, I'll definitely check
+                    it out.
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/goodcatchallexceptions-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/goodcatchallexceptionscomment11.txt"
+                            >source</a
+                        >
+                    </div>
+                    <pre>
+Catching all exceptions is bad, because it shows that you do not know how your program works.
+Any exception IS predictable, we are talking computer programs, not random static.
+
+Sometimes you need a program to crash or properly raise exceptions. Reraising only works if
+the clean-up action doesn't raise any exceptions, as discussed earlier.  Here's the deal,
+only catch exceptions that you except. If an exception you don't expect is raised that
+means you have a bug, you fix the bug and add the proper handling of that exception.
+
+I've seen many Java programmers do
+
+try {
+  yada
+} catch (Exception e) {
+  System.err.println(&quot;Error occurred: &quot; + e.getMessage());
+}
+
+and this sucks TREMENDOUSLY if you are trying to debug a program. Sometimes you want your
+program to crash and burn, just to let you know that something is really wrong.
+Even user input is predictable enough to write exact error handling.
+Catching all exception may cure the symptoms, but not the cause; fix the cause instead.
+
+Finally, it might be OK to catch all exceptions if it is imperitive that your
+process/thread do not stop. In that case, try catching the exception at the highest
+possible level and log with full stacktrace and give as much debug input as possible.
+However, on many systems bugs might just as well end the process and send the stacktrace
+to stderr. I've seen too many bad things happen with processes that should have been
+terminated due to bugs, but poor programming let the processes continue doing bad things
+to the rest of the system.
+</pre
+                    >
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/goodcatchallexceptionscomment11.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Ian Bicking
+                    </div>
+                    <hr noshade />
+                </blockquote>
+
+                <div class="document">
+                    <p>
+                        I was surprised to be ego-Googling for my Mongoose
+                        project a short time after there was some discussion
+                        about it! :-)
+                    </p>
+                    <p>
+                        I'm intrigued to know who wrote &quot;I've had really
+                        good luck with Mongoose&quot; and what they've been
+                        using it for, as I wasn't aware of anyone who was
+                        actively using outside its original deployment. (I was
+                        confused because that comment appeared to be Ian
+                        replying to himself.)
+                    </p>
+                    <p>
+                        I liked the Incident Identifier idea a lot and would be
+                        most interested in it being adopted by other similar
+                        projects.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/goodcatchallexceptions-comment-14.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Phil
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Sorry, I edited the comment (for formatting) and
+                            that messed up the attribution... maybe I have it
+                            back now. It was Denis Dube:
+                            <a
+                                class="reference"
+                                href="http://msdl.cs.mcgill.ca/people/denis/"
+                                >http://msdl.cs.mcgill.ca/people/denis/</a
+                            >
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/goodcatchallexceptions-comment-15.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="index.html">Ian Bicking</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

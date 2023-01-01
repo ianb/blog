@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Atom, threading, etc.</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Atom, threading, etc.</h1>
+
+        <div class="document">
+            <p>
+                Atom has an
+                <a
+                    class="reference"
+                    href="http://www.ietf.org/internet-drafts/draft-snell-atompub-feed-thread-12.txt"
+                    >extension for threading</a
+                >
+                (<a
+                    class="reference"
+                    href="http://www.tbray.org/ongoing/When/200x/2006/06/29/Atom"
+                    >via</a
+                >). This is great; when I was building an importer for this blog
+                (from another blog software where I wrote the export by
+                accessing the database directly) I used Atom, but had to invent
+                something to match comments up to their respective posts.
+                Relating comments to their posts was the only place where there
+                seemed to be information loss in dumping the entire blog to
+                Atom. So I made
+            </p>
+            <p>So, the extension seems to look like this:</p>
+            <pre class="literal-block">
+&lt;feed xmlns:thr=&quot;http://purl.org/syndication/thread/1.0&quot;&gt;
+  &lt;entry&gt;
+    &lt;thr:in-reply-to ref=&quot;post-id&quot; /&gt;
+    ....
+  &lt;/entry&gt;
+&lt;/feed&gt;
+</pre
+            >
+            <p>
+                With this I think most blogs can be 100% represented by an Atom
+                model.
+            </p>
+            <p>
+                Well... another problem is that many blogs use something other
+                than HTML for their content; something like Restructured Text,
+                Textile, Markdown, etc. To be an accurate representation, the
+                <tt class="docutils literal"
+                    ><span class="pre">&lt;content&gt;</span></tt
+                >
+                should contain that format, or multiple forms of the content
+                should be presented, with one marked as editable. Maybe the
+                simplest solution to this is to store only the canonical
+                representation (as, say,
+                <tt class="docutils literal"
+                    ><span class="pre">text/x-restructured-text</span></tt
+                >) and render the feed differently for actual readers. But it
+                would be nicer if this wasn't necessary.
+            </p>
+            <p>
+                There's also an extension in that spec for giving the comment
+                feed URL:
+            </p>
+            <pre class="literal-block">
+&lt;link rel=&quot;replies&quot; href=&quot;comment-feed.xml&quot; /&gt;
+</pre
+            >
+            <p>
+                This doesn't really do anything for blog publishing software,
+                just for readers, but it could be nice; having per-entry comment
+                feeds isn't very interesting right now because the subscription
+                process is not well automated -- the typical blog subscription
+                process is way too heavy when you are just curious about
+                followup comments that might last for a week at most. This gives
+                smart readers an opportunity to treat this case specially.
+            </p>
+            <p>
+                A while ago there was some talk on the Pylons list about blog
+                publishing software, and I brainstormed a kind of
+                <a
+                    class="reference"
+                    href="http://webwareforpython.org/archives/message/20060621.051852.7622e3bf.en.html"
+                    >distributed set of pieces</a
+                >
+                to implement a blog. The
+                <a
+                    class="reference"
+                    href="http://www.ietf.org/internet-drafts/draft-ietf-atompub-protocol-09.txt"
+                    >Atom Publishing Protocol</a
+                >
+                and an Atom store could potentially be all the persistence you
+                need, though I'm unclear on how you'd do general querying and
+                reporting with the APP. Querying probably is best implemented
+                just with ad hoc systems for now.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 30 Jun '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>Have you looked at demokritos?</p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://www.jtauber.com/demokritos"
+                        >http://www.jtauber.com/demokritos</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/atom-threading-etc-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.defuze.org">Sylvain Hellegouarch</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <blockquote>
+                    having per-entry comment feeds isn’t very interesting right
+                    now because the subscription process is not well automated
+                </blockquote>
+                <p>
+                    Another problem is that it scales very poorly if a reader
+                    wants to stay informed of <em>all</em> comments on a weblog.
+                    You don’t know when someone will post a comment on a
+                    long-silent entry, so you would usually need to poll them
+                    all.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/atom-threading-etc-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://plasmasturm.org/">Aristotle Pagaltzis</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    The APP offers enough introspection to guide the posting of
+                    Atom entries and collections, but it is silent on querying.
+                    As you say anyone can implement an ad hoc query interface
+                    against their Atom store. No surprise that Google has
+                    offered a query and authentication interface:
+                    <a
+                        class="reference"
+                        href="http://code.google.com/apis/gdata/protocol.html"
+                        >GData</a
+                    >.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/atom-threading-etc-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="https://ianbicking.org/none">Rick Thomas</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

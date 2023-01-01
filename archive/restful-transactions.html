@@ -1,0 +1,757 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>RESTful transactions (a speculation)</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>RESTful transactions (a speculation)</h1>
+
+        <div class="document">
+            <p>
+                So I've been doing some work on
+                <a class="reference" href="http://pythonpaste.org/ohm/">OHM</a>,
+                which is a library for exposing an object as a series of RESTful
+                resources. (It also is a library for consuming such services,
+                but for now don't use that because it's still twitchy -- but the
+                server-side half is good IMHO.)
+            </p>
+            <p>
+                I realized part way through that it was different from many such
+                APIs that I've seen, in that OHM exposes <em>attributes</em> as
+                resources, not entire documents. This made sense for the thing I
+                was initially creating, as it's basically the configuration API
+                for the entire application, and since the application is farmed
+                (that is, we add new instances programmatically) I wanted to
+                deal with a bunch of these objects in a general way. I could
+                have done it with normal controllers and standard framework
+                stuff, but resources actually map really great to attributes
+                (GET is getattr, PUT is setattr, DELETE is delattr) so it was a
+                very comfortable fit. Also while I could represent the entire
+                configuration as one XML document, I didn't really
+                <em>want</em> to do that as the document would feel very
+                artificial to me.
+            </p>
+            <p>
+                The downside of exposing a bunch of resources is that, while
+                it's easy to set them each individually, there's no way to
+                indicate that you want to do a bunch of things at once. There's
+                no <em>transactions</em> -- you can update 2 out of 4 things,
+                then fail, and there's no good way to revert. You can reset
+                everything, which <em>should</em> work -- if you are using
+                symmetric methods like GET and PUT, by putting back what you got
+                before you should be safe. There still might be side effects --
+                things like logs, last changed timestamps, etc -- but if you are
+                being properly RESTful then there shouldn't be any
+                <em>important</em> side effects. That would be possible for me
+                to do here, as it's not likely there will be much concurrency.
+                But that's not a very good transaction.
+            </p>
+            <p>
+                There's another option I've been thinking about: pack a bunch of
+                requests into one request. MIME already defines a way to do this
+                sort of thing:
+            </p>
+            <pre class="literal-block">
+POST / HTTP/1.1
+Content-Type: multipart/mixed; boundary=&quot;random-string&quot;
+
+--random-string
+X-HTTP-Request-Method: PUT
+X-HTTP-Path: /resource/1
+Content-Type: application/xml
+
+&lt;xml request body...&gt;
+--random-string
+X-HTTP-Request-Method: PUT
+X-HTTP-Path: /resource/2
+Content-Type: application/xml
+
+&lt;another xml request body...&gt;
+--random-string--
+</pre
+            >
+            <p>
+                WebDAV
+                <a
+                    class="reference"
+                    href="http://www.webdav.org/specs/rfc2518.html#rfc.section.8.2.1"
+                    >defines a 207 Multi-Status code</a
+                >, which could be used here:
+            </p>
+            <pre class="literal-block">
+HTTP/1.1 207 Multi-Status
+Content-Type: multipart/mixed; boundary=&quot;random-string&quot;
+
+--random-string
+X-HTTP-Path: /resource/1
+X-HTTP-Status: 201 Created
+
+--random-string
+X-HTTP-Path: /resource/2
+X-HTTP-Status: 204 No Content
+
+--random-string--
+</pre
+            >
+            <p>
+                Generally this doesn't make a lot of sense for GET requests, and
+                so the Multi-Status responses are generally a little boring in
+                the case of a success (they should all be some form of 2xx). But
+                for failures it is more interesting:
+            </p>
+            <pre class="literal-block">
+HTTP/1.1 207 Multi-Status
+Content-Type: multipart/mixed; boundary=&quot;random-string&quot;
+
+--random-string
+X-HTTP-Path: /resource/1
+X-HTTP-Status: 403 Forbidden
+Content-Type: text/html
+
+&lt;html&gt;... access forbidden ...&lt;/html&gt;
+--random-string
+X-HTTP-Path: /resource/2
+X-HTTP-Status: 412 Precondition Failed
+Content-Type text/html
+
+&lt;html&gt;... other request /resource/1 failed ...&lt;/html&gt;
+--random-string--
+</pre
+            >
+            <p>
+                WebDAV uses XML responses for 207, but it's not a very good
+                match for what HTTP already is IMHO -- HTTP looks like MIME, it
+                doesn't look anything like XML.
+            </p>
+            <p>
+                Of course all this is purely speculative; nothing implements any
+                of this. But I started thinking about this in terms of a WSGI
+                middleware that explodes out the requests, turning that example
+                into two WSGI requests. <em>If</em> all the pieces can agree on
+                a container for the transaction (so the side-effects of the
+                requests can be committed or rolled back as one), then it could
+                almost be automatic -- you just make sure all the requests share
+                the same transaction. This doesn't work over process boundaries
+                really, though with a two-phase commit and some convention for
+                indicating the transaction, it should be doable. Maybe like:
+            </p>
+            <pre class="literal-block">
+POST /resource HTTP/1.1
+X-Transaction-ID: 12345 (globally unique non-guessable ID)
+...
+
+HTTP/1.1 202 Accepted
+Content-Type: ...
+
+(response body AS IF the commit had happened)
+
+POST /resource HTTP/1.1
+X-Transaction-ID: 12345
+X-Commit: true
+
+HTTP/1.1 204 No Content
+</pre
+            >
+            <p>
+                Two-phase commit is hardly a great solution, or necessarily easy
+                to implement generally, but at least this offers
+                <em>some</em> possible practice for doing this.
+            </p>
+            <p>
+                Interestingly (at least to me), you <em>can</em> build tools to
+                implement this sort of convention in different environments. To
+                ensure interoperability you'd need some kind of document or
+                <em>something</em> to define what was expected. In the REST vs.
+                WS-* conflict it often seems phrased as though it's purely
+                use-what-we-have vs. build-new-specifications. Or
+                use-what-we-have and build-new-frameworks. There's an underlying
+                (and incorrect) assumption that if you subscribe to REST notions
+                then <em>what we have is all we will have</em>. I think it's
+                more that REST people want to walk lightly when building on web
+                that we have; avoid recreating what already exists, and
+                definitely don't conflict with it. There's a deeper
+                architectural difference as well -- WS-* is focused on RPC, and
+                the over-the-wire protocols defer to the language frameworks,
+                while REST is focused on independent resources and pushes back
+                on language frameworks to fit that model. But that distinction
+                doesn't mean there isn't new code to be written, and new
+                conventions or specifications to be built.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 12 Mar</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    maybe this rest-discuss thread is of interest:
+                    <a
+                        class="reference"
+                        href="http://tech.groups.yahoo.com/group/rest-discuss/message/7780"
+                        >http://tech.groups.yahoo.com/group/rest-discuss/message/7780</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/restful-transactions-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Paul Winkler
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        That thread is very interesting indeed Paul. However it
+                        mentions the POE techniques which I really don't see as
+                        a good alternative. There are lots of corner cases the
+                        POE draft doesn't address at all.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/restful-transactions-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.defuze.org">Sylvain Hellegouarch</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    you semi-lost me at &quot;WSGI middleware that explodes out
+                    the requests, turning that example into two WSGI
+                    requests.&quot; does that mean at the HTTP level, theres
+                    just one request, then the middleware creates multiple WSGI
+                    requests in-process ? since when I read this, the main thing
+                    jumping out at me is &quot;you have to make 4 separate
+                    requests to set 4 different attributes, hows that going to
+                    work for 10 users at once ?&quot;. i.e. yes the
+                    transaction-ness is one issue, but also just plain
+                    memory/time overhead of all those connections.
+                </p>
+                <p>
+                    also, while the whole PUT /my/attribute thing is pretty
+                    cool, i must admit my instinct to set 10 attributes at once
+                    would be just, POST /my/object ....
+                    attr1=val1&amp;attr2=val2&amp;... is that so terrible ?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/restful-transactions-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">mike bayer</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <blockquote>
+                        you semi-lost me at &quot;WSGI middleware that explodes
+                        out the requests, turning that example into two WSGI
+                        requests.&quot; does that mean at the HTTP level, theres
+                        just one request, then the middleware creates multiple
+                        WSGI requests in-process ? since when I read this, the
+                        main thing jumping out at me is &quot;you have to make 4
+                        separate requests to set 4 different attributes, hows
+                        that going to work for 10 users at once ?&quot;. i.e.
+                        yes the transaction-ness is one issue, but also just
+                        plain memory/time overhead of all those connections.
+                    </blockquote>
+                    <p>
+                        Generally REST is better optimized for reads than writes
+                        anyway. In the particular situation I'm in neither
+                        performance is terribly important -- it's just a
+                        configuration API, not part of the regular
+                        functionality. 4 GETs <em>could</em> be optimized just
+                        with Keep-Alive, assuming going up and down the backend
+                        stack is fast enough. It depends on the application of
+                        course, but multiple requests aren't necessarily a
+                        problem. And really while I stuffed a bunch of
+                        configuration in <em>one</em> piece of code (WSGI
+                        middleware actually), it's really covering about 3
+                        different use cases, and potentially all of those could
+                        be handled separately, and then it
+                        <em>really</em> should be multiple requests. (Unless I
+                        automatically aggregate them somehow, which is what I'm
+                        considering here.)
+                    </p>
+                    <blockquote>
+                        also, while the whole PUT /my/attribute thing is pretty
+                        cool, i must admit my instinct to set 10 attributes at
+                        once would be just, POST /my/object ....
+                        attr1=val1&amp;attr2=val2&amp;... is that so terrible ?
+                    </blockquote>
+                    <p>
+                        Sure, you could do it that way, though each of those
+                        attributes is at least moderately complicated (generally
+                        each is a JSON document). It's not that different from
+                        what I propose, actually, except what I discuss can be
+                        understood by an intermediary. Well... actually I can't
+                        decide on the difference between
+                        <tt class="docutils literal"
+                            ><span class="pre">multipart/mixed</span></tt
+                        >
+                        and
+                        <a
+                            class="reference"
+                            href="http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4.2"
+                            >multipart/form-data</a
+                        >, which itself is used in HTML forms already. So it's
+                        not necessarily even that different from a POST, just
+                        adding in some path and method headers.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/restful-transactions-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    You could look into the locking section in the WebDAV
+                    specification:
+                </p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://www.webdav.org/specs/rfc2518.html#locking"
+                        >http://www.webdav.org/specs/rfc2518.html#locking</a
+                    >
+                </p>
+                <p>
+                    Of course, you'd still need to implement your own
+                    transactional mechanisms. Meanwhile, there's also the
+                    versioning extensions to WebDAV, which seem to exist to
+                    support Subversion, or at least things similar to
+                    Subversion:
+                </p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://www.webdav.org/specs/rfc3253.html"
+                        >http://www.webdav.org/specs/rfc3253.html</a
+                    >
+                </p>
+                <p>
+                    The problem with the WebDAV specifications is that to be
+                    compliant you end up having to support lots of stuff you'll
+                    rarely need, I suppose.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/restful-transactions-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Paul Boddie
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I'm tackling a similar issue in
+                    <a
+                        class="reference"
+                        href="http://code.google.com/p/grassyknoll/"
+                        >http://code.google.com/p/grassyknoll/</a
+                    >
+                    Though for me, the issue is less one of transactions than
+                    optimization. The backend (PyLucene) performs
+                    <em>much</em> better when passed requests in batches. So a
+                    request like (pardon the pseudocode):
+                </p>
+                <p>PUTMANY(doc1, doc2, doc3, doc4)</p>
+                <p>is much zippier than doing:</p>
+                <dl class="docutils">
+                    <dt>for d in [doc1, doc2, doc3, doc4]:</dt>
+                    <dd>PUT(d)</dd>
+                </dl>
+                <p>interestingly, this is true for GET as well...</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/restful-transactions-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.pobox.com/~pfein/">Peter Fein</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Doing this in an intermediary wouldn't really help then,
+                        as it would make the controller unaware of the other
+                        requests happening at the same time. Hmm... too bad
+                        that. Though in that case you wouldn't have to use a
+                        standard intermediary like I propose, you could have a
+                        custom one, and presumably client-side support can
+                        develop separately without having to pay attention to it
+                        one way or the other.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/restful-transactions-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I've been thinking about this issue as well for a project
+                    I've been tinkering with, a RESTful database implemented in
+                    Python [1].
+                </p>
+                <p>
+                    One idea I had was to add a special transaction resource (at
+                    /transactions, or some other agreed-upon location). When you
+                    POST to the transaction resource, it sprouts a new child
+                    with a unique ID (/transactions/12345). That URL now
+                    duplicates the entire structure of the database. So if the
+                    database had a resource called /Users/Bob, there is now a
+                    /transactions/12345/Users/Bob resource. The client can do
+                    all of his database operations within his transaction
+                    sandbox, then POST to /transactions/12345 to commit.
+                </p>
+                <p>
+                    I think this is a fairly RESTful way to implement
+                    transactions. The best part IMO is that it allows you to add
+                    transactions without adding any HTTP headers, additional
+                    verbs, etc. The only downside I see is that there are now
+                    multiple URLs for a single resource. You might be able to
+                    solve that by using HTTP 301 to point clients at the
+                    canonical one if they try to touch something that's already
+                    been committed.
+                </p>
+                <p>
+                    [1]
+                    <a
+                        class="reference"
+                        href="http://blog.extracheese.org/2007/02/introducing-another-wildly-ambitious.html"
+                        >http://blog.extracheese.org/2007/02/introducing-another-wildly-ambitious.html</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/restful-transactions-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://blog.extracheese.org/">Gary Bernhardt</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Heh. Gary, we've independently invented the same thing
+                        :-) Check out the link I posted above.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/restful-transactions-comment-11.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://">Paul Winkler</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Yes, I posted my reply here before reading through
+                            that thread. :) It seems like the only real
+                            difference between our approaches is that when you
+                            create a transaction, you tell it which resources
+                            you'll want to touch. I prefer to &quot;branch&quot;
+                            the whole URL space, rather than some subset. That
+                            way, your code doesn't have to think about which
+                            resources it'll touch until it does the touching. :)
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/restful-transactions-comment-12.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://blog.extracheese.org/"
+                            >Gary Bernhardt</a
+                        >
+                    </div>
+                    <hr noshade />
+                </blockquote>
+
+                <div class="document">
+                    <p>
+                        I haven't got the book yet, but &quot;the transaction is
+                        a resource&quot; is a pattern spelled out in this review
+                        by Jon Udell:
+                        <a
+                            class="reference"
+                            href="http://blog.jonudell.net/2007/05/24/restful-web-services/"
+                            >http://blog.jonudell.net/2007/05/24/restful-web-services/</a
+                        >
+                        so apparently it's in the book.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/restful-transactions-comment-16.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="https://ianbicking.org/www.slinkp.com"
+                        >Paul Winkler</a
+                    >
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Yikes. I propose two reasons you'd rather head down a
+                    different path.
+                </p>
+                <ol class="arabic simple">
+                    <li>
+                        I expect that usually when you want to update several
+                        things at once, you're doing something singularly
+                        nameable; ie, there's a further abstraction to the group
+                        of work that is a resource. In OHM I see this issue,
+                        each attribute is individually accessible, but although
+                        we've grouped them into an object's attributes
+                        conceptually, there's no way to access or offer that
+                        conceptual grouping. OHM-level support for record and
+                        collection (tuple and relation :) abstractions should be
+                        implemented, even if it's just a set of conventions that
+                        we don't know yet. If we can name the set of data we're
+                        updating (at the simplest level, SO's o.set vs
+                        o._set_X), we can REST it in one request. The
+                        abstraction part comes from seeing your data as a
+                        relational database with idealized views.
+                    </li>
+                    <li>
+                        We still have to make use of mechanisms where it is each
+                        resource's responsibility to ensure its state transition
+                        is atomic when reacting to a side-effect verb, because
+                        any abstraction over URL-based referencing means process
+                        boundary is no different from server boundary or network
+                        boundary. How do you architect this differently when
+                        your mindset is thinking about having a change on this
+                        site need to set something else on another site? Same as
+                        within parts of your site that you may end up
+                        partitioning by machine or farm out to a third party.
+                        Rhetorically, does the reliability of that inner
+                        resource impact the assumptions of the original code
+                        when you could count on a local transaction? If updating
+                        your marriage status should be reflected in your holy
+                        rewards program availability, is two-phase commit with
+                        an optimization if we're lucky enough to be on the same
+                        process really the mechanism that comes to mind? Mines a
+                        little blurry.
+                    </li>
+                </ol>
+                <p>Peace, Luke</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/restful-transactions-comment-9.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Luke Opperman
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Ok, found the article I'd printed out (!) on this
+                        subject, the original PDF seems to have disappeared but
+                        google cache is
+                        <a
+                            class="reference"
+                            href="http://209.85.165.104/search?q=cache:44SdWHeWNXcJ:www-db.cs.wisc.edu/cidr/cidr2007/papers/P15.pdf&amp;hl=en&amp;ct=clnk&amp;cd=1&amp;gl=us"
+                            >http://209.85.165.104/search?q=cache:44SdWHeWNXcJ:www-db.cs.wisc.edu/cidr/cidr2007/papers/P15.pdf&amp;hl=en&amp;ct=clnk&amp;cd=1&amp;gl=us</a
+                        >
+                    </p>
+                    <p>
+                        &quot;Life beyond Distributed Transactions&quot; by Pat
+                        Helland
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/restful-transactions-comment-10.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Luke Oppperman
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <blockquote>
+                        I expect that usually when you want to update several
+                        things at once, you're doing something singularly
+                        nameable; ie, there's a further abstraction to the group
+                        of work that is a resource. In OHM I see this issue,
+                        each attribute is individually accessible, but although
+                        we've grouped them into an object's attributes
+                        conceptually, there's no way to access or offer that
+                        conceptual grouping.
+                    </blockquote>
+                    <p>
+                        If you do want to do this in OHM, you can create an
+                        attribute that is located at the root of the object (<tt
+                            class="docutils literal"
+                            ><span class="pre">url_path=&quot;&quot;</span></tt
+                        >). This can be a property that aggregates all the
+                        attributes of the object. <em>If</em> they are all JSON,
+                        you could do:
+                    </p>
+                    <pre class="literal-block">
+class MyObject(object):
+    ... all the other attrs ...
+    all_attrs = ['a', 'b', ...]
+    def complete_state__get(self):
+        return dict((attr, getattr(self, attr))
+                    for attr in self.all_attrs)
+    def complete_state__set(self, data):
+        for name, value in data.items():
+            assert name in self.all_attrs
+            setattr(self, name, value)
+    complete_state = property(complete_state__get, complete_state__set)
+
+class MyObjectWrapper(ohm.server.ApplicationWrapper):
+    complete_state = ohm.server.JSONSetter(uri_path='')
+</pre
+                    >
+                    <p>
+                        With XML you could do something similar, though actually
+                        creating the documents involves more documentation and
+                        details. But if you have heterogeneous types in your
+                        resources this doesn't work so well. For instance, I
+                        also attach a file server to the object that accepts
+                        PUT, MKCOL, and DELETE. Or some objects may be JSON, and
+                        others XML documents, and some operations might really
+                        be POST operations, and so forth. Mixing these into one
+                        document just doesn't work.
+                    </p>
+                    <p>
+                        So what I describe here is really the same process, only
+                        it's amenable to any kind of document types. And I
+                        suppose eclectic HTTP methods.
+                    </p>
+                    <blockquote>
+                        We still have to make use of mechanisms where it is each
+                        resource's responsibility to ensure its state transition
+                        is atomic when reacting to a side-effect verb, because
+                        any abstraction over URL-based referencing means process
+                        boundary is no different from server boundary or network
+                        boundary. How do you architect this differently when
+                        your mindset is thinking about having a change on this
+                        site need to set something else on another site?
+                    </blockquote>
+                    <p>
+                        I certainly would not argue that this lets you ignore
+                        what's going on, internally or in the remote server. The
+                        failure cases and likelihood of those cases will change.
+                        This is really just a tool to make the
+                        <em>mechanics</em> easier. That doesn't make the system
+                        design easier, except that it might let you focus on the
+                        system and not get too bogged down in the mechanics.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/restful-transactions-comment-13.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I'm new to this - so forgive me if this is a silly
+                    suggestion;
+                </p>
+                <p>
+                    Instead of a PUT just to update the existing config
+                    attributes, can you also use PUT to create a new config set?
+                </p>
+                <p>
+                    Then use a PUT to make that the new config current ( a
+                    'committ')
+                </p>
+                <p>
+                    Maybe define a GET to retrieve past, current, and new config
+                    sets that have been PUT? (So you can rollback to one of
+                    them)
+                </p>
+                <p>If this is silly - please let me know why.</p>
+                <p>Cheers,</p>
+                <p>Stephen</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/restful-transactions-comment-14.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Stephen
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

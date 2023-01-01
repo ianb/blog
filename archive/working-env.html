@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>working-env.py</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>working-env.py</h1>
+
+        <div class="document">
+            <p>
+                <strong>Update</strong>: a newer version of this script is
+                discussed
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/workingenv-revisited.html?"
+                    >here</a
+                >
+            </p>
+            <p>
+                After mulling over the stuff from my
+                <a class="reference" href="working-env-brainstorm.html"
+                    >last distutils post</a
+                >
+                I started playing around with ideas. In the end I came up with
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/home/ianb/working-env.py"
+                    >working-env.py</a
+                >. This is similar to
+                <a
+                    class="reference"
+                    href="http://peak.telecommunity.com/DevCenter/EasyInstall#creating-a-virtual-python"
+                    >virtual-python.py</a
+                >, but perhaps &quot;lighter&quot;, because it doesn't create
+                lots of symlinks or a new Python interpreter.
+            </p>
+            <p>Basically it works like:</p>
+            <pre class="literal-block">
+$ python working-env.py new-working-env
+$ source new-working-env/bin/activate
+</pre
+            >
+            <p>
+                That
+                <tt class="docutils literal"
+                    ><span class="pre">activate</span></tt
+                >
+                script just sets some environmental variables; mostly equivalent
+                to
+                <tt class="docutils literal"
+                    ><span class="pre">export</span>
+                    <span class="pre"
+                        >PYTHONPATH=/path/to/new-working-env/lib/python2.4</span
+                    ></tt
+                >
+            </p>
+            <p>
+                Setting
+                <tt class="docutils literal"
+                    ><span class="pre">$PYTHONPATH</span></tt
+                >
+                is what activates the working environment. Your path will be
+                fixed up. Optionally (and by default)
+                <tt class="docutils literal"
+                    ><span class="pre">site-packages</span></tt
+                >
+                <em>won't</em> be picked up, so the only thing you bring in from
+                external sources is the standard library. I'd like to add some
+                support for copying over packages from
+                <tt class="docutils literal"
+                    ><span class="pre">site-packages</span></tt
+                >
+                explicitly, probably with Egg-style annotation and links. E.g.,
+                <tt class="docutils literal"
+                    ><span class="pre">copy_package</span>
+                    <span class="pre">psycopg</span>
+                    <span class="pre">version=2.0</span></tt
+                >
+                will create
+                <tt class="docutils literal"
+                    ><span class="pre">psycopg-2.0.egg-info/</span></tt
+                >, fix up your
+                <tt class="docutils literal"><span class="pre">.pth</span></tt>
+                file, etc.
+            </p>
+            <p>
+                It monkeypatches distutils to do this. I think that's nice and
+                effective. It also monkeypatches setuptools, which isn't
+                sustainable -- distutils isn't a moving target, so the patch is
+                pretty stable, but setuptools is a different story. For
+                setuptools it is changing the way scripts are generated, so that
+                the working environment is hardcoded into the script (i.e.,
+                using
+                <tt class="docutils literal"
+                    ><span class="pre"
+                        >new-working-env/bin/some-script</span
+                    ></tt
+                >
+                automatically activates that working environment).
+            </p>
+            <p>
+                I'm still trying to figure this out, but I feel fairly good
+                about working-env.py; I'm very interested in feedback.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 15 Mar '06<br />
+            Modified 26 Apr '06
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    One thing I'd point out as well is that I
+                    <em>really</em> like being able to use
+                    <tt class="docutils literal"
+                        ><span class="pre">easy_install</span></tt
+                    >
+                    and
+                    <tt class="docutils literal"
+                        ><span class="pre">setup.py</span></tt
+                    >
+                    commands without having to remember any special options.
+                    It's amazingly comforting to know you can't mess it up
+                    unless you actively try to mess it up. That's something this
+                    (and virtual-python.py) handles that several other options
+                    don't handle.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/working-env-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I moved my current virtual-python install I had in $HOME out
+                    of the way, restarted my shell so bash would see
+                    /usr/bin/python, installed setuptools globally, and then did
+                    this:
+                </p>
+                <pre class="literal-block">
+$ rm -rf lib
+$ python bin/working-env.py $HOME
+Making working environment in /home/gldnspud
+Creating lib/python2.4
+Creating lib/python2.4/distutils
+Creating lib/python2.4/setuptools
+Creating file lib/python2.4/distutils/distutils.cfg
+Creating file lib/python2.4/distutils/__init__.py
+Creating file lib/python2.4/setuptools.pth
+Creating file bin/activate
+Creating file lib/python2.4/setuptools/__init__.py
+Creating file lib/python2.4/site.py
+</pre
+                >
+                <p>Now I can't import setuptools:</p>
+                <pre class="literal-block">
+$ source bin/activate
+$ python
+&gt;&gt;&gt; import setuptools
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+  File &quot;/home/gldnspud/lib/python2.4/setuptools/__init__.py&quot;, line 10, in ?
+    execfile(os.path.join(setuptools_path, '__init__.py'))
+NameError: name 'setuptools_path' is not defined
+</pre
+                >
+                <p>
+                    I checked sys.path and there's no setuptools anywhere in it.
+                    When I went back to the global python, it does pick up all
+                    the egg files from the pth files.
+                </p>
+                <p>Any ideas on where to go from there?</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/working-env-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Matthew Scott
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        The setuptools stuff is hacky, and now I can't remember
+                        why I did it the way I did. That
+                        lib/python2.4/setuptools.pth file should contain the
+                        real path to setuptools, which gets used by
+                        setuptools/__init__.py. I put in a slightly better error
+                        message in this case (at least not NameError). I've been
+                        trying to figure out if working-env.py should actually
+                        install setuptools locally as part of the setup; it kind
+                        of seems like it should.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/working-env-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            I think that would be a logical way to do it. I was
+                            admittedly surprised that system-wide setuptools was
+                            required by working-env, since I was used to putting
+                            it locally into a virtual-python. I think it would
+                            be less hassle if it were possible to use
+                            working-env as a pre-setuptools bootstrap. Perhaps
+                            working-env could optionally/automatically run
+                            ez_setup.py within the newly-created environment?
+                        </p>
+                        <p>I've switched back to virtual-python for now :)</p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/working-env-comment-4.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Matthew Scott
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                I have to second this comment. The whole reason
+                                for me running something like working-env or
+                                virtual-python is so that I don't have to mess
+                                with my virgin Python installation. If I have to
+                                install setuptools first, it kind of defeats the
+                                purpose....
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/working-env-comment-5.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            mbogosian
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+
+                    <div class="document">
+                        <p>
+                            Your activate script is also kind of tricky (i.e.,
+                            it looks like &quot;activating&quot; twice really
+                            means deactivate). If I may make a suggestion to
+                            rename it &quot;toggle-wenv&quot; or something to
+                            make that clearer.
+                        </p>
+                        <p>
+                            Also, if PYTHONPATH is unset when it is run, the new
+                            PYTHONPATH will have a trailing ':' which may result
+                            in including the current working directory in the
+                            PYTHONPATH which may not be the best idea. It also
+                            may be harmless, but I don't think it hurts to be
+                            careful, especially if other modifying scripts
+                            acticipate a well-formed PYTHONPATH variable.
+                        </p>
+                        <p>
+                            In addition, I might suggest using more unique names
+                            for your saved PYTHONPATH and PATH variables (this
+                            is a common trick and one probably doesn't want to
+                            risk a name clash). Here's a patch for
+                            working-env.py which includes all my suggestions
+                            (it's also a little friendlier to those WORKING_ENV
+                            paths which contain spaces:
+                        </p>
+                        <pre class="literal-block">
+--- working-env.py      2006-04-20 23:21:49.000000000 -0700
++++ working-env.py.new  2006-04-21 10:09:50.000000000 -0700
+&#64;&#64; -203,22 +203,22 &#64;&#64;
+ script_dir = __WORKING__/bin/
+ &quot;&quot;&quot;
+
+-files_to_write['bin/activate'] = &quot;&quot;&quot;\
+-# This file must be used with &quot;source bin/activate&quot;
++files_to_write['bin/toggle-wenv'] = &quot;&quot;&quot;\
++# This file must be used with &quot;source bin/toggle-wenv&quot;
+ # you cannot run it directly
+-export WORKING_ENV=%(working_env)s
+-if [ -n &quot;$_OLD_WORKING_PATH&quot; ] ; then
+-    PATH=&quot;$_OLD_WORKING_PATH&quot;
++export WORKING_ENV='%(working_env)s'
++if [ -n &quot;$_WORKING_ENV_OLD_PATH&quot; ] ; then
++    PATH=&quot;$_WORKING_ENV_OLD_PATH&quot;
+ else
+-    _OLD_WORKING_PATH=&quot;$PATH&quot;
++    _WORKING_ENV_OLD_PATH=&quot;$PATH&quot;
+ fi
+ export PATH=$WORKING_ENV/bin:$PATH
+-if [ -n &quot;$_OLD_PYTHONPATH&quot; ] ; then
+-    PYTHONPATH=&quot;$_OLD_PYTHONPATH&quot;
++if [ -n &quot;$_WORKING_ENV_OLD_PYTHONPATH&quot; ] ; then
++    PYTHONPATH=&quot;$_WORKING_ENV_OLD_PYTHONPATH&quot;
+ else
+-    _OLD_PYTHONPATH=&quot;$PYTHONPATH&quot;
++    _WORKING_ENV_OLD_PYTHONPATH=&quot;$PYTHONPATH&quot;
+ fi
+-export PYTHONPATH=$WORKING_ENV/lib/python%(python_version)s:$PYTHONPATH
++export PYTHONPATH=&quot;$WORKING_ENV/lib/python%(python_version)s${PYTHONPATH:+:}$PYTHONPATH&quot;
+ &quot;&quot;&quot;
+
+ def make_working_environment(
+</pre
+                        >
+                        <p>I hope this helps a little.</p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/working-env-comment-6.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        mbogosian
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>Oops....</p>
+                            <p>I forgot to also change this line:</p>
+                            <pre class="literal-block">
+export PATH=$WORKING_ENV/bin:$PATH
+</pre
+                            >
+                            <p>To this (note the quotes):</p>
+                            <pre class="literal-block">
+export PATH=&quot;$WORKING_ENV/bin:$PATH&quot;
+</pre
+                            >
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/working-env-comment-7.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="http://">mbogosian</a>
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

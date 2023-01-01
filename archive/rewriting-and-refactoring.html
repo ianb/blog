@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Rewriting and Refactoring</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Rewriting and Refactoring</h1>
+
+        <div class="document">
+            <p>
+                I've been advocating lately to rewrite a CMS that
+                <a class="reference" href="http://imagescape.com">we've</a>
+                developed, to move it from Zope to Webware. For various reasons
+                we developed it with Zope -- the previous version was in Zope,
+                all the other development was done in Zope, and I didn't feel
+                confident about my opinion on Zope. Having gone through the
+                process, I now feel more confident -- it wasn't a disaster or
+                anything, but ultimately I was just working around the
+                environment, and the parameters of the development pretty much
+                excluded the possibility of leveraging Zope (RDBMS persistence
+                with static publishing). These are a few of my thoughts as I try
+                to justify this... notes to myself, but I thought I'd share the
+                thought process.
+            </p>
+            <p>
+                So... the product is deployed and functional, and I've built
+                various little workarounds to make due with the environment. But
+                I know it could be a better product in the right environment
+                (i.e., in a fully Pythonic environment). Because of the way it
+                has been developed, changing environments would mean major
+                reorganizing of the code (read: rewrite).
+            </p>
+            <p>
+                Rewriting perfectly working code is a hard thing to justify.
+                It's not even a cleanup -- I haven't sabotaged the code, and I
+                haven't lazily let cruft collect, and even if I did cleanup
+                would be a very bad justification for code I wrote myself. Or,
+                if it's a cleanup, it's an architectural cleanup, which is
+                vague, especially since it's not my architecture.
+            </p>
+            <p>
+                I think there's two reasons to be suspicious of rewrites:
+                <a
+                    class="reference"
+                    href="http://www.joelonsoftware.com/articles/fog0000000069.html"
+                    >it's risky</a
+                >, and it can lead to
+                <a
+                    class="reference"
+                    href="http://c2.com/cgi/wiki?SecondSystemEffect"
+                    >second-system syndrome</a
+                >.
+            </p>
+            <p>
+                Joel's comments on the riskiness are really an accusation of
+                hubris on the part of developers; where they confuse
+                I-can't-understand-this with this-is-bad-code. There's other
+                parts too, like there's a lot of knowledge contained in that
+                code, and you may not recognize it or appreciate its effect on
+                the product. Or, in his summary:
+            </p>
+            <blockquote>
+                It's important to remember that when you start from scratch
+                there is <strong>absolutely no reason</strong> to believe that
+                you are going to do a better job than you did the first time.
+                First of all, you probably don't even have the same programming
+                team that worked on version one, so you don't actually have
+                &quot;more experience&quot;. You're just going to make most of
+                the old mistakes again, and introduce some new problems that
+                weren't in the original version.
+            </blockquote>
+            <p>
+                What does this say to me? It says: we must rewrite now! Because
+                I <em>do</em> have more experience than the first team (which
+                was a team made up of me). And if there's knowledge caught up in
+                the code, that knowledge is also caught up in my brain.
+                <em>If</em> this code needs a rewrite then it's best to do it
+                quickly, because if I go then everything Joel says will be true
+                about anyone who wants to rewrite it. (This is all the more
+                complicated, because <em>this</em> version is itself a rewrite
+                of someone else's work, so obviously I apply these ideas only
+                when convenient :)
+            </p>
+            <p>
+                So... it's not the rewrite Joel is talking about. Which leads us
+                to the
+                <a
+                    class="reference"
+                    href="http://en.wikipedia.org/wiki/Second-system_effect"
+                    >second-system syndrome</a
+                >:
+            </p>
+            <blockquote>
+                Designing the successor to a relatively small, elegant, and
+                successful system, there is a tendency to become grandiose in
+                one's success and design an elephantine feature-laden
+                monstrosity.
+            </blockquote>
+            <p>
+                This <em>is</em> a risk. And it's something I've done. My
+                response to this is that we need to focus on one thing -- in
+                this case the programming environment -- and resist making any
+                other changes in the process. Which means no added features, no
+                change in the database schema, no changes to the URL schemes or
+                screen layout, and a very clear target: something that is
+                indistinguishable from the current application. In reality there
+                will be some changes, because I would revisit every piece of the
+                system, and some parts are forgotten and changes will occur to
+                me. But fixing those things isn't in the plan, and if I
+                <em>realize</em> I'm doing that, then I've already spent too
+                much time distracted from my main goal (reimplementation) and I
+                should check myself.
+            </p>
+            <p>
+                Sadly, this means that the resulting program will have no
+                advantages over the original program. The time invested will
+                seem like a waste from the outside. But then, that's always the
+                nature of refactoring -- and even though this involves rewriting
+                all the code, it's really just a kind of refactoring.
+            </p>
+            <p>
+                It's still to be seen if I can actually convince them of this
+                all...
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 27 Apr '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            Sounds like you've got an uphill battle.
+            <br />
+
+            <br />
+            Are there any real benefits for the customer?
+            <br />
+
+            <br />
+            Perhaps it will decrease the implementation time for an upcoming
+            feature or set of features? If so, then it becomes an easier sell.
+            <div align="right">
+                <a href="https://ianbicking.org/comment833.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://cardboard.nu">Alan</a>
+            </div>
+            <hr noshade />
+            For the customer? No, benefit they could perceive (by design). This
+            would have to be done as unbilled work. Which is possible, since
+            this is an internally developed product, not something that belongs
+            to a customer, and we aren't recouping costs on a service basis. Of
+            course, if we wanted to sell more on the basis of service, this
+            investment would allow a greater margin (if we bid).
+            <br />
+
+            <br />
+            Thankfully I don't have to explain any of this to a customer, only
+            to people in the company. That's part of the idea of packaged
+            software, I guess: someone else does this thinking (and investment)
+            for you, and you (the customer) don't have to consider things like
+            development environments.
+            <div align="right">
+                <a href="https://ianbicking.org/comment834.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            One advantage of revisiting work, even if it isn't to rewrite it
+            from scratch is that you can often make use of technologies that
+            have arisen since. This can lead to the removal of code that you
+            previously had to write yourself to get a job done, but can now
+            utilise someone else's package to do.
+            <br />
+
+            <br />
+            I've seen quite a lot of wheel reinventing in my time (and have
+            probably done quite a bit myself), but I'm inclined to believe that
+            shorter projects are better than longer projects if only because of
+            the phenomenon described above - ie. you can make more
+            dynamic/up-to-date technology decisions and can focus on only the
+            most pertinent areas rather than committing yourself to writing lots
+            of subsequently redundant code.
+            <div align="right">
+                <a href="https://ianbicking.org/comment835.html" rel="nofollow"
+                    >#</a
+                >
+                Paul Boddie
+            </div>
+            <hr noshade />
+            What test suite you have? You can put new application against the
+            old one, but that's too big granularity. And that also means you'll
+            copy bug by bug.
+            <div align="right">
+                <a href="https://ianbicking.org/comment836.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://smejmoon.lv">G'irts</a>
+            </div>
+            <hr noshade />
+            Fowler gets quite adamant these days about people calling tasks like
+            this 'refactoring'. Refactoring is a very small and focused event.
+            See
+            <a
+                href="http://www.martinfowler.com/bliki/RefactoringMalapropism.html"
+                target="_blank"
+                >Refactoring Malapropism</a
+            >.
+            <br />
+
+            <br />
+            At its heart, refactoring is about "improving the design of existing
+            code," and should take no more than a few minutes according to
+            Fowler. Completely changing the publishing environment and framework
+            is a much bigger deal.
+            <br />
+
+            <br />
+            Anyways, on projects like this, where there was a very small team,
+            I've had good success with rewrites - they usually turn out smaller
+            and more focused than the replaced system. I'm starting to realize
+            that another benefit of Python is that its enabled me to always work
+            in very small teams and still accomplish great things. This leaves
+            many of us Python programmers isolated from the types of articles
+            Joel writes, as they focus more on environments where larger teams
+            are needed. (There's still wisdom to be gained from such articles,
+            but I've always felt strange when they talk about team and company
+            sizes).
+            <div align="right">
+                <a href="https://ianbicking.org/comment837.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://toulouse.amber.org/">J.Shell</a>
+            </div>
+            <hr noshade />
+            Maybe "foundational restructuring" would be a better term (since
+            it's restructuring based on a change in the foundation/environment
+            of the application -- and the rewrite falls out as a necessity, but
+            in its essence it's a limited kind of restructuring.
+            <div align="right">
+                <a href="https://ianbicking.org/comment838.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            Don't forget that there *will* be improvements - on many of my
+            perl-to-python rewrites, I've found things that could never have
+            worked, done a little experimenting and confirmed that indeed, they
+            hadn't, and fixed them as part of the rewrite. Some of this is
+            purely due to paying new attention to the code - some of it, though,
+            can be creditted to "explicit rather than implicit" and the way you
+            expose certain things.
+            <br />
+
+            <br />
+            This tricky part is not taking the temptation to improve beyond
+            that. If you're being especially rigorous, the experimenting above
+            goes in the test suite, to explicitly show what wasn't working
+            before...
+            <div align="right">
+                <a href="https://ianbicking.org/comment839.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.thok.org/bloggery/">Mark Eichin</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

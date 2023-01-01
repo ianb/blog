@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>My CherryPy Rant</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>My CherryPy Rant</h1>
+
+        <div class="document">
+            <p>
+                I spent way more time than I planned or wanted to spend on
+                CherryPaste today, mostly trying to get Catwalk to work
+                correctly.
+            </p>
+            <p>
+                First, CherryPy's WSGI application
+                <a class="reference" href="http://www.cherrypy.org/ticket/444"
+                    >doesn't use SCRIPT_NAME</a
+                >
+                like it should. After getting a less than enthusiastic response
+                on that ticket, I thought I would just not bother pursuing that
+                and fix it myself. CherryPaste could then be seen simply as the
+                valid-to-spec WSGI application for CherryPy. That ended up being
+                a pain in the butt. The
+                <a
+                    class="reference"
+                    href="http://www.cherrypy.org/wiki/VirtualPathFilter"
+                    >VirtualPathFilter</a
+                >
+                recipe I built off of is just a silly hack, frankly, despite the
+                fact that it's a likely part of any realistic deployment. The
+                WSGI environment is thrown away, so if you planned to pass
+                information through WSGI into the CherryPy request you can't. I
+                haven't looked very hard, but I haven't yet found the way to
+                turn off CherryPy's catching of exceptions (which I want because
+                Paste has a better exception handler). CherryPy eats exceptions
+                from some filter methods.
+            </p>
+            <p>
+                This all to get Catwalk to run under something besides the root
+                path. Then I realize CatWalk has entirely hardcoded URLs. That's
+                just silly.
+                <tt class="docutils literal"
+                    ><span class="pre">turbogears.view.stdvars</span></tt
+                >
+                creates dynamic values that it should be using; that was an easy
+                enough change. Except TurboGears bases those values off
+                something calculated at server startup, and stores it in a
+                module global. So I have to patch in a threadlocal value that
+                poses as a string. Lastly Catwalk patches the configuration to
+                add static paths when you access the index page; but since I'm
+                keeping configuration information isolated to each request that
+                doesn't work. So I have to add a specific hack to the Catwalk
+                entry point to fix up the configuration on each request.
+            </p>
+            <p>
+                In the end it all works, at least for this one case. But damn.
+                This is not what I want to be working on. I feel like I'm just
+                cleaning up other people's shit. I have enough shit of my own
+                that needs cleaning up.
+            </p>
+            <p>
+                It's not like this is Paste-specific stuff.
+                <em>No one</em> knows how to do this stuff in CherryPy. No one
+                seems to have any authoritative answer on how you deploy these
+                apps -- how you move between servers, how you change the
+                application root, how you put apps together into a single
+                server. Everything is ad hoc stuff that just barely works for
+                one app on one server. It's all &quot;recipes&quot;. Recipes are
+                often just stuff that no one cares enough about to do right.
+                This is too central to what CherryPy is supposed to be doing to
+                be a recipe.
+            </p>
+            <p>
+                It occurs to me that TurboGears was extracted from an
+                application that runs on the local machine. In that case none of
+                these issues would have been apparent. But that's not similar to
+                how people are actually using TG. I think these shaky
+                underpinnings are risky for the project.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 22 Jan '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Catwalk does all sorts of bad things, like bare except
+                    clauses... The style is also very sloppy and inconsistent
+                    with PEP-8. It definitely isn't worth my time to fix,
+                    though, especially because it's not technically broken.
+                    Hopefully the developer will fix those bad habits with more
+                    practice.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-cherrypy-rant-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pythonmac.org/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Yeah, there's a number of things. But these are all
+                        mostly easy bugs. The template was... well, very
+                        peculiar that it hadn't been fixed. But certainly not
+                        <em>hard</em> to fix. Doing it right actually was hard,
+                        but that wasn't Catwalk's fault.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-cherrypy-rant-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    &gt; I haven't yet found the way to turn off CherryPy's
+                    catching of exceptions
+                </p>
+                <p>
+                    That feature was added to CP 2.2 on Dec 27, 2005 in
+                    <a
+                        class="reference"
+                        href="http://www.cherrypy.org/changeset/884"
+                        >http://www.cherrypy.org/changeset/884</a
+                    >. Set the config entry &quot;server.throw_errors&quot; to
+                    True.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-cherrypy-rant-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.aminus.org/blogs/index.php/fumanchu"
+                    >Robert Brewer</a
+                >
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Doh, I saw that, but I was setting the environment
+                        (instead of the configuration) to have
+                        server.throw_errors (which doesn't do anything). So
+                        CherryPaste should handle that now, and Paste exceptions
+                        should be usable around a CherryPy app.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-cherrypy-rant-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    This is a common problem with cherrypy. there is now easy
+                    way of distributing a cherrypy application. And there is
+                    also no easy way to setup more than one cherrypy application
+                    on a server.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-cherrypy-rant-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.active-4.com">Armin Ronacher</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I've hacked up something that allows you to distribute
+                        cherrypy applications as eggs.
+                    </p>
+                    <p>
+                        You can see the source at
+                        <a
+                            class="reference"
+                            href="http://bwinton.latte.ca/Programming/cherryPy/"
+                            >http://bwinton.latte.ca/Programming/cherryPy/</a
+                        >
+                        and the (not entirely working at this point for some
+                        reason, but used to work before) result at
+                        <a class="reference" href="http://cherrypy.latte.ca/"
+                            >http://cherrypy.latte.ca/</a
+                        >
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-cherrypy-rant-comment-11.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://bwinton.latte.ca/">Blake Winton</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            (Yes, I know my server is down. I'll reboot my
+                            POS-brand router when I get home.)
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/my-cherrypy-rant-comment-12.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://bwinton.latte.ca/">Blake Winton</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Surely the big jaw-opener for CherryPy (or was it
+                    TurboGears?) was that barely-reported security hole that
+                    came up the other day. Less time on the hype and more on the
+                    software is the answer there, I think.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-cherrypy-rant-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                The Badger
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I also find catwalk's assumption that it's at the root path
+                    annoying, could the changes you made (the hard-coded url
+                    bits - obviously the WSGI bits don't apply) be submitted as
+                    a patch to TurboGears? Seems like a waste not to get it in
+                    there!
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-cherrypy-rant-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                anonymous
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Yeah, I was planning to that -- Trac just happened to be
+                        down while I was doing this stuff.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/my-cherrypy-rant-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            The necessary changes to Catwalk have now been
+                            committed.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/my-cherrypy-rant-comment-10.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Ian Bicking
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I've responded here:
+                    <a
+                        class="reference"
+                        href="http://groups.google.com/group/cherrypy-users/browse_thread/thread/5f35e3497d730219"
+                        >http://groups.google.com/group/cherrypy-users/browse_thread/thread/5f35e3497d730219</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-cherrypy-rant-comment-9.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.cherrypy.org">Remi Delon</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

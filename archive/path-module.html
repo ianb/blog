@@ -1,0 +1,512 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>path module</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>path module</h1>
+
+        <div class="document">
+            <p>
+                I've been using
+                <a
+                    class="reference"
+                    href="http://www.jorendorff.com/articles/python/path/"
+                    >Jason Orendorff's path module</a
+                >
+                (doh, I'd been misspelling Jason's name) lately in a couple
+                command-line scripts. A while ago I stopped writing many scripts
+                in shell, since I always found it hard to grow the scripts, and
+                the quoting always causes problems. How many shell scripts can
+                deal with filenames with spaces in them? Shell scripting is a
+                crappy language. I always thought Tcl would make a good shell --
+                both simpler and more reliable than shell, but just as
+                string-oriented. But it never seemed to happen... so it goes.
+            </p>
+            <p>
+                Anyway, when writing command-line programs you do lots of file
+                operations, and typically use
+                <tt class="docutils literal"
+                    ><span class="pre">os.path</span></tt
+                >
+                a lot.
+                <tt class="docutils literal"
+                    ><span class="pre">os.path</span></tt
+                >
+                is a pain to use -- too much
+                <tt class="docutils literal"
+                    ><span class="pre"
+                        >os.path.join(os.path.dirname(...))</span
+                    ></tt
+                >
+                and the like. This makes Python rather painful to use.
+            </p>
+            <p>
+                Despite
+                <a
+                    class="reference"
+                    href="http://groups.google.com/groups?hl=en&amp;lr=&amp;ie=UTF-8&amp;threadm=mailman.1057651032.22842.python-list%40python.org&amp;rnum=1&amp;prev=/groups%3Fq%3Dcomp.lang.python%2Bpath%2Bmodule%2Bian%2Bbicking%26hl%3Den%26lr%3D%26ie%3DUTF-8%26selm%3Dmailman.1057651032.22842.python-list%2540python.org%26rnum%3D1"
+                    >wanting</a
+                >
+                a path module for a long time, I keep forgetting to use the one
+                I have (standard or no). After using it some, I find it very
+                pleasant. Besides avoiding
+                <tt class="docutils literal"
+                    ><span class="pre">os.path</span></tt
+                >, I get nice functions like
+                <tt class="docutils literal"
+                    ><span class="pre">text()</span></tt
+                >
+                and
+                <tt class="docutils literal"
+                    ><span class="pre">write_text()</span></tt
+                >
+                which read and write text to the file in a single chunk, no
+                <tt class="docutils literal"
+                    ><span class="pre">open()</span></tt
+                >
+                required. And I'm sure there's more good stuff in there that I
+                haven't assimilated yet either.
+            </p>
+            <p>
+                There's an outstanding (pre)
+                <a
+                    class="reference"
+                    href="http://people.nl.linux.org/~gerrit/creaties/path/pep-xxxx.html"
+                    >PEP</a
+                >, and a second discussion on
+                <a
+                    class="reference"
+                    href="http://mail.python.org/pipermail/python-list/2004-January/201672.html"
+                    >comp.lang.python</a
+                >
+                surrounding a path module. Personally Jason's module fits me
+                well, and I think it's worth the time to learn even if you've
+                become accustomed (as I have) to
+                <tt class="docutils literal"
+                    ><span class="pre">os.path</span></tt
+                >.
+            </p>
+            <p>
+                (And I like the use of
+                <tt class="docutils literal"><span class="pre">/</span></tt> for
+                <tt class="docutils literal"
+                    ><span class="pre">os.path.join</span></tt
+                >
+                -- purists say that it's not division, but I say who cares;
+                <tt class="docutils literal"><span class="pre">%</span></tt>
+                substitution isn't modulo either)
+            </p>
+            <p>
+                <strong>Update</strong>: Jason wrote at length about some of his
+                thoughts on the module in the
+                <a
+                    class="reference"
+                    href="http://blog.colorstudy.com/system/comments.py?u=0000001&amp;p=P57"
+                    >comments</a
+                >
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 24 Jan '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            No experience with this module, but I agree with you. / makes sense.
+            I'm for it (as long as there's a method way to do it too and it's
+            not called __div__).
+            <br />
+
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment676.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            There's a .joinpath() method as well. (Since path subclasses str,
+            the .join() method is already taken)
+            <div align="right">
+                <a href="https://ianbicking.org/comment677.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            Coooooool. Thanks for the pointer.
+            <div align="right">
+                <a href="https://ianbicking.org/comment678.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.pycs.net/users/0000231">John P Speno</a>
+            </div>
+            <hr noshade />
+            There is a bug in modulefinder, which struggles on import of Jason
+            Jorendorff's path module.
+            <br />
+
+            <br />
+            That is especially bad when using py2exe - maybe also with other
+            distutils stuff (but I did not experience that, because I only use
+            distutils with py2exe)
+            <br />
+
+            <br />
+            One solution is to rename path.py to jpath.py.
+            <br />
+
+            <br />
+            Anyway - path.py from Jason Jorendorff is GREAT. I even use it to
+            access contents of a file via
+            <br />
+
+            <br />
+            p=path.path("somefile.extension")
+            <br />
+            content=p.bytes()
+            <br />
+
+            <br />
+            The other nice thing: when dealing with windows, path.py keeps a lot
+            of the filenametroubles perfectly wrapped.
+            <br />
+
+            <br />
+            Harald
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment679.html" rel="nofollow"
+                    >#</a
+                >
+                <a
+                    href="http://starship.python.net/crew/theller/moin.cgi/PathModul"
+                    >Harald Armin Massa</a
+                >
+            </div>
+            <hr noshade />
+            My favourite features in Jason's path module are the iterator-style
+            walk* methods. Code like:
+            <br />
+
+            <br />
+            for pyfile in path('src').walkfiles('*.py'):
+            <br />
+            ....
+            <br />
+
+            <br />
+            is just a pleasure to write (and to read!).
+            <div align="right">
+                <a href="https://ianbicking.org/comment680.html" rel="nofollow"
+                    >#</a
+                >
+                Graham Fawcett
+            </div>
+            <hr noshade />
+            What a wonderfully pythonic path module! As already said: thanks for
+            the pointer. And thanks to Jason Jorendorff (and contributors) for
+            writing it! Is there any mandate for including it in the Python
+            Standard Library some day (supposedly named differently)? In my eyes
+            (after just quickly checking it out) it seems as close-to-core and
+            useful as optik, PyUnit and other fairly recently included modules.
+            By having it along with the other batteries by default, it might
+            provide yet another 'first glance of python' epiphany.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment681.html" rel="nofollow"
+                    >#</a
+                >
+                Niklas Lindström
+            </div>
+            <hr noshade />
+            I have a couple links in the original post to a PEP (which has lost
+            momentum for the moment), and an older discussion where I suggested
+            the module has a place in the core as well.
+            <br />
+
+            <br />
+            The PEP summarizes some issues. I can't say I agree with some of the
+            conclusions people had in the thread that followed (e.g., that path
+            shouldn't subclass string, __div__ shouldn't be provided, and some
+            of the other stuff).
+            <br />
+
+            <br />
+            I think the next step, though, is to get some more people using the
+            module. People shouldn't (and don't have to) theorize about what's a
+            good API. An API exists (two, actually -- the other is linked from
+            the PEP), and people should use them and see what they think, THEN
+            comment. That's process is appropriate for adoption in the standard
+            library as well.
+            <div align="right">
+                <a href="https://ianbicking.org/comment682.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            Since several comments have repeated the original mistake, it would
+            seem worthwhile to point out that the module is actually by Jason
+            Orendorff, and not Jason Jorendorff...
+            <div align="right">
+                <a href="https://ianbicking.org/comment683.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+            This rocks! But it does not seem to work on win98. I tested the walk
+            funtion with this little script:
+            <br />
+            8<---------
+            <br />
+            from path import path
+            <br />
+            import sys
+            <br />
+            p = path('c:\\')
+            <br />
+            for f in p.walk():
+            <br />
+            print f
+            <br />
+            ------->8
+            <br />
+
+            <br />
+            It fails with this trace back:
+            <br />
+            8<---------
+            <br />
+            Traceback (most recent call last):
+            <br />
+            File "test.py", line 4, in ?
+            <br />
+            for f in p.walk():
+            <br />
+            File "D:\download\path\path.py", line 346, in walk
+            <br />
+            if child.isdir():
+            <br />
+            AttributeError: 'str' object has no attribute 'isdir'
+            <br />
+            ------->8
+            <br />
+
+            <br />
+            Can anyone confirm this?
+            <div align="right">
+                <a href="https://ianbicking.org/comment684.html" rel="nofollow"
+                    >#</a
+                >
+                Fredrik
+            </div>
+            <hr noshade />
+            > Since path subclasses str, the .join() method is already taken
+            <br />
+
+            <br />
+            It's a bad idea to leave original str.join method in path class: in
+            this case path.join(...) makes no sence and should be replaced or
+            "removed" (raise exception).
+            <div align="right">
+                <a href="https://ianbicking.org/comment685.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.python.ru/">ods</a>
+            </div>
+            <hr noshade />
+            I'm answering my own question about the walk bug.
+            <br />
+            I changed line 342:
+            <br />
+            for child in self:
+            <br />
+            to:
+            <br />
+            for child in self.listdir():
+            <br />
+            and now it works. Maybe it should be fixed in another way, but this
+            seem to work.
+            <br />
+            I think this bug applies to all walk methods.
+            <br />
+            Cheers,
+            <br />
+            Fredrik
+            <div align="right">
+                <a href="https://ianbicking.org/comment686.html" rel="nofollow"
+                    >#</a
+                >
+                Fredrik
+            </div>
+            <hr noshade />
+            Thanks for the comments here, especially Fredrik's bug report. I
+            guess I should use my unit tests. Will fix tonight.
+            <br />
+
+            <br />
+            === What I've learned from <tt>path</tt> ===
+            <br />
+
+            <br />
+
+            <br />
+            1. <b><tt>path</tt> is useful</b>, much more useful than I expected.
+            Now when I use <tt>os.path</tt>, supposedly to save myself the
+            pain/time/complexity of installing <tt>path.py</tt>, I often end up
+            switching to <tt>path</tt> later ( fortunately that's pretty easy,
+            by design). Is Guido really "lukewarm" about this? I have to wonder
+            if he's tried it...
+            <br />
+
+            <br />
+
+            <br />
+            2. <b>Which features I use:</b> Roughly in order, <tt>bytes()</tt>,
+            <tt>files()</tt>, <tt>.name</tt>, <tt>lines()</tt>,
+            <tt>isdir()</tt>, <tt>isfile()</tt>, <tt>.parent</tt>,
+            <tt>.size</tt>, + operator, / operator, <tt>.mtime</tt>,
+            <tt>makedir()</tt>, <tt>walkfiles()</tt>, followed by everything
+            else.
+            <br />
+
+            <br />
+            <tt>walkfiles()</tt> makes me smile.
+            <br />
+
+            <br />
+            <tt>listdir()</tt> is not useful. It's superceded by all those other
+            more specific methods, particularly <tt>files()</tt>.
+            <br />
+
+            <br />
+            The optional wildcard argument to <tt>files()</tt>, et al, is really
+            cool. I forget who suggested it, but I'm glad I decided to try it
+            out instead of instantly showering them with scorn (always my first
+            impulse).
+            <br />
+
+            <br />
+            On modern Windows systems, paths are Unicode. So on Windows,
+            <tt>path</tt> subclasses <tt>unicode</tt>. Maybe someday I'll use
+            this. <tt>:)</tt>
+            <br />
+
+            <br />
+
+            <br />
+            3. <b><tt>path</tt> subclasses <tt>str</tt>.</b> A path
+            <i>is-a</i> string. I don't really like it. But it's inescapable.
+            The precedent is overwhelming: the entire tradition of Unix,
+            Windows, C, and Python programming. I've come to see the wisdom of
+            it.
+            <br />
+
+            <br />
+            There's a practical aspect, too. Why would you write a
+            <tt>path</tt> class that you can't use with existing functions that
+            take paths as arguments? I like writing
+            <tt>win32file.FileCopy(path1, path2, True)</tt>, not
+            <tt>win32file.FileCopy(str(path1), str(path2), True)</tt>. The
+            latter is offensive because I'm taking an object that is already the
+            "right" type and explicitly converting it to a type that makes
+            <i>less</i> sense in order to pass it in. Plus it breaks Unicode.
+            (Gotcha.)
+            <br />
+
+            <br />
+            That said, my approach has a big, unsightly wart.
+            <tt>path</tt> inherits three decidedly unwanted features from
+            <tt>str</tt>: <tt>join()</tt>, <tt>split()</tt>, and iterability.
+            This sucks, but it sucks worse when subclasses break promises made
+            by their superclasses (something else I learned from <tt>path</tt>).
+            <br />
+
+            <br />
+
+            <br />
+            4.
+            <b>Using / and + as semantic sugar for <tt>.joinpath()</tt>:</b> I
+            don't use / much. But if we're to have an operator that does this,
+            I'm convinced + is a very bad choice. (1) It's confusable with
+            string concatenation, especially since variables and function
+            arguments are untyped. (2) It introduces bugs when you port old
+            str-based code to use path objects. Code like
+            <tt>x = mydir + "/foo"</tt> looks right, but it's broken. (3) I
+            think string concatenation is actually a more common operation than
+            <tt>joinpath()</tt> for paths.
+            <tt>bakfile = myfile + '.bak'</tt> and so forth.
+            <br />
+
+            <br />
+
+            <br />
+            5.
+            <b>Personal preferences I suppressed while making <tt>path</tt>:</b>
+            <br />
+
+            <br />
+            I dislike relative paths. They're an error-prone shortcut. Great for
+            ad hoc shell commands, of course.
+            <br />
+
+            <br />
+            Ugh, a lot of these method names stink. But I kept them exactly as
+            in the standard library, where applicable. I hope this makes it
+            easier for people to grab <tt>path</tt> and start using it.
+            <br />
+
+            <br />
+            The <tt>dothisdothat()</tt> naming convention is Python's worst
+            wart. I'd prefer either <tt>doThisDoThat()</tt> or
+            <tt>do_this_do_that()</tt>. But standard library style it is. No
+            point being inconsistent.
+            <br />
+
+            <br />
+            I usually don't like "big" classes. <tt>path</tt> is too big for my
+            taste. But people wanted all these features, and I admit I use them
+            too.
+            <br />
+
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment687.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.jorendorff.com/">Jason Orendorff</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

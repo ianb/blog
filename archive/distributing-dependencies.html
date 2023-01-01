@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Distributing dependencies</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Distributing dependencies</h1>
+
+        <div class="document">
+            <p>
+                When I cut a release for WSGIKit, I want the experience to be
+                pretty easy -- you download the package, run a command, you got
+                a server you can play with. It's pretty close to that right now,
+                you can run:
+            </p>
+            <pre class="literal-block">
+./server.py --webkit-dir=../examples/todo --server=wsgiutils \
+    --reload -v -D
+</pre
+            >
+            <p>
+                To do that I have to ship some dependencies, like a server (<a
+                    class="reference"
+                    href="http://www.owlfish.com/software/wsgiutils/"
+                    >WSGIUtils</a
+                >
+                is small, but now with
+                <a
+                    class="reference"
+                    href="http://twistedmatrix.com/projects/web/"
+                    >TwistedWeb</a
+                >
+                2 it's pretty reasonable as well). Maybe even a couple of
+                servers. And if I want to make use of other people's middleware
+                or libraries, I don't want to import them into my repository and
+                namespace. I just want to distribute the files.
+            </p>
+            <p>
+                One option is to use a zip file, which Python can import from.
+                You just add the zip file to
+                <tt class="docutils literal"
+                    ><span class="pre">sys.path</span></tt
+                >. For pure Python packages this works okay -- and if it's not
+                pure Python it's not a simple install anyway and I don't mind
+                leaving it out and forcing the user to install it on their own.
+                There are some problems, however --
+                <a
+                    class="reference"
+                    href="http://peak.telecommunity.com/DevCenter/PythonEggs"
+                    >Eggs</a
+                >
+                try to solve this, but there's still a little work to do there.
+            </p>
+            <p>
+                Then I realized I didn't really like zip files. Zip files nested
+                in zip files, what does that buy? And anyway, I want users to
+                have access to all the source unpacked, regardless of its origin
+                -- this is the transparency we like in an open source framework.
+                They shouldn't <em>need</em> to look at the source. But I
+                actually <em>want</em> them to, since then they are more likely
+                to contribute, and to generally feel comfortable with the
+                infrastructure.
+            </p>
+            <p>
+                So, my plan is to put all the external packages in a
+                <tt class="docutils literal"
+                    ><span class="pre">3rd-party</span></tt
+                >
+                directory. I named it so it's an invalid Python package, and
+                people can't import from it directly. Instead for each package
+                there's a subdirectory that is added if we need to load the
+                package, so
+                <tt class="docutils literal"
+                    ><span class="pre">3rd-party/wsgiutils-files/</span></tt
+                >
+                is added to
+                <tt class="docutils literal"
+                    ><span class="pre">sys.path</span></tt
+                >
+                if
+                <tt class="docutils literal"
+                    ><span class="pre">wsgiutils</span></tt
+                >
+                can't be loaded the normal way. I'm 100% okay with adding 100K
+                to the download to make the experience more pleasant -- heck,
+                I'm probably okay with something much larger than 100K, it's
+                only disk space and bandwidth, and both of those are cheap these
+                days. I made a
+                <a
+                    class="reference"
+                    href="http://svn.w4py.org/WSGIKit/trunk/wsgikit/util/thirdparty.py"
+                    >little module</a
+                >
+                to support this -- no magic, nothing very fancy at all.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 30 Mar '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    I would rather see a separate tarball labeled
+                    <tt class="literal"
+                        ><span class="pre">wsgikit-demo-A.B.C.tar.gz</span></tt
+                    >. If I understand WSGIKit correctly, it's a framework, not
+                    an application. If you were distributing a
+                    fully-independant, batteries-included application for
+                    Windows, then including all of the dependencies in a
+                    convenience package might be worth it. However, as a
+                    framework library, I would be disappointed to see cruft in
+                    the tarball. It would simply take up mirror-space and
+                    filesystem space for those that wish to create binary
+                    packages of your library.
+                </p>
+                <p>
+                    There was recently a discussion on the gnu-prog list about
+                    trying to formalize dependency requirements for applications
+                    in the form of some XML or RFC-822 document in the top-level
+                    directory of the tarball. Most of the ideas where shot down
+                    over implementation details, duplication of effort
+                    complaints, and unnecessarily making the build process too
+                    complicated.
+                </p>
+                <p>
+                    Perhaps if you could leverage PyPI information regarding
+                    package versions and locations, you could bootstrap the
+                    retrieval and installation of the necessary software for
+                    your demo; something you could optionally tie in to
+                    <tt class="literal"><span class="pre">setup.py</span></tt
+                    >.
+                </p>
+                <p>
+                    Really, what it boils down to is that you need to
+                    <strong>inform your user</strong> of the necessary
+                    information rather than trying to hold his/her hand
+                    throughout the process.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/distributing-dependencies-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://wookimus.net/~chewie">Chad Walstrom</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I want a pleasing immediate experience, so informing the
+                        user isn't really what I'm looking to do. OTOH, it
+                        probably makes sense to package two tarballs. Either way
+                        the package includes just one
+                        <tt class="literal"
+                            ><span class="pre">setup.py</span></tt
+                        >, and it doesn't install any third-party packages, it
+                        would only make a difference when you run the server out
+                        of the unpacked directory.
+                    </p>
+                    <p>
+                        OTOH, Twisted is looking pretty large -- 800K
+                        compressed, to include twisted core, twisted.web, and
+                        Zope interfaces. Which is disappointing. WSGIUtils and a
+                        couple other servers are only a file, so it's easier.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/distributing-dependencies-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                eggs aren't tightly bound to zip files. If it's a directory,
+                instead of a zip file, it works identically.
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/distributing-dependencies-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pythonmac.org/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

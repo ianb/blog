@@ -1,0 +1,788 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Initial thoughts on Prothon</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Initial thoughts on Prothon</h1>
+
+        <div class="document">
+            <div class="note">
+                <p class="admonition-title first">Note</p>
+                Looking for
+                <a
+                    class="wiki reference"
+                    href="https://ianbicking.org/concurrency-looking-for-positive-models"
+                    >Concurrency: looking for positive models</a
+                >?
+            </div>
+            <p>
+                <a class="reference" href="http://www.prothon.org/">Prothon</a>
+                looks quite interesting. Reading through the
+                <a
+                    class="reference"
+                    href="http://www.prothon.org/description.htm"
+                    >description</a
+                >, here are a few of my thoughts.
+            </p>
+            <div class="section" id="line-continuations">
+                <h1><a name="line-continuations">Line Continuations</a></h1>
+                <p>
+                    Prothon uses whitespace for continuations, so if a line is
+                    indented from the previous line it is considered a
+                    continuation of that line. I have a really hard time keeping
+                    lines under 80 characters in width, and
+                    <tt class="literal"><span class="pre">\</span></tt> and
+                    <tt class="literal"><span class="pre">()</span></tt> always
+                    break up my coding -- the first is ugly, and the second
+                    requires me to back up to the beginning of the line once I
+                    realize I'm going over 80 characters.
+                </p>
+                <p>This is purely syntactic, Python could also do this.</p>
+            </div>
+            <div class="section" id="with-keyword">
+                <h1><a name="with-keyword">&quot;with&quot; keyword</a></h1>
+                <p>
+                    This is really at the heart of Prothon. This is actually my
+                    plan for OO in
+                    <a class="reference" href="http://pylogo.org">PyLogo</a>
+                    (except it's called
+                    <tt class="literal"><span class="pre">TELL</span></tt>
+                    there). When you use
+                    <tt class="literal"
+                        ><span class="pre">with</span>
+                        <span class="pre">var:</span></tt
+                    >,
+                    <tt class="literal"><span class="pre">var</span></tt>
+                    becomes the &quot;self&quot; object (though Prothon doesn't
+                    use the word &quot;self&quot;).
+                </p>
+                <p>
+                    This kind of scares me, though. My experience with DTML
+                    shows that this is a horrible feature. Though, that said,
+                    I'm not sure if
+                    <tt class="literal"><span class="pre">with</span></tt> is
+                    quite as dangerous as
+                    <tt class="literal"><span class="pre">dtml-with</span></tt>
+                    -- so long as it only applies locally it's not too bad. The
+                    issue would be something like:
+                </p>
+                <pre class="literal-block">
+with File:
+    def .writeAll(*objs):
+        for ob in objs:
+           .write(CustString(ob))
+
+def CustString(ob):
+    if .filename.endswith('.txt'):
+        ob = Str(obj)
+    else:
+        ob = Str(obj).encode('UTF-8')
+</pre
+                >
+                <p>
+                    I don't know, I'm kind of contriving that example. But the
+                    question being, do you &quot;inherit&quot; the
+                    <tt class="literal"><span class="pre">.</span></tt> (self)
+                    according to call order? Or only statically? Eh, they
+                    probably do the right (static only) thing here.
+                </p>
+            </div>
+            <div class="section" id="def-with-expressions">
+                <h1><a name="def-with-expressions">def with expressions</a></h1>
+                <p>Or, more specifically, something like:</p>
+                <pre class="literal-block">
+def Point.move(xofs, yofs): ...
+</pre
+                >
+                <p>
+                    In this case, adding a method
+                    <tt class="literal"><span class="pre">move</span></tt> to
+                    <tt class="literal"><span class="pre">Point</span></tt
+                    >. I like this, it's very natural feeling. It is used to
+                    more effect in Prothon than it would be in normal Python.
+                </p>
+            </div>
+            <div class="section" id="variable-naming">
+                <h1><a name="variable-naming">Variable naming</a></h1>
+                <p>
+                    In Prothon, locals start with lower-case letters or the
+                    underscore, and globals are capitalized. This is okay. I
+                    still like lower-case functions, but I can live with
+                    upper-case functions.
+                </p>
+                <p>
+                    I do <em>not</em> like all the prefixes they come up with. I
+                    think this is clearly a case of starting with one or two
+                    prefixes, then it spiraling out of control. Here's the
+                    prefixes:
+                </p>
+                <table border class="table">
+                    <colgroup>
+                        <col width="12%" />
+                        <col width="88%" />
+                    </colgroup>
+                    <thead valign="bottom">
+                        <tr>
+                            <th>Prefix</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+                    <tbody valign="top">
+                        <tr>
+                            <td>
+                                <tt class="literal"
+                                    ><span class="pre">.</span></tt
+                                >
+                            </td>
+                            <td>
+                                <tt class="literal"
+                                    ><span class="pre">.x</span></tt
+                                >
+                                is like
+                                <tt class="literal"
+                                    ><span class="pre">self.x</span></tt
+                                >, kind of. Problem:
+                                <tt class="literal"
+                                    ><span class="pre">.</span></tt
+                                >
+                                can't be pronounced, and it's really small. I
+                                still like
+                                <tt class="literal"
+                                    ><span class="pre">self</span></tt
+                                >, though I can understand taking it out of
+                                method signatures. I think they should make
+                                <tt class="literal"
+                                    ><span class="pre">self</span></tt
+                                >
+                                a keyword.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <tt class="literal"
+                                    ><span class="pre">^</span></tt
+                                >
+                            </td>
+                            <td>
+                                Like &quot;super&quot;, though the exact
+                                equivalent in Python is terribly confusing (the
+                                <tt class="literal"
+                                    ><span class="pre">super()</span></tt
+                                >
+                                function). I'm used to it from Smalltalk, and
+                                like the brevity compared to Python's standard
+                                mechanism. A
+                                <tt class="literal"
+                                    ><span class="pre">super</span></tt
+                                >
+                                keyword would still be better (to go with a
+                                <tt class="literal"
+                                    ><span class="pre">self</span></tt
+                                >
+                                keyword).
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <tt class="literal"
+                                    ><span class="pre">&amp;</span></tt
+                                >
+                            </td>
+                            <td>
+                                This is a closure variable -- a variable that is
+                                defined in the parent scope. Anyone who has
+                                tried Scheme-style closures in Python has
+                                probably known the suffering of trying to figure
+                                out how scopes work. This makes it very
+                                explicit, which actually makes it usable. I also
+                                imagine it makes it easier to implement, since
+                                you actually know which variables need to be
+                                kept with the closure. Horrible punctuation, but
+                                a good idea.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <tt class="literal"
+                                    ><span class="pre">&#64;</span></tt
+                                >
+                            </td>
+                            <td>
+                                Dynamic local variables. There's no equivalent
+                                in Python -- you'd have to open up the current
+                                frame object and look in parent scopes. While
+                                it's expedient, I think it's also a very bad
+                                idea to provide this. That kind of mucking about
+                                with parent scopes is just asking for problems.
+                                I guess it could be used to macro-like effect in
+                                some ways.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="section" id="init-function">
+                <h1><a name="init-function">__init__ function</a></h1>
+                <p>
+                    <tt class="literal"><span class="pre">__init__</span></tt>
+                    allows for more playing around than in Python -- you can
+                    return an object besides self and effect the result of the
+                    constructor. Of course, you've already constructed the
+                    object anyway, so maybe
+                    <tt class="literal"><span class="pre">__new__</span></tt>
+                    really is called for, if you actually want to avoid creating
+                    an object. (If you had to call
+                    <tt class="literal"><span class="pre">^__init__</span></tt>
+                    to construct the object, then it would be more general)
+                </p>
+                <p>
+                    In the list of little tweaks, they also allow identifiers to
+                    contain <tt class="literal"><span class="pre">!</span></tt
+                    >, with the usual meaning (indicating the method mutates the
+                    object). I always like that punctuation, so I like that it's
+                    in there. It's much more useful than Python's convention of
+                    returning None -- I can tell statically that a method name
+                    contains <tt class="literal"><span class="pre">!</span></tt
+                    >, but I can't do the same for returning None, and returning
+                    None is annoying. Prothon also returns self by default,
+                    instead of returning None (there's some conflicting
+                    information on this, so they might not be doing this). I
+                    like <tt class="literal"><span class="pre">?</span></tt> in
+                    identifiers as well, but Prothon doesn't add that.
+                </p>
+                <p>
+                    There also seems to be a tendency to global methods, like
+                    <tt class="literal"><span class="pre">obj.chr()</span></tt>
+                    instead of
+                    <tt class="literal"><span class="pre">str(obj)</span></tt
+                    >. I'm not entirely clear about this -- I think it falls out
+                    of the way builtins are defined. I generally prefer Python's
+                    style with magic methods, purely from an aesthetic point of
+                    view, though I can understand why some people would prefer
+                    using methods for everything.
+                </p>
+                <p>
+                    There's also some changes in generators, but I haven't used
+                    generators enough to have an opinion on the subject. I think
+                    the change is fairly significant, from a stylistic/usage
+                    point of view.
+                </p>
+            </div>
+            <div class="section" id="conclusion">
+                <h1><a name="conclusion">Conclusion</a></h1>
+                <p>
+                    It's an interesting effort. There are some small
+                    aesthetic/syntactic changes, some of which I like and some
+                    of which I don't. Then there's the prototypes... which are
+                    something else entirely.
+                </p>
+                <p>
+                    I actually wonder to what degree prototypes could be
+                    implemented in Python with metaclasses. While some of the
+                    syntax would currently be crufy with Python (e.g., you'd
+                    have to create a function, then assign the function to an
+                    object), that's kind of a separate issue. The basic object
+                    model in Python feels like it should be replaceable,
+                    especially since we already have both new and old style
+                    classes. I think it's still a bit hard to think about these
+                    with the syntax getting in the way or otherwise being
+                    distracting, but feel like the potential is in there
+                    somewhere.
+                </p>
+                <p>
+                    If it could be hacked onto Python instead of developed
+                    entirely separately from Python, it could make Prothon much
+                    more interesting from the perspective of practical
+                    programming. Ultimately it would probably have to be like
+                    <a class="reference" href="http://stackless.com"
+                        >Stackless</a
+                    >
+                    -- a patch against Python implementing some necessary
+                    changes to syntax. But that's a more viable development
+                    effort, and one that's more likely to percolate ideas into
+                    the main Python interpreter.
+                </p>
+            </div>
+        </div>
+        <div class="dates" align="right">
+            Created 30 Mar '04<br />
+            Modified 25 Jan '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            I checked out your comments thinking you'd certainly have a reaction
+            to the elimination of the GIL. *That* is what caught my attention
+            regarding Prothon.
+            <br />
+
+            <br />
+            I seem to remember you saying you don't think the GIL is much of a
+            design flaw. I do. I'm very interested to see if this really might
+            be the end of the GIL. Preferably in Python. I see the GIL as the #1
+            weakness in Python. For me, at least, with access to machines with
+            16 processors.
+            <div align="right">
+                <a href="https://ianbicking.org/comment760.html" rel="nofollow"
+                    >#</a
+                >
+                John Mudd
+            </div>
+            <hr noshade />
+            The GIL needs to stay as-is if Python is going to be reasonably
+            programmable at the C API. It would also make Python a lot slower,
+            and it would break just about every extension... neither of which it
+            needs. A GIL-free Python is going to have to wait until something
+            smarter comes along, like PyPy, which could just automatically
+            parallelize your code if it makes sense to do so.
+            <br />
+
+            <br />
+            If you have 16 processors, use 16 processes. You'll do fine. With
+            shared memory on a decent kernel, the only real latency you'll see
+            is going to be your fault ;)
+            <div align="right">
+                <a href="https://ianbicking.org/comment761.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            You're probably thinking of this post:
+            <br />
+
+            <br />
+            <a
+                href="http://blog.colorstudy.com/ianb/weblog/2003/10/31.html#P24"
+                target="_blank"
+                >http://blog.colorstudy.com/ianb/weblog/2003/10/31.html#P24</a
+            >
+            <br />
+
+            <br />
+            Wherein I agree with Bob, and think the GIL isn't so bad.
+            <div align="right">
+                <a href="https://ianbicking.org/comment762.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            PyPy already sounded cool. If it can eliminate the GIL or find
+            anothre route to SMP performance then it's just that much better.
+            Cool.
+            <br />
+
+            <br />
+            I do read often that the GIL must stay. But what about Java? No GIL
+            there. I'v even converted Python to Jython, switched to Java threads
+            and, wow, it works great. Of course, only on a JVM. But doesn't that
+            show the way for CPython developers? (If Sun can do it...) And I
+            guess Prothon might also show the way if it suceeds.
+            <br />
+
+            <br />
+            Until the GIL is gone from CPython I feel like Java is still ahead,
+            which is depressing. It's hard for me to honestly persuade Java
+            programers to try CPython so long as there's a GIL.
+            <div align="right">
+                <a href="https://ianbicking.org/comment763.html" rel="nofollow"
+                    >#</a
+                >
+                John Mudd
+            </div>
+            <hr noshade />
+            Have you ever compared Java's performance for Python-style data
+            structures like lists (Vectors) and dictionaries (Hashtables)? It's
+            just a guess, but I think you'll find that Python's structures beat
+            the snot out of Java's, because Python's don't require synchronized
+            methods. They're implicitly synchronized by the GIL. Whereas Java
+            objects need to have locks around each method call.
+            <br />
+
+            <br />
+            For Java, this is acceptable *only* because vectors and hashtables
+            aren't on the critical path for performance. Java object fields are
+            accessed using fixed offsets. In Python, those structures are used
+            for *everything* (including all attribute lookups and use of
+            globals), so adding item-specific synchronization kills Python
+            performance dead dead dead. There was a guy who actually made a
+            version of Python without the GIL, and it was "only" 50% SLOWER than
+            Python with the GIL.
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment764.html" rel="nofollow"
+                    >#</a
+                >
+                Phillip J. Eby
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>could you describe this more?</p>
+                    <p>that java needs to synchronize every method call?</p>
+                    <p>
+                        i've done some java programming (2years), and when i
+                        wanted to synchronize, i used synchronize, and when i
+                        did not want it, i did not use it.
+                    </p>
+                    <p>that's all.</p>
+                    <p>
+                        there is absolutely NO need to put synchronize around
+                        every method call imho.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/-comment-896.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Gabor Farkas
+                </div>
+                <hr noshade />
+            </blockquote>
+            >I actually wonder to what degree prototypes could
+            <br />
+            >be implemented in Python with metaclasses.
+            <br />
+
+            <br />
+            Prototypes could certainly be implemented in current Python (I think
+            that Lulu Lotus Eater IBM guy posted something on the Slashdot story
+            about it), but it's a bit like asking to implement OOP in C.
+            <br />
+
+            <br />
+            See the also comp.lang.python for more debate.
+            <div align="right">
+                <a href="https://ianbicking.org/comment765.html" rel="nofollow"
+                    >#</a
+                >
+                Michael
+            </div>
+            <hr noshade />
+            On the subject of the GIL again: I think it would be far, far more
+            interesting to make multiple-process Python programs easier to write
+            -- to make interprocess communication seemless, and just generally
+            to establish robust (and easy to use!) patterns for that kind of
+            programming. The benefits would far excede the benefits of mere SMP
+            threading performance. But even right now, I imagine it's way easier
+            to write a multi-process Python program than a threaded Java
+            program.
+            <br />
+
+            <br />
+            On prototypes, Hans Nowak has played around with systems implemented
+            in Python, in posts like:
+            <br />
+
+            <br />
+            <a
+                href="http://zephyrfalcon.org/weblog/arch_d7_2003_09_13.html#e343"
+                target="_blank"
+                >http://zephyrfalcon.org/weblog/arch_d7_2003_09_13.html#e343</a
+            >
+            <br />
+
+            <br />
+            I think Prothon takes it a bit further... but maybe not that much
+            further once you look past the syntax.
+            <div align="right">
+                <a href="https://ianbicking.org/comment766.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            Personally, I think that pre-emptive threads with the same object
+            space is THE WRONG PARADIGM ANYWAY. It makes for impossible to
+            predict and debug code, thread locks suck, doesn't cooperate with
+            event systems like GUIs, etc. I'm willing to bet that much higher
+            performance and reliability can be attained with something else that
+            is actually easier to code (something else that doesn't exist for a
+            Python-like-language yet). Processes (pre-emptive switching between
+            separate execution contexts that can be explicitly parallelized to
+            multiple CPUs) and stackless-like tasklets (task switching in a
+            single execution context) are the best we can currently do in
+            Python, live with it, it's not going to change.
+            <div align="right">
+                <a href="https://ianbicking.org/comment767.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            Everything I keep reading and hearing about repeats the theme that
+            threads are an accident that came from people trying to "perfect"
+            processes and thus making them too slow. Threading is way too hard
+            and there are no indications that it will continue to be anything
+            but a dead end. Other forms of concurrency, especially ones that are
+            more OO and that remove problems like deadlock and race conditions,
+            are much more preferable.
+            <div align="right">
+                <a href="https://ianbicking.org/comment768.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://mindview.net">Bruce Eckel</a>
+            </div>
+            <hr noshade />
+            Re: "Threading is way too hard"
+            <br />
+
+            <br />
+            For me threads are much simpler to use than forking processes and,
+            for example, using xmlrpclib for inter-thread communication. I've
+            done both, and God bless xmlrpclib, but processes are still tedious
+            compared to simple, almost magical, threads.
+            <br />
+
+            <br />
+            Did you mean hard to use or hard to build into the language? Even
+            CPython already gives access to real native threads. I have to keep
+            reminding myself of that. It's just the GIL design that kills (not
+            just 2X, more like 10X) potential performance. I have a Jython
+            thread demo that run circles around CPython. Of course, only with
+            multiple CPUs.
+            <br />
+
+            <br />
+            Re: "Other forms of concurrency... are much more preferable."
+            <br />
+
+            <br />
+            I admit I'm kinda stuck on threads. What else should I try?
+            <div align="right">
+                <a href="https://ianbicking.org/comment769.html" rel="nofollow"
+                    >#</a
+                >
+                John Mudd
+            </div>
+            <hr noshade />
+            As far as I know, concurrency is far from being a solved problem in
+            computer science.
+            <br />
+
+            <br />
+            Stackless offers some different -- or at least, unfamiliar to me --
+            models. Which reminds me: must beat up Christian until he agrees to
+            talk about them at europython :-)
+            <div align="right">
+                <a href="https://ianbicking.org/comment770.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://starship.python.net/crew/mwh/"
+                    >Michael Hudson</a
+                >
+            </div>
+            <hr noshade />
+            On another note ... I haven't seen anyone upset at the potential
+            that alternative Python implementations like Prothon have to
+            fragment the Python user base. People are already talking about the
+            profileration of web frameworks in Python ... what about when the
+            language itself has 3-4 different implementations? Jython has a good
+            reason for existence, but much of Prothon's design seems to be
+            related to personal preference, not actual improvements.
+            <div align="right">
+                <a href="https://ianbicking.org/comment771.html" rel="nofollow"
+                    >#</a
+                >
+                Brandon Corfman
+            </div>
+            <hr noshade />
+            Prothon IS NOT PYTHON. Did you read the post?
+            <div align="right">
+                <a href="https://ianbicking.org/comment772.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            > I think it would be far, far more interesting to make
+            <br />
+            > multiple-process Python programs easier to write
+            <br />
+
+            <br />
+            The problem is that under Windows, a process-switch takes a lot more
+            times than a thread-switch.
+            <br />
+            So replacing a multi threaded prog by several processes
+            communicating with some protocols is not as much a solution as it
+            can be with, say, Linux (I don't know it, but I have been told that
+            under Linux process ~ thread under Windows).
+            <br />
+            That's not to say it can't be done, but there are possibly more
+            cases under windows where you have no other choice than using
+            threads whereas you have the option under Linux to use a multi
+            processes solution.
+            <br />
+            I wish processes were not so heavy with Windows: I made a lot of
+            multi-threading programming until now, I know the problems it
+            involves and how it can be frustrating to debug such programs !
+            <div align="right">
+                <a href="https://ianbicking.org/comment773.html" rel="nofollow"
+                    >#</a
+                >
+                popov
+            </div>
+            <hr noshade />
+            Prothon is close enough to Python (notice the spelling here) to
+            consider it an alternative implementation in my mind. Except for the
+            64-bit/threading issues which are a minor issue to most (wasn't this
+            supposed to be a _simpler_ language??), the "big changes" of
+            tabs/spaces, removal of self, and removal of classes/metaclasses is
+            just noise. Why introduce another implementation that solves no
+            apparent issues except syntax?
+            <div align="right">
+                <a href="https://ianbicking.org/comment774.html" rel="nofollow"
+                    >#</a
+                >
+                Brandon Corfman
+            </div>
+            <hr noshade />
+            Yes, of course, it's exactly the same except it has a totally
+            different idea of scope, a completely different object system, and a
+            fresh implementation intended for tomorrow's computers and very
+            large problem sets. Come on :)
+            <div align="right">
+                <a href="https://ianbicking.org/comment775.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            ]] Dynamic local variables. There's no equivalent in Python -- you'd
+            have to open up the current frame object and look in parent scopes.
+            While it's expedient, I think it's also a very bad idea to provide
+            this. That kind of mucking about with parent scopes is just asking
+            for problems. I guess it could be used to macro-like effect in some
+            ways. [[
+            <br />
+
+            <br />
+            Actually aren't all local variables in Python dynamic?
+            <br />
+
+            <br />
+            def func():
+            <br />
+            print x, y
+            <br />
+
+            <br />
+            x = 1
+            <br />
+            y = 2
+            <br />
+            func()
+            <br />
+
+            <br />
+            I agree that this is a really bad idea...
+            <div align="right">
+                <a href="https://ianbicking.org/comment776.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.joecheng.com">Joe Cheng</a>
+            </div>
+            <hr noshade />
+            No. Those are globals!
+            <br />
+
+            <br />
+            >>> def func():
+            <br />
+            ... print x,y
+            <br />
+            ...
+            <br />
+            >>> import dis
+            <br />
+            >>> dis.dis(func.func_code)
+            <br />
+            2 0 LOAD_GLOBAL 0 (x)
+            <br />
+            3 PRINT_ITEM
+            <br />
+            4 LOAD_GLOBAL 1 (y)
+            <br />
+            7 PRINT_ITEM
+            <br />
+            8 PRINT_NEWLINE
+            <br />
+            9 LOAD_CONST 0 (None)
+            <br />
+            12 RETURN_VALUE
+            <div align="right">
+                <a href="https://ianbicking.org/comment777.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            I can almost guarantee that the process switching overhead in
+            Windows is far less than the overhead that you get with the GIL...
+            because guess what, two chunks of python code can NEVER EVER RUN AT
+            THE SAME TIME with Python threads! :) It's only carefully written C
+            code that can explicitly allow ONE python thread to run concurrently
+            while it's doing something way outside of the Python domain.
+            <br />
+
+            <br />
+            That said, I don't use Windows anymore, so I can't do a benchmark,
+            but I think you are blowing the win32 process switching overhead out
+            of proportion.
+            <div align="right">
+                <a href="https://ianbicking.org/comment778.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            Ah, thanks for clearing that up, Bob.
+            <br />
+
+            <br />
+            To the person who was complaining about process-switch... are you
+            sure you're not talking about the slowness of
+            <b>creating</b> processes vs. threads on Windows? (By "switch" I
+            assume everyone is talking about context switching?)
+            <div align="right">
+                <a href="https://ianbicking.org/comment779.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.joecheng.com">Joe Cheng</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

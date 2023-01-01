@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>PyCon 2006</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>PyCon 2006</h1>
+
+        <div class="document">
+            <p>
+                So, I really enjoyed PyCon. I felt a little overwhelmed at
+                times. There were a ton of people I wanted to talk to but
+                didn't, or where we only had a quick <em>hi</em>.
+            </p>
+            <p>
+                I wasn't sufficiently prepared for my talks. I'm afraid the
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/docs/pycon2006/plugins.html"
+                    >talk I gave on Eggs</a
+                >
+                was very well attended -- because Eggs are all the rage and
+                people want to know more about them -- but I didn't tell people
+                what they needed to know. I gave a talk about the issues I've
+                encountered using Eggs for plugins, and some vague suggestions
+                for how best handle that case, and people really just need to
+                know about basics; using Eggs for plugins is something people
+                will want to know about <em>next</em> year, this year they just
+                need to know about using Eggs at all. And if I'm going to talk
+                about pitfalls and techniques, I should do so in a more concrete
+                way. Like I could have told the story of Paste or something
+                (Eggs clarified a lot of things in Paste for me). I felt better
+                about my other talk, which was more-or-less about deploying web
+                applications. Steve Holden
+                <a
+                    class="reference"
+                    href="http://holdenweb.blogspot.com/2006/03/everything-about-web-programming.html"
+                    >summarized it nicely</a
+                >
+                -- I'm sure his summary is more useful than
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/docs/pycon2006/devel-process3.html"
+                    >my slides</a
+                >. I was really frustrated, though, that I couldn't find a
+                picture of the scene in Star Wars where Luke smashes Vader's
+                helmet only to see his own face. Oh Internet, how could you have
+                forsaken me!
+            </p>
+            <p>
+                Dallas turned out to be a fine venue. I never spent much time
+                appreciating DC in previous PyCons anyway. And for all the
+                criticism Dallas gets (probably simply because it is in Texas),
+                Addison is virtually indistinguishable from suburban Chicago
+                (except warmer). Which sucks for Addison and suburban Chicago --
+                glad I don't live in either -- but it's perfectly fine as a
+                venue for PyCon.
+            </p>
+            <p>
+                I think there was a lot of good communication between the
+                different web frameworks, especially with Django, TurboGears,
+                and Zope people all around for the sprints. It's still a little
+                hard to find the actionable items for us to work on together,
+                but I think everyone is open to them as they emerge.
+            </p>
+            <p>
+                We made some really good progress on pushing WSGI further into
+                TurboGears during the sprint, with a branch that uses
+                RhubarbTart and streamlining the interaction of RT's
+                CherryPy-style object publishing with a heterogeneous stack that
+                includes WSGI among other things.
+            </p>
+            <p>
+                Several Zope people were working hard at refactoring Zope 3 into
+                a series of eggs, which will also be really important. People
+                outside of Zope are quite willing to use Zope 3 code and take
+                advantage of the things they've been doing there, but the
+                packaging is really critical to making that possible. And with
+                WSGI underneath Zope (and even
+                <a
+                    class="reference"
+                    href="http://awkly.org/archive/zope-paste-wsgi-applications-in-zope-3-using-paste-deploy"
+                    >Paste support</a
+                >!) I'm hoping we see a much more fluid exchange with the rest
+                of the Python community. Up until now, Zope's only exchange with
+                other Python web developers has been through <em>ideas</em> not
+                actual <em>code</em>. I heard a couple rumors about renaming
+                Zope 3 -- in part because it's really Zope Five (the Zope 2 +
+                Zope 3 fusion) that is continuing the Zope legacy. I think that
+                also would be a good idea, but the packaging is much more
+                concretely important. One of the first things that would be nice
+                to see extracted is the transaction manager. A modern and clean
+                ZPT distribution would be nice too. After that I think Zope as a
+                WSGI server would be nice to see -- making it easy to embed
+                other people's WSGI applications into Zope (both into 3 and
+                Five).
+            </p>
+            <p>
+                I had a long conversation over beers about Zope adaptation, with
+                Chris McDonough and Tres Seaver. I'm anti-adaptation, I'm
+                afraid, and I think questions about adaptation and interfaces
+                are going to be the big barrier for adoption of bits and pieces
+                of Zope 3. As it is zope.interfaces is the one requirement I
+                expect almost every Zope 3 package will have, and that does
+                scare people off. In part Eggs will help that, but I think
+                adaptation is more intrusive than just the fear of C extensions.
+                But we drank too many beers for me to remember the entire
+                argument. Oddly, <em>interfaces</em> aren't really
+                controversial, but at the same time adaptation seems more
+                comfortable for dynamic languages (as interfaces without
+                adaptation implies type checking). And yet, it's adaptation that
+                bends people's minds. When it comes down to it, I think:
+            </p>
+            <ul class="simple">
+                <li>
+                    adaptation is being used for too much in Zope 3, including
+                    things like event handling and generic functions; they are
+                    confusing mechanism (the adapter lookup process, which is a
+                    useful and widely applicable mechanism) with meaning (the
+                    adaptation of objects)
+                </li>
+                <li>
+                    adaptation and interfaces require things being tied together
+                    in a way that leads naturally to ZCML (declarative
+                    configuration of components in Zope 3), and people don't
+                    really like ZCML
+                </li>
+                <li>
+                    adaptation without declaration (with no ZCML) means that
+                    imports become much more meaningful (because the declaration
+                    actually happens imperatively at import time), and that
+                    sucks too
+                </li>
+                <li>
+                    integrating truly separate packages from different sources
+                    happens more cleanly/simply with Eggs and entry points, and
+                    this removes some of the need for adaptation
+                </li>
+            </ul>
+            <p>
+                I'm hoping that Zope people will start to break down Zope into
+                pieces -- however small -- that don't depend on zope.interface.
+                And then they'll start to visualize an infrastructure that
+                doesn't require adaptation; or they'll simply start using such
+                an infrastructure (perhaps if they start using WSGI in places as
+                an internal protocol) and they'll like it. The Zope community I
+                met at PyCon -- including Jim Fulton (the Zope BDFL) -- all seem
+                interested enough in participating this larger, more inclusive,
+                more fluid intersection of web frameworks, and even radical
+                changes in Zope 3's perspective don't seem impossible.
+            </p>
+            <p>
+                But anyway, I kind of randomly digressed into Zope thoughts. I
+                feel entirely optimistic about the interactions I saw between
+                Python web framework authors, and I look forward to that
+                continuing.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 08 Mar '06</div>
+    </body>
+</html>

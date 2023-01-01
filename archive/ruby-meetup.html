@@ -1,0 +1,1179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Ruby Meetup</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Ruby Meetup</h1>
+
+        <div class="document">
+            <p>
+                I went to a Ruby Meetup the other day, where
+                <a class="reference" href="http://www.loudthinking.com/">DHH</a>
+                attended. I didn't talk a whole lot (at least, I don't think I
+                did); I'm a Python programmer, and I didn't want to intrude, so
+                I mostly listened.
+            </p>
+            <p>
+                If anything, I came away feeling even more that Ruby and Python
+                are alike. Not just at the language level, but at the community
+                level as well -- especially when you take away the syntax and
+                other particulars (and people talk with neither
+                <tt class="docutils literal"><span class="pre">begin</span></tt>
+                and
+                <tt class="docutils literal"><span class="pre">end</span></tt
+                >, nor significant whitespace, so all those particulars are gone
+                in conversation).
+            </p>
+            <p>
+                David had actually read
+                <a class="reference" href="more-thoughts-on-ruby-on-rails.html"
+                    >my last post on Rails</a
+                >
+                and we talked about it a little. One thing he cleared up for me
+                is that templates and helpers are not mixed into the controller,
+                so helpers aren't a way of creating private methods, but a way
+                of giving templates access to code. The confusing part, for me,
+                is that Rails copies all the instance variables from the
+                controller over to the template, so the template
+                <em>appears</em> to be the same object as the controller, even
+                if it isn't.
+            </p>
+            <p>
+                Another thing that people talked about a lot of Ajax (DHTML),
+                which everyone was very excited about. During their discussion
+                of Ajax, one advantage of their &quot;partials&quot; (HTML reuse
+                by composing multipe templates/files) is that these same bits of
+                partial content are used heavily for the Ajax portions -- a
+                typical Ajax request in Rails sends something to the server, and
+                the server rerenders the content of a
+                <tt class="docutils literal"
+                    ><span class="pre">&lt;div&gt;</span></tt
+                >
+                and sends it back. So in many cases the partial is rendered in
+                isolation and delivered in isolation (then put in place by
+                assigning to
+                <tt class="docutils literal"
+                    ><span class="pre">innerHTML</span></tt
+                >). I still think it's an unpleasant way to reuse HTML, but this
+                unexpected benefit might change that. I guess it's a move
+                towards page-as-widgets, which has never attracted me before,
+                but Ajax does really change that.
+            </p>
+            <p>
+                My ASP comparison came up again. Anyway, in that case he
+                explained that he didn't want people to think that Rails had an
+                execution model like ASP, where the URL points to a template,
+                and so forth. I just meant ASP in terms of template syntax, to
+                clarify.
+            </p>
+            <p>
+                And lastly, on the Rails topic, there's a a complaint I forgot
+                last time ;)
+            </p>
+            <p>
+                This code from the
+                <a
+                    class="reference"
+                    href="http://manuals.rubyonrails.com/read/chapter/38#page109"
+                    >to-do tutorial</a
+                >
+                shocked and surprised me:
+            </p>
+            <pre class="literal-block">
+if item.save  # Try to save our item into the database
+  redirect_to(:action =&gt; &quot;list&quot;)  # Return to the list page if it suceeds
+else
+  render_text &quot;Couldn't add new item&quot;  # Print an error message otherwise
+end
+</pre
+            >
+            <p>
+                I've just been dealing with some Perl CGI code, and one of the
+                things that drives me nuts is how the code -- not horrible code,
+                mind you -- just ignores all sorts of errors (usually causing
+                things to fail at a later point in time). If something isn't
+                successful <strong>raise an exception</strong>. The only time
+                not to do this is if the function has no side effect and has
+                indication of success/failure as its sole purpose. This does not
+                describe a database save.
+            </p>
+            <p>Anyway, that's all on that.</p>
+            <p>
+                Ultimately I'm left unsatisfied. Like all occassions in the past
+                when I've looked at Ruby, I'm left feeling mystified. There's
+                room for multiple languages, but Ruby and Python are
+                <em>so</em> similar, and only seem to become
+                <em>more</em> similar with time. Not just technically, but
+                culturally as well. Sometimes I think people have choosen Ruby
+                <em>because</em> it is less popular, because green field work is
+                more exciting, because they can have a larger influence on the
+                community. I wish them well... but now that they are putting up
+                a real fight for mindshare <em>I</em> at least plan to meet them
+                head-to-head, and leverage all of Python's strength that I can.
+                I don't see any reason to snipe Rails users -- you could do a
+                lot worse than Rails, and that's not a group ripe for conversion
+                -- but I won't let them define themselves as the Next Big Thing
+                in web programming without a fight.
+            </p>
+            <p>
+                Well, that's a good segway... so, the topic of Rails clones came
+                up at the meetup. David felt that the clones weren't taking the
+                right approach by using pre-existing components, as
+                <a class="reference" href="http://subway.python-hosting.com/"
+                    >Subway</a
+                >
+                and
+                <a class="reference" href="https://trails.dev.java.net/"
+                    >Trails</a
+                >
+                are, that they should have rewritten things from the ground up.
+                Of course, this really <em>would</em> put them on level ground
+                with Rails (except a year behind), which is why the authors
+                chose not to do that. People seemed skeptical that anyone could
+                achieve what Rails achieved without total integration and design
+                (and redesign) of multiple components in concert. (For
+                Pythonistas -- we're not talking Zope-2-like integration here,
+                since Rails is heavy on testability which discourages explicit
+                coupling.)
+            </p>
+            <p>
+                Personally I don't buy that, but I'll let you all think about
+                that on your own.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 27 Apr '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    I've been playing with Ruby (and Rails) a fair bit over the
+                    past couple of months, and one thing that took me a while to
+                    understand was the importance of being able to leave out
+                    parentheses on method calls. Initially, I found that ability
+                    pretty disgusting (I imagine in the same way that people new
+                    to Python are put off by the forced indentation) but I've
+                    begun to realise that it's one of the key features in making
+                    Rails so pleasant to use. The loose syntax actively
+                    encourages the creation of domain specific mini-languages,
+                    which is exactly what Rails is when you come down to it. It
+                    may seem like a small thing, but it's the small things that
+                    make all the difference.
+                </p>
+                <p>
+                    I'm not saying Python should introduce this kind of loose
+                    syntax - in fact I'd argue against it, as one of Python's
+                    main strengths is its clarity and uniformity. It does make
+                    for a very interesting aspect of Ruby as a language though.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ruby-meetup-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://simon.incutio.com/">Simon Willison</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        simon says &quot;The loose syntax actively encourages
+                        the creation of domain specific mini-languages&quot;
+                    </p>
+                    <p>
+                        I think this is one of the problems that makes reading
+                        Rails source code hard for me. Variables appear
+                        magically with no indication of where they are from, as
+                        if they were just another keyword. I'm easily lost
+                        without the use of explicit namespaces and imports that
+                        Python provides. All of the RoR code I've looked at
+                        doesn't do this, and it seems unpleasant to use. There's
+                        no accounting for taste though...
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/ruby-meetup-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://macspeno.com/jps/">John P. Speno</a>
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        I think Ruby's calling syntax makes the distinction
+                        between variables and methods much more casual. Of
+                        course, that goes as far as having no public instance
+                        variables, just methods, but it looks the same as
+                        methods anyway. The equivalent in Python is actually
+                        less explicit, because the name embodies the privacy
+                        (leading underscores) and it tends to be casual what is
+                        public and what is not. You can always fix things up
+                        later with
+                        <tt class="docutils literal"
+                            ><span class="pre">property</span></tt
+                        >, but I seldom do that.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/ruby-meetup-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>You saw this right?</p>
+                        <p>
+                            <a
+                                class="reference"
+                                href="http://redhanded.hobix.com/inspect/holyRedSnakes.html"
+                                >http://redhanded.hobix.com/inspect/holyRedSnakes.html</a
+                            >
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/ruby-meetup-comment-9.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://tgtg.org">Todd G</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Good write-up, Ian. I'll attempt to address some of the
+                    points raised in a later blog posting. Regarding item.save,
+                    I have a longer rant prepared on whether or not to raise an
+                    exception in the case of Base#save, which will actually
+                    appear in the forthcoming book on Rails, but for now I'll
+                    leave you with the fact that if you do item.save! an
+                    exception will indeed be raised on error.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ruby-meetup-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.loudthinking.com"
+                    >David Heinemeier Hansson</a
+                >
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I believe that the success of Rails is ultimately a success
+                    in marketing. DHH presented rails to the ruby community
+                    delicately (I was following the ruby mailing lists in fall
+                    2003). His website, the Rails site and most of his language
+                    have a level of polish that has sold the project to the
+                    point that it has taken on a life of it's own.
+                </p>
+                <p>
+                    If you really want Paste to compete I think you need to
+                    spend a bunch of energy on marketing. Pay a designer to
+                    develop a nifty logo/template, etc.
+                </p>
+                <p>ch</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ruby-meetup-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                culley
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I thinks its the combination of success in marketing
+                        <em>and</em> the technical excellence to back it up. If
+                        it were simply good marketing hype, no one would stick
+                        around after their first look.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/ruby-meetup-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://blog.curthibbs.us">Curt Hibbs</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            There are plenty of web frameworks with a high
+                            degree of technical excellence. Sadly, it is the
+                            marketing that pushes an excellent framework to
+                            achieve social success.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/ruby-meetup-comment-10.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">culley</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>Um, BetaMax?</p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/ruby-meetup-comment-11.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="http://tgtg.org">Todd G</a>
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I have the impression that one aspect of RoR success is that
+                    it manages because of its evolution/history and presentation
+                    to appeal and capture designer (in the broad sense of
+                    interaction designers etc) mindshare, not only programmers'.
+                    This discussion seem also relevant:
+                    <a
+                        class="reference"
+                        href="http://radar.oreilly.com/archives/2005/04/designing_from.html"
+                        >http://radar.oreilly.com/archives/2005/04/designing_from.html</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ruby-meetup-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                anonymous
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I don't really see how you can fight them (as the next Big
+                    Thing in Web Development).
+                </p>
+                <p>
+                    How many books have there been on Python web frameworks?
+                    <em>None</em>
+                </p>
+                <p>
+                    They already have several almost done and published, with a
+                    few more in active development. Look around on a bookshelf,
+                    and the competition you'd see isn't in Python Frameworks.
+                    For reference sake, the Perl folk have had a few books
+                    written about different Perl templating languages (Mason,
+                    Template Toolkit). Where are the Python web framework books,
+                    is anyone working on one?
+                </p>
+                <p>
+                    Books <strong>do</strong> help! Especially for getting new
+                    developers interested.
+                </p>
+                <p>How much money is used to fund Python Web frameworks?</p>
+                <p>
+                    Each person going with TextDrive for their Rails hosting is
+                    inadvertantly funding more Rails development. Look at the
+                    amount of contributions and code patches sent in, its a
+                    pretty decent number. Take a cruise through the Rails wiki
+                    and community section, there's a decent amount of people
+                    contributing advice and documentation.
+                </p>
+                <p>
+                    Even if every developer responsible for all the myriad
+                    Python Web frameworks came together behind one, that'd only
+                    match or slightly exceed the amount of development Rails has
+                    going on. We all know there's no chance of that, given some
+                    of the massive differences in personality between some of
+                    the developers and design paths chosen for the various
+                    Python web frameworks.
+                </p>
+                <p>
+                    The real question we (Python programmers) need to be asking
+                    ourselves in regard to Rails is,
+                    <strong>Do we want to compete with Rails?</strong>
+                </p>
+                <p>
+                    I personally don't see why we should, not to mention I don't
+                    think its possible anyways. Rails is not all hype. It's
+                    getting a lot of well deserved attention for what it does.
+                    What it does, is make writing mainly single-purpose web
+                    applications (Project manager, to-do list apps seem popular)
+                    quite easy. Only time will tell whether it can quickly
+                    evolve to meet various simultaneous application
+                    requirements.
+                </p>
+                <p>
+                    What I mean by this is, if you build a large-scale corporate
+                    website with Rails, and then Sales/Marketing declares that
+                    entire sections have to perform in drastically different
+                    ways, can you quickly and easily cope with this request? How
+                    well does Rails cope with sudden, unexpected design changes?
+                    How much of the Rails framework is built solidly into the
+                    expectation that your requirements are clearly defined in
+                    advance? (As I'm guessing the designers of BaseCamp did)
+                </p>
+                <p>
+                    To summarize this, Rails does well what its meant to do, it
+                    has a well deserved hype going for it which I think is
+                    great. It doesn't make sense to compete. If we want a Python
+                    web framework to get as much attention, it needs to satisfy
+                    a large enough niche that is currently not filled or
+                    lacking, with enough developers supporting it.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ruby-meetup-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.groovie.org/">Ben Bangert</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        How many books have there been on Python web frameworks?
+                        <em>None</em>
+                    </p>
+                    <p>
+                        Well, that's just not true. There's probably a dozen
+                        Zope books, two (?) on Zope 3, and a couple on Plone.
+                        And there's two general Python web programming books.
+                    </p>
+                    <blockquote>
+                        Even if every developer responsible for all the myriad
+                        Python Web frameworks came together behind one, that'd
+                        only match or slightly exceed the amount of development
+                        Rails has going on. We all know there's no chance of
+                        that, given some of the massive differences in
+                        personality between some of the developers and design
+                        paths chosen for the various Python web frameworks.
+                    </blockquote>
+                    <p>
+                        That's not true either. There's a
+                        <strong>large</strong> number of quiet Python web
+                        programmers out there. There's a large number of
+                        in-house frameworks... I think in-house frameworks might
+                        have as much share of Python programmers as the
+                        open/public frameworks. Well, not counting Zope, which
+                        is large as either group, and larger than Rails.
+                    </p>
+                    <p>
+                        But I'm not saying we need to compete head-to-head with
+                        Rails. Still, we don't need to concede territory to them
+                        yet. They <strong>are not that big</strong>. I don't
+                        mind using Rails to put a little scare into Python
+                        developers to get our shit in order, but I think it's
+                        wrong to buy into Rails' hype too much.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/ruby-meetup-comment-12.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Ah yes, good catch there. I completely forgot about
+                            Zope again, which is humorous for me as we're
+                            running a production Plone site here for a small
+                            business so I have several of those Plone and Zope
+                            books lying around.
+                        </p>
+                        <p>
+                            I agree completely with the large amount of quiet
+                            programmers. When I used Mason extensively, while
+                            the user-base was very large there didn't seem to be
+                            much hype even though it was used extensively within
+                            several large companies. The Mason Wiki is also
+                            relatively small and bare compared with the Rails
+                            wiki. Very reflective of a large, but quiet
+                            developer community (They do talk quite a bit on the
+                            Mason mailing lists though).
+                        </p>
+                        <p>
+                            So with Python Paste and other such systems, are we
+                            aiming to convert Zope developers/programmers to
+                            unite around a different web framework? They have
+                            such a time investment in the system, plus Zope 3
+                            makes some nice advances, I'm not sure I see them
+                            ready to move off it to lend support to a different
+                            Python Web framework.
+                        </p>
+                        <p>
+                            When you say &quot;get our shit in order&quot; what
+                            do you mean?
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/ruby-meetup-comment-13.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.groovie.org/">Ben Bangert</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                Very reflective of a large, but quiet developer
+                                community
+                            </p>
+                            <p>
+                                I'd say this is a cultural problem, but not an
+                                insurmountable one. One aspect of Rails is that
+                                it excites people. Excitement has a lot to do
+                                with interpretation. Getting your job done well
+                                and on time is not exciting. But it
+                                <em>could</em> be exciting, if you phrase it
+                                differently; and that's what Rails has done.
+                                Sharing can be exciting, and experimentation and
+                                playfulness. Important things to think about.
+                            </p>
+                            <blockquote>
+                                So with Python Paste and other such systems, are
+                                we aiming to convert Zope developers/programmers
+                                to unite around a different web framework?
+                            </blockquote>
+                            <p>
+                                No, I don't think it makes sense to focus on
+                                converting current Python web programmers. Paste
+                                isn't intended to convert anyone to a particular
+                                framework, as it isn't a framework and is
+                                intended to encompass several frameworks.
+                                Potentially any framework. Once Zope goes WSGI
+                                (which is in the works) it could run Zope too
+                                (though I suspect it won't attract that crowd as
+                                much, as they already have their own custom
+                                infrastructure to match Paste). I want to make
+                                the experience better for people who aren't
+                                doing Python web programming; both web
+                                programmers who aren't using Python, and Python
+                                programmers who aren't using the web.
+                            </p>
+                            <blockquote>
+                                When you say &quot;get our shit in order&quot;
+                                what do you mean?
+                            </blockquote>
+                            <p>
+                                Being able to answer the question &quot;so how
+                                do I do web programming in Python&quot; easily.
+                                Being able to provide robust infrastructure.
+                                Being able to write documentation that is both
+                                complete and concise (which simply isn't
+                                possible if the underlying code doesn't allow
+                                for that). All the boring stupid stuff that
+                                needs to be done to make working apps, but isn't
+                                exciting.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/ruby-meetup-comment-16.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="index.html">Ian Bicking</a>
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    Ok, I'm not sure how Paste will meet any of
+                                    the goals you seem to desire. (This is
+                                    assuming I'm understanding Paste correctly,
+                                    as the comments on your blog have
+                                    demonstrated its exceptionally difficult to
+                                    explain Paste to other web developers, so
+                                    how one could explain it to a new
+                                    person....)
+                                </p>
+                                <p>
+                                    First, you want Paste to encompass other
+                                    frameworks, however I'm not sure how thats
+                                    possible. From several of the frameworks
+                                    I've looked at, they work in such a
+                                    different environment that I don't see how
+                                    they can be modified to fit into Paste
+                                    without destroying what makes them unique
+                                    and valuable to their creators.
+                                </p>
+                                <p>
+                                    As one example, when I was reading over
+                                    Paste, it seems to have its own Resolver in
+                                    it, that then dispatches to Webware or a
+                                    different framework. Myghty has a very
+                                    powerful resolver methodology that we
+                                    wouldn't want interrupted or pre-empted. I'm
+                                    sure many other frameworks have a lot of
+                                    parts to them that their developer doesn't
+                                    want stepped on by some sort of
+                                    &quot;universal&quot; meta-framework.
+                                </p>
+                                <p>
+                                    <em
+                                        >Being able to answer the question
+                                        &quot;so how do I do web programming in
+                                        Python&quot; easily</em
+                                    >
+                                </p>
+                                <p>
+                                    If we take Paste to what I see as your
+                                    desired conclusion, ie, you download Paste,
+                                    hit a command, and have an app ready to go
+                                    with the framework of your choice (assuming
+                                    there's a half dozen or two frameworks ppl
+                                    have integrated). How does that make it
+                                    easy? Sure, installing it was easy, but now
+                                    what? How do you choose what framework to
+                                    set your app to? How does that help
+                                    documentation? There's still a dozen
+                                    different frameworks, written by a dozen or
+                                    more different people, documented by a dozen
+                                    or more people, etc.
+                                </p>
+                                <p>
+                                    How easy would Rails be if once you had it
+                                    installed, you had to choose from a dozen
+                                    different framework paradigms?
+                                </p>
+                                <p>
+                                    As I'm working actively with
+                                    <a
+                                        class="reference"
+                                        href="http://www.myghty.org/"
+                                        >Myghty</a
+                                    >
+                                    and web development, I'd love to see it
+                                    included in Paste. But why spend time
+                                    developing that out if its easier and
+                                    quicker to do what Paste provides myself?
+                                </p>
+                                <p>
+                                    For example, I'm currently writing up a
+                                    little script, that when run lays out a
+                                    basic directory template with some defaults
+                                    setup for
+                                    <a
+                                        class="reference"
+                                        href="http://www.myghty.org/"
+                                        >Myghty</a
+                                    >. It's fairly simple, and the directories
+                                    it lays out are pretty conventional for a
+                                    MVC webapp. With a single command, I can run
+                                    the
+                                    <a
+                                        class="reference"
+                                        href="http://www.myghty.org/"
+                                        >Myghty</a
+                                    >
+                                    app standalone and play with it locally,
+                                    however it also has a CGI, WSGI, and
+                                    mod_python set of scripts allowing it to
+                                    easily be used in any of those environments
+                                    with no modification.
+                                </p>
+                                <p>
+                                    The module
+                                    <a
+                                        class="reference"
+                                        href="http://www.myghty.org/docs/modulecomponents.myt"
+                                        >component</a
+                                    >
+                                    I'm writing for use with this layout will be
+                                    flexible enough to call methods (actions
+                                    from the Rails-jargon world) based on URL if
+                                    desired, or any other scheme.
+                                    <a
+                                        class="reference"
+                                        href="http://www.myghty.org/"
+                                        >Myghty</a
+                                    >
+                                    has a Path Translate function that works as
+                                    an internal redirect of sorts, sort of like
+                                    Rail's routing mechanism, I have Module
+                                    <span class="nowiki"
+                                        >Components<a
+                                            class="wiki reference"
+                                            href="https://ianbicking.org/components.html"
+                                            >?</a
+                                        ></span
+                                    >
+                                    to handle mapping to controllers, and the
+                                    <a
+                                        class="reference"
+                                        href="http://www.myghty.org/"
+                                        >Myghty</a
+                                    >
+                                    template language to handle the view.
+                                </p>
+                                <p>
+                                    In the earlier Ruby post, some of the
+                                    responses were wondering how
+                                    <a
+                                        class="reference"
+                                        href="http://www.myghty.org/"
+                                        >Myghty</a
+                                    >
+                                    is a framework vs template language, maybe
+                                    that helps some?
+                                </p>
+                                <p>
+                                    Anyways, with one simple command, a small
+                                    set of directories will be laid out, ready
+                                    to run, with an easy to configure set of
+                                    mapping rules to controllers and methods. It
+                                    will also deal with a bunch of your
+                                    complaints about Ruby's implicitness by
+                                    relying more on Python's explicit nature
+                                    (ie, you pass the arguments to templates
+                                    rather than having them all copied, the URL
+                                    can map to components and methods in
+                                    whatever method desired, things aren't
+                                    passed-by-name everywhere).
+                                </p>
+                                <p>
+                                    Add a dozen different frameworks, and its
+                                    Paste, no?
+                                </p>
+                                <!-- _ Components: http://www.myghty.org/docs/modulecomponents.myt -->
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/ruby-meetup-comment-17.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://www.groovie.org/"
+                                    >Ben Bangert</a
+                                >
+                            </div>
+                            <hr noshade />
+                            <blockquote>
+                                <div class="document">
+                                    <p>
+                                        Just wanted to clarify my prior comment
+                                        as it might come off
+                                        &quot;flame-ish&quot;. My main intention
+                                        was not to insult Paste or claim Myghty
+                                        was the way. It was focused merely on
+                                        realistic goals given the developers
+                                        working on various projects.
+                                    </p>
+                                    <p>
+                                        As far as I know, Ian is the sole person
+                                        working on SQLObject and FormEncode. I
+                                        really really dig SQLObject and use it
+                                        extensively, and I'm starting to use
+                                        what I can from FormEncode to as its a
+                                        really killer way to verify/coerce
+                                        forms. Paste is yet another project that
+                                        Ian's tackling. How many projects can
+                                        you work on at once before some of them
+                                        start lapsing?
+                                    </p>
+                                    <p>
+                                        The goal of my prior comment was, is
+                                        Paste the solution? Will being able to
+                                        easily install a dozen or two frameworks
+                                        help a new web developer? How will the
+                                        documentation be collected in one
+                                        location and made uniform? Will Paste
+                                        come with bundled frameworks, or will
+                                        the framework maintainer be able to push
+                                        framework updates down independently of
+                                        Paste?
+                                    </p>
+                                    <p>
+                                        I'm sorry about the tone my other
+                                        comment.
+                                    </p>
+                                    <p>That's it. I'll shut up now. :)</p>
+                                </div>
+                                <div align="right">
+                                    <a
+                                        href="https://ianbicking.org/ruby-meetup-comment-18.html"
+                                        rel="nofollow"
+                                        >#</a
+                                    >
+                                    <a href="http://www.groovie.org/"
+                                        >Ben Bangert</a
+                                    >
+                                </div>
+                                <hr noshade />
+                                <blockquote>
+                                    <div class="document">
+                                        <p>
+                                            <em
+                                                >As far as I know, Ian is the
+                                                sole person working on SQLObject
+                                                and FormEncode.</em
+                                            >
+                                        </p>
+                                        <p>
+                                            Actually, I've been lapsing on
+                                            SQLObject work, but thankfully Oleg
+                                            has been doing a good job
+                                            maintaining it, and there's a group
+                                            of people answering questions about
+                                            it and submitting patches. So it's
+                                            working out fine. There's been other
+                                            significant contributions to
+                                            FormEncode, and I'm hoping by
+                                            keeping its scope very limited and
+                                            clearly defined that it will also be
+                                            able to exist on its own at some
+                                            point, maybe even reach
+                                            &quot;maturity&quot;. And while
+                                            Paste represents a particular vision
+                                            of mine, I hope to bring other
+                                            developers and visions into it; I
+                                            know it's not easy getting an open
+                                            source project to the point where it
+                                            really is a collaborative project,
+                                            but it's possible and something I
+                                            think about quite a bit as I develop
+                                            these things.
+                                        </p>
+                                    </div>
+                                    <div align="right">
+                                        <a
+                                            href="https://ianbicking.org/ruby-meetup-comment-20.html"
+                                            rel="nofollow"
+                                            >#</a
+                                        >
+                                        <a href="index.html">Ian Bicking</a>
+                                    </div>
+                                    <hr noshade />
+                                </blockquote>
+
+                                <div class="document">
+                                    <p>
+                                        Paste is still a work in process, so its
+                                        advantages aren't extreme. You can
+                                        reimplement its functionality for your
+                                        framework, and it wouldn't be that hard.
+                                        It's also quite easy to use Paste with
+                                        your framework, so I honestly don't know
+                                        that it's <em>easier</em> to do things
+                                        on your own, even if you factor in the
+                                        getting-to-know-you time (at least if
+                                        you are planning to support WSGI at
+                                        all). Peter Hunt said it took him about
+                                        4 hours to convert Subway to Paste; I
+                                        haven't seen the details of his code
+                                        yet, but I think that includes some
+                                        degree of integrating setup scripts and
+                                        other pieces.
+                                    </p>
+                                    <blockquote>
+                                        <em
+                                            >As one example, when I was reading
+                                            over Paste, it seems to have its own
+                                            Resolver in it, that then dispatches
+                                            to Webware or a different
+                                            framework.</em
+                                        >
+                                    </blockquote>
+                                    <p>
+                                        It is definitely not expected that all
+                                        frameworks will share a resolver.
+                                        <tt class="docutils literal"
+                                            ><span class="pre"
+                                                >paste.urlparser</span
+                                            ></tt
+                                        >
+                                        does file-based parsing as WSGI
+                                        middleware, but you could implement
+                                        other strategies as middleware, or just
+                                        provide a single entry point and do it
+                                        internally. That's how initial Quixote
+                                        support will work -- it'll use their
+                                        Publisher without modification, and
+                                        maybe in the future that can become
+                                        middleware. I think it's reasonable to
+                                        expect framework support to start as a
+                                        monolithic integration -- a single entry
+                                        point and everything after is internal
+                                        to the framework. Later pieces can be
+                                        factored out, or replaced with existing
+                                        Paste functionality. This is the way
+                                        that WSGI middleware can make a
+                                        framework melt away. But it's
+                                        incremental, and I'm as dedicated to
+                                        backward compatibility as you probably
+                                        are, so the buy-in required is gentle.
+                                    </p>
+                                    <blockquote>
+                                        <em
+                                            >If we take Paste to what I see as
+                                            your desired conclusion, ie, you
+                                            download Paste, hit a command, and
+                                            have an app ready to go with the
+                                            framework of your choice (assuming
+                                            there's a half dozen or two
+                                            frameworks ppl have integrated). How
+                                            does that make it easy?</em
+                                        >
+                                    </blockquote>
+                                    <p>
+                                        That sounds easy to me. Really, I tried
+                                        the framework comparison thing, and it
+                                        was <em>really hard</em> because of
+                                        installation. Not because I couldn't
+                                        figure out the difference between the
+                                        frameworks quickly. It doesn't mean
+                                        there's no work to do for the framework
+                                        authors, but they can focus on making
+                                        their frameworks compelling instead of
+                                        robust or easy to install.
+                                    </p>
+                                    <blockquote>
+                                        <em
+                                            >How easy would Rails be if once you
+                                            had it installed, you had to choose
+                                            from a dozen different framework
+                                            paradigms?</em
+                                        >
+                                    </blockquote>
+                                    <p>
+                                        Paste isn't Rails, at all. There's a
+                                        couple ideas I'm taking, but only a
+                                        couple. Like maybe two. They have very
+                                        different scopes and purposes.
+                                    </p>
+                                    <blockquote>
+                                        <em
+                                            >[description of new Myghty
+                                            features...] Add a dozen different
+                                            frameworks, and its Paste, no?</em
+                                        >
+                                    </blockquote>
+                                    <p>
+                                        Paste without the reuse, sharing, or
+                                        community. I think that's a big
+                                        difference.
+                                    </p>
+                                </div>
+                                <div align="right">
+                                    <a
+                                        href="https://ianbicking.org/ruby-meetup-comment-21.html"
+                                        rel="nofollow"
+                                        >#</a
+                                    >
+                                    <a href="index.html">Ian Bicking</a>
+                                </div>
+                                <hr noshade />
+                            </blockquote>
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I really wonder why Aquarium is AFAIK never being mentioned
+                    as Python alternative to Rails. It is very Pythonic, uses
+                    all Cheetah goodies, doesn't dictates how the Model must be
+                    programmed but has clear conventions for View and Conroller,
+                    and it has just enough &quot;magic&quot; for an easy start
+                    :-)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ruby-meetup-comment-14.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Ksenia
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Some thoughts: pretty bare-bones website, minimal docs
+                        (&quot;docs&quot; being more than API). And using
+                        literate programming ideas for docs is basically telling
+                        people who want to RTFM to just read all the source code
+                        to figure out how it works. Most people don't find that
+                        an attractive way to learn something.
+                    </p>
+                    <p>
+                        Also, with &quot;never being mentioned&quot;, who should
+                        be mentioning it? It's up to the project and its users
+                        to make some noise! Everyone bitches about the Rails
+                        people making too much noise and (sometimes un)justified
+                        hype but then laments all the attention it's getting.
+                        They (DHH mostly) didn't just sit back and wait for
+                        attention. He went and got it. For better and/or worse.
+                    </p>
+                    <p>
+                        I personally found 'Aquarium' a very fitting name, as it
+                        struck me as the code equivalent of a real one - a
+                        container with all different kinds of things floating
+                        around all over the place in it. Clearly I've some more
+                        source code to read...
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/ruby-meetup-comment-15.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://t74.com">ToddG</a>
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>You answer your own question....</p>
+                    <p>
+                        &quot;doesn't dictates how the Model must be
+                        programmed&quot;....Rails wouldn't be much without
+                        ActiveRecord.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/ruby-meetup-comment-22.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Huy
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Ian, you should look at PSE:
+                    <a class="reference" href="http://nick.borko.org/pse"
+                        >http://nick.borko.org/pse</a
+                    >
+                </p>
+                <p>Also, the images on your HTML comment editor are broken.</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/rubymeetupcomment19.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.kenkinder.com/">Ken Kinder</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        In this small thread: Subway, Paste, Zope, Myghty,
+                        Aquarium, PSE!!! We need to clone GvR and have a webBDFL
+                        ...
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/rubymeetup-comment-23.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Pedro Lima
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I'm just starting to look at Ruby. It's the performance of
+                    Python that's driving my to look at other things. Code that
+                    runs on Perl (without much optimization), can take 5X longer
+                    in Python (with optimization). The whole immutable object
+                    thing makes Python spend all its time creating and
+                    destroying objects.
+                </p>
+                <p>
+                    Python has always downplayed performance, but ultimately it
+                    limits how far it scales. You can create a hybrid system
+                    with C/C++, but that loses all the portability advantages.
+                </p>
+                <p>
+                    Ruby appears to have performance closer to Perl, with the
+                    elegance of Python.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/ruby-meetup-comment-27.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Dan C
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Constraints and Continuations</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Constraints and Continuations</h1>
+
+        <div class="document">
+            <p>
+                Bill de hÓra
+                <a
+                    class="reference"
+                    href="http://lesscode.org/2006/03/19/rest-wins-noone-goes-home/"
+                    >on REST</a
+                >:
+            </p>
+            <blockquote>
+                <p>
+                    REST is about design constraints -- what you can't say.
+                    That's contrary to industry practice, where it's all about
+                    about getting cool new features piled on, and to heck with
+                    principles. If anything, most developers are cynical about
+                    architecture and architects. Developers, Developers,
+                    Developers. Give 'em what they want. Keep ornamenting the
+                    stack with pointy-clicky solution cruft.
+                </p>
+                <p>
+                    There'll be a bit less of that. On the web, there are less
+                    assumptions you can make and those you can make are rigid
+                    and need to be treated as invariant. Developing for the web,
+                    as opposed to developing around it, is spartan work. Coming
+                    from middleware and enterprise development, could be a bit
+                    like coming from the Victorian ornateness and richness of
+                    Ruskin and Morris to the urban cold and minimalism of le
+                    Corbusier and Mies van der Rohe. It'll be disorienting at
+                    best.
+                </p>
+            </blockquote>
+            <p>
+                This is why I think that continuation-based frameworks (<a
+                    class="reference"
+                    href="http://www.seaside.st/"
+                    >Seaside</a
+                >
+                being the quintessential example) are a dead-end. They are a
+                giant workaround for the web. (<a
+                    class="reference"
+                    href="http://paulgraham.infogami.com/blog/morepatents"
+                    >Even Paul Graham thinks so,</a
+                >
+                and it seems he may have invented the technique... but I
+                shouldn't really present his off-handed remark as more than it
+                is.)
+            </p>
+            <p>
+                The web is events. And asynchronous. And stateless. And you need
+                to know this, you need to internalize this model as a programmer
+                to work with the web. It isn't a GUI. So I don't think these
+                (extremely clever) continuation-based synchronous layers on top
+                of the asynchronous web are a good direction.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 22 Mar '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    So what about the people that are trying to work around the
+                    statelessness by not closing the connection? Is
+                    <a
+                        class="reference"
+                        href="http://alex.dojotoolkit.org/?p=545"
+                        >comet</a
+                    >
+                    a dead end?
+                </p>
+                <p>
+                    It doesn't completely work around the http model in all
+                    scenarios, but it does have a fairly significant impact on
+                    how you think about communications while dom scripting.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/constraints-and-continuations-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://gr.ayre.st">Karl Guertin</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I find vanilla web restrictive too, that's why I use Flash
+                    to maintain some state.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/constraints-and-continuations-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Kevin Deenanauth
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Er - you know that the internet is more than the web, right?
+                    For instance, I do a lot of code based on top of twisted,
+                    and a very, very small amount of it is web-based.
+                </p>
+                <p>
+                    The approach used in something like twisted is still useful,
+                    even if the web didn't suck.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/constraints-and-continuations-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Anthony Baxter
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I don't think Twisted's use of continuations looks much
+                        like Seaside's. Twisted is very explicit about where a
+                        continuation is formed and returned (via Deferreds),
+                        while in Seaside it is entirely implicit.
+                        <a
+                            class="reference"
+                            href="http://subway.python-hosting.com/wiki/CherryFlow"
+                            >CherryFlow</a
+                        >
+                        is the only system I'm aware of that does Seaside-style
+                        continuations (using
+                        <a class="reference" href="http://www.stackless.com/"
+                            >Stackless</a
+                        >).
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/constraints-and-continuations-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            I should amend that -- Twisted's Athena probably is
+                            more like Seaside, though (I only know about them
+                            indirectly). But I also presume Athena is strictly
+                            for the web.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/constraints-and-continuations-comment-5.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Ian Bicking
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                <a
+                                    class="reference"
+                                    href="http://divmod.org/trac/wiki/DivmodNevow/Athena"
+                                    >Athena</a
+                                >
+                                is a
+                                <a class="reference" href="http://divmod.org"
+                                    >Divmod</a
+                                >
+                                project, and has very little to do with Twisted
+                                (other than the fact that it uses it as a
+                                library).
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/constraints-and-continuations-comment-10.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Moe Aboulkheir
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    IP is stateless. TCP is stateful. HTTP is stateless. Web
+                    apps are stateful.
+                </p>
+                <p>See a pattern?</p>
+                <p>
+                    HTTP is just one layer in a stack of protocols, some of
+                    which are stateful, others of which are stateless. Stateful
+                    protocols coordinate state at the endpoints by exchanging
+                    messages over stateless protocols.
+                </p>
+                <p>
+                    A web application NEEDS to maintain state for the person
+                    using the browser. It does that by maintaining coordinating
+                    state in the browser and server by exchanging messages over
+                    HTTP. How stateful the application needs to be depends on
+                    the application. It's an engineering trade-off, not a
+                    religious belief.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/constraints-and-continuations-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Nat
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I guess with respect to this specifically, I think the
+                        state should be stored explicitly by the application,
+                        not implicitly by the language or framework. In a
+                        continuation-based framework, state is captured in the
+                        form of the call stack, and stored transparently. Far
+                        too clever for me, and hides the developer from things
+                        the developer shouldn't and can't really be hidden from.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/constraints-and-continuations-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Isn't this just another example on varying level of
+                            abstaction in different systems? To pick couple of
+                            (hopefully) non-controversial examples:
+                        </p>
+                        <ul class="simple">
+                            <li>
+                                do you feel comfortable relying on operating
+                                system to store the state of your process?
+                            </li>
+                            <li>
+                                do you trust on language to handle memory
+                                management automatically for you?
+                            </li>
+                        </ul>
+                        <p>
+                            Whether the abstraction fits into a particular task
+                            might also be just a matter of how well it fits into
+                            one's mental model of the problem :)
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/constraints-and-continuations-comment-11.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Tero Saarni
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        <p>
+                            If the alternatively is manually coding in a
+                            spaghetti-ish continuation passing style-like way
+                            then give me continuations please.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/constraints-and-continuations-comment-13.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Nico
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        <p>
+                            If the alternative is manually coding in a
+                            spaghetti-ish continuation passing style-like way
+                            then give me continuations please.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/constraints-and-continuations-comment-14.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Nico
+                    </div>
+                    <hr noshade />
+                </blockquote>
+
+                <div class="document">
+                    <p>
+                        The statement &quot;the web is stateless&quot; is a bit
+                        misleading, while I would have found something like
+                        &quot;HTTP is stateless&quot; more accurate. As said in
+                        the above comment, applications are usually stateful
+                        (they internally manage a link between a succession of
+                        events --HTTP requests--). HTTP requires the programmers
+                        to handle this state (the link between a sequence of
+                        HTTP requests) internally (which is done with cookies).
+                    </p>
+                    <p>
+                        Take SIP for instance, you will see that this protocol
+                        explicitely stores state (the notion of
+                        &quot;Transaction&quot; and &quot;Session&quot; to which
+                        requests and sequences of request belong), which is
+                        quite helpful... but can also be done internally on top
+                        of HTTP.
+                    </p>
+                    <p>
+                        Now, regarding continuations, they are simply a way to
+                        &quot;slice&quot; a process and to automatically weave
+                        and rejoin the slices together, so that the programmer
+                        does not have to carry the burden of finding where the
+                        program was last interupted. They offer a process-based
+                        (or &quot;dynamic&quot;-base perspective) as opposed to
+                        a state-based (or &quot;static&quot;-based) perspective,
+                        as it is the case with most framework.
+                    </p>
+                    <p>
+                        So it's rather a matter of perspective, instead of a
+                        implementation -- and then I wouldn't say that this
+                        perspective is a dead-end, it is just different, and
+                        IMHO closer if not more fitted to the domain of
+                        communications, from which the Web stems.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/constraints-and-continuations-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.ivy.fr/blog">Sébastien Pierre</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    There is a conversation between Marco Baringer (who has
+                    written his own continuation based web framework) and Dave
+                    Roberts that you might find interesting:
+                    <a
+                        class="reference"
+                        href="http://common-lisp.net/project/ucw/docs/html/rest/rest.html"
+                        >http://common-lisp.net/project/ucw/docs/html/rest/rest.html</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/constraints-and-continuations-comment-9.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                anonymous
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I would realy like to know how this (apperently)
+                        stateless commenting system is working. Usualy I would
+                        imagine that my comment was stored somewhere as part of
+                        the state of the program that generates this webbpage.
+                        But as the net is stateless i guess thats wrong. But I
+                        just cant grasp how else it could work.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/constraints-and-continuations-comment-12.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    anonymous
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>My Tripod of Web Testing</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>My Tripod of Web Testing</h1>
+
+        <div class="document">
+            <p>
+                So, now that I'm
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/starting-with-selenium.html?"
+                    >using Selenium</a
+                >
+                (well, planning to), I'm thinking about
+                <a class="reference" href="http://imagescape.com">our</a>
+                all-around testing system. There's unit testing -- but that's
+                not web-specific so I won't talk about that here.
+            </p>
+            <p>
+                Selenium seems good for acceptance and cross-browser testing.
+                Hopefully with the right toolset even non-programmers can start
+                building and running testing scripts on applications.
+            </p>
+            <p>
+                There's also a &quot;Driven&quot; mode for Selenium -- basically
+                a process drives the Selenium Javascript code. I'm not 100%
+                clear on how the communication is done, but anyway. If your
+                Selenium test looks like:
+            </p>
+            <table border class="table">
+                <colgroup>
+                    <col width="42%" />
+                    <col width="56%" />
+                    <col width="2%" />
+                </colgroup>
+                <tbody valign="top">
+                    <tr>
+                        <td>open</td>
+                        <td>http://myhost.com/app</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>click</td>
+                        <td>//a[text()-'Next']</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>verifyTextPresent</td>
+                        <td>Page 2</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Then your drive code might look like:</p>
+            <pre class="literal-block">
+selenium.open('http://myhost.com')
+selenium.click(&quot;//a[text()='Next']&quot;)
+selenium.verifyTextPresent('Page 2')
+</pre
+            >
+            <p>
+                And you could put that in
+                <tt class="literal"><span class="pre">unittest</span></tt
+                >-based tests or whatever. I'm not that excited about that --
+                driving browsers on an unattended basis seems like a bit of a
+                pain. Which perhaps is where
+                <a
+                    class="reference"
+                    href="http://issola.caltech.edu/~t/twill/README.html"
+                    >Twill</a
+                >
+                fits in -- in fact, Twill could even take something looking very
+                much like Seleniums commands, and provide extra value like HTML
+                validation, link checking, performance testing, etc., all in a
+                more controlled environment. More than just a place for both, I
+                see them working in concert.
+            </p>
+            <p>
+                But two testing strategies don't provide a tripod of stability,
+                and metaphorical stability is top on my list.
+            </p>
+            <p>
+                So the third testing strategy is to make sure the applications
+                are happily humming away when they are live and no one is
+                looking at them. I don't think it's reasonable to run acceptance
+                tests on live applications -- too much valuable state. So
+                instead I want to start adding self-diagnostic code to those
+                applications. This code will check database connections, make
+                sure files are all in place, etc. Even just a &quot;yes I'm
+                alive&quot; response is a big improvement over nothing. Each of
+                these will be a page, in an out-of-the-way location.
+            </p>
+            <p>
+                Then we point a monitoring daemon at it. I like the look of
+                <a class="reference" href="http://www.kernel.org/software/mon/"
+                    >Mon</a
+                >, but our sysadmin has experience with
+                <a class="reference" href="http://www.bb4.org/">Big Brother</a>.
+                So I'm not sure exactly what we'll use (opinions welcome).
+                Either way, I want all of our applications to be pinged on a
+                regular basis, with notification of problems. This will turn
+                into a total system check -- if the network is down, if Apache
+                is down, or if our application server is down, we'll get a
+                report.
+            </p>
+            <p>
+                But wait, that is not all! No tripod is complete without a
+                fourth leg! The last part is handling all exceptions, no matter
+                who triggers them. Webware can email all exceptions to you --
+                nice, and easy to configure. We have something ad hoc that does
+                the same in Zope -- a bit ugly and not so easy (what's up with
+                that?!), but it's there. I'm working on a refinement here as
+                well; it won't apply to every system we have -- it can't be in
+                place on a PHP application, for instance -- but it's an
+                exception reporter that can be used outside of a web context,
+                while providing all the contextual information that both Webware
+                and Zope's error reports have. It can also work on background
+                tasks, like cron jobs and scheduled tasks. Extra information
+                (beyond the normal traceback) is important for post-mortem
+                debugging, and so that no error -- no matter how small! -- will
+                go forgotten.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 05 Mar '05<br />
+            Modified 16 Mar '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                I'd suggest taking a hard, hard look at Nagios for monitoring.
+                I'll admit to not using Mon since 2000, but the Nagois (well, it
+                was called Netsaint then) installation that replaced Mon proved
+                itself to be insanely more configurable, more scalable, and more
+                flexible. Mon's probably gotten better in the last 4 years, but
+                then so has Nagios.
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-tripod-of-web-testing-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Petro
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I concur with the previous poster about Nagios. I've been
+                    using it for a long time and it's extremely stable and
+                    non-obtrusive. It only sends mail when there really is
+                    something going on with the server. I'll send you a URL you
+                    can check out for yourself.
+                </p>
+                <p>
+                    As for &quot;holistic&quot; testing for your Web site, I
+                    suggest a 5th leg :-) ... performance/load/stress testing.
+                    One approach that worked for me was to blast the Web site
+                    via some load tool (I've used siege, httperf, and more
+                    recently openload), while actively monitoring the servers
+                    (Web/DB) via either 1) command line utilities such as top,
+                    vmstat, iostat, etc. or 2) SNMP (I configured net-snmp on
+                    each server and then queried the servers for all kinds of
+                    things like memory, CPU, disk, number of processes etc.).
+                    This way you can see where to tweak your servers for better
+                    performance. Of course, you can also run your Web app
+                    through a profiler while this is going on, to detect
+                    bottlenecks in your code; same thing for your DB.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-tripod-of-web-testing-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://agiletesting.blogspot.com">Grig Gheorghiu</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                Actually a 6th leg is security testing. You can use a
+                general-purpose security scanner such as nessus, or a
+                HTTP-specific scanner such as N-Stealth, nikto, whisker and many
+                others. In fact, you gave me an idea for a future post :-)
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-tripod-of-web-testing-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://agiletesting.blogspot.com">Grig Gheorghiu</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                I use the term &quot;operational testing&quot; for the test
+                suite that checks the health of the running app.
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/my-tripod-of-web-testing-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bitsko.slc.ut.us/">Ken MacLeod</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

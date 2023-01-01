@@ -1,0 +1,367 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Concurrency and Processes</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Concurrency and Processes</h1>
+
+        <div class="document">
+            <p>
+                For a long time when people criticize threads, my feeling has
+                been that (a) they have a point, but (b) threads aren't as hard
+                as they imply because (c) concurrency is always hard, but mostly
+                (d) thread critics need to provide better tools for concurrency.
+                I know how to use threads, and I'm relatively happy with them;
+                I'm quite willing to look at alternatives, but I don't feel I'm
+                being given very good alternatives. Convince me with carrots
+                instead of sticks. An especially poor argument is one that tells
+                me that I'm currently being beaten with a stick, but apparently
+                don't know it. For people who think threads aren't a reasonable
+                option for concurrency in Python: you are simply wrong, lots of
+                people are successfully using threads for concurrency, and
+                arguments to the contrary are simply delusional.
+            </p>
+            <p>
+                The Twisted people have tried to provide alternative tools, and
+                they certainly put their hearts into it, but I just don't think
+                their style of asynchronous programming is straight-forward
+                enough for the bulk of programmers. It doesn't provide the
+                gradual learning curve that I value in Python (regardless of
+                where I personally am on that learning curve). It certainly
+                looks like Python 2.5 will improve things, but I don't think the
+                style really elucidates the issues of concurrent programming
+                particularly well. Concurrent programming introduces inevitable
+                challenges; a good model guides the programmer, it can't solve
+                the problems on its own.
+            </p>
+            <p>
+                The other alternative -- multi-process -- in Python is common
+                enough, but feels very ad hoc to me. There aren't good tools for
+                sharing data and communication (or if there are they aren't well
+                enough publicized). Nor are there good tools for handling
+                multiple processes in a cross-platform way. I don't use Windows,
+                but I'm not willing to abandon Windows users by
+                <em>relying</em> on fork. (That doesn't mean we can't use fork,
+                just that we can't <em>only</em> use fork.)
+            </p>
+            <p>
+                But, it seems that there might be some progress. I came upon
+                <a
+                    class="reference"
+                    href="http://www.oreillynet.com/pub/wlg/8002"
+                    >this post</a
+                >
+                by Jeremy Jones about concurrency, which led me to
+                <a
+                    class="reference"
+                    href="http://mail.python.org/pipermail/python-dev/2005-September/056829.html"
+                    >this proposal</a
+                >
+                by
+                <a class="reference" href="http://hathawaymix.org/"
+                    >Shane Hathaway</a
+                >
+                and
+                <a
+                    class="reference"
+                    href="http://thread.gmane.org/gmane.comp.python.devel/71708"
+                    >this Py-Dev thread</a
+                >.
+            </p>
+            <p>
+                The discussion seems to have stopped, which is too bad. I hope
+                it starts back up again.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 07 Oct '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    &gt; The other alternative -- multi-process -- in Python is
+                    common enough, but feels very ad hoc to me. There aren't
+                    good tools for sharing data and communication (or if there
+                    are they aren't well enough publicized).
+                </p>
+                <p>Filesystems are pretty well publicized :).</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/concurrency-and-processes-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Jacob
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Queuing in a filesystem? The proper locking is also a
+                        little confusing, at least if you want to do it cross
+                        platform. Filesystem events? I have no idea how that
+                        works; in theory there are ways of efficiently detecting
+                        changes to files, but there's no unified cross-platform
+                        way to do it (and even single platforms have multiple
+                        ways to do it). Sure, the filesystem could (maybe)
+                        provide infrastructure for these things, but we would
+                        still need better tools.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/concurrency-and-processes-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    These days, when people talk multi-core CPUs and
+                    massively-parallel anything, my first question is always,
+                    &quot;OK, show me the debugger.&quot; (The greatest thing
+                    about the Linda (tuple space) model of concurrency was how
+                    easy it was to debug --- I never found anything else that
+                    even came close.)
+                </p>
+                <p>
+                    Greg (who wrote a book on parallel programming in the
+                    mid-1990s, and became more productive when he went back to a
+                    single-threaded life)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/concurrency-and-processes-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.third-bit.com/">Greg Wilson</a>
+            </div>
+            <hr noshade />
+            I've been using Twisted for about two years now, and I have to
+            agree: Twisted is not easy to use. The other problem I have in using
+            Twisted is that you have to use it for everything -- any kind of
+            blocking call in the standard library is out of the question unless
+            you wrap it in a thread. It's just always extremely clear, that in
+            Twisted, you aren't using Python as it was intended.<br /><br />Having
+            said that, noting that the scalability of a Twisted server verses
+            that of a threaded or forking one (developed in Python) speaks for
+            itself. You <span style="font-style: italic">can</span> manage
+            concurrency with threads in Python, but it just can't compare to the
+            asynchronous framework. I don't know what kind of work you do, but
+            in working on systems that have hundreds of chat network sessions
+            open, Twisted's ugly but it does the job.<br /><br />I'd like to get
+            to know more about Ruby's microthreading model -- it looks a lot
+            like what Twisted does, but as part of the language.<br />
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/concurrencyandprocessescomment3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.kenkinder.com/">Ken Kinder</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        The one thing I'm sure of, twisted is a great idea with
+                        a horrible implementation. If they would implement
+                        something along the lines of ACE, things would be
+                        better. Heck, just embracing more established design
+                        patterns would be a good thing...and in the end, that's
+                        the only area I can give high marks to twisted.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/concurrencyandprocesses-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    anonymous
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        I have the same opinion about the Twisted - being
+                        enthusiastic at the beginning, I have invested some time
+                        in it, but now I'm a bit disappointed. It's just not how
+                        a program must flow - inside out, throwing in countless
+                        microcallbacks and keeping state variables. I'm not
+                        unfamiliar with the asynchronous model, but it have very
+                        restricted use.
+                    </p>
+                    <p>
+                        More, the Twisted is in very raw state yet. For example,
+                        it's a shame that there is no good http client in the
+                        network toolkit. But worse, you cannot use the httplib
+                        from the standard Python distribution - it is,
+                        naturally, totally unusable with the Twisted, and this
+                        is a common problem with asyncronous model.
+                    </p>
+                    <p>
+                        After all, if your application is simple, you'll have no
+                        problem with threads, but if it's complicated, you'll
+                        get troubles with the Twisted as well, no less than with
+                        the threads model.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/concurrencyandprocesses-comment-9.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    jk
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    <a
+                        class="reference"
+                        href="http://www.erights.org/elib/concurrency/event-loop.html#safety"
+                        >http://www.erights.org/elib/concurrency/event-loop.html#safety</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/concurrency-and-processes-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://divmod.org/">Allen Short</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    It's a good idea to try to find a concurrency model at a
+                    higher level of abstraction than locks and semaphores that
+                    fits the desired semantics and behaviour of your program,
+                    and use that to manage the interactions between threads.
+                </p>
+                <p>
+                    I wrote some Python code implementing a number of useful
+                    concurrency primitives - multiqueues, reader-writer locks,
+                    active objects, dataflow variables and so on. It's available
+                    as part of the Tripoli triple space source code:
+                </p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://sourceforge.net/projects/tripoli"
+                        >http://sourceforge.net/projects/tripoli</a
+                    >
+                </p>
+                <p>
+                    Incidentally, my own comments on (inter alia) Twisted's
+                    programming model and threads are here:
+                </p>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://codepoetics.com/poetix/index.php?p=141"
+                        >http://codepoetics.com/poetix/index.php?p=141</a
+                    >
+                </p>
+                <p>
+                    Unsurprisingly this little rant annoyed some Twisted people
+                    mightily; but Glyph's reply, in the comments on the post, is
+                    both polite and pertinent.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/concurrency-and-processes-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.codepoetics.com/poetix">Dominic Fox</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Another attempt at modelling concurrency at
+                    <a class="reference" href="http://kamaelia.sourceforge.net"
+                        >http://kamaelia.sourceforge.net</a
+                    >.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/concurrency-and-processes-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Paul
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I'm a programming newbie in most respects, and have always
+                    programmed small programs in a single thread. But I'm
+                    interested in concurrent programming and have been very
+                    interested in the various generator-based approaches.
+                    Perhaps someone should write an article on: 1. The
+                    advantages/disadvantages between true threads and the
+                    microthread approach (i.e. like the Nanothread module from
+                    the LGT project), and 2. A list of the different microthread
+                    modules out there and their limitations. From a newbie point
+                    of view, the microthread approach seems like a holy grail
+                    (i.e. speed; deterministic results avoiding race conditions,
+                    etc.), but maybe I just don't understand what it can't do.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/concurrency-and-processes-comment-10.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                newbie
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

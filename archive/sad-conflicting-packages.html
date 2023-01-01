@@ -1,0 +1,489 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Sad conflicting packages</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Sad conflicting packages</h1>
+
+        <div class="document">
+            <p>
+                Sigh... I've decided that
+                <a class="reference" href="http://pydispatcher.sourceforge.net/"
+                    >PyDispatcher</a
+                >
+                is probably the right thing for
+                <a class="reference" href="events-and-sqlobject.html"
+                    >SQLObject events</a
+                >
+                -- I think it's a predictable and easy-to-understand package for
+                this context, and I really prefer phrasing this in terms of
+                events. But PyDispatcher conflicts with
+                <a
+                    class="reference"
+                    href="http://www-128.ibm.com/developerworks/library/l-cppeak2/"
+                    >RuleDispatch</a
+                >, because they both use the package
+                <tt class="docutils literal"
+                    ><span class="pre">dispatch</span></tt
+                >. Not a problem unless you want to use them both at once. Which
+                is certain to happen, since TurboGears added the JSON code
+                <a class="reference" href="first-try-at-generic-functions.html"
+                    >I mentioned</a
+                >
+                (that uses RuleDispatch), and also uses SQLObject.
+            </p>
+            <p>
+                This is annoying. Maybe I'll think again about using
+                RuleDispatch... but I feel unnecessarily forced into the
+                decision.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 31 Oct '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Have you looked at
+                    <a
+                        class="reference"
+                        href="http://developer.berlios.de/project/shownotes.php?release_id=7650"
+                        >FibraNet</a
+                    >?
+                </p>
+                <p>
+                    It is much simpler than PyDispatcher, and may suit your
+                    needs better.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/sad-conflicting-packages-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">anonymous</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        PyDispatcher isn't that complicated, really. Not very
+                        complicated at all, at least when I consider what I want
+                        to do with it. And it seems better documented than
+                        FibraNet.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/sad-conflicting-packages-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I agree with the general lament: that an unambiguous
+                    namespace means having to deal with packages that have the
+                    same name.
+                </p>
+                <p>
+                    You can, of course, get around that in any specific code
+                    with
+                    <tt class="docutils literal"
+                        ><span class="pre">import</span>
+                        <span class="pre">foo</span>
+                        <span class="pre">as</span>
+                        <span class="pre">bar</span></tt
+                    >.
+                </p>
+                <p>
+                    In this specific case, though, should the JSON code just be
+                    reimplemented using PyDispatcher? I must admit to sharing
+                    your preference for the simple, hugely flexible
+                    PyDispatcher.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/sad-conflicting-packages-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Ben Finney
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I may be a little naive about event dispatching
+                        mechanisms, but when it comes to simplicity, how simple
+                        can they get, and exactly what flexibility is required?
+                    </p>
+                    <p>
+                        I've used FibraNet (back when it was just called
+                        'EventNet'), the event/signal mechanism in PGU, and
+                        PyDispatcher. From my experience, EventNet was the most
+                        simple. One line to post an event:
+                    </p>
+                    <p>
+                        eventnet.driver.post('my_event', arg1=something,
+                        arg2=something_else)
+                    </p>
+                    <p>
+                        and one line to register a callable to receive an event:
+                    </p>
+                    <p>&#64;eventnet.driver.subscribe('my_event')</p>
+                    <p>
+                        def my_event_handler(event): print event.name,
+                        event.arg1, event.arg2
+                    </p>
+                    <p>
+                        EventNet does force you to keep track of references, and
+                        explicitly unsubscribe event handlers, as it does not
+                        use weak references. This can result in some extra code.
+                    </p>
+                    <p>
+                        I've found writing code like this can be either very
+                        elegant, or very confusing. This situation gets
+                        amplified (for better or worse) once you start using the
+                        eventnet.net module, which works well for simple IPC,
+                        though I do not know how safe it is.
+                    </p>
+                    <p>
+                        I am curious, how exactly are you planning to use an
+                        event dispatcher in SQLObject, and what problems will it
+                        help solve?
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/sad-conflicting-packages-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://">anonymous</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>How is this simpler:</p>
+                        <pre class="literal-block">
+eventnet.driver.post('my_event', arg1=something, arg2=something_else)
+</pre
+                        >
+                        <p>Than this:</p>
+                        <pre class="literal-block">
+dispatcher.send('my_event', arg1=something, arg2=something_else)
+</pre
+                        >
+                        <p>Or listening with:</p>
+                        <blockquote>
+                            dispatcher.connect(my_event_handler, 'my_event')
+                        </blockquote>
+                        <p>
+                            It's not a decorator, but that would be very easy to
+                            implement. PyDispatcher also has has the concept of
+                            &quot;sender&quot;, which I find useful, as I'm
+                            actually expecting to listen to events on a
+                            per-class basis (and SQLObject classes are the
+                            senders).
+                        </p>
+                        <p>
+                            The events I'm proposing are listed in
+                            <a
+                                class="reference"
+                                href="http://svn.colorstudy.com/SQLObject/trunk/sqlobject/events.py"
+                                >sqlobject.events</a
+                            >
+                            in the repository -- it could quickly become a core
+                            part of how basic concepts like joins and columns
+                            are implemented. E.g., a column with a
+                            <tt class="docutils literal"
+                                ><span class="pre">cascade=True</span></tt
+                            >
+                            setting would listen for a delete event.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/sad-conflicting-packages-comment-7.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Ian Bicking
+                    </div>
+                    <hr noshade />
+                </blockquote>
+
+                <div class="document">
+                    <p>
+                        PyDispatcher doesn't really apply to the JSON code, so
+                        that's not an option. The name conflict doesn't help,
+                        because you simply can't have two distributions loaded
+                        with the same top-level name (except maybe with the
+                        technique PJE mentioned, though that requires
+                        repackaging the libraries, at which point I could just
+                        rename the package).
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/sad-conflicting-packages-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Well, I was suggesting that if enough people asked
+                            for it, then the authors of the respective packages
+                            (i.e., me and Patrick O'Brien) would probably be
+                            willing to include that code for compatibility's
+                            sake.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/sad-conflicting-packages-comment-8.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://dirtSimple.org">Phillip J. Eby</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                Patrick doesn't do much with PyDispatcher these
+                                days AFAIK, but I'd certainly be willing to
+                                incorporate changes that would let the two
+                                packages coexist. Heck, if I recall correctly
+                                from our earlier discussion the two packages can
+                                actually be dumped into the same directory and
+                                both continue to function as expected.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/sad-conflicting-packages-comment-11.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="http://www.vrplumber.com/"
+                                >Mike Fletcher</a
+                            >
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    Hmm, should have finished reading the whole
+                                    comment thread. Apparently Patrick is all
+                                    over it :) .
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/sad-conflicting-packages-comment-12.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://www.vrplumber.com/"
+                                    >Mike Fletcher</a
+                                >
+                            </div>
+                            <hr noshade />
+                            <blockquote>
+                                <div class="document">
+                                    <p>
+                                        I'm more than happy to defer to you,
+                                        Mike, since you've been shepherding the
+                                        code for some time now. I appreciate all
+                                        the work you've done to make the code
+                                        available, fix bugs, add enhancements,
+                                        etc.
+                                    </p>
+                                </div>
+                                <div align="right">
+                                    <a
+                                        href="https://ianbicking.org/sad-conflicting-packages-comment-13.html"
+                                        rel="nofollow"
+                                        >#</a
+                                    >
+                                    <a href="http://www.schevo.org"
+                                        >Patrick K. O'Brien</a
+                                    >
+                                </div>
+                                <hr noshade />
+                            </blockquote>
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    You know, you <em>could</em> package one or the other so
+                    it's a namespace package, as long as there aren't any
+                    conflicting names <em>within</em> the two
+                    <tt class="docutils literal"
+                        ><span class="pre">dispatch</span></tt
+                    >
+                    packages. Just add something like:
+                </p>
+                <pre class="literal-block">
+try:
+    from pkg_resources import declare_namespace
+except ImportError:
+    pass
+else:
+    declare_namespace(__name__)
+</pre
+                >
+                <p>
+                    to the end of both
+                    <tt class="docutils literal"
+                        ><span class="pre">dispatch/__init__.py</span></tt
+                    >
+                    files. The only downside is that it forces both packages'
+                    <tt class="docutils literal"
+                        ><span class="pre">__init__</span></tt
+                    >
+                    modules to be loaded when you
+                    <tt class="docutils literal"
+                        ><span class="pre">import</span>
+                        <span class="pre">dispatch</span></tt
+                    >.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/sad-conflicting-packages-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://dirtSimple.org">Phillip J. Eby</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I agree, this situation is unfortunate. I would gladly
+                    support any solution that will make it easier for people to
+                    use both packages. In the mean time, what we have done with
+                    Schevo is simply included pydispatcher as a subpackage of
+                    schevo. Call it a fork, if you will. Then we use it like
+                    this:
+                </p>
+                <pre class="literal-block">
+from schevo.dispatcher import dispatcher
+from schevo.dispatcher.errors import DispatcherKeyError
+</pre
+                >
+                <p>
+                    I don't think this is the ideal solution. And certainly Eggs
+                    makes dependency management much more palatable than it used
+                    to be, so someone may come up with something better. But if
+                    a simple solution isn't forthcoming, then sometimes you just
+                    do what you gotta do. You would not offend me in the
+                    slightest if you took the same approach with SQLObject. :-)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/sad-conflicting-packages-comment-9.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.schevo.org">Patrick K. O'Brien</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Yeah, I'm thinking about doing that as well. I could
+                        repackage it as
+                        <tt class="docutils literal"
+                            ><span class="pre">pydispatcher</span></tt
+                        >, but that makes the installation harder to handle,
+                        because I'd have to give that new package a name, and
+                        people couldn't install strictly from PyPI if they were
+                        using easy_install (unless I registered it, which I
+                        don't want to do... unless maybe it was a hidden
+                        registration, which might actually work...)
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/sad-conflicting-packages-comment-10.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p># mymodule</p>
+                <p>import sys</p>
+                <p>
+                    # manipulate sys.path, to be sure you get the right dispatch
+                </p>
+                <p>import dispatch as d</p>
+                <p>del sys.modules['dispatch']</p>
+                <p>
+                    # now refer to this dispatch in your code only as mymodule.d
+                </p>
+                <p>import dispatch</p>
+                <p># second dispatch</p>
+                <p># But yes, this namespace handling sucks :)</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/sad-conflicting-packages-comment-14.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.revver.com/">Andreas Kostyrka</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

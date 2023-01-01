@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Breaking the Web We Have</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Breaking the Web We Have</h1>
+
+        <div class="document">
+            <p>
+                So, the web (or at least a few people who are encountering early
+                adoptors) are
+                <a
+                    class="reference"
+                    href="http://37signals.com/svn/archives2/google_web_accelerator_hey_not_so_fast_an_alert_for_web_app_designers.php"
+                    >up in arms</a
+                >
+                about
+                <a class="reference" href="http://webaccelerator.google.com/"
+                    >Google Web Accelerator</a
+                >. The quick summary: GWA follows links for you, including links
+                like &quot;delete this item&quot;, including that it ignores
+                Javascript confirmation dialogs.
+            </p>
+            <p>
+                Of course, REST people are going to say you shouldn't be causing
+                side effects in response to GET queries, that this is a
+                <a
+                    class="reference"
+                    href="http://www.franklinmint.fm/blog/archives/000379.html"
+                    >learning</a
+                >
+                <a
+                    class="reference"
+                    href="http://jtauber.com/blog/2005/05/06/an_http_lesson_from_google"
+                    >experience</a
+                >. What I learn: some people pay too much attention to HTTP and
+                not enough attention to The Web That We Have. Sure, GET
+                <em>shouldn't</em> have side effects, but
+                <a
+                    class="reference"
+                    href="http://simon.incutio.com/archive/2005/05/06/bad"
+                    >Simon Willison correctly notes</a
+                >
+                that &quot;shouldn't&quot; doesn't mean &quot;can't&quot;, and
+                so it's entirely reasonable and legal to do so. Mozilla has
+                prefetching, but strictly in an opt-in manner (<tt
+                    class="docutils literal"
+                    ><span class="pre">&lt;link</span>
+                    <span class="pre">rel=&quot;prefetch&quot;&gt;</span></tt
+                >
+                and a few other cases); this works fine. Frankly I don't know
+                how Google could be so stupid; this issue occurred to me the
+                moment I first heard about prefetching, long before the GWA.
+                Don't they have any web application developers at Google? I can
+                only hope they do the right thing and retract the GWA
+                immediately, and use whatever system they have to disable this
+                feature in all currently deployed instances.
+            </p>
+            <p>
+                For anyone who happens to be using Apache, you can use this to
+                disable the GWA on your site:
+            </p>
+            <pre class="literal-block">
+RewriteEngine on
+RewriteCond %{HTTP_X_MOZ} prefetch
+RewriteRule .* - [F]
+</pre
+            >
+            <p>Hopefully this will only be necessary transitionally.</p>
+            <p>
+                The real issue is that HTML and web browsers have not supported
+                POST well, and web application developers have used GET because
+                of UI issues. If anchor tags had a
+                <tt class="docutils literal"
+                    ><span class="pre">method=&quot;post&quot;</span></tt
+                >
+                attribute, this wouldn't be a problem. But they don't, and so
+                that's why we are where we are. It's not a Hard Problem, but the
+                W3C gave up on HTML a long time ago, it seems, and so they gave
+                up on being relevant. The
+                <a class="reference" href="http://whatwg.org/">WHAT-WG</a> has
+                been trying to address these issues, but they are relatively
+                new. I think they are doing important things, but you can't
+                expect any web developers to have used anything they are
+                producing yet. The
+                <a
+                    class="reference"
+                    href="http://whatwg.org/specs/web-apps/current-work/"
+                    >Web Application Spec</a
+                >
+                does allow for more flexible arrangement of forms, including
+                (effectively) nested forms. Though it doesn't make the
+                <tt class="docutils literal"
+                    ><span class="pre">&lt;a&gt;</span></tt
+                >
+                tag any richer, which is a shame.
+            </p>
+            <p>
+                The fact is: the Google Web Accelerator breaks the web that
+                exists right now. Therefore the GWA is broken. It doesn't matter
+                who is more right, who kept with the spec, or even if current
+                practices aren't entirely safe. When the GWA breaks things that
+                didn't break before, I'm going to blame the GWA. And I'm going
+                to blame Google. So they better get their ass in gear and
+                <a
+                    class="reference"
+                    href="http://www.loudthinking.com/arc/000454.html"
+                    >fix this quick</a
+                >.
+            </p>
+            <p>
+                <strong>Update</strong>: revisiting the WHAT-WG specs, I think
+                the
+                <a
+                    class="reference"
+                    href="http://whatwg.org/specs/web-forms/current-work/"
+                    >Web Form spec</a
+                >
+                is actually more relevant.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 06 May '05<br />
+            Modified 06 May '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    &quot; Sure, GET <em>shouldn't</em> have side effects, but
+                    Simon Willison correctly notes that &quot;shouldn't&quot;
+                    doesn't mean &quot;can't&quot;, and so it's entirely
+                    reasonable and legal to do so. &quot;
+                </p>
+                <p>
+                    SHOULD means it's legal, but will probably cause interop
+                    problems. This is a textbook case of not knowing when it's
+                    OK to ignore a SHOULD.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/breaking-the-web-we-have-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                anonymous
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

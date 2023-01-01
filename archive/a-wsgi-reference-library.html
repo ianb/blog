@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>A WSGI reference library</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>A WSGI reference library</h1>
+
+        <div class="document">
+            <p>
+                I posted this idea to the
+                <a class="reference" href="http://www.python.org/sigs/web-sig/"
+                    >Web-SIG</a
+                >
+                list, but didn't get much response (except from James Gardner,
+                the author of
+                <a class="reference" href="http://www.pythonweb.org/"
+                    >pythonweb</a
+                >). But then, that list is kind of weird -- sometimes when
+                topics come up I think everyone just happens to be paying
+                attention to other things. Or at least, if <em>I'm</em> the one
+                who brings up Topics Important To Me and I don't get a response,
+                I make myself feel better by thinking that ;) And then I repeat
+                myself here...
+            </p>
+            <p>
+                What do people think about collaborating on a kind of
+                &quot;standard&quot; library of WSGI middleware? (Not standard
+                like distributed-with-Python, just well publicized.) This is
+                what I've tried to put together a little with
+                <a
+                    class="reference"
+                    href="http://wiki.webwareforpython.org/wsgikit.html"
+                    >WSGIKit</a
+                >, though not all parts of it would apply. And other people are,
+                I think, starting to develop the same things, perhaps with some
+                overlap. Maybe we can pool our efforts together.
+            </p>
+            <p>The criteria I'd consider for components in this library:</p>
+            <ul class="simple">
+                <li>
+                    Should be something we could do Right, i.e., can become
+                    &quot;complete&quot;. E.g., a proxying WSGI application
+                    could be complete. A commenting system can't.
+                </li>
+                <li>
+                    Shouldn't involve much UI. Mostly because it can't be very
+                    complete.
+                </li>
+                <li>
+                    Shouldn't be tied to anything very specific. E.g., if
+                    there's a templating middleware (um, don't ask me exactly
+                    what that would look like) it shouldn't be bound to any
+                    particular templating language. The specific bindings to
+                    specific templating languages should probably be part of the
+                    upstream libraries. (Except maybe some reference bindings)
+                </li>
+                <li>
+                    Provides robust architecture more than a pleasant API. E.g.,
+                    WSGIKit implements
+                    <a class="reference" href="http://webwareforpython.org"
+                        >Webware</a
+                    >
+                    (more or less), but when you use that you see very little of
+                    the middleware that WSGIKit uses. And that middleware looks
+                    kind of ugly from an API perspective, what with the
+                    environment and its string keys and the sometimes funny
+                    semantics that WSGI implies.
+                </li>
+                <li>
+                    Be really well documented and stable (at least once we come
+                    to consensus on an interface), so that people could reliably
+                    and easily used these middleware components in their
+                    frameworks.
+                </li>
+                <li>Testable and tested.</li>
+            </ul>
+            <p>Some candidates I imagine:</p>
+            <ul class="simple">
+                <li>Sessions middleware</li>
+                <li>
+                    Logging middleware/library (based on the standard library of
+                    course)
+                </li>
+                <li>Error reporting middleware/library</li>
+                <li>Test frameworks (?)</li>
+                <li>
+                    A file application (handling
+                    <tt class="docutils literal"
+                        ><span class="pre">If-Modified-Since</span></tt
+                    >, etc)
+                </li>
+                <li>A proxy application</li>
+                <li>
+                    Libraries for parsing query strings and all that. Most of
+                    what is in Phillip's
+                    <a
+                        class="reference"
+                        href="http://cvs.eby-sarna.com/wsgiref/"
+                        >wsgiref</a
+                    >.
+                </li>
+                <li>Authentication (this would be on the ambitious end)</li>
+                <li>
+                    URL parsers (several, but maybe we could distill this down
+                    to a few primary models for parsing)
+                </li>
+                <li>
+                    And maybe a few of the more boring servers, like the CGI
+                    server, which will otherwise be homeless (or widely
+                    repeated).
+                </li>
+            </ul>
+            <p>
+                I'd expect everyone involved in this project have ulterior
+                motives, i.e., they'd all have their own separate pet projects
+                and whatnot, and wouldn't be looking to this library (alone) to
+                solve all their needs. And that would be good, another part of
+                what would keep this from being Yet Another Framework.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 04 Feb '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    You're spot on about the mailing-list, at least in my case.
+                    Too busy. Not to mention the general expectation in OSS
+                    discussions: if you open your mouth, expect to get assigned
+                    more work. :)
+                </p>
+                <p>
+                    Although I'd like to see some standardized middleware, I'm
+                    more interested <em>at this stage</em> of WSGI to get the
+                    major servers on board (Apache 2 being first on my list).
+                    But you didn't hear that from me; I have enough to do on
+                    those &quot;other projects&quot;.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/a-wsgi-reference-library-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Robert Brewer</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    Better applications means more motivation for better
+                    servers. Or vice versa -- either way, working on one doesn't
+                    keep anyone from working on the other; quite the contrary!
+                    And because WSGI is a stable target for both sides, they can
+                    work happily and safely in parallel.
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/a-wsgi-reference-library-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            ...just saying that <em>my</em> time is a limited
+                            good. So if _I_ work on one, _I_ can't work on the
+                            other and still expect to continue getting paid for
+                            my day job. ;)
+                        </p>
+                        <p>Hence the silence.</p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/a-wsgi-reference-library-comment-6.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">Robert Brewer</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+
+                <div class="document">
+                    <a
+                        class="reference"
+                        href="http://www.amorhq.net/blogs/index.php/fumanchu/2005/02/05/paraware_vs_middleware"
+                        >http://www.amorhq.net/blogs/index.php/fumanchu/2005/02/05/paraware_vs_middleware</a
+                    >
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/a-wsgi-reference-library-comment-1.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://">Robert Brewer</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        FastCGI is orthogonal to WSGI. WSGI is a way Python
+                        applications and servers can communicate
+                        <em>in the same process</em>. The &quot;server&quot; may
+                        just be something accepting FastCGI connections, or
+                        might be a real HTTP server, or whatever. So WSGI is an
+                        internal API, not a protocol.
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/a-wsgi-reference-library-comment-4.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Ian Bicking
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>Ian,</p>
+                <p>
+                    For my thoughts see
+                    <a
+                        class="reference"
+                        href="http://42.blogs.warnock.me.uk/2005/02/a_wsgi_referenc.html"
+                        >http://42.blogs.warnock.me.uk/2005/02/a_wsgi_referenc.html</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/a-wsgi-reference-library-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://42.blogs.warnock.me.uk">Dave Warnock</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>Possible other addition:</p>
+                <ul class="simple">
+                    <li>Static caching middleware</li>
+                </ul>
+                <p>
+                    ie, some standard way, Done Right, to cache pages on a
+                    dynamic site that haven't changed since the last access.
+                </p>
+                <p>
+                    If there's anything middleware Done Right would be useful
+                    for, it's this. Unfortunatel I don't have much experiance
+                    with this sort of thing to offer to do it myself, but I'd
+                    definitely take it up if it were around...
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/a-wsgi-reference-library-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://metamoof.net/">Moof</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

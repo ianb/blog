@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>HTTP proxying questions</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>HTTP proxying questions</h1>
+
+        <div class="document">
+            <p>
+                Since I'm doing
+                <a class="reference" href="wsgi-and-paste-proxy.html"
+                    >some HTTP proxying</a
+                >
+                I've been thinking about how it should work. And I really don't
+                know -- it's all very vague. Much more vague than it should be.
+                HTTP won't be a
+                <a
+                    class="reference"
+                    href="http://blog.duncandavidson.com/2006/06/the_web_is_a_pi.html"
+                    >pipe</a
+                >
+                if we have to rely on ad hoc configuration everywhere.
+            </p>
+            <p>Some of the issues...</p>
+            <div class="section">
+                <h1><a id="host" name="host">Host</a></h1>
+                <p>
+                    Some information gets covered up. For instance, in many HTTP
+                    proxying situations the Host header is lost; changed into
+                    <tt class="docutils literal"
+                        ><span class="pre">localhost</span></tt
+                    >
+                    or something that doesn't accurately represent the initial
+                    request. I guess there's an informal standard that
+                    <tt class="docutils literal"
+                        ><span class="pre">X-Forwarded-Server</span></tt
+                    >
+                    contains the original Host value.
+                </p>
+                <p>
+                    Also the remote IP address is lost, but there's a more
+                    widely used convention to put that information in
+                    <tt class="docutils literal"
+                        ><span class="pre">X-Forwarded-For</span></tt
+                    >. This seems much less interesting than Host to me, but
+                    much more widely supported. Go figure.
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a id="request-path" name="request-path">Request path</a>
+                </h1>
+                <p>
+                    I don't know of any standards that exist for remapping
+                    request paths. I guess in theory you shouldn't need to do
+                    this, but in practice it is pretty common. For instance,
+                    lets say you want to map
+                    <tt class="docutils literal"
+                        ><span class="pre">/blog/*</span></tt
+                    >
+                    to
+                    <tt class="docutils literal"
+                        ><span class="pre">localhost:9999</span></tt
+                    >
+                    where your blog app is running in a separate process. Do you
+                    preserve the full path? Do you duplicate any configuration
+                    for path mappings or virtual host settings in that server on
+                    port 9999? All too often the target server isn't very
+                    cooperative about this, and various
+                    <a
+                        class="reference"
+                        href="http://httpd.apache.org/docs/1.3/mod/mod_rewrite.html"
+                        >hacks</a
+                    >
+                    emerge to work around the problems. Ideally I think it would
+                    be good to give three pieces of information for the path:
+                </p>
+                <ol class="arabic simple">
+                    <li>
+                        The resource the upstream server expects to handle this
+                        request.
+                    </li>
+                    <li>
+                        The base path that the upstream server used to determine
+                        what resource should handle the request.
+                    </li>
+                    <li>
+                        The rest of the path, which is the responsibility of the
+                        downstream server.
+                    </li>
+                </ol>
+                <p>
+                    2 and 3 are similar to
+                    <tt class="docutils literal"
+                        ><span class="pre">SCRIPT_NAME</span></tt
+                    >
+                    and
+                    <tt class="docutils literal"
+                        ><span class="pre">PATH_INFO</span></tt
+                    >. 1 is something new. HTTP always leaves these all squished
+                    together.
+                </p>
+                <p>
+                    Also: potentially the request path has <em>nothing</em> to
+                    do with the original path or domain. This can happen when
+                    you are aggregating pieces of data from many sources (e.g.,
+                    using
+                    <a
+                        class="reference"
+                        href="http://httpd.apache.org/docs/1.3/mod/mod_include.html"
+                        >SSIs</a
+                    >, which get pieces of content as subrequests, or
+                    <a
+                        class="reference"
+                        href="http://www.mnot.net/javascript/hinclude/"
+                        >HInclude</a
+                    >
+                    which composes content in the client). If the output uses
+                    HTML then that HTML needs to be written either with
+                    <em>no</em> assumptions about what URL it is rendered under
+                    (i.e., all links are fully qualified), or it needs to be
+                    smart about the real context it will be rendered in. How to
+                    write relocatable HTML is a separate issue, but there also
+                    doesn't seem to be any conventions about how to tell the web
+                    app about the indirection that is happening.
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a
+                        id="all-the-other-information"
+                        name="all-the-other-information"
+                        >All the other information</a
+                    >
+                </h1>
+                <p>
+                    There's a lot more information that can be passed through.
+                    For instance, the upstream server may have authenticated the
+                    request already. How does it pass that information through?
+                    Maybe there's other ad hoc information. For instance,
+                    consider this rewrite rule:
+                </p>
+                <pre class="literal-block">
+RewriteCond %{HTTP:Host} ^(.*)\.myblogs.com$
+RewriteRule (.*) http://localhost:9999/blogapp/$1?username=%1 [P,QSA]
+</pre
+                >
+                <p>
+                    If you aren't familiar with mod_rewrite, this tells Apache
+                    to take a request like
+                    <tt class="docutils literal"
+                        ><span class="pre"
+                            >http://bob.myblogs.com/archive?month=1</span
+                        ></tt
+                    >
+                    and forward it to
+                    <tt class="docutils literal"
+                        ><span class="pre"
+                            >http://localhost:999/blogapp/archive?month=1&amp;username=bob</span
+                        ></tt
+                    >
+                </p>
+                <p>This kind of works, but is clearly hacky.</p>
+                <p>
+                    Ideally we would pass a header like
+                    <tt class="docutils literal"
+                        ><span class="pre">X-Blog-Username:</span>
+                        <span class="pre">bob</span></tt
+                    >. But that opens up other issues...
+                </p>
+            </div>
+            <div class="section">
+                <h1>
+                    <a
+                        id="security-of-piped-information"
+                        name="security-of-piped-information"
+                        >Security of piped information</a
+                    >
+                </h1>
+                <p>
+                    We can start adding headers willy-nilly, and that's actually
+                    okay, but opens up security concerns. If you aren't certain
+                    that only trusted clients can access your backend server,
+                    can you really trust the headers? It's no good if anyone can
+                    connect to your server with
+                    <tt class="docutils literal"
+                        ><span class="pre">X-Remote-User:</span>
+                        <span class="pre">admin</span></tt
+                    >
+                    and then you trust that information. With no concept of
+                    trusted and untrusted headers, we have to rely on ad hoc
+                    configuration for security. This is both difficult to setup
+                    and maintain, and doing it wrong can lead to a very insecure
+                    setup.
+                </p>
+                <p>
+                    The previous issues can all be resolved with conventions
+                    about new HTTP headers. This one is much harder.
+                </p>
+            </div>
+            <div class="section">
+                <h1><a id="conclusion" name="conclusion">Conclusion</a></h1>
+                <p>
+                    I'd like to use HTTP like a pipe. Really! None of the issues
+                    I've brought up are new, but they also aren't well answered
+                    despite their age. In comparison, FastCGI and SCGI actually
+                    answer most of these problems <em>right now</em>.
+                </p>
+                <p>
+                    If we're going to use HTTP this way -- and there's great
+                    reasons to start doing this -- we need to work harder at
+                    coming up with a good answer for these kinds of issues.
+                </p>
+            </div>
+        </div>
+        <div class="dates" align="right">Created 21 Oct '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    I can only see two viable options to trusting data in
+                    headers/urls, share a secret and sign the header with that
+                    (a simple example would be to just to set the authorization
+                    header for the backend, but that requires that the backend
+                    have some sort of authentication system in place to check
+                    the data) or only allow requests to from trusted
+                    servers/ports.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/http-proxying-questions-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://objectvibe.net/blog">Laurence Rowe</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    The security problem doesn't seem to have much to do with
+                    HTTP headers, really. If your back-end server is open to the
+                    network, the entire content of each request is suspect,
+                    right?
+                </p>
+                <p>
+                    You need authentication; and you need to secure the channel
+                    from snooping and tampering. Each of these three facets of
+                    the problem has to be enforced in some protocol layer.
+                </p>
+                <p>
+                    Take authentication. You need to: (a) stack HTTP on top of a
+                    network-level protocol that authenticates; <em>OR</em> (b)
+                    use some hypothetical flavor of HTTP authentication that's
+                    actually secure; <em>OR</em> (c) stack another
+                    authentication-capable protocol on top of HTTP--you know,
+                    SOAP with digital signatures or whatever they're doing these
+                    days.
+                </p>
+                <ol class="loweralpha simple" start="2">
+                    <li>
+                        doesn't exist, and everyone knows (c) is immoral, so
+                        take (a). This is the &quot;don't do that&quot;
+                        solution. Just do exactly what you said you weren't
+                        going to do, and firewall off the back-end server. There
+                        are several ways to do it--SSL; SSH (?); checking
+                        getpeername(); moving the back-end server to another
+                        machine behind a physical firewall; VMware... some of
+                        which have performance problems, and some of which are
+                        only secure given certain prerequisites. You can pick
+                        one way that will work everywhere; or you can have your
+                        system choose the best way dynamically; or you can push
+                        the burden of configuring all the pieces to talk
+                        together onto the user.
+                    </li>
+                </ol>
+                <p>
+                    Or take tampering. You need to: (a) stack HTTP on top of a
+                    protocol that provides a no-tampering guarantee;
+                    <em>or</em> (b) use some hypothetical HTTP feature that
+                    prevents tampering, like adding an HTTP header with a
+                    digitally signed hash of the message; <em>or</em> (c) stack
+                    another protocol on top of HTTP. Again with the SOAP.
+                </p>
+                <p>
+                    Etc. The world of (a) contains multitudes, with no means of
+                    interoperability; the standards for (b) simply doesn't have
+                    the features you need; and the stuff at level (c) is
+                    despised by all right-thinking persons.
+                </p>
+                <p>-j</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/http-proxying-questions-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://jorendorff.blogspot.com/">Jason</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>An Ideal Python Web Programming Environment</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>An Ideal Python Web Programming Environment</h1>
+        <p>
+            W while ago I wrote this list of features I'd like in a Python web
+            programming environment. It was before WSGI (which I think is a big
+            step forward); but I realized most of these features aren't aspects
+            which WSGI really addresses. I've edited the list down to things
+            that can happen on the WSGI server/middleware side.
+        </p>
+
+        <p></p>
+
+        <ol>
+            <li>
+                Deployable in a variety of environments. This includes Windows,
+                Unix, Apache, IIS, with its own HTTP server, or behind other
+                reasonably sane servers. Bonus if it can optionally integrate
+                with its environment in some way -- while environment neutrality
+                is nice, <i>optional</i> environment neutrality is much better.
+            </li>
+
+            <li>
+                Highly reliable in the face of bugs. Writing bad code cannot
+                take the server down. <i>Maybe</i> malicious code could take
+                down the server -- it's never going to be safe to give enemies
+                access to a full Python system. But poorly-written code should
+                be expected.
+            </li>
+
+            <li>
+                Some reliability even when infinite loops, massive memory use,
+                or other resource hogs are encountered.
+            </li>
+
+            <li>
+                Hopefully, bad C code won't take the entire server down either
+                (though it will inevitably take down at least that one request).
+                Maybe bad C code is too difficult to protect against, but it
+                shouldn't be totally catastrophic to the server if it happens.
+                The server should in no circumstances disappear or indefinitely
+                stop handling requests.
+            </li>
+
+            <li>
+                Reasonable to manage in a multi-user environment, where users
+                don't trust each other. I.e., shared commercial hosts.
+            </li>
+
+            <li>
+                No cryptic behavior, no allowing files and in-data objects to
+                get out of sync, no manual managing of reloading code. Managing
+                that manually burdens the programmer in the same way a
+                compilation step burdens the programmer.
+            </li>
+
+            <li>
+                Easy to debug. No "transparent" recompiling that will provide a
+                disconnect between what the programmer writes and what they see
+                in the traceback. Lots of good logging facilities, post-mortem
+                debugging facilities, application hooks for indicating context,
+                and interactive debugging systems for use when initially
+                developing applications.
+            </li>
+
+            <li>
+                Scales reasonably. (E.g., CGI isn't an option, because it scales
+                poorly when the code becomes more complex and process startup
+                time becomes too great; even if it actually scales fine for a
+                large number of requests.)
+            </li>
+
+            <li>
+                Could serve all HTTP needs reasonably efficiently. Maybe Apache
+                is faster at serving static files, but this framework should at
+                least be decent. No large file issues.
+            </li>
+
+            <li>No impediments to using normal Python libraries.</li>
+        </ol>
+
+        <p>
+            This is the kind of environment issue that hasn't been tackled by
+            many frameworks. Zope has tried in a couple different ways;
+            sometimes implementing one of these features has compromised
+            another. Some of the forking systems have also implemented some of
+            these features. It would be nice to see a complete solution. Maybe
+            some of these would require changes to the interpreter itself? While
+            other aspects of the solution might even be neutral with respect to
+            Python, e.g., watchdogs.
+        </p>
+
+        <p>
+            I <i>don't</i> think that platform neutrality is absolutely
+            essential. A lot of these features aren't semantic, and they won't
+            change how your program works. Instead, I think it's better to do
+            the best we can on each platform -- portable bugs and portable
+            unreliability in systems isn't useful. If we can get a system that
+            is great on Linux, pretty good on FreeBSD, and passable on Windows,
+            then great -- that's better than just passable on every platform.
+            And what makes a great solution on Linux might simply not apply to
+            Windows.
+        </p>
+
+        <p>
+            The cool thing about the WSGI, is that if you solved many of these
+            problems, they could be applied to most frameworks that were built
+            on the WSGI.
+        </p>
+
+        <p>
+            Right now I think this stuff is more strategically important for
+            Python web programming than is a pleasant programming environment.
+            Things don't need to be perfect -- programmers can adapt, and to
+            some degree will always have to adapt. But this foundational server
+            structure is something that a typical programmer can't fix. These
+            features are also an appeal to system administrators, who are
+            sometimes ignored when programmers define priorities.
+        </p>
+
+        <div class="dates" align="right">
+            Created 10 Oct '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            You might take a look at
+            <a href="http://nick.borko.org/pse" target="_blank"
+                >Python Servlet Engine</a
+            >
+            -- a former colleague of mine developed it with some of my input.
+            It's a simple system, but has a superb system for separating
+            presentation from logic without throwing away reusuable components,
+            has decent debugging, and runs well with mod_python (could be
+            expanded for other systems.) One could expand its capability for
+            cross-platform use.
+            <br />
+
+            <br />
+            I've used WingIDE to debug it, and it works well.
+            <div align="right">
+                <a href="https://ianbicking.org/comment397.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.kenkinder.com/">Ken Kinder</a>
+            </div>
+            <hr noshade />
+            Does fast cgi solve the scalability problem ? and mod_python ?
+            <div align="right">
+                <a href="https://ianbicking.org/comment398.html" rel="nofollow"
+                    >#</a
+                >
+                Oier Blasco Linares
+            </div>
+            <hr noshade />
+            In my experience mod_python is not very solid. I built one web site
+            with mod_python 2.7 and found it to be very fragile--the application
+            seemed to break very easily. Scripts that did practically nothing
+            worked very well, but more complex pages had erratic performance.
+            <div align="right">
+                <a href="https://ianbicking.org/comment399.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://eradman.com">Eric Radman</a>
+            </div>
+            <hr noshade />
+            Ian, you seems to have quite the same issue as me.
+            <br />
+            This post sound like the dilemma1/2.
+            <br />
+
+            <br />
+            <a href="http://www.larsen-b.com/Article/160.html" target="_blank"
+                >http://www.larsen-b.com/Article/160.html</a
+            >
+            <br />
+
+            <br />
+            In fact, i think the ideal system should support pdb debugging (like
+            w/ a medusa server), and mod_python for production.
+            <br />
+
+            <br />
+
+            <br />
+            mod_python provide:
+            <br />
+            - variety of env
+            <br />
+            - reliable (in fact you will crash a sub-interpreter, but apparently
+            not the main one.) And even if this occur, apache will free it, so
+            you can hope the next request will work.
+            <br />
+            - reasonalbe multi-user env. That why I end up w/ webware, having to
+            launch every server is a mess. And worst it's eating memory and
+            others even for website than never get 1 hit.
+            <br />
+            - scales well
+            <br />
+
+            <br />
+            Now i'm not a mod_python guru, so i decide to use quixote, because
+            it provide medusa and mod_python. so debugging and large scale
+            support
+            <div align="right">
+                <a href="https://ianbicking.org/comment400.html" rel="nofollow"
+                    >#</a
+                >
+                Jkx
+            </div>
+            <hr noshade />
+            IMO, FastCGI is an ideal solution, and I've actually used it for
+            running Python apps serving millions of dynamic hits per month. (And
+            could easily have scaled it much further by adding hardware).
+            <br />
+
+            <br />
+            The advantage of FastCGI is that your application runs in a separate
+            process than the web server, so you can scale it differently in
+            terms of the ideal number of processes. You're not consuming huge
+            amounts of memory due to having dozens of Apache processes each with
+            a copy of your app, if you only need maybe five copies of your app
+            running to handle the load. So, for complex applications I would
+            choose FastCGI over mod_python for those reasons.
+            <br />
+
+            <br />
+            (Also, by appropriate use of forking, a FastCGI application can have
+            very fast startups for additional copies of the application, and can
+            kill them off when not needed. PEAK includes a "process supervisor"
+            tool that manages this, by listening to the same socket and keeping
+            track of which child processes are busy.)
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment401.html" rel="nofollow"
+                    >#</a
+                >
+                Phillip J. Eby
+            </div>
+            <hr noshade />
+            mod_python doesn't seem like a very good idea in a multi-user
+            situation, because the interpreter is persistent between requests.
+            At the same time, those requests may be going to two different
+            users. In that way one user could corrupt or disrupt another user's
+            interpreter. Also, since it's a single process, you only have one
+            level of permissions.
+            <br />
+
+            <br />
+            Ideally, of course, you would run one Apache instance for each user.
+            This is actually not a bad idea, as each Apache instance can run
+            under that user's account, with configuration separated out. But
+            there's also problems. And maybe the overhead is less with the new
+            Apache 2 threaded model, but then you lose the good parts of keeping
+            interpreters partitioned.
+            <br />
+
+            <br />
+            Also, mod_python doesn't work well with Apache 1.3. In my
+            experience, it's not a big deal to upgrade, but people are extremely
+            reluctant to do so. Really they should have called it 1.4, then
+            people would be much less stressed about it -- there's substantial
+            changes, but Apache's front-facing features have remained extremely
+            stable over the releases. But I digress.
+            <br />
+
+            <br />
+            As is often the case, in a heterogeneous environment you can solve
+            problems more completely by <i>not</i> reusing components (like
+            Apache's worker process model). Obviously there are also problems
+            with this. E.g., FastCGI is nicely partitioned, but it's also a leaf
+            in the system, where mod_python can interject itself at different
+            points in a site's system, providing consistency in a heterogeneous
+            system.
+            <div align="right">
+                <a href="https://ianbicking.org/comment402.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            mod_python can use several interpreters to handle the multi-user
+            situation, because you can name the main sub-process and bind it to
+            a virtual host.
+            <br />
+
+            <br />
+            For the level of permissions: this is how php works too. and there
+            is billions of php users here.(yes you can use suexec + php as cgi
+            but you can do the same w/ python). Anyway, if you want this kind of
+            situations (I want for part of my projects) you can use mod_scgi w/
+            quixote. So you can reuse, and separate.
+            <br />
+
+            <br />
+            But mod_python require apache 2, and yes this is pain to install.
+            For example, there is no php module for apache2 in debian (there is
+            a one for apache2-prefork but...)
+            <br />
+
+            <br />
+            I haven't put quixote + mod_python in production right now. but
+            develop w/ quixote and medusa is really easy, and I think that: with
+            the bunch of way to deploy quixote (medusa + apache proxy, mod_scgi,
+            pure cgi, cgi + FastCGI, twisted, mod_python) i gonna find the best
+            way to handle the requests.
+            <br />
+
+            <br />
+
+            <br />
+
+            <br />
+
+            <br />
+            <div align="right">
+                <a href="https://ianbicking.org/comment403.html" rel="nofollow"
+                    >#</a
+                >
+                Jkx
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    What's wrong with apache2 prefork vs the old apache? I mean,
+                    the concurrency model is THE SAME and it's ACTIVELY
+                    DEVELOPED. Just because the PHP guys have a stick up their
+                    collective ass about it is no reason to shun it.
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/-comment-846.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Jefferson Davis
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

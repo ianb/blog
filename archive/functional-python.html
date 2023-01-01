@@ -1,0 +1,420 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Functional Python</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Functional Python</h1>
+
+        <div class="document">
+            <p>
+                I think Python's functional nature is largely misunderstood. For
+                instance, from a
+                <a
+                    class="reference"
+                    href="http://lambda-the-ultimate.org/node/1402#comment-16020"
+                    >Lambda the Ultimate</a
+                >
+                post on Python 2.5 (re:
+                <a
+                    class="reference"
+                    href="http://docs.python.org/dev/whatsnew/node3.html"
+                    >partial</a
+                >):
+            </p>
+            <blockquote>
+                yeah, espesially as GvR's attitude so far seems to have been
+                that functional programing is not in the style of python, and
+                should be avoided. With the proposed removal of lambda and so
+                on. Is this a change in policy? Will they make functional
+                programing in Python reasonable? do we get tail call
+                optimisations?
+            </blockquote>
+            <p>
+                This comes up a lot. It doesn't help that some people often say
+                with glee that Guido has said Python isn't a functional
+                language. Like it's a big stick in the eye to every Lisper.
+            </p>
+            <p>
+                My own interpretation is that Guido has bristled at the
+                suggestions by functional programming proponents that Python
+                take on certain features simply because they are in other
+                languages. These arguments are often presented with little
+                justification involving real use cases. Similarly people will
+                argue for features -- like truly private instance variables --
+                with the argument that this is required for Python to be a
+                &quot;real&quot; object oriented language. The functional people
+                at least have a pleasant academic air to their claims; the OO
+                people often finish their argument with a &quot;this is
+                necessary for Python to be taken seriously in the
+                enterprise.&quot;
+            </p>
+            <p>
+                But I digress... in reality, Python is a pretty decent
+                functional programming language, with functional alternatives to
+                many mutating operations (e.g.,
+                <tt class="docutils literal"><span class="pre">+</span></tt>
+                instead of
+                <tt class="docutils literal"
+                    ><span class="pre">.extend()</span></tt
+                >,
+                <tt class="docutils literal"
+                    ><span class="pre">sorted()</span></tt
+                >
+                instead of
+                <tt class="docutils literal"
+                    ><span class="pre">.sort()</span></tt
+                >), closures, many immutable types, you can use
+                <tt class="docutils literal"><span class="pre">tuple</span></tt>
+                as the poor man's
+                <tt class="docutils literal"><span class="pre">cons</span></tt
+                >, and so forth.
+            </p>
+            <p>
+                If its any indication, the OO-flavored
+                <a
+                    class="reference"
+                    href="http://www.python.org/dev/peps/pep-0245/"
+                    >interface</a
+                >
+                and
+                <a
+                    class="reference"
+                    href="http://www.python.org/dev/peps/pep-0246/"
+                    >adaptation</a
+                >
+                proposals have lingered for years, in large part because Guido's
+                resisted, or at least his apathy towards them. When generic
+                functions were brought up as an alternative -- a much more
+                functional approach to the same problems -- he
+                <a
+                    class="reference"
+                    href="http://www.artima.com/weblogs/viewpost.jsp?thread=155123"
+                    >warmed to it quickly</a
+                >.
+            </p>
+            <p>
+                Decorators are another case where a major functional feature has
+                been adopted in Python, with pretty good uptake. It's not a
+                pattern or syntax I see in other functional languages that much
+                (at least I'm not aware of it), but it's still a strongly
+                functional feature and is serving as the basis for many other
+                functional constructs (including generic functions).
+            </p>
+            <p>
+                Some functional concepts are unlikely to get traction anytime
+                soon, like tail call optimization. I would argue because tail
+                call optimization is
+                <a
+                    class="reference"
+                    href="https://ianbicking.org/the-challenge-of-metaprogramming-comment-4.html"
+                    >inaccessible to programmers</a
+                >
+                who aren't steeped in recursive theory, and rather boring in its
+                effect.
+            </p>
+            <p>
+                Lambda is syntactically -- not semantically -- awkward, but
+                Python has true closures so the fundamental technique is still
+                just as available. If you
+                <a
+                    class="reference"
+                    href="http://www.artima.com/weblogs/viewpost.jsp?thread=147358"
+                    >read Guido's explanation</a
+                >
+                about why
+                <tt class="docutils literal"
+                    ><span class="pre">lambda</span></tt
+                >
+                isn't being improved, nor another function-expression syntax
+                added, it's not that he thinks the <em>idea</em> of first class
+                functions is wrong. First class functions are used all over the
+                place in typical Python programs. It's just an issue of syntax.
+            </p>
+            <p>
+                The
+                <tt class="docutils literal"
+                    ><span class="pre">functional</span></tt
+                >
+                module itself is more about introducing functional
+                <em>language</em> into Python, without rephrasing Python as a
+                whole in those terms (hence
+                <tt class="docutils literal"
+                    ><span class="pre">partial</span></tt
+                >
+                is not added to builtins). Also it's just a place to put some
+                functional patterns. Though there was discussion of renaming
+                that module to just to
+                <tt class="docutils literal"
+                    ><span class="pre">functools</span></tt
+                >, because the scope seemed a little funky -- there are
+                functional constructs elsewhere in the standard library already
+                (e.g.,
+                <a
+                    class="reference"
+                    href="http://docs.python.org/lib/module-itertools.html"
+                    >itertools</a
+                >), and some
+                <a
+                    class="reference"
+                    href="http://mail.python.org/pipermail/python-dev/2006-March/062290.html"
+                    >other routines</a
+                >
+                seem related but not really &quot;functional&quot;.
+            </p>
+            <p>
+                But I'm still curious: what other functional concepts aren't in
+                Python that people think should be? Functional patterns that
+                rely on <em>removing</em> ideas won't work -- like removing
+                mutation -- but what is there that could be <em>added</em> to
+                Python to make it more functional-friendly? I honestly can't
+                think of a whole lot.
+            </p>
+            <ul class="simple">
+                <li>
+                    Explicit lazy evaluation might be nice; there's some
+                    cookbook recipes for that I think (but I can never find
+                    things there when I want them), but they fail in a couple
+                    ways (not major ways -- things like
+                    <tt class="docutils literal"
+                        ><span class="pre">isinstance</span></tt
+                    >) and feel a bit syntactically awkward.
+                </li>
+                <li>
+                    There's no linked list (though like I said,
+                    <tt class="docutils literal"
+                        ><span class="pre">tuple</span></tt
+                    >
+                    can fake linked lists); linked lists allow extending a list
+                    without modifying the original list, and so allow some
+                    functional techniques.
+                </li>
+                <li>
+                    Macros just happen to be in Lisp, I don't see how they
+                    relate to functional programming in any way.
+                </li>
+                <li>
+                    Tail call optimization.
+                    <a
+                        class="reference"
+                        href="http://lambda-the-ultimate.org/node/472#comment-3526"
+                        >Yawn</a
+                    >.
+                </li>
+                <li>
+                    Blast, I knew I had another one, but I've forgotten it while
+                    looking up links.
+                </li>
+            </ul>
+        </div>
+        <div class="dates" align="right">
+            Created 07 Apr '06<br />
+            Modified 07 Apr '06
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    What I liked most about OCaml (and I think Haskell has it,
+                    too) is pattern matching. I don't think that it will ever
+                    make its way into python and I'm not sure if I liked it
+                    either.
+                </p>
+                <p>
+                    But it's definately one of the cooler, functional
+                    language/syntax features out there.
+                </p>
+                <p>Somehow it could be done, though.</p>
+                <pre class="literal-block">
+def insertElementIntoTree(tree, element):
+  if element &lt; tree.left:
+    if (Pattern(tree) == Pattern(left=None) and element &lt; tree.left:
+      insertElementIntoTree(left)
+    # ...
+</pre
+                >
+                <p>
+                    Anyway, it's kind of obscuring the code if Pattern would not
+                    become part of the standard library.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/functional-python-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bitwiese.de">Justin Bayer</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        It is extremly easy to implement, by the way:
+                        <a
+                            class="reference"
+                            href="http://home.in.tum.de/~bayerj/patternmatch.py"
+                            >http://home.in.tum.de/~bayerj/patternmatch.py</a
+                        >
+                    </p>
+                    <p>(not extremly well tested, just a scratch...)</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/functional-python-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://bitwiese.de">Justin Bayer</a>
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        Generic functions, or particularly RuleDispatch,
+                        accomplishes just this. Maybe like:
+                    </p>
+                    <pre class="literal-block">
+&#64;generic
+def insert_element(tree, el):
+    raise NotImplementedError
+
+&#64;insert_element.when('tree.left is None or el &lt; tree.left')
+def insert_element_left(tree, el):
+    insert_element(tree.left, el)
+
+...
+</pre
+                    >
+                    <p>
+                        At least, I think that does what you want. I wouldn't
+                        bank on the performance of that algorithm ;) But the
+                        functionality is there, particular in RuleDispatch
+                        (which with arbitrary predicate dispatch is more
+                        general/powerful than what is being proposed for py3k).
+                        Well, I guess I'm not entirely clear on the intention f
+                        <tt class="docutils literal"
+                            ><span class="pre">Pattern(left=None)</span></tt
+                        >; I guess I'd express that as
+                        <tt class="docutils literal"
+                            ><span class="pre">lambda</span>
+                            <span class="pre">tree:</span>
+                            <span class="pre">tree.left</span>
+                            <span class="pre">is</span>
+                            <span class="pre">None</span></tt
+                        >. I assume the distinction is primarily in a language
+                        like OCaml, where you can statically analyze aspects of
+                        patterns, which is not generally possible in Python.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/functional-python-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Is the reason that you don't bank on the performance
+                            ;) that eval()-ing the condition in quotes would be
+                            a bottleneck?
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/functional-python-comment-4.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://bitwiese.de">Justin Bayer</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                It's not eval'd, it's compiled on import; it's
+                                just that doing that branching operation for
+                                every pass of a rather tight loop (in tree
+                                traversal) isn't an efficient way to do that
+                                operation.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/functional-python-comment-5.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Ian Bicking
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    www.katalog.wesnoth.pl holifld.info/katalog
+                                    www.elate.pl/cat/
+                                    marek.holewinski.pl/katalog
+                                    www.strony.pinia.pl
+                                    www.dobredomy.pl/katalog/
+                                    www.artefakt.pl/katalog/
+                                    katalog.programisci.com.pl strony.shaco.pl
+                                    katalog.twojapraca.info
+                                    www.katalog.gigante.pl www.kat.plusk.info
+                                    k1024.toreuse.pl b2b.wroclaw.pl/katalog/
+                                    news.stylokna.pl ale.biurka.pl
+                                    k1024.telewizorek.pl stop.perfectfresh.com
+                                    kat.gigahurt.pl www.strony.prbox.pl
+                                    katalog.gcity.pl ups.markpol.biz
+                                    www.coolmarket.net/katalog
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/functional-python-comment-8.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://praca.cba.pl/an/pracawsi.php"
+                                    >Adim</a
+                                >
+                            </div>
+                            <hr noshade />
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

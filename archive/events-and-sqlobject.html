@@ -1,0 +1,290 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Events and SQLObject</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Events and SQLObject</h1>
+
+        <div class="document">
+            <p>
+                I've been
+                <a
+                    class="reference"
+                    href="http://www.webwareforpython.org/archives/message/20051003.014430.541f7cfe.en.html"
+                    >thinking about events</a
+                >
+                for the 0.8 series of SQLObject. I'm thinking about using
+                <a class="reference" href="http://pydispatcher.sourceforge.net/"
+                    >PyDispatcher</a
+                >, but there's still some
+                <a
+                    class="reference"
+                    href="http://sourceforge.net/mailarchive/forum.php?thread_id=8383303&amp;forum_id=34020"
+                    >open questions</a
+                >. Jim Fulton actually got me thinking about events a while ago,
+                in lieu of &quot;hooks&quot;... PyCon 2003, I guess. He made a
+                <a
+                    class="reference"
+                    href="http://www.python.org/pycon/2005/papers/29/pycon-2005-events.html"
+                    >presentation at PyCon 2005</a
+                >
+                too, but it didn't resonate in the same way, it just seemed too
+                low level; PyDispatcher isn't very complex, but it's a bit
+                higher level. I think Jim was really proposing that higher level
+                systems be built on the low-level systems, but I dunno... it's
+                too abstract then to mean much to me.
+            </p>
+            <p>
+                Anyway, that's what I'm thinking about. The events, at least to
+                start, would be at a fairly low level -- covering things like
+                creating classes and instances, maybe creates and deletes.
+            </p>
+            <p>
+                One concern I have is that anything can be listening for an
+                event, so it's hard to know what all will be effected. When that
+                event is raised it's open season, anything could react.
+                Especially when there's feedback from the events (which I'm
+                planning on) I can imagine confusing ensuing. So... I dunno.
+                Logging?
+            </p>
+        </div>
+        <div class="dates" align="right">Created 06 Oct '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    A possible solution: use the RuleDispatch package's generic
+                    functions for your operations. Define the default method to
+                    do whatever the to-be-monitored operation does, and then you
+                    get before/after/around methods for free, or you can define
+                    custom method combination policies if you like. To
+                    subscribe, just register methods on the functions,
+                    specifying the target class(es) of parameters. Plus, you can
+                    test arbitrary conditions on the parameter values, their
+                    attributes, and call arbitrary methods/functions as well to
+                    determine whether a method applies. &quot;around&quot;
+                    methods and normal methods can choose not to call the
+                    &quot;next&quot; method, or to call it with altered
+                    parameters or fudge its return value in some way.
+                </p>
+                <p>
+                    The only thing this doesn't do that PyDispatcher does, is
+                    that PyDispatcher allows you to remove subscribers, and
+                    RuleDispatch doesn't (yet) allow that. RuleDispatch also
+                    isn't as efficient if you are subscribing to instances
+                    instead of classes. However, if I understand your intended
+                    use case, it seems unlikely that you need either of those
+                    features for SQLObject, but being able to offer your users
+                    an efficient trigger system operating on complex conditions
+                    would likely be a big plus. Can you say, &quot;complete
+                    business rules system&quot;? :)
+                </p>
+                <p>If you give it a try, I'd be interested in your feedback.</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/events-and-sqlobject-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://dirtSimple.org">Phillip J. Eby</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        &quot;&quot;&quot;RuleDispatch also isn't as efficient
+                        if you are subscribing to instances instead of
+                        classes&quot;&quot;&quot;
+                    </p>
+                    <p>
+                        Actually, I spoke too briefly. RuleDispatch is actually
+                        <em>more</em> efficient if you're subscribing to
+                        instances, as long as the set of instances involved is
+                        relatively static. It's just that if you are adding new
+                        instances to subscribe to all the time, then it can cost
+                        a lot to keep rebuilding the dispatch tree. However, if
+                        you just add a bunch of rules at application startup and
+                        then call them, RuleDispatch can be more efficient than
+                        PyDispatcher, if the subscribers have overlapping
+                        conditional tests taking place. (Because RuleDispatcher
+                        evaluates each conditional subexpression at most once,
+                        whereas PyDispatcher subscribers can't take advantage of
+                        tests evaluated by other subscribers.) This is
+                        particularly impactful if any of the tests involve query
+                        execution.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/events-and-sqlobject-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://dirtSimple.org">Phillip J. Eby</a>
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        I had thought about generic functions along the way, but
+                        I guess I was too nervous to try them for what seemed
+                        like a nominal benefit (over something more conventional
+                        like PyDispatcher). There's issues like the fact it
+                        introduces C code into a system that has no C code
+                        (except, I guess, the database drivers -- but those are
+                        commonly packaged). But even more I'm worried that I'd
+                        be a drag on an 0.8 release -- as it is, I feel I was a
+                        drag on 0.7. So I don't want to introduce new things
+                        that I don't entirely understand, unless they are at
+                        least limited. So PyDispatcher's more limited rules are
+                        an advantage there. Events are also a less complicated
+                        concept for other contributors to understand, and since
+                        I really want this feature to help open up SQLObject to
+                        other developers the comprehensibility is important.
+                    </p>
+                    <p>
+                        If I was going to implement an adaptation system, I
+                        would think very seriously about generic functions. In
+                        part because conventional adapation systems like Zope
+                        Interfaces already use C code. But also because I think
+                        adaptation is not easy as it is, and so generic
+                        functions aren't such a new and fancy notion. Or, at
+                        least, they are no more new and fancy than conventional
+                        adaptation -- a concept which has gained little traction
+                        outside of Zope 3 (which actually surprises me).
+                        TurboGears people are planning to implement a JSON
+                        adaptation process... maybe I should suggest something
+                        there. Relatedly, there's some good room for
+                        adaptation-like processes with FormEncode (and with
+                        SQLObject and web framework integration thereof), and
+                        that might be an interesting place for experimentation.
+                        All the more because I think it's a hard problem that
+                        <em>needs</em> new ideas and new programming techniques,
+                        so generic functions may very well make it successful
+                        where traditional techniques would not. When going down
+                        a road strewn with the corpses of previous projects, one
+                        must consider why the next project will be different.
+                        Forms are a place where exceptions are common, and
+                        generic functions are uniquely capable of handling
+                        exceptional behavior.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/events-and-sqlobject-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            &quot;&quot;&quot;it introduces C code into a system
+                            that has no C code&quot;&quot;&quot;
+                        </p>
+                        <p>
+                            Not true; RuleDispatch can be built
+                            <tt class="docutils literal"
+                                ><span class="pre">--without-speedups</span></tt
+                            >
+                            if you want. It does make some difference to the
+                            performance, sure, but if I recall correctly the
+                            difference is measured in a handful of microseconds
+                            for most things, mainly because I haven't written a
+                            lot of C code for it yet anyway. And for Windows --
+                            the main platform where lack of a compiler is
+                            usually an issue -- I distribute a binary egg.
+                        </p>
+                        <p>
+                            &quot;&quot;&quot;Events are also a less complicated
+                            concept for other contributors to
+                            understand&quot;&quot;&quot;
+                        </p>
+                        <ul class="simple">
+                            <li>Event type == generic function</li>
+                            <li>Event data == function parameters</li>
+                            <li>Subscribing a callback == adding a method</li>
+                        </ul>
+                        <p>
+                            What's so complicated about that? It's true that you
+                            have to make some policy decisions about what kinds
+                            of subscribers you'll have - i.e.,
+                            before/after/around/custom - but once you've made
+                            them that's that.
+                        </p>
+                        <p>
+                            Further, nothing says you have to expose the full
+                            power of the system. You can always wrap it in a
+                            shortcut API that implements common use cases. Just
+                            say that the generic functions are event objects,
+                            and have subscribe function(s) that take an event, a
+                            callback, and a filter. Voila! It's an event system,
+                            and nobody needs to know any part of RuleDispatch
+                            that you don't want to expose.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/events-and-sqlobject-comment-5.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://dirtSimple.org">Phillip J. Eby</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>Oh those bloody spammers!</p>
+                <p>Ian,</p>
+                <p>
+                    what about support for the most widely used commercial dbs
+                    (oracle, mssql, db2)? That could also be a reason why python
+                    isn't taken seriously in webapp dev.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/events-and-sqlobject-comment-18.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Michael
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

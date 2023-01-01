@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Working Environment Brainstorm</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Working Environment Brainstorm</h1>
+
+        <div class="document">
+            <p>
+                I posted this to
+                <a
+                    class="reference"
+                    href="http://www.python.org/community/sigs/current/distutils-sig/"
+                    >distutils-sig</a
+                >
+                as a kind of rambly brainstorm. I will subject you all to it
+                too. If you don't care about Python installation, you most
+                certainly won't care about this post; be warned!
+            </p>
+            <p>
+                So, I'm coming back to the idea of a working environment, an
+                isolated and more-or-less self-contained environment for holding
+                installed packages. We discussed this a fair amount at PyCon.
+            </p>
+            <p>
+                I'm assuming such an environment will be encapsulated in a
+                single directory, looking something like:
+            </p>
+            <pre class="literal-block">
+env/
+   bin/
+   lib/python2.4/
+   src/
+   conf/
+</pre
+            >
+            <p>
+                The
+                <tt class="docutils literal"><span class="pre">conf/</span></tt>
+                directory doesn't really relate to much of this specifically,
+                but in many situations it would be useful. Depending on the
+                situation, other subdirectories may exist.
+            </p>
+            <p>
+                Each of the scripts in
+                <tt class="docutils literal"><span class="pre">bin/</span></tt>
+                should know what their working environment is. This is slightly
+                tricky, depending on what that means. If it is a totally
+                isolated environment -- no
+                <tt class="docutils literal"
+                    ><span class="pre">site-packages/</span></tt
+                >
+                on
+                <tt class="docutils literal"
+                    ><span class="pre">sys.path</span></tt
+                >
+                -- then I feel like the script wrappers have to be shell
+                scripts, to invoke Python with
+                <tt class="docutils literal"><span class="pre">-S</span></tt>
+                (which is hard to do portably on the
+                <tt class="docutils literal"><span class="pre">#!</span></tt>
+                line). I don't know the details of doing the same thing on
+                Windows, but I assume it is possible. The actual directory
+                location should be portable -- all paths should be relative, and
+                you should be able to move the directory around.
+            </p>
+            <p>
+                <tt class="docutils literal"
+                    ><span class="pre">lib/python2.4/</span></tt
+                >
+                is for packages. I'm almost inclined to say that
+                <tt class="docutils literal"
+                    ><span class="pre"
+                        >--single-version-externally-managed</span
+                    ></tt
+                >
+                makes sense on some level, with a record kept in some standard
+                place (<tt class="docutils literal"
+                    ><span class="pre"
+                        >lib/python2.4/install-record.txt</span
+                    ></tt
+                >?) -- but I'm basically indifferent. I at least don't see a
+                need for multiple simultaneous versions in this setup, and
+                multiple versions do lead to confusion. Version metadata is
+                still nice, of course.
+            </p>
+            <p>
+                <tt class="docutils literal"><span class="pre">src/</span></tt>
+                is for checkouts, where each package is installed with
+                <tt class="docutils literal"
+                    ><span class="pre">setup.py</span>
+                    <span class="pre">develop</span></tt
+                >. These are naturally single-version, which is part of why I
+                like the idea of only using single-version setups. I'm a little
+                unsure of how
+                <tt class="docutils literal"><span class="pre">src/</span></tt>
+                should be layed out. In practice I want all &quot;my&quot;
+                packages to be installed in
+                <tt class="docutils literal"><span class="pre">src/</span></tt>
+                as checkouts, either from tags or the trunk (or a branch or
+                whatever). Even in the case of tags, a checkout can be turned
+                into a branch fairly easily. So I'm not sure if I should name
+                the subdirectories after the package, or maybe even the package
+                plus a tag name.
+            </p>
+            <p>
+                One of the things SwitchTower (now &quot;Cappucino&quot;, I
+                think) does in Rails land is it makes a dated checkout, then
+                activates that checkout (it does that with a symlink; we'd do it
+                with
+                <tt class="docutils literal"
+                    ><span class="pre">setup.py</span>
+                    <span class="pre">develop</span></tt
+                >). It then rolls back by switching to an existing checkout. Of
+                course svn switch + svn up does this in place, and with less
+                checkout trash laying around, even if rollbacks aren't as fast
+                as a result. So, I'm thinking just
+                <tt class="docutils literal"
+                    ><span class="pre">src/PackageName/</span></tt
+                >, or whatever convention you felt like (e.g.,
+                <tt class="docutils literal"
+                    ><span class="pre">src/PackageName-branchname/</span></tt
+                >)
+            </p>
+            <p>
+                There's an installation issue with checkouts -- it would be nice
+                if I could say &quot;these are the packages I want to install as
+                editable&quot; and
+                <tt class="docutils literal"
+                    ><span class="pre">easy_install</span></tt
+                >
+                would pick those up (maybe detecting based on what package index
+                the package was found in) and install them in
+                <tt class="docutils literal"><span class="pre">src/</span></tt>
+                as editable.
+            </p>
+            <p>
+                Anyway,
+                <tt class="docutils literal"
+                    ><span class="pre">sys.path</span></tt
+                >
+                would contain
+                <tt class="docutils literal"
+                    ><span class="pre">/usr/lib/python2.4</span></tt
+                >
+                (or Windows equivalent),
+                <tt class="docutils literal"
+                    ><span class="pre">env/lib/python2.4/</span></tt
+                >
+                and <em>optionally</em>
+                <tt class="docutils literal"
+                    ><span class="pre"
+                        >/usr/lib/python2.4/site-packages</span
+                    ></tt
+                >, and all the similar directories. Unfortunately figuring out
+                what &quot;similar&quot; directories there are is hard. sys.path
+                on my machine now has 63 entries normally and 12 with
+                <tt class="docutils literal"
+                    ><span class="pre">python</span>
+                    <span class="pre">-S</span></tt
+                >. I guess I'd really like to start with 12 and build up,
+                instead of 63 and try to strip them down.
+            </p>
+            <p>
+                Installation as a whole is an open issue. Putting in
+                <tt class="docutils literal"
+                    ><span class="pre">env/setup.cfg</span></tt
+                >
+                with the setting specific to that working environment works to a
+                degree --
+                <tt class="docutils literal"
+                    ><span class="pre">easy_install</span></tt
+                >
+                will pick it up if invoked from the
+                <tt class="docutils literal"><span class="pre">env/</span></tt>
+                directory. But that doesn't work with
+                <tt class="docutils literal"
+                    ><span class="pre">setup.py</span>
+                    <span class="pre">develop</span></tt
+                >, or
+                <tt class="docutils literal"
+                    ><span class="pre">setup.py</span>
+                    <span class="pre">install</span></tt
+                >, or some other scenarios. The system
+                <tt class="docutils literal"
+                    ><span class="pre">distutils.cfg</span></tt
+                >
+                doesn't really work, because the only expansion it knows how to
+                do is of user directories, so there's little way to pass
+                interesting information in (like a &quot;this is my
+                setup.cfg&quot; environmental variable or something). Maybe with
+                <tt class="docutils literal"
+                    ><span class="pre">$PYTHONPATH</span></tt
+                >
+                to indicate the working environment, and a distutils monkeypatch
+                put into
+                <tt class="docutils literal"
+                    ><span class="pre"
+                        >lib/python2.4/distutils/__init__.py</span
+                    ></tt
+                >? I played around with putting the path setup in
+                <tt class="docutils literal"
+                    ><span class="pre">sitecustomize</span></tt
+                >, but that runs after
+                <tt class="docutils literal"
+                    ><span class="pre">site.py</span></tt
+                >, and doesn't run at all if
+                <tt class="docutils literal"
+                    ><span class="pre">python</span>
+                    <span class="pre">-S</span></tt
+                >
+                is used, so it seems like it brings in too much before it can
+                remove stuff.
+            </p>
+            <p>
+                Another option is a completely new python interpreter bound to
+                the environment. Basically the
+                <a
+                    class="reference"
+                    href="http://peak.telecommunity.com/DevCenter/EasyInstall#creating-a-virtual-python"
+                    >virtual-python.py option</a
+                >.
+            </p>
+            <p>
+                In this model using
+                <tt class="docutils literal"
+                    ><span class="pre">env/bin/python</span></tt
+                >
+                indicates the proper environment, and you'd have local installs
+                of <em>everything</em> including
+                <tt class="docutils literal"
+                    ><span class="pre">easy_install</span></tt
+                >. This fixes so many problems without crazy hacks that it
+                strongly appeals to me, especially if we can make it somewhat
+                lighter. I get this
+                <tt class="docutils literal"
+                    ><span class="pre">/usr/lib/python2.4.zip</span></tt
+                >
+                on my path, a file that doesn't usually exist; if we could
+                create that zip on demand and use such a big-bundle-zip, that
+                seems lighter and faster and nicer, especially if shared. If we
+                just put
+                <tt class="docutils literal"><span class="pre">.pyc</span></tt>
+                files in the zip, and those
+                <tt class="docutils literal"><span class="pre">.pyc</span></tt>
+                files refer back to the actual module source (in
+                <tt class="docutils literal"
+                    ><span class="pre">/usr/lib/python2.4/</span></tt
+                >), then tracebacks should also still work, I believe? No actual
+                symlinks either, so it should work on Windows. I'm not entirely
+                sure where I'm going with this, though.
+            </p>
+            <p>
+                So, by the end I'm thinking an improved
+                <tt class="docutils literal"
+                    ><span class="pre">virtual-python.py</span></tt
+                >
+                is what I'm looking for, as kind of the One True Way to do good
+                Python installation and deployment.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 08 Mar '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>What itch does this working environment scratch?</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/working-env-brainstorm-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bitsko.slc.ut.us/">Ken MacLeod</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Well, it <em>touches</em> nearly every aspect of
+                        installation and workflow. And I think it improves on
+                        them. It's a good way to do development, and a good way
+                        to deploy application stacks.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/working-env-brainstorm-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+            <p>
+                Your post got me to purse some of my own ideas about about
+                deploying Python applications. I've written a small script,
+                <a href="http://agni.phys.iit.edu/~kmcivor/potpourri/whisk"
+                    >whisk</a
+                >, that (ab)uses setuptools to build a working envrionment for
+                deployment.
+            </p>
+            <p>
+                You run <tt>whisk HelloWorld GoodByeWorld</tt> and get a working
+                environment that contains HelloWorld and GoodByeWorld, their
+                scripts, and all of their requirements.
+                <tt>easy_install</tt> does the installation, so the arguments
+                can be files, URIs, and requirements. The resulting scripts
+                automatically find their envrionment's libraries based on the
+                value of <tt>sys.path[0]</tt>. This is more along the lines of
+                OSX Application bundles and CRL Assemblies than what you're
+                talking about, but I thought it might give you some ideas.
+            </p>
+
+            <p></p>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/workingenvbrainstormcomment3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Ken McIvor
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

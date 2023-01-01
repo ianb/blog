@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Re: Optional Static Typing</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Re: Optional Static Typing</h1>
+
+        <div class="document">
+            <p>
+                Guido wrote up some thoughts on
+                <a
+                    class="reference"
+                    href="http://www.artima.com/weblogs/viewpost.jsp?thread=85551"
+                    >optional static typing</a
+                >. This will obviously lead to much debate, and no actual
+                forward movement anytime soon, but (at least from my
+                perspective) it just looks like a thought experiment, only meant
+                to produce discussion, so it's no big deal. There's no reason
+                this should turn into a trinary-operator-style discussion.
+            </p>
+            <p>
+                My initial thoughts are that the thought experiment makes it
+                pretty clear that optional type declarations aren't a good idea.
+                Static type declarations are
+                <a
+                    class="reference"
+                    href="because-unanswered-problems-are-always-hard.html"
+                    >hard</a
+                >, and there's more interesting problems to work on. More
+                specifically, I think the problem is that static type
+                declarations aren't <em>closed</em> conceptually.
+            </p>
+            <p>
+                By &quot;closed&quot;, I mean that introducing one aspect of
+                static typing will make you think about another aspect, and so
+                on, until it's snowballed out of control. There's no
+                <em>easy</em> way to handle static typing, instead you dive
+                straight into the deepest and most unanswered aspects of typing.
+                And none of it makes any sense for Python.
+            </p>
+            <p>
+                ML, for instance, can handle typing in many elegant ways. But it
+                also (from what I can tell from my reading) has a relative
+                paucity of built-in types. The compiler has to know about lists
+                and tuples and structures, because all compound types have to be
+                understood by the typing system, and the compiler verifies the
+                typing system. In Python our basic compound types (lists,
+                tuples, dictionaries, objects) aren't really part of the
+                compiler -- they aren't any more magic than anything else, and
+                pretend dictionaries (like
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-UserDict.html"
+                    >UserDict</a
+                >) are generally substitutable for the &quot;real&quot; thing.
+            </p>
+            <p>
+                When Guido talks about expressions like
+                <tt class="docutils literal"
+                    ><span class="pre">min(a:</span>
+                    <span class="pre">iterable(T))</span>
+                    <span class="pre">-&gt;</span>
+                    <span class="pre">T</span></tt
+                >
+                how is the compiler going to <em>know</em> what
+                <tt class="docutils literal"
+                    ><span class="pre">iterable</span></tt
+                >
+                is? It's not (in the current Python) resolvable until runtime.
+                And sure, we could &quot;fix&quot; its definition, not allowing
+                <tt class="docutils literal"
+                    ><span class="pre">iterable</span></tt
+                >
+                to be rebound. But that doesn't really solve the issue -- this
+                only works for a small number of fixed containers, and isn't
+                extensible for user-defined types.
+            </p>
+            <p>
+                In general, it's not clear what Guido is trying to achieve with
+                this proposal. The only motivation he gives is:
+            </p>
+            <blockquote>
+                Without losing the benefits of Python's dynamic typing, it would
+                be nice if you had the option to add type declarations for your
+                method arguments, variables and so on, and then the compiler
+                would give you a warning if you did something that wasn't
+                possible given what the compiler knows about those types.
+            </blockquote>
+            <p>
+                This isn't a justification for type declarations, but for
+                interface declarations. Interfaces tell you something about the
+                method signatures, and could potentially in turn provide further
+                contract information (e.g.,
+                <tt class="docutils literal"
+                    ><span class="pre">IImage</span></tt
+                >
+                objects have a
+                <tt class="docutils literal"
+                    ><span class="pre">.histogram()</span></tt
+                >
+                method that returns a sequence of
+                <tt class="docutils literal"
+                    ><span class="pre">IColor</span></tt
+                >
+                objects). They <em>don't</em> tell you exactly what code will be
+                run when you call a method -- that's what
+                <em>type</em> declarations can provide, because given a type and
+                a method name you can look up the specific code (not allowing
+                for subclassing). That's really useful when you are doing lots
+                of static analysis -- like you would in ML or
+                <a class="reference" href="http://boo.codehaus.org/">Boo</a> --
+                but it won't get us very far. But we don't need that level of
+                static analysis to support source checkers (like PyChecker or
+                PyLint) or to allow auto-completion in IDEs.
+            </p>
+            <p>
+                Of course, the container problem really isn't solved for
+                interfaces either -- you could create a
+                <tt class="docutils literal"
+                    ><span class="pre">IIteratorInteger</span></tt
+                >
+                interface where
+                <tt class="docutils literal"
+                    ><span class="pre">.next()</span></tt
+                >
+                was declared to return an
+                <tt class="docutils literal"
+                    ><span class="pre">IInteger</span></tt
+                >
+                object, but this becomes awkward (since you then have to create
+                an
+                <tt class="docutils literal"
+                    ><span class="pre">IIterableInteger</span></tt
+                >
+                interface and who knows what else). Interfaces that took
+                parameters might be useful. From what I've seen, the current
+                interface implementations (Zope and PyProtocols) don't provide
+                this, but I may be mistaken.
+            </p>
+            <p>
+                Anyway, that current interfaces lack these features isn't as big
+                a deal. With the kind of interfaces Python has now, the stakes
+                are much lower. They don't fix anything into the syntax of the
+                language. You can be a little sloppy where they aren't
+                sufficient to express your intentions now, and maybe later you
+                can be more explicit. Or not, if people continue not to care too
+                much (and if people continue not to care too much, it means it's
+                just not that important). We can come to some consensus on
+                interfaces, and we never will with type declarations; I don't
+                think that's a sign of a structural problem in the Python
+                community, but rather a sign that type declaration doesn't have
+                a well-defined problem or solution.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 24 Dec '04</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    PyProtocols actually does include one paramerizable
+                    interface factory:
+                    <tt class="literal"
+                        ><span class="pre">sequenceOf(aProtocol)</span></tt
+                    >
+                    returns a protocol object representing a &quot;sequence of
+                    aProtocol&quot;. It's left to the user to create other
+                    parameterized interfaces if they have the need. You could
+                    also subclass
+                    <tt class="literal"
+                        ><span class="pre">protocols.InterfaceClass</span></tt
+                    >
+                    and add a
+                    <tt class="literal"
+                        ><span class="pre">__getitem__</span></tt
+                    >
+                    method to create parameterizable interfaces, although you
+                    might need a couple of other things. Hm, maybe something
+                    like:
+                </p>
+                <pre class="literal-block">
+class IFactory(ParamaterizedInterface):
+
+    createsType = InterfaceParameter()
+
+    def create() -&gt; createsType:
+        &quot;&quot;&quot;Create an instance of the appropriate type&quot;&quot;&quot;
+</pre
+                >
+                <p>
+                    and then
+                    <tt class="literal"
+                        ><span class="pre">IFactory[IFoo]</span></tt
+                    >
+                    would represent something whose
+                    <tt class="literal"><span class="pre">create</span></tt>
+                    method returns an
+                    <tt class="literal"><span class="pre">IFoo</span></tt
+                    >. Adapting to an InterfaceParameter directly would always
+                    raise an error; the idea is that the
+                    <tt class="literal"
+                        ><span class="pre">__getitem__</span></tt
+                    >
+                    would somehow clone the methods and change their type
+                    signatures in the non-parameterized version of the
+                    interface.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/reoptionalstatictyping-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://dirtSimple.org">Phillip J. Eby</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

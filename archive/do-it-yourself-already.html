@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Do It Yourself</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Do It Yourself</h1>
+
+        <div class="document">
+            <p>
+                In response to some of the recent activity around Python web
+                frameworks, and some of the new interest in Paste, I thought it
+                would be helpful to write a document about how you write a
+                framework using WSGI. With RhubarbTart coming in at 302 lines
+                (according to
+                <a class="reference" href="http://www.dwheeler.com/sloccount/"
+                    >sloccount</a
+                >) I figure it's a pretty reasonable to consider writing your
+                own. But really my hope is that this will make people more
+                comfortable with this architectural style. Even if you don't
+                write your own framework, it's nice to know both that you
+                <em>could</em> write your own framework, and that you can
+                probably understand the framework someone else writes,
+                approaching it piece-by-piece.
+            </p>
+            <p>
+                So, here's the start:
+                <a
+                    class="reference"
+                    href="http://pythonpaste.org/do-it-yourself-framework.html"
+                    >A Do-It-Yourself Framework</a
+                >. I still want to talk about configuration and deployment with
+                Paste Deploy, and about packaging your application with
+                setuptools and using entry points, but this is a good start.
+            </p>
+            <p>
+                Note that I haven't tested the examples. Bad me. Testing tires
+                me out sometimes.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 01 Feb '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Wow, really nice tutorial. Now you've made me want to look
+                    more into Paste :) I found one minor mistake while going
+                    throughe the code, environ and next_obj are switched in the
+                    recursive call:
+                </p>
+                <pre class="literal-block">
+def find_object(self, obj, environ):
+    ...
+    return self.find_object(environ, next_obj)
+</pre
+                >
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-it-yourself-already-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                julien
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>Thanks for the note; now fixed.</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/do-it-yourself-already-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>two words: tremendously useful!</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-it-yourself-already-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://jw.n--tree.net/">Jan-Wijbrand Kolman</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I was reading your post on my rss reader (bloglines) and the
+                    link got
+                    <a
+                        class="reference"
+                        href="http://pythnopaste.org/do-it-yourself-framework.html"
+                        >http://pythnopaste.org/do-it-yourself-framework.html</a
+                    >
+                    note the pythnopaste. What could be the problem?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-it-yourself-already-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Leonardo
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        That is most bizarre, since I did not edit the post in
+                        any way and didn't make that typo...
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/do-it-yourself-already-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Could you frame WareWeb in this context, plus maybe compare
+                    it to RhubarbTart?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-it-yourself-already-comment-9.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://webseitz.fluxent.com/wiki">Bill Seitz</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I finnaly got to work through your tutorial. Its brilliant
+                    and really illustrates what WSGI is all about. Instead of
+                    your object traversal to locate the correct callable for the
+                    path I just used a simple dictionary of path names mapped to
+                    callables and then on KeyError just return a 404.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-it-yourself-already-comment-10.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://noga.muti.co.za">thakadu</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

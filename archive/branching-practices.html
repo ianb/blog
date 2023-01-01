@@ -1,0 +1,444 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Branching Practices</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Branching Practices</h1>
+
+        <div class="document">
+            <p>
+                Bill de hÓra has a good post on
+                <a
+                    class="reference"
+                    href="http://www.dehora.net/journal/2006/02/subversion_tips_dealing_with_branches.html"
+                    >Subversion branching practices</a
+                >.
+            </p>
+            <p>
+                So here's a Python-specific quandary: how should tagging happen
+                exactly?
+            </p>
+            <p>
+                Into the
+                <a class="reference" href="http://buildutils.lesscode.org/"
+                    >buildutils</a
+                >
+                <tt class="docutils literal"><span class="pre">svtag</span></tt>
+                command I've built this process:
+            </p>
+            <ul class="simple">
+                <li>
+                    Copy from
+                    <tt class="docutils literal"
+                        ><span class="pre">Project/trunk</span></tt
+                    >
+                    (current directory) to
+                    <tt class="docutils literal"
+                        ><span class="pre">Project/tags/version</span></tt
+                    >
+                </li>
+                <li>
+                    Check out the new version into
+                    <tt class="docutils literal"
+                        ><span class="pre">../Project-version</span></tt
+                    >
+                </li>
+                <li>
+                    Edit
+                    <tt class="docutils literal"
+                        ><span class="pre">setup.py</span></tt
+                    >
+                    to change the version (if necessary), and
+                    <tt class="docutils literal"
+                        ><span class="pre">setup.cfg</span></tt
+                    >
+                    to remove
+                    <tt class="docutils literal"
+                        ><span class="pre">tag_svn_repository</span></tt
+                    >
+                    and
+                    <tt class="docutils literal"
+                        ><span class="pre">tag_build</span>
+                        <span class="pre">=</span>
+                        <span class="pre">dev</span></tt
+                    >
+                </li>
+                <li>
+                    Edit
+                    <tt class="docutils literal"
+                        ><span class="pre">setup.py</span></tt
+                    >
+                    in the trunk to have the next version
+                </li>
+                <li>Commit all changes</li>
+            </ul>
+            <p>
+                It ends up being three commits, which is a little annoying. And,
+                technically, I'm editing a tag, even if it is a very minor edit.
+            </p>
+            <p>
+                Another issue -- do people have any particular tricks for
+                keeping their checkouts up to date? I just have a shell script
+                that does an
+                <tt class="docutils literal"
+                    ><span class="pre">svn</span>
+                    <span class="pre">up</span></tt
+                >
+                for each directory, and another for doing
+                <tt class="docutils literal"
+                    ><span class="pre">svn</span> <span class="pre">stat</span>
+                    <span class="pre">-u</span></tt
+                >
+                on all my &quot;active&quot; projects. But I don't use the
+                scripts as regularly as I should, nor do I keep the list of
+                active projects up to date. And it's all kind of vague anyway --
+                I run lots of things from svn checkouts even if I am not
+                necessarily tracking every development on the project.
+            </p>
+            <p>
+                I'm also curious about tools built on Subversion for handling
+                branches better. One of the commenters points to
+                <a
+                    class="reference"
+                    href="http://subclipse.tigris.org/branch_tag.html"
+                    >Subclipse</a
+                >, which uses a property to track tags. But it doesn't seem to
+                describe what exactly it is doing and what that tag means.
+                <a class="reference" href="http://svk.elixus.org/">svk</a> also
+                uses a special property for tracking merges, which is probably
+                better documented. I'm curious how half-heartedly I can use svk
+                (<a
+                    class="reference"
+                    href="http://svk.elixus.org/?SVKForSubversion"
+                    >this page isn't actually that helpful</a
+                >) -- can I just use it as a better frontend to Subversion? Will
+                it work okay if other developers aren't using svk?
+            </p>
+            <p>
+                Indexing of repositories and general tracking also remains
+                relevent, both locally (what do I track?) and globally (what
+                versions of things exist out there?)
+            </p>
+            <p>
+                Incidentally, I would be very interested to hear how exactly
+                people are using svn (or svk) on their machines. Like, the
+                play-by-play of every non-obvious command they use, script they
+                have, or whatever.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 14 Feb '06<br />
+            Modified 14 Feb '06
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    A while ago I wrote a entry called
+                    <a
+                        class="reference"
+                        href="http://www.tummy.com/journals/entries/jafo_20060102_172958"
+                        >Subversion is a gateway drug</a
+                    >. In general, my version control needs were fairly modest,
+                    and I tried to keep them that way. However, for some recent
+                    projects we have 2 to 3 people modifying code, and have the
+                    code in a few different versions. I had to do some branching
+                    to fold in changes to the stable version while doing
+                    development changes as well.
+                </p>
+                <p>
+                    I found that, in general, even with cvs2svn doing the wrong
+                    thing with non-text files, it was easier to convert from CVS
+                    to SVN and branch, than to branch the CVS. I always ended up
+                    running problems with &quot;branch is not a sticy tag&quot;
+                    that I couldn't get resolved...
+                </p>
+                <p>
+                    However, once I had branches, I started wanting to use them,
+                    and found that merging between branches was quite painful. I
+                    really have to have at least two branches, with all changes
+                    from one being merged into the other, and sometimes going
+                    the other direction when changes are ready. Really I want a
+                    tree of branches where changes at a higher level flow down
+                    to a lower level. That would be ideal.
+                </p>
+                <p>
+                    I was looking at other systems, and finally with the help of
+                    Jeremy Hinegardner and Duncan McGreggor, I switched to
+                    darcs, and have been liking it.
+                </p>
+                <p>
+                    Basically, with darcs, you can check out one working tree
+                    into another. Each of these is a self-sufficient repository.
+                    The repositories can be local or remote. So, I can have a
+                    parent repository and then children can &quot;darcs
+                    pull&quot; from their parents. I can also cherry-pick
+                    patches to push back up-stream. For me, that's a much less
+                    frequent thing, so that can be much more difficult. It's
+                    keeping the children up with the parents that happens
+                    frequently.
+                </p>
+                <p>
+                    I like that I have a full local copy of the repository. It
+                    makes doing releases insanely easy and fast, plus I can do
+                    commits and tags without needing net access.
+                </p>
+                <p>
+                    However, pushing and pulling from a remote repository can be
+                    real slow. Slower than svn at least.
+                </p>
+                <p>
+                    I should try svk at some point. Really all I'd like to see
+                    is good branch merging support. I know you can do tricks to
+                    follow branches, but those seem like they require
+                    remembering much more and are more prone to errors.
+                </p>
+                <p>Sean</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/branching-practices-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.tummy.com/journals/users/jafo/"
+                    >Sean Reifschneider</a
+                >
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    svk works fine as an svn frontend. You don't even need to
+                    use the local mirroring stuff if you don't want to (though
+                    it is handy). Merge tracking (via smerge) is a godsend. I've
+                    found it's pretty smart about doing the right thing even
+                    when the other committers are using straight SVN.
+                </p>
+                <p>
+                    The thing to keep in mind is that it's <em>not</em> a
+                    substitue for good repo practices. You still want branches,
+                    etc (treating your local mirror like a private branch just
+                    isn't a good idea).
+                </p>
+                <p>
+                    I wonder if you could avoid the need to edit tags via clever
+                    use of SVN keywords &amp; a little python string
+                    transformation?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/branching-practices-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Peter Fein
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I use svk exactly for that: a better branch merger. I
+                    usually keep local mirrors and merge between those (I keep
+                    my own branches in my own SVN repositories for upstream
+                    stuff, so that I can easily keep local modifications). So
+                    svk is a real godsend for any way of forking, even if it is
+                    just for your own convenience. Actually I _only_ do the
+                    merging and fork-handling in svk, everything else is done
+                    with standard svn - that's mostly because svk is dog-slow on
+                    my OS X machines.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/branching-practices-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://rfc1437.de/page/">hugo</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I tried using svk as a front-end to Python's svn repository
+                    (as recommended by Fredrik Lundh on his blog), but after
+                    bizarre error messages (it's not that often that I see Perl
+                    tracebacks) I decided that whilst tools like bazaar are also
+                    badly documented, at least they manage to complete
+                    operations in the advertised &quot;how to&quot; documents
+                    without crashing inexplicably.
+                </p>
+                <p>
+                    Personally, I wish that the developers of &quot;next
+                    generation&quot; revision control systems would spend some
+                    time writing documentation, rather than leaving it to others
+                    to write terse command sequences that &quot;worked for
+                    them&quot;, or just referring everyone to the tool that
+                    inspired the latest effort.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/branching-practices-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Paul Boddie</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    You can reduce this process to two commits (and not have to
+                    edit the tag) by including the version bump during the
+                    branch copy. Check out a clean version of trunk, modify the
+                    version number locally and make your src '.' while doing an
+                    svn copy. You'll get a clean commit like this:
+                    <a
+                        class="reference"
+                        href="http://www.hellanzb.com/trac/hellanzb/changeset/551"
+                        >http://www.hellanzb.com/trac/hellanzb/changeset/551</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/branching-practices-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Philip Jenvey
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Thanks, that would save the need for a checkout of the
+                        tag as well.
+                    </p>
+                    <p>
+                        In theory it should be doable with one commit, but I
+                        don't know how to actually do that without having an
+                        actual checkout of the tags directory, which is not
+                        really feasible.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/branching-practices-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    The technique I've used most is to have a 'make-release'
+                    script that takes the repository path or tag, picks the
+                    version out of the path or tag, exports the project, inserts
+                    the version into the right places (setup.py here), and
+                    creates the release tarball and whatnot. I have an older
+                    version of the script (my pre-Python days!) with a CVS
+                    mini-HOWTO with the whole release process,
+                    <a
+                        class="reference"
+                        href="http://bitsko.slc.ut.us/~ken/make-rel/"
+                        >http://bitsko.slc.ut.us/~ken/make-rel/</a
+                    >
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/branching-practices-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bitsko.slc.ut.us">Ken MacLeod</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        <a
+                            class="reference"
+                            href="http://buildutils.lesscode.org"
+                            >buildutils</a
+                        >
+                        has several of these features, though I haven't used
+                        them all (I use setuptools' PyPI uploading, and don't
+                        bother with the announce feature in buildutils either).
+                    </p>
+                    <p>
+                        I actually want the checkout to be usable -- which means
+                        a proper version (which becomes much more important with
+                        setuptools and
+                        <tt class="docutils literal"
+                            ><span class="pre">python</span>
+                            <span class="pre">setup.py</span>
+                            <span class="pre">develop</span></tt
+                        >), so the version fixup has to happen in the
+                        repository, not just at build time. There's still
+                        versions in the documentation, though. Some of these are
+                        unresolveable by any automated process (e.g., NEWS).
+                    </p>
+                    <p>
+                        Anyway, with buildutils it's a pretty clean release
+                        process:
+                    </p>
+                    <pre class="literal-block">
+python setup.py svntag --version=0.4.1 --next-version=0.4.2
+cd ../Package-0.4.1
+python setup.py register
+python setup.py sdist upload
+# Then the documentation:
+python setup.py pudge publish
+</pre
+                    >
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/branching-practices-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

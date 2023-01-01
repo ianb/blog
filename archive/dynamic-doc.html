@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Dynamic __doc__</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Dynamic __doc__</h1>
+
+        <div class="document">
+            <p>
+                One thing I did in the last (0.4) release of
+                <a class="reference" href="http://formencode.org">FormEncode</a>
+                is add some dynamic docstrings. I've started relying more
+                heavily on
+                <a
+                    class="reference"
+                    href="http://formencode.org/module-formencode.validators.html"
+                    >automatically-generated documentation</a
+                >, but there was information specific to validators that I
+                wanted to include without the tedium or redundancy of copying it
+                into the docstring. In particular, I wanted to display
+                information about all of the error messages a validator can
+                produce.
+            </p>
+            <p>
+                Since I was already using a
+                <a class="reference" href="a-conservative-metaclass.html"
+                    >__classinit__ metaclass</a
+                >
+                it was easy to add code that gets run for every subclass of
+                <tt class="docutils literal"
+                    ><span class="pre">Validator</span></tt
+                >. And I just did something like this (to paraphrase):
+            </p>
+            <pre class="literal-block">
+def __classinit__(cls, new_attrs):
+    ...
+    for name, value in cls._messages.items():
+        cls.__doc__ += '\n``%s``: %s' % (name, value)
+</pre
+            >
+            <p>
+                Before I had been thinking about putting all sorts of cleverness
+                into the documentation generation system so it could detect
+                these attributes, but this is much better all around, and
+                simpler to boot. Of course, it would be nice to have indexes and
+                whatnot, but ultimately I think those would be better
+                implemented in the underlying documentation system (<a
+                    class="reference"
+                    href="http://docutils.sourceforge.net/rst.html"
+                    >restructured text</a
+                >
+                moreso than
+                <a class="reference" href="http://pudge.lesscode.org/">Pudge</a
+                >), and maybe I could just add a special role to the text.
+            </p>
+            <p>Anyway, it made me feel clever so I thought I'd share.</p>
+        </div>
+        <div class="dates" align="right">Created 22 Nov '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    That might be an interesting place to park some information.
+                    Consider testing, when you may want remember the number of
+                    times a function was called, without cluttering up the
+                    standard output. Hmm....
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/dynamic-doc-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://">Chris</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Oh, ew, don't go adding programmatic meaningfulness to
+                        doc comments :-).
+                    </p>
+                    <p>
+                        If you want to store that kind of info, why not just
+                        stick it in another attribute on the function (or other
+                        callable) object?
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/dynamic-doc-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Nathaniel Smith
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    That's nice. If you don't mind, I'll use this example in my
+                    upcoming &quot;Agile documentation&quot; talk at PyCon.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/dynamic-doc-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://agiletesting.blogspot.com">Grig Gheorghiu</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>Cool!</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/dynamic-doc-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://testoob.sourceforge.net">Ori Peleg</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

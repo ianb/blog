@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Building testability into web applications</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Building testability into web applications</h1>
+
+        <div class="document">
+            <p>
+                Well, besides setup scripts the other thing I want to take from
+                Rails is building testability into the system. But I haven't
+                quite figured out how to do that. The specific idea I want to
+                take is that of data fixtures -- data that puts the site into a
+                &quot;known&quot; state that can be tested against. In the Rails
+                world that's a bunch of rows to be inserted into the database,
+                which is a particular case I'm interested in, but of course it
+                should be more general.
+            </p>
+            <p>
+                That's not too terribly hard; it's mostly grunt work. Not
+                super-simple, but not hard. I've added the necessary
+                configuration file hooks to handle different kind of
+                environments running out of the same directory:
+                <tt class="docutils literal"
+                    ><span class="pre">include()</span></tt
+                >
+                and
+                <tt class="docutils literal"><span class="pre">load()</span></tt
+                >, both of which have access to previous files, so you could do:
+            </p>
+            <pre class="literal-block">
+if debug:
+    include('database_debug.conf')
+else:
+    include('database.conf')
+</pre
+            >
+            <p>
+                Or any number of things, like testing
+                <tt class="docutils literal"
+                    ><span class="pre">if</span>
+                    <span class="pre">profile</span>
+                    <span class="pre">==</span>
+                    <span class="pre">'debug'</span></tt
+                >. This kind of flexibility (among other things) makes Python
+                files very useful; I was skeptical at first about Python syntax
+                (having
+                <a
+                    class="reference"
+                    href="http://svn.w4py.org/home/ianb/wsgikit_old_config/"
+                    >invested much time</a
+                >
+                into an INI-file based configuration), but it makes
+                <em>so many things</em> so easy.
+            </p>
+            <p>
+                Oh, but back to the actual testing. One thing I like about how
+                things have shaped up in Paste is that testing has been pretty
+                easy.
+                <a
+                    class="reference"
+                    href="http://svn.w4py.org/Paste/trunk/paste/wsgilib.py"
+                    >paste.wsgilib</a
+                >
+                has a function
+                <tt class="docutils literal"
+                    ><span class="pre">raw_interactive(app,</span>
+                    <span class="pre">path_info)</span></tt
+                >
+                that is quite useful, and I use it in
+                <a
+                    class="reference"
+                    href="http://svn.w4py.org/Paste/trunk/paste/tests/fixture.py"
+                    >paste.tests.fixture</a
+                >
+                in
+                <tt class="docutils literal"
+                    ><span class="pre">fake_request()</span></tt
+                >. It lets me do things like:
+            </p>
+            <pre class="literal-block">
+res = fake_request(p, '/')
+res.all_okay() # Asserts status is 200 OK, no errors logged
+assert 'Welcome' in res
+assert res.header('content-type') == 'text/html'
+</pre
+            >
+            <p>
+                And so on. There's some things I feel should be tweaked. For
+                instance, it should normal throw an error for any status besides
+                <tt class="docutils literal"
+                    ><span class="pre">200</span>
+                    <span class="pre">OK</span></tt
+                >
+                (with a keyword to explicitly say that another status is okay or
+                expected). Maybe test for compliant HTML (<a
+                    class="reference"
+                    href="http://svn.w4py.org/Paste/trunk/paste/wdg_validate.py"
+                    >paste.wdg_validate</a
+                >
+                is a start for this). It should make requests a little easier to
+                perform -- maybe it should be a wrapper around an application,
+                for instance. But it's pretty close as it is, it just needs a
+                little loving to get all the convenience methods in (and a good
+                testing framework is all about convenience). And then you could
+                do the whole thing in
+                <a
+                    class="reference"
+                    href="http://python.org/doc/current/lib/module-doctest.html"
+                    >doctest</a
+                >, maybe like:
+            </p>
+            <blockquote>
+                <pre class="doctest-block">
+&gt;&gt;&gt; app = FakeApp(this_app)
+&gt;&gt;&gt; res = app.post('/login', data={'username': 'bob', 'password': 'bob'})
+&gt;&gt;&gt; res.element(id='message')
+&lt;div id=&quot;message&quot;&gt;User 'bob' logged in&lt;/div&gt;
+</pre
+                >
+            </blockquote>
+            <p>
+                And so on. You could put this right into your object's
+                docstrings. Using things like
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/FormEncode/trunk/formencode/doctest_xml_compare.py"
+                    >doctest_xml_compare</a
+                >
+                you can make your test say just what you mean, and no more.
+            </p>
+            <p>
+                That could be really sweet. Interested?
+                <a
+                    class="reference"
+                    href="http://pythonpaste.org/mailman/listinfo/paste-users"
+                    >Join paste-users</a
+                >
+                and we'll talk there.
+            </p>
+            <p>
+                <strong>Update</strong>: There's been some progress on this in
+                <a
+                    class="reference"
+                    href="http://svn.w4py.org/Paste/trunk/paste/tests/fixture.py"
+                    >paste.tests.fixture.TestApp</a
+                >
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 10 May '05<br />
+            Modified 11 May '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>Do you have an RSS feed for this site?</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/building-testability-into-web-applications-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="https://ianbicking.org/www.nigelthorne.com"
+                    >Nigel Thorne</a
+                >
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Auto-discoverable, yes; it's at
+                        <a
+                            class="reference"
+                            href="https://ianbicking.org/feeds/new_pages.xml"
+                            >https://ianbicking.org/feeds/new_pages.xml</a
+                        >
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/building-testability-into-web-applications-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Awesome. Exactly what I was looking for. Loved pbp and
+                    twill, but couldn't integrate it very well with py.test.
+                    Once you go py.test, you can't go back. :)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/building-testability-into-web-applications-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://blog.99hats.com">Kevin Smith</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

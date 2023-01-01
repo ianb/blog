@@ -1,0 +1,685 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>What is Paste</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>What is Paste</h1>
+
+        <div class="document">
+            <p>
+                Well, after trying
+                <a class="reference" href="what-is-wsgikit.html">twice</a>
+                <a class="reference" href="what-can-wsgikit-do-for-you.html"
+                    >before</a
+                >, I think I didn't actually make it clear what Paste is. I
+                don't know if I've done any better this time, but I'll keep
+                trying. I'm not sure entirely what the confusion is -- in part
+                Paste is several disconnected things, in part I think people
+                read more into it than there is (it's not any Deep New Ideas),
+                or maybe I'm leaving out important details. Feedback welcome.
+                The canonical location for this document is
+                <a
+                    class="reference"
+                    href="http://pythonpaste.org/docs/what-is-paste.html"
+                    >http://pythonpaste.org/docs/what-is-paste.html</a
+                >
+                and copied here for all you RSS readers...
+            </p>
+            <div class="section" id="introduction">
+                <h1><a name="introduction">Introduction</a></h1>
+                <p>
+                    It has come up several times that people don't understand
+                    quite what Paste is and what it is intended to be. This
+                    document is an attempt to respond to that.
+                </p>
+                <p>
+                    In part the confusion has been because Paste has is really
+                    several things. It is an attempt to fill in some of the gaps
+                    in web frameworks, and to identify places where things can
+                    be shared; as such it is a reaction to the current state of
+                    frameworks, and a direct attempt to be complimentary to
+                    those frameworks. As a result it can be somewhat eclectic.
+                </p>
+            </div>
+            <div class="section" id="server-application-glue">
+                <h1>
+                    <a name="server-application-glue"
+                        >Server/Application Glue</a
+                    >
+                </h1>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://www.python.org/peps/pep-0333.html"
+                        >WSGI</a
+                    >
+                    defines how servers invoke applications, and how application
+                    respond. However, it does not define how servers or
+                    applications come into existance, or how they are passed to
+                    each other.
+                </p>
+                <p>
+                    Paste is meant to bridge that, but providing a single entry
+                    point that can create and configure a server, create an WSGI
+                    application, and hook the two together.
+                </p>
+                <p>
+                    This generally involves distinct code for each server
+                    supported, since there isn't any standard.
+                </p>
+                <p>
+                    Also, Paste is expected to create the applications that get
+                    served. This is typically done through at least
+                    somewhat-custom code that is driven by the configuration.
+                    Which leads us to...
+                </p>
+            </div>
+            <div class="section" id="configuration">
+                <h1><a name="configuration">Configuration</a></h1>
+                <p>
+                    In order to set up servers and application, some kind of
+                    configuration is needed. Paste loads up configuration files
+                    and makes these available to all parts of the system.
+                </p>
+                <p>
+                    One goal of Paste is to support small pieces of decoupled
+                    code that work together. This is part of its WSGI-driven
+                    architecture. However, exactly how that code is split up is
+                    an implementation detail that really shouldn't be exposed to
+                    end users. Because of this, each component can't have its
+                    own configuration without resulting in a mess of
+                    configuration files and formats that are fragile and
+                    difficult to understand.
+                </p>
+                <p>
+                    This configuration is accessible from all portions of the
+                    system, so your application configuration can go in beside
+                    server and middleware configuration.
+                </p>
+            </div>
+            <div class="section" id="reusable-middleware">
+                <h1><a name="reusable-middleware">Reusable Middleware</a></h1>
+                <p>
+                    WSGI allows for the idea of &quot;middleware&quot; --
+                    something that is both a server and an application. This is
+                    similar to a filter or a wrapper. By building these on WSGI,
+                    they are neutral with respect to any particular framework.
+                </p>
+                <p>
+                    Use of the middleware is generally optional, but they serve
+                    as a way to share work, and tend to be a fairly good
+                    architecture for many problems.
+                </p>
+                <p>Some of the middleware included:</p>
+                <ul class="simple">
+                    <li>
+                        Adding configuration information to the request (<tt
+                            class="docutils literal"
+                            ><span class="pre">paste.configmiddleware</span></tt
+                        >)
+                    </li>
+                    <li>
+                        Catching and reporting errors (<tt
+                            class="docutils literal"
+                            ><span class="pre">paste.error_middleware</span></tt
+                        >)
+                    </li>
+                    <li>
+                        Catching HTTP-related exceptions and producing HTTP
+                        responses (<tt class="docutils literal"
+                            ><span class="pre">paste.httpexceptions</span></tt
+                        >)
+                    </li>
+                    <li>
+                        Testing for WSGI compliance (<tt
+                            class="docutils literal"
+                            ><span class="pre">paste.lint</span></tt
+                        >)
+                    </li>
+                    <li>
+                        Identifying and authenticating user logins (<tt
+                            class="docutils literal"
+                            ><span class="pre">paste.login</span></tt
+                        >)
+                    </li>
+                    <li>
+                        Facilitating internal redirects and recursive calls (<tt
+                            class="docutils literal"
+                            ><span class="pre">paste.recursive</span></tt
+                        >)
+                    </li>
+                    <li>
+                        Adding sessions to the request (<tt
+                            class="docutils literal"
+                            ><span class="pre">paste.session</span></tt
+                        >)
+                    </li>
+                    <li>
+                        Validating HTML output from applications (<tt
+                            class="docutils literal"
+                            ><span class="pre">paste.wdg_validate</span></tt
+                        >)
+                    </li>
+                </ul>
+                <p>
+                    Another kind of middleware is one which finds and constructs
+                    applications. At the moment, just one such middleware is in
+                    the library:
+                    <tt class="docutils literal"
+                        ><span class="pre">paste.urlparser</span></tt
+                    >. This looks on disk for files and Python modules, and
+                    creates WSGI applications from them. Other URL resolvers are
+                    also possible, e.g., one that traverses objects, or uses
+                    explicit URL-&gt;application maps.
+                </p>
+            </div>
+            <div class="section" id="otherwise-homeless-code">
+                <h1>
+                    <a name="otherwise-homeless-code"
+                        >Otherwise Homeless Code</a
+                    >
+                </h1>
+                <p>
+                    All code has to go somewhere. Sometimes there's not a good
+                    location for that code. So it can go in Paste.
+                </p>
+                <div class="section" id="an-implementation-webware">
+                    <h2>
+                        <a name="an-implementation-webware"
+                            >An Implementation Webware</a
+                        >
+                    </h2>
+                    <p>
+                        <tt class="docutils literal"
+                            ><span class="pre">paste.webkit</span></tt
+                        >
+                        is a reimplementation of Webware built on the Paste
+                        middleware. This is a fairly thin implementation, mostly
+                        mapping the middleware APIs to Webware APIs.
+                    </p>
+                    <p>
+                        In this system Webware Servlet instances become WSGI
+                        applications (<tt class="docutils literal"
+                            ><span class="pre"
+                                >paste.webkit.wkservlet.Servlet.__call__</span
+                            ></tt
+                        >
+                        implements a WSGI application).
+                    </p>
+                </div>
+                <div class="section" id="reloader">
+                    <h2><a name="reloader">Reloader</a></h2>
+                    <p>
+                        This module (<tt class="docutils literal"
+                            ><span class="pre">paste.reloader</span></tt
+                        >) checks in the background for modified files
+                        (typically modules in
+                        <tt class="docutils literal"
+                            ><span class="pre">sys.modules</span></tt
+                        >) and restarts the entire server when that happens.
+                    </p>
+                    <p>
+                        This avoids the stale-code issue, where code in memory
+                        gets out of sync with code on disk. When that happens
+                        confusion can ensue. Manually restarting is also
+                        somewhat annoying, so this does the restarting for you.
+                        It's not really appropriate for a live deployment, but
+                        it works well in development.
+                    </p>
+                </div>
+                <div class="section" id="documentation-system">
+                    <h2>
+                        <a name="documentation-system">Documentation System</a>
+                    </h2>
+                    <p>
+                        This is still young and not well defined, but there's
+                        some work on using
+                        <a
+                            class="reference"
+                            href="http://python.org/doc/current/lib/module-doctest.html"
+                            >doctest</a
+                        >
+                        to generate and test documentation. These can turn into
+                        a kind of acceptance test.
+                    </p>
+                </div>
+            </div>
+            <div class="section" id="application-templates">
+                <h1>
+                    <a name="application-templates">Application Templates</a>
+                </h1>
+                <p>
+                    One facility in Paste is
+                    <tt class="docutils literal"
+                        ><span class="pre">paste-setup</span></tt
+                    >
+                    a script to create application &quot;templates&quot;.
+                    Basically an empty application, with a little structure. For
+                    instance, the Webware/Zope Page Template (webkit_zpt)
+                    application template sets up these files:
+                </p>
+                <pre class="literal-block">
+__init__.py
+server.conf
+sitepage.py
+templates/standard_template.pt
+templates/index.pt
+web/__init__.py
+web/index.py
+web/static/stylesheet.css
+</pre
+                >
+                <p>
+                    This is a kind of a minimal set up for a typical web
+                    application using these systems. After the application is
+                    set up,
+                    <tt class="docutils literal"
+                        ><span class="pre">paste-setup</span></tt
+                    >
+                    can provide other commands. For instance in a webkit_zpt
+                    application
+                    <tt class="docutils literal"
+                        ><span class="pre">paste-setup</span>
+                        <span class="pre">servlet</span>
+                        <span class="pre">edit</span></tt
+                    >
+                    will create
+                    <tt class="docutils literal"
+                        ><span class="pre">web/edit.py</span></tt
+                    >
+                    and
+                    <tt class="docutils literal"
+                        ><span class="pre">web/edit.pt</span></tt
+                    >
+                    files. Each template has control implement any commands how
+                    it sees fit, but some convenient functions and classes are
+                    provided to make implementation easier.
+                </p>
+            </div>
+            <div class="section" id="distribution">
+                <h1><a name="distribution">Distribution</a></h1>
+                <p>
+                    This is still an open issue, but I hope Paste will
+                    facilitate installation of multiple frameworks quickly. Some
+                    of this is handled already:
+                    <tt class="docutils literal"
+                        ><span class="pre">paste-server</span></tt
+                    >
+                    starts a server easily and quickly, and
+                    <tt class="docutils literal"
+                        ><span class="pre">paste-setup</span></tt
+                    >
+                    gives a user the basis for an application quickly. Actual
+                    software installation is a little harder. Right now the plan
+                    is to use
+                    <a
+                        class="reference"
+                        href="http://peak.telecommunity.com/DevCenter/PythonEggs"
+                        >Python Eggs</a
+                    >, but it's just a plan. Python Eggs are still in
+                    development (though usable), and it requires creating
+                    packages for each project (which is feasible, but requires a
+                    fair amount of grunt work).
+                </p>
+            </div>
+        </div>
+        <div class="dates" align="right">Created 07 May '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    I've been following the work on Paste on svn, and missed two
+                    things, the first on is this explanation (I think it can use
+                    some more examples, though) and another one is a ChangeLog
+                    file for tracking development. Is this last one awkward to
+                    work with? Thanks for the good work!
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/what-is-paste-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                pachi
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I guess I've never really kept a change log for any
+                        project I've done. I try to keep good svn log messages,
+                        and
+                        <a
+                            class="reference"
+                            href="http://pythonpaste.org/mailman/listinfo/paste-checkins"
+                            >paste-checkins</a
+                        >
+                        will let you track that. Once there are releases I want
+                        to keep a news file for significant API changes (which
+                        is generally much easier to track than a change log).
+                        The bug tracker should keep track of some other details.
+                        I'm not sure exactly where a change log fits into that.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/what-is-paste-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Oh, I wasn't aware of that one. Maybe it could be
+                            possible to pipe the check-in messages into a
+                            ChangeLog style file so those check-in messages can
+                            be read without svn or an avaliable connection...
+                            Maybe I'm too lazy, or too used to a way of doing
+                            things, but I track quite a bunch of projects and I
+                            use to read the ChangeLogs to see what has been
+                            going on and when something appealing catches my
+                            attention I give it a closer look. I just thought
+                            that would make some people track Paste more
+                            closely... and it deserves it :)
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/what-is-paste-comment-4.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">pachi</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                I should create an RSS feed from it using this:
+                                <a
+                                    class="reference"
+                                    href="http://svn.pythonfr.org/public/pythonfr/utils/subversion/subverssed.py"
+                                    >http://svn.pythonfr.org/public/pythonfr/utils/subversion/subverssed.py</a
+                                >
+                            </p>
+                            <p>
+                                Otherwise
+                                <tt class="docutils literal"
+                                    ><span class="pre">svn</span>
+                                    <span class="pre">log</span></tt
+                                >
+                                can show you cumulative log messages.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/what-is-paste-comment-5.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="index.html">Ian Bicking</a>
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Sorry, but I still don't get it. Parts of paste are clearer
+                    to me now, but overall, not very. I'd like to help improve
+                    this document. What's the best way to do this? Can you put
+                    it on a wiki and let me hack on it?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/what-is-paste-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://macspeno.com/jps/">John P. Speno</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I just came here from a link on the Python Daily URL. This
+                    doesn't really explain it for me. Sometimes when I write
+                    documentation, I try to address who the reader is and what
+                    they're used to seeing, which often means separate
+                    paragraphs (or even chapters) for the particular audience.
+                </p>
+                <p>
+                    Myself, I use Python and Java to write (non-web)
+                    applications, and Apache + PHP to write web sites &amp; web
+                    applications. So for me, I was basically lost by the second
+                    paragraph.
+                </p>
+                <p>
+                    I guess you're assuming knowledge of WSGI. Maybe the
+                    introduction needs a sentence like &quot;Before trying to
+                    understand what Paste is, you should know what WSGI is (link
+                    to a _What_is_WSGI_ document)&quot;
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/what-is-paste-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                sjbrown
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Mmm... you are probably right. Right now it's really
+                        directed to people who have experience with Python web
+                        frameworks. But that should be explicit, otherwise
+                        people without that experience will just be discouraged.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/what-is-paste-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            IMHO a better bet will be to direct it to people
+                            with little experience. A developer experienced in
+                            python web frameworks will be less impressed, he/she
+                            will have a lot of habits acquired in the other
+                            frameworks, will be more reluctant to change and
+                            Paste has to be really really good to impress him.
+                        </p>
+                        <p>
+                            A beginner caries a lot less baggage. He will give
+                            Paste 10, 20 maybe 30 min. and if in that time Paste
+                            impresses him there is a good chance he will use it.
+                        </p>
+                        <p>
+                            I'm a beginner and I see &quot;Zope Page
+                            Templates&quot;, beside the fact that I get scared
+                            by the word Zope when I look at the mini
+                            introduction to TAL I'm thinking &quot;What the heck
+                            is this?&quot; a beginner will see to much
+                            information, a seasoned programmer will see
+                            redundancy.
+                        </p>
+                        <p>
+                            In my view Paste will be better served using
+                            something like HTMLTemplate
+                            <a
+                                class="reference"
+                                href="http://freespace.virgin.net/hamish.sanderson/htmltemplate.html"
+                                >http://freespace.virgin.net/hamish.sanderson/htmltemplate.html</a
+                            >, it is simple, powerful and did I mentioned
+                            simple? Yeah simple, how simple? well... copying one
+                            .py file somewhere in the PYTHONPATH takes care of
+                            the installation. Using it is just as simple.
+                        </p>
+                        <p>
+                            Take the beginner from A to Z, show him a quick
+                            install, a simple example, a simple but not trivial
+                            example, a complex example and of course provide
+                            value. For example if John Doe were to install Paste
+                            and instantly get a Wiki and a blog or a bliki as a
+                            bonus (complete with 2-3 nice CSS designs) all
+                            validating, RSS/Atom enabled, all the bells and
+                            whistles John Doe will be very happy, he will
+                            recommend Paste to all his friends. He might not
+                            care that is python as long as it works or maybe he
+                            just discovered python and wants to use it in
+                            everything or maybe he is like me... hateing PHP
+                            syntax.
+                        </p>
+                        <p>
+                            Go after the beginners! there are a lot more of them
+                            than seasoned programmers, they might be more
+                            forgiving especially if you put up a big sign saying
+                            &quot;Alpha&quot; and if they can do it... seasoned
+                            programmers will have no other excuse not to at
+                            least try it.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/what-is-paste-comment-9.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Peter Damoc
+                    </div>
+                    <hr noshade />
+
+                    <div class="document">
+                        <p>
+                            That was my feeling too knowing nothing about
+                            WSGI... I read all 3 of your attempts to explain
+                            Paste and I think this one is much better than the
+                            ones before but still maybe not basic enough...
+                        </p>
+                        <p>
+                            Maybe a bit more structure would help as well, it
+                            might be just me but some more headlines, a kind of
+                            table of contents even for an article as short as
+                            this would help. There something like &quot;What is
+                            WSGI&quot;, &quot;How does a server fit in&quot;,
+                            etc could fit in.
+                        </p>
+                        <p>
+                            I guess an example of a specific server + paste +
+                            application (that's the way it works, is it not?)
+                            like apache + paste + ? would also show more than a
+                            lot of explaining.
+                        </p>
+                        <p>
+                            I read your stuff quite frequently and always wonder
+                            how you find the time to actually do stuff
+                            <em>and</em> at the same time read/investigate/try
+                            in all other web frameworks and other tools...
+                            That's actually something you seem to assume from
+                            the casual reader. I do read a lot about some of the
+                            (it seems) 100s of Python web frameworks but have
+                            not been able to try one as there are so many and I
+                            am always looking for a really good solution Paste
+                            might be to get to.
+                        </p>
+                        <p>
+                            Just some ideas, actually writing a good
+                            documentation <em>and</em> explaining what something
+                            is for all kinds of users is very difficult...
+                            (something I am experiencing myself at the moment)
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/what-is-paste-comment-10.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Chris
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I was just trying to get the energy together to lurn Zope3
+                    when I saw this nice, literate looking exercise. Though I
+                    don't understand it.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/what-is-paste-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="https://ianbicking.org/www.jorjun.org.uk">jorjun</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    One thing you don't mention is persistence. This is a key
+                    feature of what i think are probably the top three competing
+                    python frameworks - zope with ZODB, sqlobject with subway
+                    and atop with the twisted/nevow/quotient stuff.
+                </p>
+                <p>What's your plan for persistence with paste?</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/what-is-paste-comment-11.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://adju.st">Doug Winter</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

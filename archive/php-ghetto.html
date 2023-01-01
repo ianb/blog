@@ -1,0 +1,517 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>The PHP Ghetto</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>The PHP Ghetto</h1>
+
+        <div class="document">
+            <p>
+                <a
+                    class="reference"
+                    href="http://www.livejournal.com/users/jerub/68408.html"
+                    >Stephen Thorn posted a note about a PHPXMLRPC exploit</a
+                >. Whenever I see such things, I try to figure out what
+                implementation would cause that. At first I was baffled, but
+                then I realized that the XMLRPC parser created an array of
+                arguments, then created the text of the function call somehow
+                like
+                <tt class="docutils literal"
+                    ><span class="pre">&quot;$method_name($param1,</span>
+                    <span class="pre">$param2,</span>
+                    <span class="pre">...)&quot;</span></tt
+                >
+                and used
+                <a
+                    class="reference"
+                    href="http://us3.php.net/manual/en/function.eval.php"
+                    >eval</a
+                >
+                on it (instead of
+                <a
+                    class="reference"
+                    href="http://us3.php.net/manual/en/function.call-user-func-array.php"
+                    >call_user_func_array</a
+                >). This is partially the fault of PHP, as the
+                <tt class="docutils literal"><span class="pre">eval</span></tt>
+                page doesn't give any warning about how dangerous the function
+                is. It's the fault of the person who wrote PHPXMLRPC for being
+                really dumb -- the code isn't just insecure, it's really buggy
+                too. It's the fault of anyone who used the library for paying
+                <em>no</em> attention to the code (or apparently ever testing
+                the code with even slightly creative input).
+            </p>
+            <p>
+                Actually
+                <a
+                    class="reference"
+                    href="http://www.gulftech.org/?node=research&amp;article_id=00088-07022005"
+                    >more info here</a
+                >
+                -- the code in question seems confusing and indirect enough that
+                I don't understand exactly why it does what it does, or how it
+                would be fixed.
+            </p>
+            <p>
+                Someone could have written the exact same code in Python. Python
+                has the same functions. And yet I almost never come upon code
+                like this in Python. If anyone posted code like this in Python,
+                someone would immediately bonk them on the head for their
+                stupidity. Even if they wrote confusing code like in this case,
+                people would know enough to see
+                <tt class="docutils literal"
+                    ><span class="pre">eval()</span></tt
+                >
+                and get a hunch something was wrong.
+            </p>
+            <p>
+                I think the
+                <a
+                    class="reference"
+                    href="http://en.wikipedia.org/wiki/Broken_Windows"
+                    >Broken Windows theory</a
+                >
+                applies here. PHP is such a load of crap, right down to the
+                standard library, that it creates a culture where it's
+                acceptable to write horrible code. The bugs and security holes
+                are so common, it doesn't seem so important to keep everything
+                in order and audited. Fixes get applied wholesale, with
+                monstrosities like
+                <a
+                    class="reference"
+                    href="http://us2.php.net/manual/en/security.magicquotes.php"
+                    >magic quotes</a
+                >. It's like a shoot-first-ask-questions-later policing policy
+                -- sure some apps get messed up, but maybe you catch a few
+                attacks in the process. It's what happened when the language
+                designers gave up. Maybe with PHP 5 they are trying to clean up
+                the neighborhood, but that doesn't change the fact when you
+                program in PHP you are programming in a dump.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 07 Jul '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    As Python programmers, we should be a little bit careful to
+                    point the finger. After all, it wasn't too long ago that we
+                    also had a security hole in the Python XML-RPC server code
+                    included with the actual Python distribution. Granted, the
+                    Python problem was in part of the code which wouldn't have
+                    been commonly used, and was a bit more involved than
+                    inappropriate use of eval, but .... ;-)
+                </p>
+                <p>
+                    In some respects, one could say the problem really lies with
+                    RPC protocols where a server implementer tries to be smart
+                    and provide some measure of automagic unmarshalling,
+                    traversal and dispatching. Unless they have a thorough
+                    knowledge of the ins and outs of the implementation language
+                    and supporting infrastructure, it can be all too easy to
+                    screw up at some point, with it not being detected that
+                    there is a problem until quite some time later. Because the
+                    point of the XML-RPC protocol is to allow remote access, any
+                    security problem is made worse because of the fact that the
+                    service is public to start with.
+                </p>
+                <p>
+                    The same also holds to a degree with web frameworks which
+                    provide automagic object traversal to map a URL against a
+                    resource. Many Python web frameworks have this sort of
+                    feature and not all use an explicit mechanism to say what is
+                    visible. As a consequence you can get security problems in
+                    Python web frameworks along the same lines as the XML-RPC
+                    server problem that occurred in Python. In fact, it was the
+                    problem initially found in mod_python that led onto the
+                    similar problem being found in the Python XML-RPC server
+                    code.
+                </p>
+                <p>
+                    Thus, PHP may be a worse base from which to start with, but
+                    Python also has a few dark and obscure corners. There are
+                    probably just a lot less of them in Python and they are
+                    harder to find. I do note though that Python programmers
+                    also seem to be less willing to accept that Python code
+                    could have security problems. The initial reactions when
+                    trying to find an appropriate forum to send details of the
+                    Python XML-RPC server problems gave testament to that. :-(
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/php-ghetto-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.dscpl.com.au">Graham Dumpleton</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        There is someplace now to contact about security
+                        problems:
+                        <a
+                            class="reference"
+                            href="http://www.python.org/security/"
+                            >http://www.python.org/security/</a
+                        >
+                    </p>
+                    <p>
+                        Certainly this all can, and sometimes does, happen in
+                        Python. All the mechanisms that cause problems in PHP
+                        exist in Python, and I've seen people abuse them in very
+                        similar ways. But I see a much stronger emphasis on
+                        correcting problems and avoiding the same problem in the
+                        future. My initial impression of this bug was that it
+                        had something to do with the same problem as SQL
+                        injections (<tt class="docutils literal"
+                            ><span class="pre">&quot;blah</span>
+                            <span class="pre">'$string'&quot;</span></tt
+                        >), but once I saw the actual code it was more
+                        complicated than that. It should have raised flags --
+                        being complicated and using a dangerous construct -- but
+                        it wasn't blindingly obvious.
+                    </p>
+                    <p>
+                        Though perhaps what surprised me more was that the code
+                        was just really really buggy, and no one noticed. It
+                        wouldn't accept any XMLRPC request that contained a
+                        string with
+                        <tt class="docutils literal"
+                            ><span class="pre">'</span></tt
+                        >
+                        in it. Geez. Anyone with the name O'Something must curse
+                        PHP, because PHP really hates that character.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/php-ghetto-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        Such incidents <em>should</em> be finger-pointed. Not
+                        long ago there was a similar case in libpng (i think,
+                        some lib for graphics anyway). The problem was braindead
+                        code which had a buffer overflows. As a consequence if
+                        your web browser used that library, downloading and
+                        displaying an image from the internet could execute code
+                        on your computer!
+                    </p>
+                    <p>
+                        At the time I thought this was intentional and that the
+                        person who wrote that library was a script kiddie who
+                        wanted a backdoor. Such cases should be punished imo.
+                        Finger-pointing and blacklisting is fair for such
+                        stupendous code. The people who write it should not be
+                        trusted for some years.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/php-ghetto-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    jfj
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    &quot;It's the fault of anyone who used the library for
+                    paying no attention to the code (or apparently ever testing
+                    the code with even slightly creative input).&quot;
+                </p>
+                <p>
+                    I don't think that's fair. Do you think it's reasonable to
+                    expect people to audit every single module (even widely-used
+                    ones) they use? (I'm not talking about a software utopia
+                    where we have unlimited time and manpower; I'm talking about
+                    the real world where people have tight deadlines and code
+                    reuse is a lifesaver.)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/php-ghetto-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.joegrossberg.com">Joe Grossberg</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        In isolation, sure things get overlooked. But such a
+                        core library for so long? (Well, kind of core; PEAR has
+                        a forked version which I presume was fixed earlier --
+                        but why didn't that fix get pushed back to PHPXMLRPC?) I
+                        accept that one person might use it unwittingly, but the
+                        projects Stephen lists are large projects and they
+                        really should be paying more attention. Also, if this
+                        were the first bug like this, then it would be
+                        understandable. But the PHP community should have
+                        already learned its lesson on things like this.
+                    </p>
+                    <p>
+                        I guess I'm spreading fault liberally. It's not like
+                        anyone is getting punished for this; assigning blame is
+                        purely for kicks. I don't think the original developer
+                        deserves all the blame; they did the work and tried. It
+                        was sloppy work, but supposedly one of the benefits of
+                        releasing your code is that other people will look at
+                        it. It took too long for that to happen in this case.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/php-ghetto-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Well if there were anywhere near as many people writing
+                    Python as PHP, especially on cheap shared hosting plans you
+                    would probably see just as much crap in Python. The fact
+                    that Python (and many others) possess a relatively high
+                    barrier to entry drastically cuts down on the likelihood of
+                    this IMHO. I mean, would you want to regularly use or browse
+                    a site written with Python CGI compared to the relative
+                    speed of PHP? Most people don't, so PHP is used.
+                </p>
+                <p>
+                    If mod_(python|perl|ruby|etc) were as prevalent as mod_php
+                    there'd be travesties such as this in them too. Now if you
+                    want to argue that higher barrier to entry is
+                    <em>a good thing</em>, and/or mod_php shouldn't be deployed
+                    all over on shared hosts, I think that's a different topic.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/php-ghetto-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://t74.com">ToddG</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        That explains why there's such a multitude of such
+                        problems in various PHP programs -- and there is a huge
+                        number and variety -- but not why a library used by
+                        respected PHP software projects would have that kind of
+                        problem.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/php-ghetto-comment-7.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Agreed -- I was addressing the larger point of the
+                            overall quality level of most PHP code out there.
+                            But as mentioned above by jfj, this is hardly the
+                            exclusive domain of PHP - libpng had a huge hole[s],
+                            and check out the vendor list of products that lib
+                            made it into:
+                            <a
+                                class="reference"
+                                href="http://www.kb.cert.org/vuls/id/388984"
+                                >http://www.kb.cert.org/vuls/id/388984</a
+                            >
+                            Yikes!
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/php-ghetto-comment-9.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        ToddG
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    Hmm, yes, there are stupid things in PHP. There are stupid
+                    things in Python. There are stupid things in Java. And so
+                    forth. PHP in itself is not evil. People tend to think that
+                    PHP is evil because it let you do evil things. Hogwash!
+                    Point me to any framework / language / OS that doesn't let
+                    you do evil things. Blame developers of said tool, not the
+                    tool itself. PHP done right can be truly beautiful.
+                </p>
+                <p>
+                    I can understand the frustration that a popular module used
+                    for some time can turn out to be utter garbage, but hey, it
+                    <em>is</em> open-source, a world where good-enough can last
+                    you a long time until someone sits down and solve the
+                    problem once and for all some other better way. Feel free to
+                    jump in. It is all about ideas and developers, not tools.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/php-ghetto-comment-8.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://shelter.nu/">Alexander</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        That's my point -- everything that was misused in PHP
+                        exists in Python. It's not PHP-the-language at fault,
+                        it's PHP-the-community or
+                        PHP-the-development-methodology.
+                    </p>
+                    <p>
+                        In the case of libpng that people mentioned,
+                        <em>that's</em> actually a language flaw in C.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/php-ghetto-comment-10.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        I have major problems with PHP, I have a list somewhere
+                        of the things I hate the most about the language, which
+                        I really should dig up and blog about now that I don't
+                        work where I used to work anymore.
+                    </p>
+                    <p>
+                        To give you an idea of the fundamental breakage that PHP
+                        gives us, let me show you why I hate the language.
+                    </p>
+                    <p>
+                        To write an SQL query in PHP, there are two popular
+                        methods. One is an easy way, the other is the RIGHT way.
+                        Let me show you.
+                    </p>
+                    <p>Easy Way:</p>
+                    <pre class="literal-block">
+mysql_query(&quot;UPDATE users SET age='$age' WHERE id = '$id'&quot;);
+</pre
+                    >
+                    <p>Right Way:</p>
+                    <pre class="literal-block">
+if (get_magic_quotes_gpc()) {
+  $age = stripslashes($age);
+}
+mysql_query(&quot;UPDATE users SET age='&quot;.mysql_real_quote_string($age).&quot;' WHERE id = '&quot;.mysql_real_quote_string($id).&quot;'&quot;);
+</pre
+                    >
+                    <p>
+                        So PHP gives you a choice, use the easy to use
+                        &quot;string $interpolation&quot; syntax provided by the
+                        language, or write correct code. You can immediately see
+                        why there are so many security problems in PHP.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/php-ghetto-comment-11.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://thorne.id.au/blog">Stephen Thorne</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            I hate to say this, but that's a pretty stupid
+                            argument. If your syntax for doing things the right
+                            way is long or complex, abstract it, wrap around it,
+                            fiddle with it, chuck it in a function or fold it to
+                            an object or obfuscate it in a Perl module or
+                            however else you'd like to make things simpler. This
+                            is what programming is all about, no? This is why
+                            annotations are popular. This is why Groovy is
+                            groovy. This is why Python is cool and Ruby shines.
+                            And it's why PHP isn't as bad as the PHP developer.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/php-ghetto-comment-13.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://shelter.nu/">Alexander</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

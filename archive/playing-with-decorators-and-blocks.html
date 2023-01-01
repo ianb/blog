@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Playing with decorators and blocks</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Playing with decorators and blocks</h1>
+
+        <div class="document">
+            <p>
+                This is really just a silly use of decorators to do something
+                vaguely like Ruby's or Smalltalk's blocks:
+            </p>
+            <pre class="literal-block">
+def collect(sequence):
+    &quot;&quot;&quot;
+    Like Ruby's .collect::
+
+        &gt;&gt;&gt; &#64;collect([1, 2, 3])
+        ... def result(item):
+        ...     return -item
+        &gt;&gt;&gt; result
+        [-1, -2, -3]
+    &quot;&quot;&quot;
+    def decorator(func):
+        return [func(item) for item in sequence]
+    return decorator
+</pre
+            >
+            <p>
+                Someone must have done this before. But then decorator abuse is
+                still young, so maybe not. I wrote up a few examples:
+                <tt class="literal"><span class="pre">foreach</span></tt
+                >, <tt class="literal"><span class="pre">inject</span></tt
+                >, and <tt class="literal"><span class="pre">file_do</span></tt
+                >. Also a decorator
+                <tt class="literal"><span class="pre">set</span></tt
+                >, which lets you add methods to classes and objects, like:
+            </p>
+            <pre class="literal-block">
+&gt;&gt;&gt; class color: ...
+&gt;&gt;&gt; &#64;set(color)
+... filter(self, r, g, b):
+...     return self.__class__(self.r*r, self.g*g, self.b*b)
+</pre
+            >
+            <p>
+                And then your
+                <tt class="literal"><span class="pre">color</span></tt> class
+                gets a new method
+                <tt class="literal"><span class="pre">filter</span></tt
+                >. It can also add methods to objects, but you have to do
+                <tt class="literal"
+                    ><span class="pre">&#64;set(color_instance,</span>
+                    <span class="pre">make_method=True)</span></tt
+                >. Hmm... but now that I think that it would be neater if it
+                looked at the name of the first argument to the function, and
+                turned it into a
+                <tt class="literal"><span class="pre">classmethod</span></tt>
+                <tt class="literal"><span class="pre">staticmethod</span></tt>
+                (or did nothing and left it a normal method); or if attaching it
+                to an instance it would bind the class or instance to the first
+                argument. So,
+                <tt class="literal"><span class="pre">magic_set</span></tt> is
+                in there too.
+            </p>
+            <p>
+                They are in
+                <a
+                    class="reference"
+                    href="http://svn.colorstudy.com/home/ianb/ruby_blocks.py"
+                    >http://svn.colorstudy.com/home/ianb/ruby_blocks.py</a
+                >
+            </p>
+        </div>
+        <div class="dates" align="right">Created 04 Mar '05</div>
+    </body>
+</html>

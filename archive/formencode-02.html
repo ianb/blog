@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>FormEncode 0.2</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>FormEncode 0.2</h1>
+
+        <div class="document">
+            <p>
+                After way too long I made a real release of
+                <a class="reference" href="http://formencode.org">FormEncode</a
+                >. Hopefully I didn't forget anything; but if I did I'll just
+                make another release, not that big a deal.
+                <a class="reference" href="http://sqlobject.org">SQLObject</a>
+                is going to depend on FormEncode, because
+                <tt class="docutils literal"
+                    ><span class="pre">sqlobject.includes.validators</span></tt
+                >
+                was always just an expedient fork of FormEncode. Peter Hunt
+                supplied a patch to bring them back together (since he is using
+                both in
+                <a class="reference" href="http://subway.python-hosting.com"
+                    >Subway</a
+                >).
+            </p>
+            <p>
+                It's really my first end-to-end release through
+                <a
+                    class="reference"
+                    href="http://peak.telecommunity.com/DevCenter/setuptools"
+                    >setuptools</a
+                >. There was still
+                <a
+                    class="reference"
+                    href="http://mail.python.org/pipermail/distutils-sig/2005-August/004940.html"
+                    >one issue</a
+                >
+                I wasn't sure about, but it went okay. Here's how I released:
+            </p>
+            <pre class="literal-block">
+$ svn cp -m &quot;Prepare for release&quot; \
+  http://svn.colorstudy.com/FormEncode/trunk/ \
+  http://svn.colorstudy.com/FormEncode/tags/0.2
+$ svn co http://svn.colorstudy.com/FormEncode/tags/0.2 FE02
+$ cd FE02
+# edit setup.cfg to remove these lines; commit:
+    [egg_info]
+    tag_build = dev
+    tag_svn_revision = true
+# Add to the Cheese Shop (PyPI):
+$ python setup.py register
+# Upload package to Cheese Shop:
+$ python setup.py sdist upload
+</pre
+            >
+            <p>
+                I'm thinking about making this process a command to
+                <tt class="docutils literal"
+                    ><span class="pre">setup.py</span></tt
+                >
+                (setuptools makes the commands fairly extensible).
+            </p>
+            <p>
+                The
+                <tt class="docutils literal"
+                    ><span class="pre">setup.cfg</span></tt
+                >
+                lines ensure that when you install from the svn trunk you will
+                get a version that looks something like
+                &quot;0.2dev-r1292&quot;, even though
+                <tt class="docutils literal"
+                    ><span class="pre">setup.py</span></tt
+                >
+                still says the version is
+                <tt class="docutils literal"
+                    ><span class="pre">&quot;0.2&quot;</span></tt
+                >.
+            </p>
+            <p>
+                Also note I used the
+                <tt class="docutils literal"
+                    ><span class="pre">upload</span></tt
+                >
+                command to upload the file to the Cheese Shop; a fairly recent
+                feature there is a file repository. No more SourceForge file
+                releases for me.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 15 Aug '05<br />
+            Modified 15 Aug '05
+        </div>
+    </body>
+</html>

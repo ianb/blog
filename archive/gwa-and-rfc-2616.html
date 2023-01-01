@@ -1,0 +1,479 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>GWA and RFC 2616</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>GWA and RFC 2616</h1>
+
+        <div class="document">
+            <p>
+                So now people are going back and forth about what the spec says.
+                Here's what seems to be the relevant portion of
+                <a
+                    class="reference"
+                    href="http://www.w3.org/Protocols/rfc2616/rfc2616.html"
+                    >RFC 2616 (HTTP/1.1)</a
+                >:
+            </p>
+            <blockquote>
+                <p>
+                    <a
+                        class="reference"
+                        href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1"
+                        >9.1 Safe and Idempotent Methods</a
+                    >
+                </p>
+                <p>9.1.1 Safe Methods</p>
+                <p>
+                    Implementors should be aware that the software represents
+                    the user in their interactions over the Internet, and should
+                    be careful to allow the user to be aware of any actions they
+                    might take which may have an unexpected significance to
+                    themselves or others.
+                </p>
+                <p>
+                    In particular, the convention has been established that the
+                    GET and HEAD methods SHOULD NOT have the significance of
+                    taking an action other than retrieval. These methods ought
+                    to be considered &quot;safe&quot;. This allows user agents
+                    to represent other methods, such as POST, PUT and DELETE, in
+                    a special way, so that the user is made aware of the fact
+                    that a possibly unsafe action is being requested.
+                </p>
+                <p>
+                    Naturally, it is not possible to ensure that the server does
+                    not generate side-effects as a result of performing a GET
+                    request; in fact, some dynamic resources consider that a
+                    feature. The important distinction here is that the user did
+                    not request the side-effects, so therefore cannot be held
+                    accountable for them.
+                </p>
+                <p>9.1.2 Idempotent Methods</p>
+                <p>
+                    Methods can also have the property of
+                    &quot;idempotence&quot; in that (aside from error or
+                    expiration issues) the side-effects of N &gt; 0 identical
+                    requests is the same as for a single request. The methods
+                    GET, HEAD, PUT and DELETE share this property. Also, the
+                    methods OPTIONS and TRACE SHOULD NOT have side effects, and
+                    so are inherently idempotent.
+                </p>
+                <p>
+                    However, it is possible that a sequence of several requests
+                    is non- idempotent, even if all of the methods executed in
+                    that sequence are idempotent. (A sequence is idempotent if a
+                    single execution of the entire sequence always yields a
+                    result that is not changed by a reexecution of all, or part,
+                    of that sequence.) For example, a sequence is non-idempotent
+                    if its result depends on a value that is later modified in
+                    the same sequence.
+                </p>
+                <p>
+                    A sequence that never has side effects is idempotent, by
+                    definition (provided that no concurrent operations are being
+                    executed on the same set of resources).
+                </p>
+            </blockquote>
+            <p>
+                Interestingly, a
+                <tt class="docutils literal"
+                    ><span class="pre">delete?id=10</span></tt
+                >
+                link is idempotent. Assuming the id is unique and not reused,
+                the first GET will be the same as the second or third.
+                Idempotent says nothing about the server side or the difference
+                between N=0 and N=1.
+            </p>
+            <p>
+                Other links are interesting. Consider a link that changes the
+                order of a list.
+                <tt class="docutils literal"
+                    ><span class="pre">move?id=10&amp;direction=up</span></tt
+                >
+                is not idempotent -- repeated calls change the response to move
+                the item up more and more.
+                <tt class="docutils literal"
+                    ><span class="pre">move?id=10&amp;to_position=3</span></tt
+                >
+                is idempotent. As a sequence it is not idempotent, as it is
+                effected by other links (which could change the order of other
+                items in the list).
+                <tt class="docutils literal"
+                    ><span class="pre"
+                        >move?pos=10:1&amp;pos=13:2&amp;pos=15:3</span
+                    ></tt
+                >
+                (i.e.,
+                <tt class="docutils literal"
+                    ><span class="pre">item_id:position_index</span></tt
+                >) provides idempotent sequences.
+            </p>
+            <p>
+                But none of these are safe. But &quot;idempotent&quot; sounds
+                cooler than &quot;safe&quot; so it's being used a lot.
+            </p>
+            <p>This paragraph is interesting as well:</p>
+            <blockquote>
+                Naturally, it is not possible to ensure that the server does not
+                generate side-effects as a result of performing a GET request;
+                in fact, some dynamic resources consider that a feature. The
+                important distinction here is that the user did not request the
+                side-effects, so therefore cannot be held accountable for them.
+            </blockquote>
+            <p>
+                In the case of the Google Web Accelerator, the user most
+                certainly did not request the side-effects. The question
+                everyone is asking, is who <em>is</em> responsible for the side
+                effects, the original web application developer, or Google?
+                <a class="reference" href="breaking-the-web-we-have.html"
+                    >I say Google</a
+                >
+                because they are breaking expectations. Other people say the web
+                developer, because that's what the spec says. But frankly I
+                don't see how the spec says that, but it's blindingly obvious
+                what convention says. The spec addresses issues of caching,
+                which is where idempotency comes into play, but has little to do
+                with this situation (though the GWA has been
+                <a
+                    class="reference"
+                    href="http://groups-beta.google.com/group/Google-Web-Accelerator/browse_thread/thread/c83940007681cfef/0e92df909ec9376f#0e92df909ec9376f"
+                    >accused of breaking that too</a
+                >
+                -- which <em>I</em> blame on IE for not implementing
+                <tt class="docutils literal"><span class="pre">Vary</span></tt>
+                properly and so rendering a useful header conventionally
+                useless).
+            </p>
+            <p>
+                Remember what's required to make the GWA work. It's not just the
+                delete links, though those are the most painful ones. A mail
+                program that marks mail read will be broken by the GWA. A logout
+                link will be broken. A vote-for-this link will be broken. And
+                all the fixes involve Javascript; either you make your site
+                inaccessible to people without Javascript, or
+            </p>
+            <p>
+                GWA will break your site (since it acts just like a
+                Javascript-disabled client). Without nested forms you
+                <em>can't</em> do what people are saying, you can't turn
+                everything unsafe into a POST.
+            </p>
+            <p>
+                To me, the GWA is a kind of loophole in the spec, not something
+                the spec allowed for. It seems like it makes sense, because it's
+                doing what bots have always done, trolling around for content.
+                But it's doing so pretending it's a user, and that's why it
+                doesn't work with the web we have. If they want a new spec about
+                how to do that, okay. Of course an HTTP/1.2 that clarifies this
+                stuff is unlikely, but for all the reasons that Google has
+                uncovered here.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 10 May '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    I have yet to see an example of something that can't be done
+                    without nested forms. People have used that as an excuse a
+                    lot, but nobody's given an example. It seems to me that a
+                    GET used in an unsafe way is equivalent to an opening form
+                    tag (with an action attribute and a method attribute with
+                    the value GET), a bunch of hidden inputs, a submit button,
+                    and a closing form tag.
+                </p>
+                <p>
+                    Talking about nested forms as being necessary to replace
+                    unsafe GETs would appear to require people to be using
+                    nested links already, and they aren't.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/gwa-and-rfc-2616-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Jim
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>Here's an example:</p>
+                    <pre class="literal-block">
+&lt;form action=&quot;edit_addresses&quot; method=&quot;POST&quot;&gt;
+  Address 1: &lt;input type=&quot;text&quot; name=&quot;address-1&quot; value=&quot;123 W. St&quot;&gt;
+    &lt;a href=&quot;delete_address?id=1&quot;&gt;delete this address&lt;/a&gt;&lt;br&gt;
+  Address 2: ...
+&lt;/form&gt;
+</pre
+                    >
+                    <p>
+                        Happy? Yes, you could make
+                        <tt class="docutils literal"
+                            ><span class="pre">edit_addresses</span></tt
+                        >
+                        process deletes as well (which is a semantic change to
+                        the form, though arguably a better user interface). Then
+                        the delete could be a button like
+                        <tt class="docutils literal"
+                            ><span class="pre">&lt;input</span>
+                            <span class="pre">type=&quot;submit&quot;</span>
+                            <span class="pre"
+                                >name=&quot;delete_address-1&quot;</span
+                            >
+                            <span class="pre">value=&quot;delete</span>
+                            <span class="pre">this</span>
+                            <span class="pre">address&quot;&gt;</span></tt
+                        >. But that's often a rather difficult change to make on
+                        a legacy application.
+                    </p>
+                    <p>
+                        Personally I plan to put in
+                        <tt class="docutils literal"
+                            ><span class="pre"
+                                >rel=&quot;nofollow&quot;</span
+                            ></tt
+                        >
+                        on these links in the future; in many ways it seems like
+                        the best compromise, and a good indication of what I
+                        really mean (which is &quot;no robots here&quot;, not
+                        &quot;this item has side effects,&quot; which is not
+                        quite the same thing).
+                    </p>
+                    <p>
+                        There's also other more subtle places where requests are
+                        pretty &quot;safe&quot; and certainly
+                        &quot;idempotent&quot;, but the GWA will cause problems
+                        by following links. The most obvious being a webmail
+                        application where it would cause all mail to be marked
+                        as &quot;read&quot;. Turning a mail read into a form
+                        submission would be really really bad UI.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/gwa-and-rfc-2616-comment-2.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="index.html">Ian Bicking</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            In the example you give, why not use a two-stage
+                            delete? The anchor &quot;delete this address&quot;
+                            would take the user agent to a confirmation that
+                            yes, indeedy, they'd love to delete the address.
+                            Then the actual deletion would be a POST, since the
+                            form has trouble with its being a DELETE.
+                        </p>
+                        <p>
+                            However, I wouldn't go so far as to GET an item from
+                            my address book and have it magically appear in the
+                            trash (which could then be emptied on a POST).
+                            Misbehaving robots would then rip all the pages out
+                            of my book, and I'd need to dig around in the
+                            wastebasket looking for them.
+                        </p>
+                        <p>
+                            With regard to the reading of mail,
+                            &quot;reading&quot; is a kind of GET. How do you
+                            tell the difference between a real person and a
+                            robot before you change the state?
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/gwa-and-rfc-2616-comment-3.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.coxesroost.net/">Will Cox</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                <em
+                                    >In the example you give, why not use a
+                                    two-stage delete? The anchor &quot;delete
+                                    this address&quot; would take the user agent
+                                    to a confirmation that yes, indeedy, they'd
+                                    love to delete the address. Then the actual
+                                    deletion would be a POST, since the form has
+                                    trouble with its being a DELETE.</em
+                                >
+                            </p>
+                            <p>
+                                I don't want to do that because sometimes
+                                deletes aren't that big a deal. Maybe they are
+                                undoable. Maybe it's assumed that lots of
+                                deletes happen. It's a UI concern, and sometimes
+                                it's appropriate to allow quick actions. It
+                                would be totally backwards to have HTTP methods
+                                driving the UI decisions like that.
+                            </p>
+                            <p>
+                                <em
+                                    >With regard to the reading of mail,
+                                    &quot;reading&quot; is a kind of GET. How do
+                                    you tell the difference between a real
+                                    person and a robot before you change the
+                                    state?</em
+                                >
+                            </p>
+                            <p>
+                                You put it behind authentication where robots
+                                can't get to. Until Google uses users as a their
+                                trojan horse to get their robot claws on all the
+                                data hidden behind actions it can't take
+                                (because of robots.txt, POST forms,
+                                authentication, etc). Not that they are
+                                necessarily so sinister... but it's not
+                                impossible that they do intend to use GWA users
+                                as a way to find data they can't find on their
+                                own.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/gwa-and-rfc-2616-comment-4.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="index.html">Ian Bicking</a>
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    Delete causes data loss, and thus is always
+                                    a big deal. Think about how you use the
+                                    trash can in your kitchen (or [=rm], if you
+                                    prefer). Tossing something is an intentional
+                                    act. Accidentally tossed the $50 Amazon gift
+                                    certificate in the bin with the junk mail?
+                                    You might want to retrieve that. If your
+                                    trash can is an incinerator, you look twice
+                                    at everything you toss in, or throw a whole
+                                    bin's worth once a week. Maybe the action is
+                                    undoable, and maybe it does need to be
+                                    quick, but neither requires using a GET.
+                                </p>
+                                <p>
+                                    In the mail example, consider non-web mail
+                                    user agents. They copy the messages from the
+                                    server to your desk, but have you read those
+                                    messages? No. Why should the cacheing of
+                                    mail by your HTTP user agent indicate that
+                                    the mail has been read?
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/gwa-and-rfc-2616-comment-5.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://www.coxesroost.net/"
+                                    >Will Cox</a
+                                >
+                            </div>
+                            <hr noshade />
+
+                            <div class="document">
+                                <p>
+                                    Delete causes data loss, and thus is always
+                                    a big deal. Think about how you use the
+                                    trash can in your kitchen. Tossing something
+                                    is an intentional act. Accidentally tossed
+                                    the $50 Amazon gift certificate in the bin
+                                    with the junk mail? You might want to
+                                    retrieve that. If your trash can is an
+                                    incinerator, you look twice at everything
+                                    you toss in, or throw a whole bin's worth
+                                    once a week. Maybe the action is undoable,
+                                    and maybe it does need to be quick, but
+                                    neither requires using a GET.
+                                </p>
+                                <p>
+                                    In the mail example, consider non-web mail
+                                    user agents. They copy the messages from the
+                                    server to your desk, but have you read those
+                                    messages? No. Why should the caching of mail
+                                    by your HTTP user agent indicate that the
+                                    mail has been read?
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/gwa-and-rfc-2616-comment-6.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                <a href="http://www.coxesroost.net/"
+                                    >Will Cox</a
+                                >
+                            </div>
+                            <hr noshade />
+                        </blockquote>
+                    </blockquote>
+
+                    <div class="document">
+                        <p>
+                            &gt; &lt;a
+                            href=&quot;delete_address?id=1&quot;&gt;delete this
+                            address&lt;/a&gt;
+                        </p>
+                        <p>
+                            What is wrong with &lt;input type=&quot;submit&quot;
+                            name=&quot;delete-id-1&quot; value=&quot;Delete this
+                            address&quot;&gt; ?
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/gwa-and-rfc-2616-comment-7.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">Jim</a>
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

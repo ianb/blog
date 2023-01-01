@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Interfaces: Signatures and Semantics</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Interfaces: Signatures and Semantics</h1>
+
+        <div class="document">
+            <p>
+                Thinking a little about
+                <a
+                    class="wiki reference"
+                    href="https://ianbicking.org/latent-interfaces"
+                    >latent interfaces</a
+                >
+                (and latent typing, but mostly the interfaces) -- one of the
+                issues with an interface in Python (or this
+                <a
+                    class="reference"
+                    href="http://www.jot.fm/issues/issue_2002_05/article1"
+                    >Smalltalk implementation</a
+                >
+                that someone noted in a comment) is that they consist of method
+                signatures, but nothing about semantics. This is even more true
+                with latent interfaces (where latent interfaces are the
+                interfaces you can infer from how code uses an object).
+            </p>
+            <p>
+                The way to make latent interfaces safer in a dynamic environment
+                is generally to choose good method names -- you shouldn't use
+                the same method name for two conceptually different operations.
+                The example in the
+                <a
+                    class="reference"
+                    href="http://www.mindview.net/WebLog/wiki-0050"
+                    >comments</a
+                >
+                to Bruce's post is a method
+                <tt class="literal"><span class="pre">shoot()</span></tt> that
+                may refer to a Gun or Camera, where each has very different
+                semantic meaning.
+            </p>
+            <p>
+                A more practical example might be
+                <tt class="literal"
+                    ><span class="pre">obj.write(value)</span></tt
+                >
+                which might mean <em>write value to obj</em> (i.e., a file-like
+                object), or <em>write obj to value</em> (i.e., serialize obj).
+                That's a bad choice of method names, because they mean very
+                different things, but if you accidentally get an object that
+                uses the latter semantics where the first are expected, you
+                could get very weird behavior.
+            </p>
+            <p>
+                An explicit interface usually implies specific semantics --
+                that's why it's okay to have two interfaces which
+                programmatically look the same, i.e., define the same set of
+                method names and signatures. Usually an interface also includes
+                documentation which provides a description of the semantics.
+            </p>
+            <p>
+                Unfortunately, this doesn't offer any program-accessible
+                semantics, only programmer-accessible. We can programmatically
+                check signatures, but how can we check semantics? Statically
+                typed languages are a little better on this, because their
+                signatures include type information which starts to define
+                semantic relationships.
+            </p>
+            <p>
+                Anyway, we still have something more general than static typing
+                in contracts -- or more concretely, pre- and post-conditions
+                (typically a bunch of asserts). After all, what's a type
+                declaration besides an assertion of type? (Well, asserted at
+                compile-time instead of runtime, but eh)
+            </p>
+            <p>
+                A neat extension to an interface system (like
+                <a
+                    class="reference"
+                    href="http://peak.telecommunity.com/PyProtocols.html"
+                    >PyProtocols</a
+                >) would be to add contracts. The contracts would be attached to
+                the interfaces themselves, not the particular implementation of
+                those interfaces.
+            </p>
+            <p>
+                To do this you'd have to change the
+                <tt class="literal"><span class="pre">adapt()</span></tt>
+                function to return a wrapper -- this wrapper would intercept
+                calls that had interface contracts, and confirm the contract as
+                well as delegating to the original code. (There might be other
+                ways --
+                <a
+                    class="reference"
+                    href="http://www.python.org/peps/pep-0246.html"
+                    >PEP 246</a
+                >
+                describes the lower-level mechanics of adaptation)
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 14 Mar '04<br />
+            Modified 14 Dec '04
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            You don't need to add any functionality at all to PyProtocols, all
+            of this is already there. It's up to the object, the protocol
+            (interface), or some adapter to decide what kind of object gets
+            returned (or doesn't). If you want this proxying style, you simply
+            make either the objects, the protocols, or adapters return these
+            proxies. So the answer is yes, you would have to write code, but no,
+            you don't have to change what PyProtocols does.
+            <div align="right">
+                <a href="https://ianbicking.org/comment743.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            Then I guess you'd have to change your... interface objects? Using
+            the improved Interface class as the superclass for all your
+            interfaces...? Ideally you shouldn't need to make any changes to the
+            objects that implement the interfaces in order to support contracts,
+            only to the interfaces themselves.
+            <div align="right">
+                <a href="https://ianbicking.org/comment744.html" rel="nofollow"
+                    >#</a
+                >
+                Ian Bicking
+            </div>
+            <hr noshade />
+            You don't need to change anything, you just implement some interface
+            object that is compliant with PyProtocols (i.e. a subclass of
+            Interface) and use that whenever you want its special behavior.
+            <div align="right">
+                <a href="https://ianbicking.org/comment745.html" rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pycs.net/">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+            For contracts in python, check out
+            <a href="http://www.logilab.org/projects/aspects" target="_blank"
+                >http://www.logilab.org/projects/aspects</a
+            >
+            which brings Aspect-Oriented Programming to python and implements
+            Contracts as an Aspect.
+            <div align="right">
+                <a href="https://ianbicking.org/comment746.html" rel="nofollow"
+                    >#</a
+                >
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>It's Not Another Damn Framework</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>It's Not Another Damn Framework</h1>
+
+        <div class="document">
+            <p>
+                <a
+                    class="reference"
+                    href="http://www.decafbad.com/blog/2005/07/18/discovering_wsgi_and_xslt_as_middleware"
+                    >Leslie Orchard</a
+                >
+                just wrote a WSGI middleware for interpreting XSLT. This is
+                cool, because it's one of those things I've thought is perfect
+                for WSGI, and I even
+                <a
+                    class="reference"
+                    href="http://mail.python.org/pipermail/web-sig/2005-July/001517.html"
+                    >mentioned it</a
+                >
+                yesterday. This means any WSGI application can output XML and
+                have it transformed by an XSLT stylesheet, without any awareness
+                on the part of the application.
+            </p>
+            <p>
+                It's also great to see someone catch on to what WSGI is about.
+                I'm afraid I haven't been that successful explaining it. But
+                maybe I should use his endorsement of the architecture:
+                &quot;it's not another damn framework.&quot;
+            </p>
+            <p>
+                And that's exactly the kind of architectural principle that made
+                me write Paste. I've been describing it as a &quot;framework
+                framework&quot;, which is awful -- 2x the badness! Really, it's
+                a collection of <em>exactly</em> the sort of thing that Leslie
+                wrote -- simple, decoupled bits of middleware. Oh, damn, there's
+                that &quot;middleware&quot; word again, which is also
+                <em>bad</em>. Simple, decoupled <em>filters</em>. Everything
+                else in Paste is the crap I had to put in to get it to work
+                together. Stuff like configuration. This <em>isn't</em> what
+                makes me excited -- it's just the pain in the ass that someone
+                needs to do, and at least in the context of WSGI no one else is
+                doing it.
+            </p>
+            <p>
+                What makes me excited is bits of code like this. This is 55
+                (logical) lines of code that implement XSLT in front of any
+                Python application that produces XML (and if someone writes a
+                WSGI proxy app, in front of any application in any language). 55
+                lines -- <em>that</em> is what excites me.
+            </p>
+            <blockquote>
+                So, like, if you have a web app that follows the
+                <a
+                    class="reference"
+                    href="http://www.python.org/peps/pep-0333.html"
+                    >WSGI</a
+                >
+                spec, it can be swallowed up by filtering apps. The filtered
+                apps can have any number of mammoth Python web frameworks
+                powering them, and the filters can be as complex or simple as
+                you want. Hell,
+                <em>build a web framework entirely out of composed filters!</em>
+                [emphasis his]
+            </blockquote>
+            <p>
+                Which is exactly what I did with Paste's Webware interface, and
+                later
+                <a class="reference" href="yet-another-framework-wareweb.html"
+                    >Wareweb</a
+                >
+                -- I moved everything I could into middleware, and built the
+                shell of a framework around it. And it works -- the core of
+                <tt class="docutils literal"
+                    ><span class="pre">paste.webkit</span></tt
+                >
+                is 776 lines of code, and the code it replaces is 6313 lines of
+                code. That 700ish lines of code doesn't provide all the
+                functionality of the original 6000ish lines of code; but it
+                builds a Webwarish thing on top of generic libraries. For both
+                of them I don't count the 600 lines in the standard library's
+                <tt class="docutils literal"><span class="pre">cgi</span></tt>
+                module either, or the 50,000+ lines in the standard library as a
+                whole; so I think there is a fair comparison. If you refactored
+                a framework like
+                <a class="reference" href="http://cherrypy.org">CherryPy</a> to
+                use WSGI middleware, I think you'd see the same kind of results.
+            </p>
+            <p>
+                The point of Paste is that you shouldn't have to compromise
+                between <em>simple</em> and <em>full-featured</em>, or between
+                <em>abstract</em> and <em>convenient</em>, or
+                <em>general</em> and <em>concrete</em>. Paste is WSGI. Paste is
+                filters built on filters. Paste is HTTP turned into Python
+                dictionaries. WSGI is working from where CGI left off. It's the
+                simplest thing that can work. It's not a framework.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 19 Jul '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    I can't believe how far behind I've let myself get. I
+                    started futzing around with things like PHP and postnuke,
+                    and completely lost track of all the cool stuff going on in
+                    the python community. I hadn't even heard of WSGI until I
+                    ran across django by accident.
+                </p>
+                <p>I have so much catching up to do!</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/its-not-another-damn-framework-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://helping-desk.blogspot.com">Bob Joad</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>Ian, I think finally <em>get it</em>. :-)</p>
+                <p>
+                    Paste is not a 'framework framework' and it's
+                    'middleware'... it's 'filters'! &lt;cue sound of mind going
+                    'click!'&gt; My brain only 'gets' things when I can see a
+                    practical use for it. :-)
+                </p>
+                <p>
+                    I've been playing around with CherryPy's filters and that
+                    description makes sense. You can write a function or class
+                    method once, and use filters to repurpose the
+                    functions/methods for different contexts (HTTP/HTML vs
+                    XML-RPC) without touching your original function/method
+                    definitions.
+                </p>
+                <p>
+                    Perhaps, you could also call them &quot;wrappers&quot; or
+                    &quot;envelopes&quot;. And I'm sure Martin Fowler has a
+                    pattern with a really complicated name for it, too. :-) But
+                    filters fits my brain the best.
+                </p>
+                <p>
+                    With filters (at least as I understand it in CherryPy), you
+                    can do the following:
+                </p>
+                <ol class="arabic">
+                    <li>
+                        <p class="first">
+                            Write a function called helloWorld() that simply
+                            returns the string &quot;Hello, world!&quot;
+                        </p>
+                    </li>
+                    <li>
+                        <p class="first">
+                            Now go write a filter that can accept XML-RPC
+                            commands and dispatch them to any function, and take
+                            any return values and return them as XML-RPC.
+                            (CherryPy already provides this for XML-RPC).
+                        </p>
+                    </li>
+                    <li>
+                        <p class="first">
+                            Do the same for SOAP, YAML, XML, JSON, GZIP
+                            compression, conversion to PDF, or whatever
+                        </p>
+                    </li>
+                    <li>
+                        <dl class="first docutils">
+                            <dt>
+                                Setup up your config so various URLS can call
+                                your helloWorld using a filter of your choosing:
+                            </dt>
+                            <dd>
+                                <p class="first last">
+                                    <a
+                                        class="reference"
+                                        href="http://localhost/soap/helloWorld"
+                                        >http://localhost/soap/helloWorld</a
+                                    >
+                                    -&gt; callable via SOAP client library,
+                                    calls hellWorld, and returns &quot;hello
+                                    world&quot; as a SOAP response.
+                                    <a
+                                        class="reference"
+                                        href="http://localhost/xmlrpc/helloWorld"
+                                        >http://localhost/xmlrpc/helloWorld</a
+                                    >
+                                    -&gt; same thing as SOAP, but for for
+                                    XML-RPC
+                                    <a
+                                        class="reference"
+                                        href="http://localhst/yaml/helloWorld"
+                                        >http://localhst/yaml/helloWorld</a
+                                    >
+                                    -&gt; etc, etc.
+                                </p>
+                            </dd>
+                        </dl>
+                    </li>
+                </ol>
+                <p>
+                    Voila! Paste now makes sense to me. I can see how this would
+                    be useful, too... I don't think Django does Webservices
+                    (XML-RPC, SOAP, REST), yet. (I could be wrong, but I haven't
+                    seen any mention of it, yet.) If there was a
+                    &quot;standard&quot; implementation of &quot;filters&quot;
+                    that other frameworks could use... then Django could benefit
+                    from this work for free without having to reimplement
+                    CherryPy's filters.
+                </p>
+                <p>
+                    Now that I've written all of this... Do I understand WSGI
+                    and Paste correctly? Now, that I think about it... you also
+                    just reinvented unix pipes, but for the web. And I think
+                    Apache 2 even implements the same thing, too. (<a
+                        class="reference"
+                        href="http://www.projectcomputing.com/resources/apacheFilterFAQ/"
+                        >http://www.projectcomputing.com/resources/apacheFilterFAQ/</a
+                    >) Correct?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/its-not-another-damn-framework-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://jrandolph.com/blog">Jason Huggins</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I've been trying to understand WSGI and Paste for a while
+                    now, and have stayed subscribed to your blog despite not
+                    understanding what you were talking about. I kept wondering
+                    why you didn't just do something like Rails in Python.
+                </p>
+                <p>
+                    The 0xDECAFBAD blog entry definitely made all the difference
+                    for me in understanding what you are doing, and why you are
+                    doing it. The 'framework' and 'middleware' words definitely
+                    have too much baggage to be used to describe something truly
+                    new and innovative. Another way of thinking about it is that
+                    we are only starting to see the first web frameworks worthy
+                    of the name, and perhaps the same can be said of WSGI as an
+                    example of 'real' middleware, at least in the brave new
+                    world of web 2.0.
+                </p>
+                <p>
+                    I just wonder whether the Ruby/Rails people will be
+                    interested, and if so how they will adopt the ideas. I can't
+                    help but think about how cool it would be for the Python and
+                    Ruby people to use each others code.
+                </p>
+                <p>
+                    Good work Ian, I hope you see some payback for your
+                    perseverance.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/its-not-another-damn-framework-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://vdm.cc/">Vincent D Murphy</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

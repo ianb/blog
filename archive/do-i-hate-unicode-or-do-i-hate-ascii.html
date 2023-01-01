@@ -1,0 +1,843 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Do I hate Unicode, or Do I Hate ASCII?</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Do I hate Unicode, or Do I Hate ASCII?</h1>
+
+        <div class="document">
+            <p>
+                I was glad to hear
+                <a
+                    class="reference"
+                    href="http://mail.python.org/pipermail/python-dev/2005-July/054614.html"
+                    >I am not alone</a
+                >
+                in feeling that (to quote) &quot;Unicode stinks&quot;.
+                <tt class="docutils literal"
+                    ><span class="pre">UnicodeDecodeError</span></tt
+                >
+                is a constant pain in the ass for me.
+            </p>
+            <p>
+                I appreciate
+                <a
+                    class="reference"
+                    href="http://mail.python.org/pipermail/python-dev/2005-July/054854.html"
+                    >this advise on Unicode</a
+                >, but I'm not entirely sure what to do with it:
+            </p>
+            <blockquote>
+                <ul class="simple">
+                    <li>
+                        strings are fine for text data that is encoded using the
+                        default encoding
+                    </li>
+                    <li>
+                        Unicode should be used for all text data that is not or
+                        cannot be encoded in the default encoding
+                    </li>
+                </ul>
+            </blockquote>
+            <p>
+                I still have
+                <tt class="docutils literal"><span class="pre">str()</span></tt>
+                calls and
+                <tt class="docutils literal"
+                    ><span class="pre">__str__</span></tt
+                >
+                methods all over the place, and Unicode sneaks into the most
+                unexpected places.
+            </p>
+            <p>
+                Sometimes I think my life would be much, much easier if my
+                default encoding was UTF-8 instead of ASCII. Isn't that a nice,
+                happy encoding? Sure, a UTF-8 string isn't equivalent to a
+                Unicode string. The lengths don't match up, some Unicode-aware
+                operations (e.g., operations that deal with letters different
+                from punctuation) won't work. Most of my strings are
+                sufficiently opaque that I don't care, though. And, doing server
+                programming, UTF-8 is a good encoding; there's no such thing as
+                locale for me. But even <em>setting</em> the default encoding
+                has been made deliberately very difficult.
+            </p>
+            <p>
+                I just really don't know what I <em>should</em> do. Should I
+                replace all my
+                <tt class="docutils literal"
+                    ><span class="pre">__str__</span></tt
+                >
+                methods with
+                <tt class="docutils literal"
+                    ><span class="pre">__unicode__</span></tt
+                >? Should I set up a boundary where I carefully decode all
+                strings, making sure I'm using Unicode <em>everywhere</em> in my
+                app? These are rather hard things to do, because
+                &quot;inside&quot; is a rather leaky place. There's all these
+                libraries other people wrote, external inputs I am hidden from,
+                etc.
+            </p>
+            <p>
+                For instance, imagine some library that writes data to a file
+                occasionally. Maybe it's a cache; the data is opaque. It expects
+                strings. What does it do when it gets a Unicode object? Very
+                possibly it writes it, if it is encodable with the default
+                encoding (typically ASCII). In fact, this works great for me
+                because my name and everything I write is ASCII; I'm not even
+                sure how to input anything but ASCII. How do I, the ignorant
+                English-speaking-and-typing American, even make a test case?
+                Well, sometimes I write
+                <tt class="docutils literal"
+                    ><span class="pre">u&quot;\u0100&quot;</span></tt
+                >
+                or something; I don't even know what that character is, but at
+                least I know it's Real Unicode. Sucks that it takes 9 characters
+                to give me that one Unicode character I want. And in practice I
+                usually leave this out of my tests. Then some European comes
+                along with an umlaut in their name, and BOOM!
+                <tt class="docutils literal"
+                    ><span class="pre">UnicodeDecodeError</span></tt
+                >
+                -- and <em>I</em> didn't even know strings were involved. It's
+                not even my library. <em>Nothing</em> is safe from these blasted
+                characters. And the problem isn't localized -- Unicode works
+                implicitly often enough that the Unicode can leak in long before
+                it causes a problem, and a subtle difference like between
+                <tt class="docutils literal"
+                    ><span class="pre">&quot;%s&quot;</span>
+                    <span class="pre">%</span> <span class="pre">obj</span></tt
+                >
+                and
+                <tt class="docutils literal"
+                    ><span class="pre">str(obj)</span></tt
+                >
+                can cascade throughout the system.
+            </p>
+            <p>
+                (And just try commenting on this post with anything but ASCII, I
+                dare you!)
+            </p>
+            <p>
+                <strong>Update</strong>: I've written some followups
+                <a class="reference" href="illusive-setdefaultencoding.html"
+                    >here</a
+                >
+                and
+                <a class="reference" href="why-python-unicode-sucks.html"
+                    >here</a
+                >.
+            </p>
+        </div>
+        <div class="dates" align="right">
+            Created 01 Aug '05<br />
+            Modified 02 Aug '05
+        </div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Excelente article. As a mexican developer I wrestle with
+                    Unicode daily and it's the only thing that can take away
+                    from Python, if I ever found a language with smooth handling
+                    of Unicode
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                anonymous
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I suspect it would be better if we had
+                        <em>only</em> Unicode text and non-text bytestrings,
+                        with a sufficiently different-enough interface that you
+                        could tell which one you expected and would work with.
+                        Like Java I guess. You'd still have all the problems,
+                        but you'd have to deal with them up front, and everyone
+                        would deal with them consistenly, and errors wouldn't
+                        propogate.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-5.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    There is no such thing like working Unicode support in any
+                    language. :-/ The main problem is that there are interfaces
+                    needed to the real world - and the real world doesn't like
+                    Unicode, it only accepts utf-8. But several libraries try to
+                    be smart. For example django uses the email module to parse
+                    multipart POST data - that's a logical choice, as HTTP
+                    multipart POST data is actually just mime attachements. Of
+                    course, email produces unicode strings if you pass in
+                    something that's defined as utf-8. And that produces
+                    problems in the django code. Or take sqlite3 for example:
+                    the pysqlite2 binding allways returns unicode strings.
+                    Except if you store data in the database directly with the
+                    sqlite command - then it stores what you pass in and what
+                    your local encoding is. It's iso-8859-1 in my case - so I
+                    can add stuff to the sqlite database that can't be read by
+                    the pysqlite2 library. With django this required me to write
+                    a row factory that removes the unicode string and replaces
+                    it by a bytestring in utf-8 encoding, just to make the
+                    django code happy.
+                </p>
+                <p>
+                    Oh, and your blog doesn't accept Umlauts in the comments -
+                    it produces a traceback with UnicodeDecodeError :-)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://hugo.muensterland.org/">hugo</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Oh, and just before anybody mentions it: both the email
+                        module and the pysqlite2 library will happily deliver
+                        bytestrings in other situations, so you can't just say
+                        to hell with it and all unicode. The email module will
+                        return non-utf-8 stuff as bytestrings and the pysqlite2
+                        library will give a registered converter not the unicode
+                        string but the raw bytestring. For example if you
+                        register a (lambda s: s) as the converter, you will get
+                        bytestrings.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://hugo.muensterland.org/">hugo</a>
+                </div>
+                <hr noshade />
+
+                <div class="document">
+                    <p>
+                        <em
+                            >Oh, and your blog doesn't accept Umlauts in the
+                            comments - it produces a traceback with
+                            UnicodeDecodeError :-)</em
+                        >
+                    </p>
+                    <p>
+                        Haha, you took my dare and YOU LOST! I actually knew you
+                        would, it's one of those Unicode errors that I'm too
+                        cowardly to try to fix. In fact, I'm pretty sure I
+                        introduced it when I was trying to fix a related
+                        encoding problem. There's a very high likelihood of
+                        regressions when you try to fix unicode-related errors.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-4.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>well, i usually code like this:</p>
+                <ul class="simple">
+                    <li>all inputs are converted to unicode</li>
+                    <li>the internals of my programs only deal with unicode</li>
+                    <li>
+                        all the outputs are converted (explicitly) to
+                        byte-strings
+                    </li>
+                </ul>
+                <p>at least this is what i'm trying ;)</p>
+                <p>
+                    there are generally 2 problems with this approach in python
+                    (it's much better in java for example):
+                </p>
+                <ol class="arabic simple">
+                    <li>
+                        probably because of historical reasons (first there were
+                        byte-strings?) python kind-of recommends
+                        byte-strings...well, not exactly recommends..but..for
+                        example if you want to write an unicode string you have
+                        to prefix it with [u]. so it's usually extra work to
+                        enter unicode strings. in java this issue does not
+                        exists, because there the strings are unicode. there are
+                        no byte-strings (only byte-arrays)
+                    </li>
+                    <li>
+                        probably a consequence of #1: many library functions
+                        only deal with byte-strings. and what's worse, sometimes
+                        (to be sure) they start with somethings like &quot;input
+                        = str(input)&quot;. and this of course completely fails
+                        when the input contains non-ascii... so you have to be
+                        careful...
+                    </li>
+                </ol>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Gabor Farkas
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    There isn't really a lot of point in <em>hating</em> ASCII.
+                    ASCII is fine if you are absolutely sure your code will only
+                    ever be used by monolingual English speakers who don't give
+                    a sh*t about whether their text looks typographically
+                    half-decent (proper quotes, en- and em-dashes etc.)
+                </p>
+                <p>
+                    If you have any interest in your code being used by the
+                    other 95% of the world, then ASCII simply isn't an option
+                    and you have to find a way to deal with unicode whether you
+                    like it or not.
+                </p>
+                <p>
+                    Django incidentally has the same problem:
+                    <a
+                        class="reference"
+                        href="http://code.djangoproject.com/ticket/170"
+                        >http://code.djangoproject.com/ticket/170</a
+                    >
+                    ... which does rather beg the question, do American
+                    newspapers not even <em>try</em> to spell foreigners' names
+                    correctly?
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.alanlittle.org/weblog/">Alan Little</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        They obviously never bother to use pound signs or euros.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://metamoof.net/">Moof</a>
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>I got your pound sign right here: # -- :-)</p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-11.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Ray
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                Kind of off-topic, but I wonder: How
+                                <em>did</em> the typographical mark '#' come to
+                                be called &quot;pound&quot; in the US? Was it
+                                through keymap differences? Or is it just a
+                                co-incidence that Shift-3 happens to produce the
+                                &quot;right pound for the job&quot;?
+                            </p>
+                            <p>
+                                (On a British keyboard, Shift-3 produces the GBP
+                                currency symbol. On a US keyboard, it produces
+                                the number sign -- what I would call a
+                                &quot;hash&quot; sign)
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-19.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="http://squirksoe.blogspot.com/"
+                                >Robert Hunter</a
+                            >
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    The &quot;octothorp&quot; is often refered
+                                    to as the &quot;pound sign&quot; because it
+                                    is used to designate pounds when it follows
+                                    a number in the retail trade (er, in the old
+                                    days, when _I_ was a kid). E.g. &quot;5# of
+                                    flour&quot;, &quot;3# of 10d common
+                                    nails&quot; (btw, that 'd' stands for
+                                    'penny'). See
+                                    <a
+                                        class="reference"
+                                        href="http://www.octothorp.us/octothorp.html"
+                                        >http://www.octothorp.us/octothorp.html</a
+                                    >
+                                    for more...
+                                </p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-20.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                anonymous
+                            </div>
+                            <hr noshade />
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+
+                <div class="document">
+                    <p>
+                        I think most Americans don't think of that as a spelling
+                        error. After all, the letters are really the same, so
+                        you can just leave out the funny decorations that
+                        furriners like to write, right? :)
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-9.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://">Randall Randall</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    It seems to me like non-ASCII character sets are just not
+                    ready for prime time yet. I treat stuff like Unicode the way
+                    I treat C++--I'm still waiting for things to shake out and
+                    the bugs to be worked out. Of course, I've been waiting 15
+                    years and C++ is still a mess.
+                </p>
+                <p>(Yes, I'm kidding. Sort of.)</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-10.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Mike Coleman
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    That why you should set the default encoding to something
+                    inexistent. automatic conversion from str to unicode or
+                    unicode to str is a source of endless bugs. Better to have
+                    everything explicit ;)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-12.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                anonymous
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        But sometimes automatic conversion really is the Right
+                        Thing. For instance, let's say I have some code that
+                        does this:
+                    </p>
+                    <pre class="literal-block">
+def popup(href, title):
+    return '&lt;a href=&quot;%s&quot; onclick=&quot;window.open(%r,'_blank')&quot;&gt;%s&lt;/a&gt;' % (
+        href, str(href), title)
+</pre
+                    >
+                    <p>
+                        Without a
+                        <tt class="docutils literal"
+                            ><span class="pre">u'</span></tt
+                        >
+                        this will raise an exception if
+                        <tt class="docutils literal"
+                            ><span class="pre">title</span></tt
+                        >
+                        is Unicode, if no default encoding is given. Is that the
+                        right behavior? No! This function works <em>fine</em>.
+                        This is <em>not</em> a boundary where encoding needs to
+                        be defined; in fact, it would suck if you had to encode
+                        the title before passing it in, because then you'd have
+                        to decode the result of the function as well, so you
+                        could re-encode it at the <em>real</em> boundary (when
+                        you serve the page). All this because of a missing
+                        <tt class="docutils literal"
+                            ><span class="pre">u</span></tt
+                        >
+                        -- and that
+                        <tt class="docutils literal"
+                            ><span class="pre">u</span></tt
+                        >
+                        is missing far more often than it is included.
+                    </p>
+                    <p>
+                        If you can &quot;fix&quot; that function, you're okay.
+                        But there's too much code out there that does this now.
+                        I simply can't update all the code out there that uses
+                        bytestrings instead of Unicode.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-13.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            But that is the problem. Unicode difficulties always
+                            come when you try to mix 8 bit strings with unicode
+                            strings. A solution ( and one of the best in my
+                            opinion ) is to do <em>all</em> string handling in
+                            unicode.
+                        </p>
+                        <p>
+                            You read a string from a file, first thing you do is
+                            convert it to unicode. You write a string to a file
+                            ? Encode it. Inbetween, always use unicode. If there
+                            is some unruly code somewhere, then it's better to
+                            ask the author of the code to correct it then to add
+                            some workaround somewhere. It is the safest solution
+                            that way because there are less hacks involved.
+                        </p>
+                        <p>
+                            If really there is some external code you can't
+                            change, then consider encapsuling the piece of code
+                            in an automatic convert/unconvert routine with utf8
+                            as the encoding.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-15.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://">anonymous</a>
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                I have a hard time asking a library author to
+                                &quot;fix&quot; their library in this way.
+                                Because when they've fixed it for Unicode-using
+                                me, they've simultaneously <em>broken</em> it
+                                for everyone else.
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-17.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            Ian Bicking
+                        </div>
+                        <hr noshade />
+                    </blockquote>
+
+                    <div class="document">
+                        <p>
+                            I always set my default string encoding to utf8 if
+                            I'm working in a python environment I have control
+                            over, and having done that I don't recalll having
+                            had any difficulties with library code that uses
+                            strings. Of course that's no use if you're in a
+                            shared hosting environment, or distributing code for
+                            others to use in their environments. The utterly
+                            stupid and bizarre only-at-startup way to set this
+                            really doesn't help.
+                        </p>
+                        <p>
+                            It occurs to me that Dutch is one of only three
+                            ASCII-only languages I can think of off the top of m
+                            head (the other one is Italian). This might explain
+                            a lot.
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-16.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        <a href="http://www.alanlittle.org/weblog/"
+                            >Alan Little</a
+                        >
+                    </div>
+                    <hr noshade />
+                    <blockquote>
+                        <div class="document">
+                            <p>
+                                Not even Italian and Dutch are absolutely ASCII.
+                                Italian makes use of accented vowels quite a lot
+                                (e.g. á) and Dutch technically needs the trema
+                                (e.g. tetraëder); the IJ (<a
+                                    class="reference"
+                                    href="http://en.wikipedia.org/wiki/%C4%B2"
+                                    >http://en.wikipedia.org/wiki/%C4%B2</a
+                                >) is usually written as two letters when using
+                                computers, but typewriters still have this as
+                                its own ligature.
+                            </p>
+                            <p>
+                                So, unless I'm missing something, English is the
+                                only pure ASCII language there is (except Latin,
+                                of course).
+                            </p>
+                        </div>
+                        <div align="right">
+                            <a
+                                href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-22.html"
+                                rel="nofollow"
+                                >#</a
+                            >
+                            <a href="http://worldcookery.com"
+                                >Philipp von Weitershausen</a
+                            >
+                        </div>
+                        <hr noshade />
+                        <blockquote>
+                            <div class="document">
+                                <p>
+                                    You think English is a &quot;pure
+                                    ASCII&quot; language?? Nonsense!
+                                </p>
+                                <p>
+                                    What about 'façade' or 'rôle', or 'résumé',
+                                    all perfectly good English words!
+                                </p>
+                                <p>~fran</p>
+                            </div>
+                            <div align="right">
+                                <a
+                                    href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-25.html"
+                                    rel="nofollow"
+                                    >#</a
+                                >
+                                Francis Tyers
+                            </div>
+                            <hr noshade />
+                        </blockquote>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    As ukrainian developer, I have to deal with Unicode issues
+                    regularly.
+                </p>
+                <p>
+                    The only viable strategy to avoid unicode errors for me has
+                    been to have clear borders of &quot;Unicode world&quot;
+                    within a program. As you noted, this may be tricky but it is
+                    doable. Usually I don't strive to have Unicode throughout
+                    the program because Unicode is used inconsistently in Python
+                    (and, yes, you're going to figure it out the hard way) but
+                    it is relatively simple to define a Unicode area within your
+                    own code. To document boundaries I usually use asserts.
+                </p>
+                <p>Regards, Max.</p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-18.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://developers.org.ua">Max Ischenko</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    I used to have the same annoyances, but then I learned to
+                    stop worrying and love the exceptions :) Or, more
+                    prosaically, faced with a large and complex project that
+                    required use of Unicode, I sat down and worked out how
+                    Python's support for it operates. The conclusion I came to
+                    is that Python is actually one of the better (if not best)
+                    languages at handling Unicode, as long as you work
+                    <em>with</em> it. That is; it presupposes a particular way
+                    of handling strings. The faults are more in the explanations
+                    and documentation.
+                </p>
+                <p>
+                    The project of which I speak is driven by a vast MySQL
+                    database, in which [essentially] all strings are Unicode.
+                    Since Python tends to promote non-Unicode strings to Unicode
+                    as required (in string operations and the like), that means
+                    that any textual object must be considered as being Unicode.
+                    They come to Python code (via MySQLdb) as Unicode objects.
+                    To the console and to files, they are sent as UTF-8-encoded
+                    strings.
+                </p>
+                <p>
+                    The general rules I've followed are: (a) Use a console
+                    environment that supports UTF8 characters (in my case, PuTTY
+                    ssh sessions to Linux boxen). Thus one can print any string
+                    that's encoded in UTF8 to stdout in Python code. (b) Assume
+                    that all strings are Unicode; when using &quot;print&quot;,
+                    convert to UTF8. Since non-Uncode strings also have an
+                    &quot;encode&quot; method, this makes life easier.
+                    Converting an ASCII string to UTF8 is essentially a no-op.
+                    Only encode when writing out from code to files or the
+                    console. Only decode when reading in. (c) When creating or
+                    reading files, know what encoding format you're handling.
+                    That should be as much an attribute of any defined file
+                    format as the line-endings or use of Ctrl-Z/EOF. I use BOM
+                    marks (as does Windows) via the constants in the
+                    &quot;codecs&quot; module to ensure that I tag files
+                    appropriately. Writing a generic file reader that spots BOM
+                    marks and decodes appropriately is an easy task. (d) Keep in
+                    mind that &quot;the console and the world are in ASCII&quot;
+                    is a falsehood that will bite you as much as &quot;everyone
+                    in the world speaks English&quot; does :) (e) UTF8 is your
+                    friend - it'll handle encoding of any Unicode character and
+                    if you can't meet rule (a) is still more-or-less printable,
+                    though you don't see the strings as intended. (f) the
+                    &quot;default encoding&quot; is your enemy. You can't rely
+                    on it, it only takes effect in some circumstances and it may
+                    bear no relation at all to what the console can or cannot
+                    handle.
+                </p>
+                <p>
+                    Given the above, I have never had a problems with rogue
+                    Unicode[De|En]codeErrors, and we handle all Western
+                    languages plus (recently) Russian and Japanese. Generally,
+                    the only times they occur is where I've found an old
+                    &quot;print&quot; line that spits some object out without
+                    encoding it first.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-21.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.benlast.com">Ben Last</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        No I don't but I do hate all things microsoft (micro as
+                        in small soft as per brain type)
+                    </p>
+                    <p>
+                        All I want to do when I call word and when it tells me
+                        it needs to convert a file I select OEM United states. I
+                        now want this selection to be the default for all the
+                        following files till I end the word session.
+                    </p>
+                    <p>How can I do this ?</p>
+                    <p>Hope one of U Gurus can help.</p>
+                    <p>I have 'Googled&#64; for the answer no help</p>
+                    <p>Paul</p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/do-i-hate-unicode-or-do-i-hate-ascii-comment-23.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Paul Suret
+                </div>
+                <hr noshade />
+            </blockquote>
+        </blockquote>
+    </body>
+</html>

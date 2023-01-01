@@ -1,0 +1,412 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Common Message Runtime</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Common Message Runtime</h1>
+
+        <div class="document">
+            <p>
+                With
+                <a
+                    class="reference"
+                    href="http://blogs.msdn.com/hugunin/archive/2006/09/05/741605.aspx"
+                    >IronPython 1.0</a
+                >
+                out, I was thinking of some of the issues of supporting multiple
+                languages in a runtime environment.
+            </p>
+            <p>
+                I'm not sure what the right strategy is. I'm not very drawn to
+                IronPython, though maybe in time that will change. Out of
+                laziness alone I'm not inclined to figure out the installation
+                and version issues of running IronPython with Mono, and since I
+                don't use Windows that's the only way I'd use IronPython.
+            </p>
+            <p>
+                But I'm also not that enchanted with multi-language runtimes.
+                It's nice, but complex, and I seldom find myself wishing that I
+                could use <em>more</em> complex systems. IronPython opens up a
+                whole new world of complex (.NET) systems to me as a Python
+                programmer. Which isn't what I was looking for. Now maybe a .NET
+                user will now be able to use a simpler Python environment, but
+                that isn't me.
+            </p>
+            <p>
+                But what about
+                <a class="reference" href="http://www.parrotcode.org/"
+                    >Parrot</a
+                >
+                or <a class="reference" href="http://hlvm.org/">HLVM</a>? These
+                are (or rather <em>want to be</em>) cross-language environments
+                for dynamic languages, and could introduce an environment that
+                is more interesting to me than .NET (or the similarly
+                uninteresting JVM). Python people are always saying that they
+                wish they could have CPAN. I should qualify that <em>I</em> am
+                not always saying that I wish I had CPAN, but maybe those other
+                people have some point.
+            </p>
+            <p>
+                But seriously? I'm just going to go to CPAN and pick out a nice
+                module and start using it, just pretending it is a normal Python
+                module? Is it just me, or does that sound absurd? I'm sure
+                there's good things in CPAN, but I <em>really</em> am not
+                looking for more complexity in my life, and that's all I see
+                down that path.
+            </p>
+            <p>
+                It occurs to me that there's a different method of
+                interoperation, but one that isn't being pursued. I've had a
+                passing interest in Erlang, and came upon
+                <a
+                    class="reference"
+                    href="http://www.defmacro.org/ramblings/concurrency.html"
+                    >this article</a
+                >
+                recently, which describes the Erlang concurrency model in a
+                fairly simple way (and using only Java-ish code, no mention of
+                functional programming or any of that).
+            </p>
+            <p>
+                Erlang processes generally communicate with other Erlang
+                processes in a homogeneous environment (note: Erlang processes
+                are not OS-level processes). But each process doesn't know a lot
+                about other processes. There's no reason they all have to be
+                written in the same language.
+            </p>
+            <p>
+                You avoid a lot of hard issues this way. You don't share data.
+                Are strings mutable or immutable in your language? It doesn't
+                really matter -- since you never share strings (or anything
+                else). What does the object model or inheritance look like
+                between languages? It doesn't really matter, since you don't
+                really share objects. Private, public, protected? Doesn't
+                matter. Things actually become <em>less</em> complex, not more
+                complex.
+            </p>
+            <p>
+                You could do this now with OS processes and sockets, but most
+                language runtimes aren't set up to deal with this kind of
+                process model very well. Processes should be
+                <em>really</em> light, lighter than any OS process or thread. It
+                would be really helpful to have shared memory with
+                copy-on-write, so that you don't <em>actually</em> have to
+                duplicate all the data sent in messages. And there needs to be a
+                common message format, plus library support in each language.
+            </p>
+            <p>
+                I'm not sure what all the implications of such a system would
+                be. But I'm pretty sure it's a system that would actually be
+                attractive to me -- not in a theoretical
+                isn't-it-nice-that-exists sense (which is the only attraction I
+                have to IronPython), but in a I-want-to-use-that sense. I don't
+                want more options and more features; <em>more</em> is tiresome,
+                I'm really just interested in <em>better</em>.
+            </p>
+        </div>
+        <div class="dates" align="right">Created 08 Sep '06</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Erlang nodes actually don't have to be written in Erlang,
+                    they just need to speak the protocol. There are
+                    implementations of that protocol in (at least) C, Java, .NET
+                    and Python.
+                </p>
+                <p>
+                    Technically, some data amongst processes in a given Erlang
+                    node can be shared, but that's an implementation detail (and
+                    all types in Erlang are immutable anyway). Erlang is a great
+                    little language, I've been playing with it for a few
+                    weeks... definitely worth trying at least once.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/common-message-runtime-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://bob.pythonmac.org">Bob Ippolito</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Running a Ruby on Rails App within a Python Paste/WSGI
+                    Environment could be &quot;better&quot;, not just
+                    &quot;more&quot;, but that would be a long way ...
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/common-message-runtime-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://beza1e1.tuxen.de">beza1e1</a>
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Maybe running a Ruby component as part of the stack.
+                        Could happen with RubyCLR and IronPython...
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/common-message-runtime-comment-6.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://www.voidspace.org.uk/python/index.shtml"
+                        >Fuzzyman</a
+                    >
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    I have had similar thoughts over the past few months. After
+                    playing around with Erlang, I simply cannot understand why
+                    you would handle concurrency any other way! Its such a joy
+                    compared to most of the alternatives, and I would absolutely
+                    love it if Python 2.6 or Python 3000 included a similar
+                    method of handling concurrency, and used Erlang's message
+                    passing format as well. I am actually very surprised that no
+                    one has mentioned something like this on the Python 3000
+                    mailing lists yet... although I am not sure that Guido would
+                    buy into it.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/common-message-runtime-comment-3.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://cleverdevil.org">Jonathan LaCour</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    IronPython is cool for a few reasons, but probably none that
+                    are relevant to you. The only way that it is relevant, is
+                    that hopefully more people will be using Python. :-)
+                </p>
+                <ul class="simple">
+                    <li>
+                        IronPython brings the power of dynamic introspection of
+                        live objects (etc) to .NET programmers
+                    </li>
+                    <li>
+                        It's easy for .NET programmers to embed Python as a
+                        scripting language into their applications (very easy
+                        generally)
+                    </li>
+                    <li>
+                        It is <em>much</em> easier (like much easier) to extend
+                        IronPython from C# than it is to extend CPython from C
+                    </li>
+                    <li>
+                        The .NET framework is actually quite cool to program
+                        with. If you are programming for Windows and want a
+                        native looking GUI, there isn't a comparable choice.
+                    </li>
+                </ul>
+                <p>
+                    Using Perl modules from Python on a common runtime sounds
+                    truly excruciating. I <em>would</em> like to cut my teeth on
+                    writing a simple compiler, by developing a static extension
+                    language for Python using .NET and / or HLVM. Probably won't
+                    ever happen though... :-(
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/common-message-runtime-comment-4.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.voidspace.org.uk/python/index.shtml"
+                    >Fuzzyman</a
+                >
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    Hmmm... and another thing. I guess it is fairly obvious that
+                    the future lies in more CPU cores and more distributed
+                    processing.
+                </p>
+                <p>
+                    This means that the whole concurrency thing has to be
+                    adressed by Python <em>sometime</em>, although that will be
+                    evolutionary I guess. It looks like the Erlang model is
+                    pretty cool. If my understanding is correct (which is
+                    unlikely), Erlang runs effectively as a 'process server'
+                    with lots of these inter-communicating 'processes'. Does the
+                    server run as a single OS process ? (So if you core dump
+                    <em>everything dies</em>, such is life.)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/common-message-runtime-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.voidspace.org.uk/python/index.shtml"
+                    >Fuzzyman</a
+                >
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        Yep, an Erlang &quot;process&quot; is internal to the
+                        Erlang runtime, or &quot;Node&quot;, which runs as a
+                        single OS process. You can run as many Nodes as you like
+                        though on the same machine or on different machines and
+                        then have them talk to each other. At that point, the
+                        message passing between Erlang processes is transparent.
+                        If you send a message to another process, you don't need
+                        to know what Node the process is running on; the runtime
+                        takes care of all that. So you typically achieve
+                        fault-tolerance by running multiple Nodes on multiple
+                        physically seperate machines and use some of Erlang's
+                        supervision and monitoring functionality to recover
+                        gracefully if a Node manages to crash. An Erlang Node
+                        crashing would probably happen more from hardware
+                        failure than a core dump though since it's been pretty
+                        thoroughly battle-tested and Erlang doesn't really let
+                        you do stupid things like pointer manipulation.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/common-message-runtime-comment-8.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    <a href="http://thraxil.org/users/anders/">Anders</a>
+                </div>
+                <hr noshade />
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    My reading on Erlang, and Joe Armstrong's thesis in
+                    particular was definitely a factor in getting me into the
+                    whole &quot;small REST applications&quot; mindset.
+                </p>
+                <p>
+                    I've also spent a bit of time thinking about the parallels
+                    between Erlang's runtime and REST in general. I'm not sure
+                    I'd go as far as saying that the
+                    <a class="reference" href="http://microapps.org/"
+                        >microapps</a
+                    >
+                    stuff I've been doing was directly influenced by Erlang's
+                    design, but it definitely helped convince me that it was the
+                    right direction to be heading. Nothing's going to be quite
+                    as smooth as message passing within an Erlang runtime, but
+                    HTTP is similar in that it's independent of the language,
+                    allows for network transparency (nodes can be on the same
+                    machine or across an oceaon) and the JSON dicts that usually
+                    get sent around are looking an awful lot like Erlang tuples.
+                    If you think of a URL as something akin to an Erlang Pid, it
+                    gets really interesting.
+                </p>
+                <p>
+                    The way that I've been composing microapps involves making
+                    requests asynchronously whenever possible and using a
+                    message queue app and event notification app. I guess to
+                    follow the Erlang model as closely as possible, we would
+                    want to avoid using GET. Instead, the client would POST a
+                    message onto the queue saying &quot;I'd like you to send
+                    this piece of data to this URL&quot;, the event notification
+                    app would notify the server that there's been a new message
+                    added to its queue, which it would retrieve, process, and
+                    then POST to the client application's queue a response with
+                    the data requested and the client would get an event
+                    notification of an item added to its queue and go get it.
+                    It's an interesting approach and I've been playing with it
+                    for some apps that the latency doesn't matter as much. But
+                    for most stuff, synchronous GET requests are so much simpler
+                    and easier that it's worth blocking for them.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/common-message-runtime-comment-7.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://thraxil.org/users/anders/">Anders</a>
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    My own lack of interest in IronPython stems from a more
+                    fundamental objection: The main advantage to using
+                    IronPython to develop and deploy Python programs on Windows
+                    (instead of CPython) is the easy access to various .NET
+                    libraries.
+                </p>
+                <p>
+                    Unfortunately, many of these libraries have licenses that
+                    preclude licensing a consuming app under the GPL (for which
+                    there may be very good business reasons). Without the
+                    ability to license my apps under the license of my choice,
+                    both any interest in using those libraries, and hence, any
+                    interest in using IronPython instead of CPython goes away.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/common-message-runtime-comment-9.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                <a href="http://www.michaelbernstein.com">Michael Bernstein</a>
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>

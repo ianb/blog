@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Help me please: Apache auth</title>
+        <link rel="stylesheet" href="WK/default.css" type="text/css" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="New Posts"
+            href="https://ianbicking.org/feeds/new_pages.xml"
+        />
+    </head>
+    <body color="black" bgcolor="white">
+        <h1 id="header">
+            <a href="index.html">Ian Bicking: the old part of his blog</a>
+        </h1>
+
+        <div style="float: right">
+            <script type="text/javascript">
+                google_ad_client = "pub-2913402032659646";
+                google_ad_width = 120;
+                google_ad_height = 600;
+                google_ad_format = "120x600_as";
+                google_ad_type = "text";
+                google_ad_channel = "";
+                google_color_border = "336699";
+                google_color_bg = "FFFFFF";
+                google_color_link = "0000FF";
+                google_color_text = "000000";
+                google_color_url = "008000";
+                //-->
+            </script>
+        </div>
+        <h1>Help me please: Apache auth</h1>
+
+        <div class="document">
+            <p>
+                I have a question about Apache authentication, which I'm hoping
+                someone will be able to help me with.
+            </p>
+            <p>
+                I want a
+                <a class="reference" href="http://svn.colorstudy.com"
+                    >subversion repository</a
+                >
+                where
+                <tt class="docutils literal"><span class="pre">/home</span></tt>
+                is less restrictive than anyplace else on the system. That is, I
+                give many people access to
+                <tt class="docutils literal"><span class="pre">/home</span></tt
+                >, where they can make branches (of anything in the system) and
+                drop experiments and whatnot. And I give a smaller set of people
+                (everyone in the
+                <tt class="docutils literal"
+                    ><span class="pre">commit</span></tt
+                >
+                group) access to the entire repository.
+            </p>
+            <p>
+                But I can't figure out any way to relax permissions on a
+                subdirectory. It's driving me nuts. I even tried hacks like
+                <tt class="docutils literal"
+                    ><span class="pre">&lt;Location</span>
+                    <span class="pre">~</span>
+                    <span class="pre"
+                        >&quot;/(every|path|but|home)&quot;&gt;</span
+                    ></tt
+                >
+                with a
+                <tt class="docutils literal"
+                    ><span class="pre">Require</span>
+                    <span class="pre">group</span>
+                    <span class="pre">commit</span></tt
+                >
+                and
+                <tt class="docutils literal"
+                    ><span class="pre">&lt;Location</span>
+                    <span class="pre">/&gt;</span></tt
+                >
+                with
+                <tt class="docutils literal"
+                    ><span class="pre">Require</span>
+                    <span class="pre">valid-user</span></tt
+                >, but it just allowed anyone to commit anywhere. Unlike
+                <tt class="docutils literal"
+                    ><span class="pre">RewriteRule</span></tt
+                >
+                it seems like
+                <tt class="docutils literal"
+                    ><span class="pre">Location</span></tt
+                >
+                doesn't allow the prefixing of regular expressions with
+                <tt class="docutils literal"><span class="pre">!</span></tt> to
+                indicate negation (so I can't use
+                <tt class="docutils literal"
+                    ><span class="pre">&lt;Location</span>
+                    <span class="pre">~</span>
+                    <span class="pre">&quot;!^/home&quot;&gt;</span></tt
+                >).
+            </p>
+            <p>Any ideas?</p>
+        </div>
+        <div class="dates" align="right">Created 15 Jul '05</div>
+        <hr noshade />
+        <h3 id="comments">Comments:</h3>
+        <blockquote>
+            <div class="document">
+                <p>
+                    Which ordering do you have in the
+                    <cite>Order</cite> directive?
+                </p>
+                <p>
+                    You will need to write a stanza for all directories at the
+                    level for which you want relaxed permissions. A brief
+                    example:
+                </p>
+                <p>
+                    consider the tree bar,baz,qux in foo using groups: elect and
+                    world
+                </p>
+                <pre class="literal-block">
+Order Allow Deny
+&lt;Directory foo/bar&gt;
+ Require group elect
+&lt;/Directory&gt;
+&lt;Directory foo/baz&gt;
+ Require group world
+&lt;/Directory&gt;
+&lt;Directory foo/qux&gt; #this lets anyone in!! it is wrong
+ Require valid-user
+ Require group elect
+&lt;/Directory&gt;
+</pre
+                >
+                <p>
+                    I find that when it comes to securing resources like this
+                    explicit is better than implicit ;-)
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/help-me-apache-auth-comment-1.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Larry
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    If it's a Subversion repository: Why not use Subversion's
+                    own authorization feature? It'll easily accept what you
+                    want.
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/help-me-apache-auth-comment-2.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                Simon Percivall
+            </div>
+            <hr noshade />
+            <blockquote>
+                <div class="document">
+                    <p>
+                        I'd forgotten about that, I'll have to give that a look
+                        again.
+                    </p>
+                </div>
+                <div align="right">
+                    <a
+                        href="https://ianbicking.org/help-me-apache-auth-comment-3.html"
+                        rel="nofollow"
+                        >#</a
+                    >
+                    Ian Bicking
+                </div>
+                <hr noshade />
+                <blockquote>
+                    <div class="document">
+                        <p>
+                            Check out:
+                            <a
+                                class="reference"
+                                href="http://svnbook.red-bean.com/en/1.1/ch06s04.html#svn-ch-6-sect-4.4"
+                                >http://svnbook.red-bean.com/en/1.1/ch06s04.html#svn-ch-6-sect-4.4</a
+                            >
+                        </p>
+                    </div>
+                    <div align="right">
+                        <a
+                            href="https://ianbicking.org/help-me-apache-auth-comment-4.html"
+                            rel="nofollow"
+                            >#</a
+                        >
+                        Peter Fein
+                    </div>
+                    <hr noshade />
+                </blockquote>
+            </blockquote>
+
+            <div class="document">
+                <p>
+                    See:
+                    <a
+                        class="reference"
+                        href="http://httpd.apache.org/docs/2.2/mod/core.html#require"
+                        >http://httpd.apache.org/docs/2.2/mod/core.html#require</a
+                    >
+                </p>
+                <p>Removing controls in subdirectories</p>
+                <p>
+                    The following example shows how to use the Satisfy directive
+                    to disable access controls in a subdirectory of a protected
+                    directory. This technique should be used with caution,
+                    because it will also disable any access controls imposed by
+                    mod_authz_host.
+                </p>
+                <p>
+                    &lt;Directory /path/to/protected/&gt; Require user david
+                    &lt;/Directory&gt; &lt;Directory
+                    /path/to/protected/unprotected&gt; # All access controls and
+                    authentication are disabled # in this directory Satisfy Any
+                    Allow from all &lt;/Directory&gt;
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/help-me-apache-auth-comment-5.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                philc
+            </div>
+            <hr noshade />
+
+            <div class="document">
+                <p>
+                    See:
+                    <a
+                        class="reference"
+                        href="http://httpd.apache.org/docs/2.2/mod/core.html#require"
+                        >http://httpd.apache.org/docs/2.2/mod/core.html#require</a
+                    >
+                    Section: Removing controls in subdirectories
+                </p>
+            </div>
+            <div align="right">
+                <a
+                    href="https://ianbicking.org/help-me-apache-auth-comment-6.html"
+                    rel="nofollow"
+                    >#</a
+                >
+                philc
+            </div>
+            <hr noshade />
+        </blockquote>
+    </body>
+</html>
