@@ -4,7 +4,7 @@ Treating configuration values as templates
 :author: Ian Bicking
 :tags: Programming
 
-A while back I `described fassembler <http://blog.ianbicking.org/2008/06/19/my-experience-writing-a-build-system />`_ and one of the things I liked in it is how the configuration works.  It uses a conventional declarative INI-style but also allows arbitrary code, so that defaults can be based on each other.
+A while back I `described fassembler <https://ianbicking.org/2008/06/19/my-experience-writing-a-build-system />`_ and one of the things I liked in it is how the configuration works.  It uses a conventional declarative INI-style but also allows arbitrary code, so that defaults can be based on each other.
 
 Here's a basic example of a default configuration::
 

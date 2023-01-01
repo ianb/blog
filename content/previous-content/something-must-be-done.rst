@@ -22,4 +22,4 @@ There's a strong attitude, in this show and others, that this is a problem for u
 
 I don't ask these questions rhetorically (and maybe that makes me different from the conservatives, who tend to only ask questions rhetorically).  There may be a good answer to these questions.  But it's far too easy to say "we must do something about this" without saying *who* and *why*.  We (especially those of us who listen to NPR) are all far too fatigued with the constant admonitions that not enough is being done, and something has to change.  This kind of approach is not an effective call to action.
 
-And it's yet another thing `trying to make me feel bad for something that's not my fault <http://blog.ianbicking.org/2008/03/31/environmental-guilt />`_.  And dammit, it really isn't my fault!
+And it's yet another thing `trying to make me feel bad for something that's not my fault <https://ianbicking.org/2008/03/31/environmental-guilt />`_.  And dammit, it really isn't my fault!

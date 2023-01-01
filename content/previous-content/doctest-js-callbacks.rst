@@ -12,7 +12,7 @@ I have yet to really use doctest.js on more than a couple real cases, and as I d
 
 Testing with callbacks is generally a tricky thing.  You want to make assertions, but they happen entirely separately from the test runner's own loop, and your callbacks may not run at all if there's a failure.
 
-I came upon some tests recently that used `Jasmine <http://pivotal.github.com/jasmine />`_, a `BDD-style <http://en.wikipedia.org/wiki/Behavior_Driven_Development>`_ test framework.  I'm `not a big fan of BDD <http://blog.ianbicking.org/behavior-driven-programming.html>`_ but I'm fairly new to serious Javascript development so I'm trying to withhold judgement.  The flow of the tests is a bit peculiar until you realize that it's for async reasons.  I'll try to show something that roughly approximates a real test of an XMLHttpRequest API call::
+I came upon some tests recently that used `Jasmine <http://pivotal.github.com/jasmine />`_, a `BDD-style <http://en.wikipedia.org/wiki/Behavior_Driven_Development>`_ test framework.  I'm `not a big fan of BDD <https://ianbicking.org/behavior-driven-programming.html>`_ but I'm fairly new to serious Javascript development so I'm trying to withhold judgement.  The flow of the tests is a bit peculiar until you realize that it's for async reasons.  I'll try to show something that roughly approximates a real test of an XMLHttpRequest API call::
 
     it("should give us no results", function() {
       runs(function () {

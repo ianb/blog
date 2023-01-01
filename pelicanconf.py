@@ -3,8 +3,8 @@
 import os
 
 base = os.path.dirname(os.path.abspath(__file__))
-AUTHOR = u"Ian Bicking"
-SITENAME = u"Ian Bicking: a blog"
+AUTHOR = "Ian Bicking"
+SITENAME = "Ian Bicking: a blog"
 SITEURL = "https://www.ianbicking.org"
 # FEED_DOMAIN = "https://ianbicking.org"
 CACHE_CONTENT = True
@@ -61,7 +61,7 @@ for filename in os.listdir(os.path.join(base, "disqusoutput")):
 
 TYPOGRIFY = True
 
-DEFAULT_LANG = u"en-US"
+DEFAULT_LANG = "en-US"
 
 # Blogroll
 LINKS = ()
@@ -76,6 +76,7 @@ THEME = "./mystyle/"
 SOCIAL = (
     # ("Mastodon", "https://mastodon.technology/@ianbicking"),
     ("@ianbicking", "https://twitter.com/ianbicking"),
+    ("@ianbicking@hachyderm.io", "https://hachyderm.io/@ianbicking"),
     ("Github", "https://github.com/ianb"),
 )
 
@@ -92,7 +93,7 @@ PLUGINS = [
 GITHUB_ACTIVITY_FEED = "https://github.com/ianb.atom"
 GITHUB_ACTIVITY_MAX_ENTRIES = 10
 
-DISQUS_SITENAME = "ianbicking"
+# DISQUS_SITENAME = "ianbicking"
 GOOGLE_ANALYTICS = "UA-2442258-1"
 
 MENUITEMS = [

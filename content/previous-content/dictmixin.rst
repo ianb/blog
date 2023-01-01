@@ -91,4 +91,4 @@ So, to recursively copy ``'/foo/bar'`` to ``'/dest/path/bar'`` you do::
 
 It doesn't really matter if ``'/foo/bar'`` is a directory or file. There's a number of other clever things that come out of this.  I think it's an example of the power of `a closed set <http://en.wikipedia.org/wiki/Closure_%28mathematics%29>`_ -- dictionaries are expressable from these four operations, and all the other methods can be derived from there.  If you find this interesting, you might want to read the `source for DictMixin <http://svn.python.org/view/python/trunk/Lib/UserDict.py?view=markup>`_; it's only about 95 lines.
 
-My article `templating via dict wrappers <http://blog.ianbicking.org/templating-via-dict-wrappers.html>`_ has some other similar dict tricks.
+My article `templating via dict wrappers <https://ianbicking.org/templating-via-dict-wrappers.html>`_ has some other similar dict tricks.

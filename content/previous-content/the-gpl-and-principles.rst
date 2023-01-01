@@ -4,7 +4,7 @@ The GPL and Principles
 :author: Ian Bicking
 :tags: Politics, Programming
 
-For the most part by the time I finished writing my `last article on licensing <http://blog.ianbicking.org/2008/05/05/choosing-a-license />`_ I had mostly convinced myself that the GPL isn't a practical license for most projects.  That is, outcomes when using the GPL aren't likely to be any better than outcomes using a permissive license, except for certain kinds of projects, mostly projects involving big faceless companies, and I'd just as soon avoid such projects anyway.
+For the most part by the time I finished writing my `last article on licensing <https://ianbicking.org/2008/05/05/choosing-a-license />`_ I had mostly convinced myself that the GPL isn't a practical license for most projects.  That is, outcomes when using the GPL aren't likely to be any better than outcomes using a permissive license, except for certain kinds of projects, mostly projects involving big faceless companies, and I'd just as soon avoid such projects anyway.
 
 My own thinking on this has changed over the years in part because of a greater sense of humility about what I produce.  I'm really not that worried about people stealing my work because I don't think that theft would be of much value.  But also because I realize that the value in software is not so much in the code as in the process.  The process is what is valuable, particularly for open source, and licensing doesn't really address issues of process.
 

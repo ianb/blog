@@ -5,7 +5,7 @@ Configuration management: push vs. pull
 :tags: Programming, Silver Lining
 :tags: puppet configuration "configuration management"
 
-Since I've been thinking about `deployment <http://blog.ianbicking.org/category/silverlining>`_ I've been thinking a lot more about what "configuration management" means, how it should work, what it should do.
+Since I've been thinking about `deployment <https://ianbicking.org/category/silverlining>`_ I've been thinking a lot more about what "configuration management" means, how it should work, what it should do.
 
 I guess my quick summary of configuration management is that it is *setting up a server correctly*.  "Correct" is an ambiguous term, but given that there are so many to configuration management the solutions are also ambiguous.
 

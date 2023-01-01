@@ -4,7 +4,7 @@ Java BDD
 :author: Ian Bicking
 :tags: Programming
 
-I notice there's another `Behavior Driven Development <http://en.wikipedia.org/wiki/Behavior_driven_development>`_ framework for Java called `Instinct <http://code.google.com/p/instinct />`_ (`via <http://bright-green.com/blog/2007_11_27/behaviour_driven_design.html>`_).   I have `commented on BDD before <http://blog.ianbicking.org/behavior-driven-programming.html>`_.
+I notice there's another `Behavior Driven Development <http://en.wikipedia.org/wiki/Behavior_driven_development>`_ framework for Java called `Instinct <http://code.google.com/p/instinct />`_ (`via <http://bright-green.com/blog/2007_11_27/behaviour_driven_design.html>`_).   I have `commented on BDD before <https://ianbicking.org/behavior-driven-programming.html>`_.
 
 Here's an `example test <http://code.google.com/p/instinct/wiki/InstinctIn2Minutes>`_::
 

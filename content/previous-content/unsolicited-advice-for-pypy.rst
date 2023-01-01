@@ -32,8 +32,8 @@ What do I want?
 
 And I guess it doesn't have to be "PyPy", but a new backend for PyPy to target; it doesn't have to be the *only* path PyPy pursues.
 
-With a runtime like this PyPy could be an absolutely rocking platform for web development.  Python could be as reliable as, oh... `PHP <http://blog.ianbicking.org/2008/01/12/what-php-deployment-gets-right />`_? Sorry, I probably won't win arguments that way ;)  As good as Erlang! Maybe we could get the benefits of async without the pain of callbacks or Deferreds. And these are features people would *use*.  Right now I'm perceiving a problem where there's lots of people standing on the sidelines cheering you on but not actually *using* PyPy.
+With a runtime like this PyPy could be an absolutely rocking platform for web development.  Python could be as reliable as, oh... `PHP <https://ianbicking.org/2008/01/12/what-php-deployment-gets-right />`_? Sorry, I probably won't win arguments that way ;)  As good as Erlang! Maybe we could get the benefits of async without the pain of callbacks or Deferreds. And these are features people would *use*.  Right now I'm perceiving a problem where there's lots of people standing on the sidelines cheering you on but not actually *using* PyPy.
 
 So: I wouldn't tell anyone what to do, and if someone tries this out I'll probably only be on the sidelines cheering you on... but I really think this could be awesome.
 
-**Update**: there's some `interesting comments on Hacker News <http://news.ycombinator.com/item?id=2406920>`_ as well.  
+**Update**: there's some `interesting comments on Hacker News <http://news.ycombinator.com/item?id=2406920>`_ as well.

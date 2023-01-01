@@ -4,7 +4,7 @@ Opening Python Classes
 :author: Ian Bicking
 :tags: Programming, Python
 
-So, I was reading through comments to despam my old posts before archiving them, and came upon `this old reply <http://dan.chokola.com/journal/?user=dan&entry=2007-01-27.105426>`_ to `this old post of mine <http://blog.ianbicking.org/re-ruby-and-python-compared.html>`_ which was a reply to `this much older post <http://web.archive.org/web/20070329162213/http://www.rexx.com/~oinkoink/Ruby_v_Python.html>`_.
+So, I was reading through comments to despam my old posts before archiving them, and came upon `this old reply <http://dan.chokola.com/journal/?user=dan&entry=2007-01-27.105426>`_ to `this old post of mine <https://ianbicking.org/re-ruby-and-python-compared.html>`_ which was a reply to `this much older post <http://web.archive.org/web/20070329162213/http://www.rexx.com/~oinkoink/Ruby_v_Python.html>`_.
 
 I won't reply to that post much, because it's mostly... well, not useful to respond to.  But people often talk about the wonders of Open Classes in Ruby.  For Python people who aren't familiar with what that means, you can do::
 

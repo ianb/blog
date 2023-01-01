@@ -4,7 +4,7 @@ WebOb
 :author: Ian Bicking
 :tags: Programming, Python, Web
 
-I've have it in my head to extract/rewrite parts of `Paste <http://pythonpaste.org>`_ lately.  `Tempita <http://blog.ianbicking.org/2007/08/06/tempita />`_ was one example.
+I've have it in my head to extract/rewrite parts of `Paste <http://pythonpaste.org>`_ lately.  `Tempita <https://ianbicking.org/2007/08/06/tempita />`_ was one example.
 
 The request and response functions in Paste grew very organically.  I wasn't trying to create a framework, so I studiously avoided anything that might look like a request or response object.  I felt that would be stepping on toes or something.  Eventually, though, `Ben Bangert <http://groovie.org />`_ really wanted a request object for `Pylons <http://pylonshq.com />`_, and it went in `paste.wsgiwrappers <http://pythonpaste.org/module-paste.wsgiwrappers.html>`_.  And at a certain point I decided that the class-based access was really just fine, and doing lots of ``function(environ, ...)`` was no better than ``Request(environ).function(...)``.
 

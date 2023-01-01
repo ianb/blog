@@ -6,7 +6,7 @@ HTML Accessibility
 
 So I gave a presentation at PyCon about HTML, which I ended up turning into an XML-sucks HTML-rocks talk.  Well that's a trivialization, but *I* have the privilege of trivializing my arguments all I want.
 
-Somewhat to my surprise this got me a heckler (of sorts).  I think it came up when I was making my `<em> lies and <i> is truth <http://blog.ianbicking.org/2007/08/14/reflection-and-description-of-meaning />`_ argument.  That is, presentation and intention are the same.  There are those people who feel they can separate the two, creating semantic markup that represents their intent, but they are so few that the *reader* can never trust that the distinction is intentional, and so ``<i>`` and ``<em>`` must be treated as equivalent.
+Somewhat to my surprise this got me a heckler (of sorts).  I think it came up when I was making my `<em> lies and <i> is truth <https://ianbicking.org/2007/08/14/reflection-and-description-of-meaning />`_ argument.  That is, presentation and intention are the same.  There are those people who feel they can separate the two, creating semantic markup that represents their intent, but they are so few that the *reader* can never trust that the distinction is intentional, and so ``<i>`` and ``<em>`` must be treated as equivalent.
 
 Someone then yelled out something like "what about blind people?"  The argument being that screen readers would like to distinguish between the two, as not all things we render as italic would be read with emphasis.
 
@@ -14,7 +14,7 @@ It's not surprising to me that the first time I've gotten an actively negative r
 
 Discussions about accessibility, however, have strong moral undertones.  This isn't just What Tool Is Right For The Job.  There is a kind of moral certainty to the argument that we should be making a world that is accessible to all people.
 
-I fear this moral certainty has led people self-righteously down unwise paths.  They believe -- with of course some justification -- that the world must be *made* right.  And so many boil-the-ocean proposals are made, and even become codified by standards, but *markup standards* are useless unless embodied in *actual content*, and this is where accessibility falls down.  
+I fear this moral certainty has led people self-righteously down unwise paths.  They believe -- with of course some justification -- that the world must be *made* right.  And so many boil-the-ocean proposals are made, and even become codified by standards, but *markup standards* are useless unless embodied in *actual content*, and this is where accessibility falls down.
 
 There are two posts that together have greatly eroded my trust in accessibility advocates, so that I feel like I am left adrift, unwilling to jump through the hoops accessibility advocates put up as I strongly suspect they are pointless.
 
@@ -26,7 +26,6 @@ Months later we started talking a bit about the accessibility of `openplans.org 
 
 Another shortcut for accessibility -- a shortcut I also distrust -- is that to make a site accessible you make sure it works without Javascript.  But don't many screen readers work directly off browsers?  Browsers implement Javascript.  Do blind users turn Javascript off?  I don't know.  If you use no-Javascript as a hint to make the site more accessible, you might just be wasting your effort.
 
-There's also some weird perspective problems with accessibility.  Blind users will always be a small portion of the population.  It's just unreasonable to expect sighted users to write to this small population.  Relying on hidden hints in content to provide accessibility just *can't work*.  Hidden content will be broken, only visible content can be trusted.  Admitting this does not mean giving up.  As a sighted reader I do not expect the written and spoken word to be equivalent.  I don't think blind listeners lose anything by hearing something that is more a dialect specific to the computer translation of written text to spoken text.  (Maybe treating text-to-speech as a translation effort would be more successful anyway?)  
+There's also some weird perspective problems with accessibility.  Blind users will always be a small portion of the population.  It's just unreasonable to expect sighted users to write to this small population.  Relying on hidden hints in content to provide accessibility just *can't work*.  Hidden content will be broken, only visible content can be trusted.  Admitting this does not mean giving up.  As a sighted reader I do not expect the written and spoken word to be equivalent.  I don't think blind listeners lose anything by hearing something that is more a dialect specific to the computer translation of written text to spoken text.  (Maybe treating text-to-speech as a translation effort would be more successful anyway?)
 
 A freely available screen reader probably would help a lot as well.  I write my markup to render in browsers, not to render to a spec.  Anything else is just bad practice.  I can't seriously write my markup for readers based on a spec.
-

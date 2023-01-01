@@ -38,4 +38,4 @@ I haven't studied the GPL v3 very closely, but it seems useful to me.  Software-
 
 If you are thinking about choosing a license, or thinking about choosing software based on the licensing, maybe these thoughts will be helpful in your own thinking.  And please don't GPL-hate in the comments, I'm not interested and if you feel the need then go write your own post.
 
-**Update:** I wrote a second article to expand on some thoughts: `The GPL and Principles <http://blog.ianbicking.org/2008/05/06/the-gpl-and-principles />`_
+**Update:** I wrote a second article to expand on some thoughts: `The GPL and Principles <https://ianbicking.org/2008/05/06/the-gpl-and-principles />`_

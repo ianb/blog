@@ -18,4 +18,4 @@ A more flexible system can ignore such problems as being "somewhere else" in the
 
 So I feel very resolved: toppcloud will hardcode everything it possibly can.  Python 2.6 and only 2.6!  (Until 2.7, but then **only 2.7**!).  Only Varnish/Apache/mod_wsgi.  I haven't figured out threads/processes exactly, but once I do, there will be only one way!  And if I get it wrong, then everyone (**everyone**) will have to switch when it is corrected!  Because I'd much rather have a system that is inflexible than one that doesn't work.  With a clear and solid design I think it is feasible to get this to work, and that is no small feat.
 
-Relatedly, `I think I'm going to change the name of toppcloud <http://blog.ianbicking.org/2010/02/09/leaving-topp/comment-page-1/#comment-151194>`_, so ideas are welcome!
+Relatedly, `I think I'm going to change the name of toppcloud <https://ianbicking.org/2010/02/09/leaving-topp/comment-page-1/#comment-151194>`_, so ideas are welcome!

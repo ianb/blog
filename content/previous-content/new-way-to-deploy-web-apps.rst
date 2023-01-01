@@ -6,7 +6,7 @@ A new way to deploy web applications
 
 Deployment is one of the things I like least about development, and yet without deployment the development doesn't really matter.
 
-I've tried a few things (e.g. `fassembler <http://blog.ianbicking.org/2008/06/19/my-experience-writing-a-build-system />`_), built a few things (`virtualenv <http://virtualenv.openplans.org>`_, `pip <http://pip.openplans.org>`_), but deployment just sucked *less* as a result.  Then I got excited about `App Engine <http://appengine.google.com>`_; everyone else was getting excited about "scaling", but really I was `excited about an accessible deployment process <http://blog.ianbicking.org/2008/04/09/app-engine-and-open-source />`_.  When it comes to deployment App Engine is the first thing that has really felt good to me.
+I've tried a few things (e.g. `fassembler <https://ianbicking.org/2008/06/19/my-experience-writing-a-build-system />`_), built a few things (`virtualenv <http://virtualenv.openplans.org>`_, `pip <http://pip.openplans.org>`_), but deployment just sucked *less* as a result.  Then I got excited about `App Engine <http://appengine.google.com>`_; everyone else was getting excited about "scaling", but really I was `excited about an accessible deployment process <https://ianbicking.org/2008/04/09/app-engine-and-open-source />`_.  When it comes to deployment App Engine is the first thing that has really felt good to me.
 
 **But** I can't actually *use* App Engine.  I was able to come to terms with the idea of writing an application to the platform, but there are limits... and with App Engine there were simply too many limits.  Geo stuff on App Engine is at best a crippled hack, I miss `lxml <http://codespeak.net/lxml />`_ terribly, I never hated relational databases, and almost nothing large works without some degree of rewriting.  Sometimes you can work around it, but you can never be sure you won't hit some wall later.  And frankly working around the platform is tiring and not very rewarding.
 
@@ -40,7 +40,7 @@ The basic lifecycle using toppcloud looks like:
     Create a new virtual server; you can create any kind of supported server, but only Ubuntu Jaunty or Karmic are supported (and Jaunty should probably be dropped).  This step is where the "cloud" part actually ends.  If you want to install a bare Ubuntu onto an existing physical machine that's fine too -- after ``toppcloud create-node`` the "cloud" part of the process is pretty much done.  Just don't go using some old Ubuntu install; this tool is for clean systems that are used only for toppcloud.
 
 ``toppcloud setup-node``
-    Take that bare Ubuntu server and set it up (or update it) for use with toppcloud.  This installs all the basic standard stuff (things like Apache, mod_wsgi, Varnish) and some management script that toppcloud runs.  This is written to be safe to run over and over, so upgrading and setting up a machine are the same.  It needs to be a bare server, but 
+    Take that bare Ubuntu server and set it up (or update it) for use with toppcloud.  This installs all the basic standard stuff (things like Apache, mod_wsgi, Varnish) and some management script that toppcloud runs.  This is written to be safe to run over and over, so upgrading and setting up a machine are the same.  It needs to be a bare server, but
 
 ``toppcloud init path/to/app/``
     Setup a basic virtualenv environment with some toppcloud customizations.
@@ -64,19 +64,19 @@ Some of the constraints:
 
 1. Binary packages are supported via Ubuntu packages; you only upload portable files.  If you need a library like lxml, you need to request that package (``python-lxml``) to be installed in your app.ini.  If you need a version of a binary library that is not yet packaged, I think creating a new deb is reasonable.
 
-2. There is no Linux distribution abstraction, but I don't care.  
+2. There is no Linux distribution abstraction, but I don't care.
 
-3. There is no option for the way your application is run -- there's one way applications are run, because I believe there is a best practice.  I might have gotten the best practice wrong, but that should be resolved inside toppcloud, not inside applications. Is Varnish a terrible cache?  Probably not, but if it is we should all be able to agree on that and replace it.  If there are genuinely different needs then maybe additional application or deployment configuration will be called for -- but we shouldn't add configuration just because someone *says* there is a better practice (and a better practice that is not universally better); there must be justifications.  
+3. There is no option for the way your application is run -- there's one way applications are run, because I believe there is a best practice.  I might have gotten the best practice wrong, but that should be resolved inside toppcloud, not inside applications. Is Varnish a terrible cache?  Probably not, but if it is we should all be able to agree on that and replace it.  If there are genuinely different needs then maybe additional application or deployment configuration will be called for -- but we shouldn't add configuration just because someone *says* there is a better practice (and a better practice that is not universally better); there must be justifications.
 
-4. By abstracting out services and persistence some additional code is required for each such service, and that code is centralized in toppcloud, but it means we can also start to add consistent tools usable across a wide set of applications and backends.  
+4. By abstracting out services and persistence some additional code is required for each such service, and that code is centralized in toppcloud, but it means we can also start to add consistent tools usable across a wide set of applications and backends.
 
 5. All file paths have to be relative, because files get moved around.  I know of some particularly problematic files (e.g., ``.pth`` files), and toppcloud fixes these automatically.  Mostly this isn't so hard to do.
 
-These particular compromises are ones I have not seen in many systems (and `I've started to look more <http://toppcloud.colorstudy.com/comparisons.html>`_).  App Engine I think goes too far with its constraints.  `Heroku <http://heroku.com />`_ is close, but closed source.  
+These particular compromises are ones I have not seen in many systems (and `I've started to look more <http://toppcloud.colorstudy.com/comparisons.html>`_).  App Engine I think goes too far with its constraints.  `Heroku <http://heroku.com />`_ is close, but closed source.
 
 This is different than a strict everything-must-be-a-package strategy.  This deployment system is light and simple and takes into account reasonable web development workflows.  The pieces of an application that move around a lot are all well-greased and agile.  The parts of an application that are better to Do Right And Then Leave Alone (like Apache configuration) are static.
 
-Unlike generalized systems like buildout this system avoids "building" entirely, making deployment a simpler and lower risk action, leaning on system packages for the things they do best.  Other open source tools emphasize a greater degree of flexibility than I think is necessary, allowing people to encode exploratory service integration into what *appears* to be an encapsulated build (I'm looking at you buildout).  
+Unlike generalized systems like buildout this system avoids "building" entirely, making deployment a simpler and lower risk action, leaning on system packages for the things they do best.  Other open source tools emphasize a greater degree of flexibility than I think is necessary, allowing people to encode exploratory service integration into what *appears* to be an encapsulated build (I'm looking at you buildout).
 
 Unlike `requirement sets <http://pip.openplans.org/requirement-format.html>`_ and packaging and versioning libraries, this makes all the Python libraries (typically the most volatile libraries) explicit and controlled, and can better ensure that small updates really are small.  It doesn't invalidate installers and versioning, but it makes that process even more explicit and encourages greater thoughtfulness.
 

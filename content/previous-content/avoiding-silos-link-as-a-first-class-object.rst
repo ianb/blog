@@ -27,7 +27,7 @@ There's clearly no room for exceptions in this code.  I am thus proposing that a
       </li>
   </ul>
 
-Just like with `changing IDs to links <http://blog.ianbicking.org/2008/10/24/hypertext-driven-urls />`_ in service documents, the template doesn't actually look any more complicated than it did before (simpler, even).  But now we can use simple object-oriented techniques to create first-class links.  The code might look like::
+Just like with `changing IDs to links <https://ianbicking.org/2008/10/24/hypertext-driven-urls />`_ in service documents, the template doesn't actually look any more complicated than it did before (simpler, even).  But now we can use simple object-oriented techniques to create first-class links.  The code might look like::
 
   class Post(SomeORM):
       def url(self):
@@ -37,7 +37,7 @@ Just like with `changing IDs to links <http://blog.ianbicking.org/2008/10/24/hyp
               base = get_request().application_url
               return '%s/%s/%s/%s' % (
                   base, self.year, self.month, self.slug)
-          
+
       def link(self):
           return html('<a href="%s">%s</a>') % (
               self.url(), self.title)

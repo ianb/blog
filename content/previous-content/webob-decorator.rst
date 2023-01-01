@@ -24,7 +24,7 @@ In the process I keep writing bits of code to make WSGI applications from simple
     def hello_world(req):
         return Response('Hi %s!' % (req.POST.get('name', 'You')))
 
-But each time I'd write it, I change things slightly, implementing more or less features.  For instance, `handling methods <http://blog.ianbicking.org/2008/10/24/decorators-and-descriptors />`_, or coercing other responses, or handling middleware.
+But each time I'd write it, I change things slightly, implementing more or less features.  For instance, `handling methods <https://ianbicking.org/2008/10/24/decorators-and-descriptors />`_, or coercing other responses, or handling middleware.
 
 Having implemented several of these (and `reading other people's implementations <http://svn.pythonpaste.org/Paste/WebOb/contrib>`_) I decided I wanted WebOb to include a kind of reference implementation.  But I don't like to include anything in WebOb unless I'm sure I can get it *right*, so I'd really like feedback.  (There's been some `less than positive feedback <http://groups.google.com/group/paste-users/browse_thread/thread/7346e75940413f46>`_, but I trudge on.)
 

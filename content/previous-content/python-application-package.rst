@@ -6,7 +6,7 @@ Python Application Package
 
 I've been thinking some more about deployment of Python web applications, and deployment in general (in part leading up to the `Web Summit <https://us.pycon.org/2012/community/WebDevSummit />`_). And I've got an idea.
 
-I `wrote about this about a year ago <http://blog.ianbicking.org/2011/03/31/python-webapp-package />`_ and `recently revised some notes on a proposal <https://github.com/ianb/pywebapp/blob/master/docs/spec.txt>`_ but I've been thinking about something a bit more basic: a way to simply ship server applications, bundles of code.  Web applications are just one use case for this.
+I `wrote about this about a year ago <https://ianbicking.org/2011/03/31/python-webapp-package />`_ and `recently revised some notes on a proposal <https://github.com/ianb/pywebapp/blob/master/docs/spec.txt>`_ but I've been thinking about something a bit more basic: a way to simply ship server applications, bundles of code.  Web applications are just one use case for this.
 
 For now lets call this a "Python application package".  It has these features:
 

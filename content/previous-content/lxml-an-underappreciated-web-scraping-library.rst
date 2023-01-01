@@ -14,7 +14,7 @@ Second, people feel lxml is harder to install.  This is correct.  **BUT**, lxml 
 
     $ STATIC_DEPS=true easy_install 'lxml>=2.2alpha1'
 
-One you have lxml installed, you have a great parser (which happens to be `super-fast <http://blog.ianbicking.org/2008/03/30/python-html-parser-performance />`_ and that is **not a tradeoff**).  You get a fairly familiar API based on `ElementTree <http://docs.python.org/library/xml.etree.elementtree.html#module-xml.etree.ElementTree>`_, which though a little strange feeling at first, offers a compact and canonical representation of a document tree, compared to more traditional representations.  But there's more...
+One you have lxml installed, you have a great parser (which happens to be `super-fast <https://ianbicking.org/2008/03/30/python-html-parser-performance />`_ and that is **not a tradeoff**).  You get a fairly familiar API based on `ElementTree <http://docs.python.org/library/xml.etree.elementtree.html#module-xml.etree.ElementTree>`_, which though a little strange feeling at first, offers a compact and canonical representation of a document tree, compared to more traditional representations.  But there's more...
 
 One of the features that should be appealing to many people doing screen scraping is that you get CSS selectors.  You can use XPath as well, but usually that's more complicated (`for example <http://css2xpath.appspot.com/?css=div.pad%20a&amp; format=html>`_).  Here's `an example I found <http://crowtheries.net/?p=60>`_ getting links from a menu in a page in BeautifulSoup:
 

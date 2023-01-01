@@ -8,7 +8,7 @@ Saturday morning my sister, Monica Bicking, and her boyfriend, Eryn Trimmer, wer
 
 They were arrested for "conspiracy to incite a riot".  This is the same charge used against the `Chicago 8 (or 7) <http://en.wikipedia.org/wiki/Chicago_Seven>`_ at the 1968 Democratic Convention.  Perhaps the police have a sense of tradition?
 
-But more directly she and Eryn were arrested in an attempt to preemptively suppress the protests at the Republican National Convention.  They were both very active with the `RNC Welcoming Committee <http://www.nornc.org />`_, which is a group coordinating and supporting some of the people coming to the Twin Cities for the convention.  
+But more directly she and Eryn were arrested in an attempt to preemptively suppress the protests at the Republican National Convention.  They were both very active with the `RNC Welcoming Committee <http://www.nornc.org />`_, which is a group coordinating and supporting some of the people coming to the Twin Cities for the convention.
 
 Obviously I'm very concerned by the arrests and charges.  But there's been a huge outpouring of support from the community -- both from activist in the Twin Cities, and from their neighbors.  In Chicago I'm a little unsure about what to do.
 
@@ -81,7 +81,7 @@ Monica and Eryn
 
 .. raw:: html
 
-    <a href="http://blog.ianbicking.org/wp-content/uploads/images/Eryn-Trimmer-and-Monica-Bicking.jpg"><img style="float: right; margin: 1em" src="http://blog.ianbicking.org/wp-content/uploads/images/Eryn-Trimmer-and-Monica-Bicking-thumb.jpg" title="Monica Bicking and Eryn Trimmer"></a>
+    <a href="https://ianbicking.org/wp-content/uploads/images/Eryn-Trimmer-and-Monica-Bicking.jpg"><img style="float: right; margin: 1em" src="https://ianbicking.org/wp-content/uploads/images/Eryn-Trimmer-and-Monica-Bicking-thumb.jpg" title="Monica Bicking and Eryn Trimmer"></a>
 
 I'd like to speak specifically of Monica and Eryn.  Talking to Monica about the RNC protests, she was never actually that excited.  The RNC isn't what she wanted to focus on.  Why focus on the thing you dislike?  Why focus on a political process you don't believe in?  Why focus on the workings of institutions you wish didn't exist?  She would have preferred to work on the scale she felt was valid -- to build a community of individuals.  But of course events are larger than us, and by whatever coincidence the RNC was coming to the Twin Cities.  This is not the sort of thing you can just ignore.  And of course it wasn't up to her whether there would be protests.
 

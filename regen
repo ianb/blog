@@ -16,19 +16,29 @@ if [[ -e "$output/drafts" ]] ; then
     rm -r $output/drafts/
     mkdir $output/drafts
 fi
-~/src/blog/.venv/bin/pelican content/ -o $output -s pelicanconf.py "$@"
+~/src/blog/.venv/bin/pelican --ignore-cache content/ -o $output -s pelicanconf.py "$@"
 (
     cd $output/drafts
     for F in * ; do
       echo "<a href=\"$F\">$F</a><br>"
     done
 ) > $output/drafts/list.html
+
+rm $output/category/"{slug}"*.html
+
+(
+    cd archive
+    rsync -r . ../$output/archive
+)
+
 echo "hiya" > $output/drafts/index.html
 cp content/favicon.ico content/Ian_Bicking_resume.pdf $output/
 echo done.
 
 if [ "$quiet" = "" ] ; then
     echo -n "rsyncing..."
-    rsync -r output/ blog.ianbicking.org:ianbicking.org/
+    # rsync -r output/ blog.ianbicking.org:ianbicking.org/
+    rsync -r --delete output/* publish-branch
     echo done.
+    echo "Commit the files in publish-branch/ to publish"
 fi

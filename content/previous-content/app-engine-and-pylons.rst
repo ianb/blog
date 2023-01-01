@@ -4,7 +4,7 @@ App Engine and Pylons
 :author: Ian Bicking
 :tags: Programming, Python, Web
 
-So I promised some more technical discussion of App Engine than my `last <http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary />`_ `two <http://blog.ianbicking.org/2008/04/09/app-engine-and-open-source />`_ posts.  Here it is:
+So I promised some more technical discussion of App Engine than my `last <https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary />`_ `two <https://ianbicking.org/2008/04/09/app-engine-and-open-source />`_ posts.  Here it is:
 
 Google App Engine uses a somewhat CGI-like model.  That is, a script is run, and it uses stdin/stdout/environ to handle the requests.  To avoid the overhead of CGI a process can be reused by defining ``__main__.main()``.  But while a process *can* be reused, it might not be, and of course it might get run on an entirely separate server.  So in many ways it's like the CGI model, with a small optimization so that, particularly under load, your requests can run with less latency.
 

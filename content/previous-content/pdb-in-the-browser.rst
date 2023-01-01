@@ -4,7 +4,7 @@ pdb in the browser
 :author: Ian Bicking
 :tags: Python, Web
 
-People have asked me a few times about `evalexception <http://blog.ianbicking.org/ajaxy-exception-catching.html>`_ and `pdb <http://python.org/doc/current/lib/module-pdb.html>`_ -- they'd like to be able to use something like pdb through the browser, stepping through code.
+People have asked me a few times about `evalexception <https://ianbicking.org/ajaxy-exception-catching.html>`_ and `pdb <http://python.org/doc/current/lib/module-pdb.html>`_ -- they'd like to be able to use something like pdb through the browser, stepping through code.
 
 The technique I used for tracebacks wouldn't really work for pdb.  For a traceback I saved all the information from the frames -- mostly just the local variables -- and then let the user interact with that through the browser.  But with pdb you pause the application part way through waiting for user input, and the routine only completes much later.
 

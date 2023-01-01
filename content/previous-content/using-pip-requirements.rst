@@ -4,7 +4,7 @@ Using pip Requirements
 :author: Ian Bicking
 :tags: Packaging, Python
 
-Following onto a set of recent posts (from `James <http://www.b-list.org/weblog/2008/dec/14/packaging />`_, `me <http://blog.ianbicking.org/2008/12/14/a-few-corrections-to-on-packaging />`_, then `James again <http://www.b-list.org/weblog/2008/dec/15/pip />`_), Martijn Faassen `wrote a description of Grok's version management <http://faassen.n--tree.net/blog/view/weblog/2008/12/16/0>`_.  Our ideas are pretty close, but he's using buildout, and I'll describe out to do the same things with pip.
+Following onto a set of recent posts (from `James <http://www.b-list.org/weblog/2008/dec/14/packaging />`_, `me <https://ianbicking.org/2008/12/14/a-few-corrections-to-on-packaging />`_, then `James again <http://www.b-list.org/weblog/2008/dec/15/pip />`_), Martijn Faassen `wrote a description of Grok's version management <http://faassen.n--tree.net/blog/view/weblog/2008/12/16/0>`_.  Our ideas are pretty close, but he's using buildout, and I'll describe out to do the same things with pip.
 
 Here's a kind of development workflow that I think works well:
 
@@ -50,7 +50,7 @@ By using ``-r project-start.txt`` you give ``pip freeze`` a template for it to s
     nose==1.4
     # Installing as editable to satisfy requirement INITools==0.2.1dev-r3488:
     -e svn+http://svn.colorstudy.com/INITools/trunk@3488#egg=INITools-0.2.1dev_r3488
-    
+
 At that point you might decide that you don't care about the nose version, or you might have installed something from trunk when you could have used the last release.  So you go and adjust some things.
 
 Martijn also asks: how do you have framework developers maintain one file, and then also have developers maintain their own lists for their projects?

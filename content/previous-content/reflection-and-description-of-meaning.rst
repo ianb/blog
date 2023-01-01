@@ -4,7 +4,7 @@ Reflection and Description Of Meaning
 :author: Ian Bicking
 :tags: HTML, Non-technical
 
-After writing my `last post <http://blog.ianbicking.org/2007/08/14/of-microformats-and-the-semantic-web />`_ I thought I might follow up with a bit of cognitive speculation. Since the `first comment <http://blog.ianbicking.org/2007/08/14/of-microformats-and-the-semantic-web/#comment-148>`_ was exactly about the issue I was thinking about writing on, I might as well follow up quickly.
+After writing my `last post <https://ianbicking.org/2007/08/14/of-microformats-and-the-semantic-web />`_ I thought I might follow up with a bit of cognitive speculation. Since the `first comment <https://ianbicking.org/2007/08/14/of-microformats-and-the-semantic-web/#comment-148>`_ was exactly about the issue I was thinking about writing on, I might as well follow up quickly.
 
 Jeff Snell replied:
 

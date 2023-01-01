@@ -6,7 +6,7 @@ Javascript Status Message Display
 
 In a `little wiki I've been playing with <http://www.bitbucket.org/ianb/pickywiki />`_ I've been trying out little ideas that I've had but haven't had a place to actually implement them.  One is how notification messages work.  I'm sure other people have done the same thing, but I thought I'd describe it anyway.
 
-A `common pattern <http://blog.ianbicking.org/web-application-patterns-status-notification.html>`_ is to accept a POST request and then redirect the user to some page, setting a status message.  Typically the status message is either set in a cookie or in the session, then the standard template for the application has some code to check for a message and display it.
+A `common pattern <https://ianbicking.org/web-application-patterns-status-notification.html>`_ is to accept a POST request and then redirect the user to some page, setting a status message.  Typically the status message is either set in a cookie or in the session, then the standard template for the application has some code to check for a message and display it.
 
 The problem with this is that this breaks all caching -- at any time any page can have some message injected into it, basically for no reason at all.  So I thought: why not do the whole thing in Javascript?  The server will set a cookie, but only Javascript will read it.
 

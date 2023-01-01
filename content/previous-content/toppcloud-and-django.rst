@@ -4,7 +4,7 @@ toppcloud (Silver Lining) and Django
 :author: Ian Bicking
 :tags: Programming, Python, Silver Lining, Web
 
-I wrote up instructions on using `toppcloud <http://blog.ianbicking.org/2010/01/29/new-way-to-deploy-web-apps />`_ (**update**: renamed Silver Lining) with Django.  They are `up on the site <http://toppcloud.colorstudy.com/django-quickstart.html>`_ (where they will be updated in the future), but I'll drop them here too...
+I wrote up instructions on using `toppcloud <https://ianbicking.org/2010/01/29/new-way-to-deploy-web-apps />`_ (**update**: renamed Silver Lining) with Django.  They are `up on the site <http://toppcloud.colorstudy.com/django-quickstart.html>`_ (where they will be updated in the future), but I'll drop them here too...
 
 Creating a Layout
 -----------------
@@ -155,9 +155,9 @@ Django magically knows to put the code in ``src/sampleapp/sampleapp/polls/`` -- 
 
 And activate the application by adding ``'sampleapp.polls'`` to ``INSTALLED_APPS`` in ``src/sampleapp/sampleapp/settings.py``.  Also add ``'django.contrib.admin'`` to get the admin app in place.  Run ``manage.py syncdb`` to get the tables in place.
 
-You can try ``toppcloud serve .`` and go to ``/admin/`` to login and see your tables.  You might notice all the CSS is broken.  
+You can try ``toppcloud serve .`` and go to ``/admin/`` to login and see your tables.  You might notice all the CSS is broken.
 
-toppcloud serves static files out of the ``static/`` directory.  You don't actually put ``static`` in the URLs, these files are available at the top-level (unless you create a ``static/static/`` directory). The best way to put files in there is generally symbolic links.  
+toppcloud serves static files out of the ``static/`` directory.  You don't actually put ``static`` in the URLs, these files are available at the top-level (unless you create a ``static/static/`` directory). The best way to put files in there is generally symbolic links.
 
 For Django admin, do this::
 

@@ -6,7 +6,7 @@ Throw out your frameworks! (forms included)
 
 No, I should say *forms particularly*.
 
-I have lots of things to blog about, but nothing makes me want to blog like *code*.  Ideas are hard, code is easy.  So when I saw `Jacob's writeup about dynamic Django form generation <http://jacobian.org/writing/dynamic-form-generation />`_ I felt a desire to respond.  I didn't see the form panel at PyCon (I intended to but I hardly saw *any* talks at PyCon, and yet still didn't even see a good number of the people I wanted to see), but as the author of an `ungenerator <http://formencode.org/htmlfill.html>`_ and as a general `form library skeptic <http://blog.ianbicking.org/on-form-libraries.html>`_ I have a somewhat different perspective on the topic.
+I have lots of things to blog about, but nothing makes me want to blog like *code*.  Ideas are hard, code is easy.  So when I saw `Jacob's writeup about dynamic Django form generation <http://jacobian.org/writing/dynamic-form-generation />`_ I felt a desire to respond.  I didn't see the form panel at PyCon (I intended to but I hardly saw *any* talks at PyCon, and yet still didn't even see a good number of the people I wanted to see), but as the author of an `ungenerator <http://formencode.org/htmlfill.html>`_ and as a general `form library skeptic <https://ianbicking.org/on-form-libraries.html>`_ I have a somewhat different perspective on the topic.
 
 The example created for the panel might display that perspective.  You should go read `Jacob's description <http://jacobian.org/writing/dynamic-form-generation />`_; but basically it's a simple registration form with a dynamic set of questions to ask.
 
@@ -64,7 +64,7 @@ I'm using `Tempita <http://pythonpaste.org/tempita />`_, but it really doesn't m
     <form action="{{action}}" method="POST">
     New Username: <input type="text" name="username"><br>
     Password: <input type="password" name="password"><br>
-    Repeat Password: 
+    Repeat Password:
       <input type="password" name="password_confirm"><br>
     {{for question in questions}}
       {{question}}: <input type="text" name="{{question}}"><br>

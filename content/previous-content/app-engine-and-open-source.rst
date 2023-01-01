@@ -6,13 +6,13 @@ App Engine and Open Source
 
 This is about `Google App Engine <http://code.google.com/appengine />`_ which probably everyone has read about already.
 
-I'm quite excited about it.  Hosting has been the bane of the Python web world for a long time.  This provides a very compelling hosting situation for Python applications.  
+I'm quite excited about it.  Hosting has been the bane of the Python web world for a long time.  This provides a very compelling hosting situation for Python applications.
 
 I'm not as interested in this from a competitive perspective as I am from a simple this-is-awesome perspective.  Regardless of how this positions Python relative to other languages, this is something Python needs.  But even looking beyond that, I think this is something the open source world needs.  Open source web development is in a funny place.  There's a lot of reasons why web programming is a good domain for open source.  The barrier to entry for web development is extremely low.  Developers have choice in their tools, as browsers don't really care what software you use so long as you serve up HTML.  This leads to experimentation and excitement and the kind of self-direction that is very motivating to developers.  It leads to the kind of personal excitement that underlies most open source development.
 
 Despite this, open source web application development doesn't seem sustainable.  There's *some* applications, sure.  WordPress, Trac, MediaWiki, MoinMoin.  But most wiki software doesn't have a vibrant community.  Many a bug tracker has fallen by the wayside.  Blog software projects have a horrible time building a viable community.  Other website software hardly gets anywhere at all.  A lot of the development that might *appear* to be application development really is more like a framework when you look closely (e.g., Plone, Drupal).
 
-I think deployment concerns are a huge part of this.  And, `given its better deployment story <http://blog.ianbicking.org/2008/01/12/what-php-deployment-gets-right />`_, it's no surprise PHP is the basis of most viable open source web applications.  Being interested in a project requires that you be able to *use* the product (and usually use it casually, as that's the point of entry for many developers).  Right now most people can't use open source web applications.
+I think deployment concerns are a huge part of this.  And, `given its better deployment story <http://ianbicking.org/2008/01/12/what-php-deployment-gets-right />`_, it's no surprise PHP is the basis of most viable open source web applications.  Being interested in a project requires that you be able to *use* the product (and usually use it casually, as that's the point of entry for many developers).  Right now most people can't use open source web applications.
 
 But people *can use* hosted applications, and that's where all the effort has gone in the past few years.  I am comfortable saying that Trac is a better issue tracker than Google Code's issue tracker.  But I'd probably recommend Google Code to someone starting a new project, because it's so much less work.  Similarly I'd try to dissuade most people from installing their own blog software.  I still don't know what to tell people about a CMS.
 
@@ -24,4 +24,4 @@ But even if other people make compatible implementations of these APIs, would it
 
 As to the details of App Engine?  Can you run Pylons or Paste on it?  Well, that's a topic for another post.
 
-**Update:** I `wrote up some more thoughts <http://blog.ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary />`_
+**Update:** I `wrote up some more thoughts <https://ianbicking.org/2008/04/09/app-engine-commodity-vs-proprietary />`_
