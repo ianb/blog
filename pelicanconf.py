@@ -31,6 +31,7 @@ CATEGORY_FEED_ATOM = "feeds/{slug}.atom.xml"
 FEED_MAX_ITEMS = 20
 RELATIVE_URLS = False
 STATIC_PATHS = ["media"]
+COVER_IMAGES_PATH = "media/cover-images"
 TAG_URL = "tag/{slug}.html"
 TAG_SAVE_AS = "tag/{slug}.html"
 WITH_FUTURE_DATES = False
@@ -84,11 +85,7 @@ DEFAULT_PAGINATION = 10
 
 PLUGIN_PATHS = ["./pelican-plugins"]
 
-PLUGINS = [
-    "github_activity",
-    "related_posts",
-    "assets",
-]
+PLUGINS = ["github_activity", "related_posts", "assets", "pelican-cover-image"]
 
 GITHUB_ACTIVITY_FEED = "https://github.com/ianb.atom"
 GITHUB_ACTIVITY_MAX_ENTRIES = 10

@@ -1,26 +1,33 @@
-{% extends "base.html" %} {% block title %}{{ article.title|striptags }}{%
-endblock %} {% block content %}
+{% extends "base.html" %}
+{% block title %}{{ article.title|striptags }}{% endblock %} {% block content %}
 <section id="content" class="body">
     <article>
-        <header>
-            <abbr class="published" title="{{ article.date.isoformat() }}">
+        <header{% if article.cover_image_url and article.cover_image_url != "2" %}
+        style="background-image: url({{ article.cover_image_url }}); background-size: cover; background-position: center; height: 300px; width: 100%;"
+        {% endif %}>
+        <div{% if article.header_background_color %}
+        style="background-color: {{ article.header_background_color }}"
+        {% endif %}>
+            <div class="published" title="{{ article.date.isoformat() }}">
                 {{ FORMAT_DATE(article.date) }}
-            </abbr>
+            </div>
             <h1 class="entry-title">
                 <a
                     href="{{ SITEURL }}/{{ article.url }}"
                     rel="bookmark"
                     title="Permalink to {{ article.title|striptags }}"
-                    >{{ article.title}}</a
+                    >{{ article.title }}</a
                 >
             </h1>
+        </div>
             {% include 'twitter.html' %}
         </header>
 
         <div class="entry-content">{{ article.content }}</div>
         <!-- /.entry-content -->
-        {# Note: disabled for now, because we're using static comments: #}
-        {% if False and DISQUS_SITENAME and article.status != "draft" and not article.nocomments %}
+        {# Note: disabled for now, because we're using static comments: #} {% if
+        False and DISQUS_SITENAME and article.status != "draft" and not
+        article.nocomments %}
         <div class="comments">
             <h2>Comments !</h2>
             <div id="disqus_thread"></div>
@@ -39,12 +46,11 @@ endblock %} {% block content %}
                 })();
             </script>
         </div>
-        {% endif %}
-        {% if COMMENTS.get(article.slug) %}
-          <div class="comments">
+        {% endif %} {% if COMMENTS.get(article.slug) %}
+        <div class="comments">
             <h2>Comments</h2>
             {{ COMMENTS[article.slug] | safe }}
-          </div>
+        </div>
         {% endif %}
     </article>
 </section>
