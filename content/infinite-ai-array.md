@@ -1,9 +1,9 @@
 Title: Infinite AI Array
 Category: ai
-Date: 2023-01-01
+Date: 2023-01-02
 Slug: infinite-ai-array
 cover_image: infinite-ai-array-logo.png
-header_background_color: rgba(255, 255, 255, 0.5)
+header_style: background-color: rgba(255, 255, 255, 0.5)
 
 <center><blockquote class="twitter-tweet"><p lang="en" dir="ltr">making new string and list classes that call gpt3 under the hood so you can access elements beyond the final one. no more index errors!</p>&mdash; shb (@himbodhisattva) <a href="https://twitter.com/himbodhisattva/status/1606712418587267072?ref_src=twsrc%5Etfw">December 24, 2022</a></blockquote></center> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
@@ -179,6 +179,6 @@ It tries one time to fix an exception, though if you keep calling the function u
 
 ## Following up...
 
-Comments welcome on [Mastodon](), [Twitter](). Contributions [kind of welcome](https://github.com/ianb/infinite-ai-array#contributing).
+Comments welcome on [Mastodon](https://hachyderm.io/@ianbicking/109621627461377616), [Twitter](https://twitter.com/ianbicking/status/1610018555222695936), [Hacker News discussion](https://news.ycombinator.com/item?id=34224664). Contributions [kind of welcome](https://github.com/ianb/infinite-ai-array#contributing).
 
 If you've gotten this far I will also throw in here that I ([Ian](https://ianbicking.org)) am looking for a job, and maybe the best job for me is one that I don't yet know exists. I'm particularly interested in the area of large language models (not just as a joke), new user interactions built on LLMs (especially their abilities to understand us in new ways). I'm excited about education, aiding in executive function, and human-centered interactions. [Let me know if you have ideas](mailto:ianbicking@gmail.com), I would appreciate it!

@@ -3,12 +3,15 @@
 <section id="content" class="body">
     <article>
         <header{% if article.cover_image_url and article.cover_image_url != "2" %}
-        style="background-image: url({{ article.cover_image_url }}); background-size: cover; background-position: center; height: 300px; width: 100%;"
+        style="background-image: url({{ article.cover_image_url }}); background-size: cover; background-position: center; height: 300px; width: 100%;{% if article.header_cover_image_style %}
+        {{ article.header_cover_image_style }}{% endif %}"
         {% endif %}>
-        <div{% if article.header_background_color %}
-        style="background-color: {{ article.header_background_color }}"
+        <div{% if article.header_style %}
+        style="{{ article.header_style }}"
         {% endif %}>
-            <div class="published" title="{{ article.date.isoformat() }}">
+            <div class="published" title="{{ article.date.isoformat() }}"{% if article.header_inner_style %}
+            style="{{article.header_inner_style}}"
+            {% endif %}>
                 {{ FORMAT_DATE(article.date) }}
             </div>
             <h1 class="entry-title">
@@ -16,6 +19,9 @@
                     href="{{ SITEURL }}/{{ article.url }}"
                     rel="bookmark"
                     title="Permalink to {{ article.title|striptags }}"
+                    {% if article.header_inner_style %}
+                    style="{{article.header_inner_style}}"
+                    {% endif %}
                     >{{ article.title }}</a
                 >
             </h1>
