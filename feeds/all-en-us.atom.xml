@@ -1,5 +1,219 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ian Bicking: a blog</title><link href="https://ianbicking.org/" rel="alternate"></link><link href="https://ianbicking.org/feeds/all-en-us.atom.xml" rel="self"></link><id>https://ianbicking.org/</id><updated>2023-01-02T00:00:00-06:00</updated><entry><title>Infinite AI Array</title><link href="https://ianbicking.org/blog/2023/01/infinite-ai-array.html" rel="alternate"></link><published>2023-01-02T00:00:00-06:00</published><updated>2023-01-02T00:00:00-06:00</updated><author><name>Ian Bicking</name></author><id>tag:ianbicking.org,2023-01-02:/blog/2023/01/infinite-ai-array.html</id><summary type="html">&lt;p&gt;&lt;center&gt;&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;making new string and list classes that call gpt3 under the hood so you can access elements beyond the final one. no more index&amp;nbsp;errors!&lt;/p&gt;&amp;mdash; shb (@himbodhisattva) &lt;a href="https://twitter.com/himbodhisattva/status/1606712418587267072?ref_src=twsrc%5Etfw"&gt;December 24, 2022&lt;/a&gt;&lt;/blockquote&gt;&lt;/center&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ian Bicking: a blog</title><link href="https://ianbicking.org/" rel="alternate"></link><link href="https://ianbicking.org/feeds/all-en-us.atom.xml" rel="self"></link><id>https://ianbicking.org/</id><updated>2023-01-17T00:00:00-06:00</updated><entry><title>Thoughts On Voice Interfaces Part 2: LLMs</title><link href="https://ianbicking.org/blog/2023/01/thoughts-on-voice-interfaces-2-llms.html" rel="alternate"></link><published>2023-01-17T00:00:00-06:00</published><updated>2023-01-17T00:00:00-06:00</updated><author><name>Ian Bicking</name></author><id>tag:ianbicking.org,2023-01-17:/blog/2023/01/thoughts-on-voice-interfaces-2-llms.html</id><summary type="html">&lt;p&gt;Over two years ago I wrote &lt;a href="https://ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html"&gt;Thoughts On Voice Interfaces&lt;/a&gt;, a scattering of ideas about voice interactions. Time has passed, I&amp;#8217;ve been working more on voice interfaces, and though products in the market have barely changed, I still have &lt;strong&gt;&lt;span class="caps"&gt;NEW&lt;/span&gt; &lt;span class="caps"&gt;THOUGHTS&lt;/span&gt;&lt;/strong&gt;.&lt;/p&gt;
+&lt;h2&gt;Large Language&amp;nbsp;Models&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;ve only been exploring …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Over two years ago I wrote &lt;a href="https://ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html"&gt;Thoughts On Voice Interfaces&lt;/a&gt;, a scattering of ideas about voice interactions. Time has passed, I&amp;#8217;ve been working more on voice interfaces, and though products in the market have barely changed, I still have &lt;strong&gt;&lt;span class="caps"&gt;NEW&lt;/span&gt; &lt;span class="caps"&gt;THOUGHTS&lt;/span&gt;&lt;/strong&gt;.&lt;/p&gt;
+&lt;h2&gt;Large Language&amp;nbsp;Models&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;ve only been exploring large language models for a couple months, and limited to &lt;span class="caps"&gt;GPT&lt;/span&gt;-3, but most of this post will be about&amp;nbsp;LLMs.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve included examples of prompts and outputs in this section. Click &lt;code&gt;⊕ Example&lt;/code&gt; to see the examples, all screenshots of the &lt;a href="https://beta.openai.com/playground"&gt;&lt;span class="caps"&gt;GPT&lt;/span&gt; Playground&lt;/a&gt;.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;With the addition of Large Language Models (LLMs), especially &lt;span class="caps"&gt;GPT&lt;/span&gt;-3, I believe everything will change. But not quickly, there&amp;#8217;s a huge amount of implementation and experimentation and finding and fixing&amp;nbsp;problems.&lt;/li&gt;
+&lt;li&gt;Existing systems are based on intent categorization and entity extraction:&lt;ol&gt;
+&lt;li&gt;You have a bunch of commands, the commands take certain kinds of arguments (song title, time span, search query,&amp;nbsp;etc).&lt;/li&gt;
+&lt;li&gt;Any utterance is compared to examples and categorized as a command, and the arguments (&amp;#8220;entities&amp;#8221;) are&amp;nbsp;extracted.&lt;/li&gt;
+&lt;li&gt;This isn&amp;#8217;t just an implementation detail, but also forms the basic shape of voice interactions. Voice interactions work the way they do because this is the technology we have (until now). This command-based model is not begging for LLMs, though it could probably increase&amp;nbsp;accuracy.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;If you plug voice into a &lt;span class="caps"&gt;GPT&lt;/span&gt;-3-driven interaction you&amp;#8217;ll find it&amp;#8217;s very sensitive to speech recognition inaccuracies.&lt;ol&gt;
+&lt;li&gt;In the traditional categorization model it will naturally ignore many inaccuracies because it&amp;#8217;s just trying to find the best match among a finite set of commands and&amp;nbsp;examples.&lt;/li&gt;
+&lt;li&gt;That is: the traditional model tries very hard to keep the conversation on the rails, and one inaccuracy won&amp;#8217;t make you jump to another&amp;nbsp;rail.&lt;/li&gt;
+&lt;li&gt;The beauty of an &lt;span class="caps"&gt;LLM&lt;/span&gt; is that we might not need rails, that we can make vastly more capable agents that can operate on a much wider set of&amp;nbsp;input.&lt;/li&gt;
+&lt;li&gt;The danger of LLMs is they take things very literally, and are very credulous. You want to know &lt;em&gt;what&amp;#8217;s next on my caliper&lt;/em&gt;? It will try very hard to come up with a creative answer instead of figuring out you were asking about your&amp;nbsp;calendar.&lt;/li&gt;
+&lt;li&gt;I&amp;#8217;m sure this isn&amp;#8217;t a fatal flaw, but it&amp;#8217;s a challenge right&amp;nbsp;now.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;LLMs are stereotyped as text &lt;em&gt;generators&lt;/em&gt;, but they are also great at &lt;em&gt;understanding&lt;/em&gt;. Two years ago I complained there&amp;#8217;s no &amp;#8220;understanding&amp;#8221; in &amp;#8220;natural language understanding&amp;#8221;. That will change.&lt;ol&gt;
+&lt;li&gt;We still have to remind ourselves that what it&amp;#8217;s doing is not &amp;#8220;understanding&amp;#8221; as we know it; when an &lt;span class="caps"&gt;LLM&lt;/span&gt; responds to something there isn&amp;#8217;t an entity underneath that is understanding things.&lt;ol&gt;
+&lt;li&gt;The understanding is when we fuse that a person&amp;#8217;s input with meaningful output or action. When we ground the model in some&amp;nbsp;purpose.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://en.wikipedia.org/wiki/Prompt_engineering"&gt;Prompt Engineering&lt;/a&gt; is an important part of that fusion: adding context to the input and interpreting the output. These shells we create are an embodiment of &lt;span class="caps"&gt;AI&lt;/span&gt;, what turns a mechanism (an &lt;span class="caps"&gt;LLM&lt;/span&gt;) into a meaningful&amp;nbsp;entity.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Some understanding will be inference: being able to contextualize and make reasonable assumptions about what the a person means. This is what people pay a lot of attention to when talking about &amp;#8220;understanding,&amp;#8221; though I think it&amp;#8217;s over-emphasized. &lt;a href="/media/voice-2/math-inference.png" title="This is the most kind of &amp;quot;reasoning&amp;quot; referred to in GPT, being able to decompose and explain a formal multi-step problem."&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Much of understanding will be translation: taking our speech and translating it into an actionable form.&lt;ol&gt;
+&lt;li&gt;We see this currently in &lt;span class="caps"&gt;GPT&lt;/span&gt;&amp;#8217;s code generation. You can ask &lt;span class="caps"&gt;GPT&lt;/span&gt; for concrete answer but it&amp;#8217;s also very good at writing down the steps by which you can get an answer. &lt;a href="/media/voice-2/decomposing-steps.png" title="These queries are personalized, and can't be answered by GPT, but GPT can come up with a plan to answer the questions. That plan could also be reused or treated like a trigger, it's not a single concrete answer."&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="dquo"&gt;&amp;#8220;&lt;/span&gt;The steps by which you can get an answer&amp;#8221; is another way of saying &amp;#8220;a program&amp;#8221;. We will be programming our agents and getting our agents to generate programs. &lt;a href="/media/voice-2/decode-intent-to-instructions.png" title="Here we take examples of typical intents and have GPT translate them into a made-up programming language"&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;You won&amp;#8217;t see the programs of course. Mostly. &lt;span class="caps"&gt;GPT&lt;/span&gt; is also pretty good at turning code into natural language. I expect this round-tripping will be useful in debugging our agents, something we&amp;#8217;ll probably have to do individually from time to time. The same way we ask another person to repeat our instructions to make sure we&amp;#8217;re clear, we may ask our &lt;span class="caps"&gt;AI&lt;/span&gt; agents to do the same. &lt;a href="/media/voice-2/describe-instructions-as-intent.png" title="We take the output from the previous example and have GPT turn those programmatic instructions back into an English description. (Note there's no shared context between these examples, these descriptions are created only from the code.)"&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;What&amp;#8217;s the programming language that our personal agents will be generating based on our commands? Probably something new, probably accidental, maybe the product of implicit negotiations between developers and the large language models, each of which is going to try to satisfy the&amp;nbsp;other.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;The &lt;span class="caps"&gt;LLM&lt;/span&gt; &amp;#8220;prompt&amp;#8221; is more than just a command for the &lt;span class="caps"&gt;LLM&lt;/span&gt;. It&amp;#8217;s instruction and goal-setting and things we haven&amp;#8217;t yet discovered. But it&amp;#8217;s especially &lt;em&gt;context&lt;/em&gt;.&lt;ol&gt;
+&lt;li&gt;We haven&amp;#8217;t been providing this context to intent parser or to speech recognition itself. What context we&amp;#8217;ve been giving is mostly internal implementation details, not accessible to language understanding. That will have to&amp;nbsp;change.&lt;/li&gt;
+&lt;li&gt;Consider a case like sending a message to a contact: this often involves the difficult vocabulary of people&amp;#8217;s names. We may solve this generally by personalizing models so they work better with individualized information like your list of contacts. But with an &lt;span class="caps"&gt;LLM&lt;/span&gt; we can include that information in the prompt or context, much more casually and contextually than most personalization. &lt;a href="/media/voice-2/messaging-example.png" title="The beginning is context from a messaging app. Using this, as well as examples to show GPT how to format the response, it can interpret the destination for a message as well as separating those instructions from the body of the message."&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;This represents an alternative to how we usually think about &amp;#8220;learning&amp;#8221; in voice interfaces, which is about frequency and probabilities. There&amp;#8217;s a lot of ideas about how to predict what the user will do and then bias the result based on that, or change the interface to make the likely thing easier, or even to do something proactively for the user. This is not&amp;nbsp;that!&lt;/li&gt;
+&lt;li&gt;Armed with many predictive capabilities I think we&amp;#8217;ve been projecting prediction onto human-to-human interactions where it doesn&amp;#8217;t exist. Your favorite barista does not actually make the coffee before you arrive. And even if they ask &amp;#8220;the regular?&amp;#8221; they are picking up the thread of past interactions and past conversations, not just predicting what you&amp;#8217;ll have. Prediction removes the autonomy and self-direction of the user. If there&amp;#8217;s a predictive analog in human-to-human interaction it&amp;#8217;s probably in how we stereotype each other and our respective roles, not in how we&amp;nbsp;communicate.&lt;/li&gt;
+&lt;li&gt;LLMs &lt;em&gt;love&lt;/em&gt; context. In your conversation you&amp;#8217;re building a transcript. It doesn&amp;#8217;t stop you from wandering, but it&amp;#8217;s always ready to build off that previous&amp;nbsp;context.&lt;/li&gt;
+&lt;li&gt;We&amp;#8217;ll have to figure out when to forget and when to erase context. &lt;span class="caps"&gt;GPT&lt;/span&gt; has a fixation problem where it will sometimes persistently attend to an unimportant detail in a conversation. &lt;a href="/media/voice-2/question-fixation.png" title="Here you can see that GPT has decided to ask the same question over and over. While GPT is good at reacting to responses that don't follow the question, in cases like these it can &amp;quot;learn&amp;quot; from its own examples to do the wrong thing."&gt;Example&lt;/a&gt;. And as we support longer conversations and relationships that happen over days and months, we will have to think about how to keep the model&amp;#8217;s focus aligned with the user&amp;#8217;s mental model and&amp;nbsp;focus.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Follow-up and refining commands will be much easier with LLMs. Maybe everything will feel a little like a chatbot, though for functional and not personality reasons. People will become used to refinements that we&amp;#8217;ve been self-censoring because we don&amp;#8217;t believe they are possible. &lt;a href="/media/voice-2/followups.png" title="Here we see how GPT will interpret following follow-ups contextually, making easy use of implied references to those earlier statements."&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;A mind-bending part of building a chat interface directly on &lt;span class="caps"&gt;GPT&lt;/span&gt;-3 is that you have to create archetypes and entities from scratch.&lt;ol&gt;
+&lt;li&gt;There is no &amp;#8220;you&amp;#8221; and &amp;#8220;me&amp;#8221;. &amp;#8220;You&amp;#8221; is a character that has to be introduced and described to the &lt;span class="caps"&gt;LLM&lt;/span&gt;. Armed with a description the &lt;span class="caps"&gt;LLM&lt;/span&gt; will then predict what this entity might do. The &lt;span class="caps"&gt;LLM&lt;/span&gt; doesn&amp;#8217;t &amp;#8220;pretend&amp;#8221; to be &amp;#8220;you&amp;#8221; as there is no underlying personality. And &amp;#8220;me&amp;#8221; (the human) is again an introduced entity. Without constraints the &lt;span class="caps"&gt;LLM&lt;/span&gt; will gladly predict &lt;em&gt;both&lt;/em&gt; sides of the conversation. &lt;a href="/media/voice-2/both-sides-conversation.png" title="Here GPT interprets what is intended to be a chat as something closer to a transcript, and predicts both sides of the conversation in the transcript proceed"&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Maybe there&amp;#8217;s something cool that could be done by making it a conversation between me and me: that is, modeling the interaction on internal dialog. &lt;a href="/media/voice-2/two-self-personalities.png" title="This is more attempt than example, presenting two personas (the human and AI) as two aspects of the same person. GPT is somewhat stubborn about actually using words like &amp;quot;I&amp;quot; for both sides of the conversation to refer to the same person."&gt;Example 1&lt;/a&gt; &lt;a href="/media/voice-2/long-term-short-term.png" title="This example imagines an assistant that you talk to fairly continuously as an ongoing record of your day, thoughts, and tasks; while it also tries to ask you questions to make sure it gets all the details it will need for later."&gt;Example&amp;nbsp;2&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;It&amp;#8217;s a fun party trick to make &lt;span class="caps"&gt;GPT&lt;/span&gt;-3 say things in the style of &lt;a href="https://twitter.com/tqbf/status/1598513757805858820"&gt;The Bible&lt;/a&gt; or &lt;a href="https://twitter.com/goodside/status/1562991379915341824"&gt;Jar Jar Binks&lt;/a&gt;, but it&amp;#8217;s more than that&amp;#8230;&lt;ol&gt;
+&lt;li&gt;Asking &lt;span class="caps"&gt;GPT&lt;/span&gt; to write something for a kindergartener is great. Maybe that should even be a standard starting instead of &amp;#8220;normal&amp;#8221; output. &lt;a href="/media/voice-2/kindergartener.png" title="In this example we took a fairly technical description of a model, pasted it in and asked it to be summarized for a kindergartener. It loses a lot of information, but keep a general gist. Results vary considerably based on the source of the information."&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Asking it to write for speech output could work, though I haven&amp;#8217;t had much success in my brief experiments. I don&amp;#8217;t know what to ask for, and I&amp;#8217;m not sure what &amp;#8220;good for speech output&amp;#8221; really means. Some people have had good success with &lt;a href="https://twitter.com/ramsri_goutham/status/1612818789858697216"&gt;&lt;span class="caps"&gt;SSML&lt;/span&gt; generation&lt;/a&gt;.&lt;ol&gt;
+&lt;li&gt;Adjustments to the output are very amenable to user override: changing the tone to be more brief, emphasize certain points, etc. These kinds of adjustments can be done without introducing combinatorial complexity. &lt;a href="/media/voice-2/summary-lengths.png" title="The source material for this example was a long day-by-day forecast. This shows several levels of detail and summary that can be created from that one source."&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Given the right chat context for an individual, and enough quantity, I&amp;#8217;m guessing an &lt;span class="caps"&gt;LLM&lt;/span&gt; may naturally adopt the user&amp;#8217;s phrasing and language style. Though I wonder if people naturally &lt;a href="https://en.wikipedia.org/wiki/Code-switching"&gt;code switch&lt;/a&gt; to speak in a &amp;#8220;formal&amp;#8221; style with voice interfaces. (&amp;#8220;Naturally&amp;#8221; may be learned behavior to avoid speech recognition errors, or it might also be based on the mental model we have about our relationship with the &lt;span class="caps"&gt;AI&lt;/span&gt;&amp;nbsp;agent.)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;I&amp;#8217;m optimistic about the novel way you can compose text in ChatGPT, by acting more as an editor than an author, and how this will be applicable to voice&amp;#8230;&lt;ol&gt;
+&lt;li&gt;If ChatGPT writes something for you and you want to change it, the best way is usually to ask for the change. &amp;#8220;Make it shorter,&amp;#8221; or &amp;#8220;take out the part about Jar Jar Binks.&amp;#8221; &lt;a href="/media/voice-2/edit-make-list.png" title="This uses the GPT Edit API which is constrained just to these kinds of editing commands. Here it's able to understand what part of the first sentence is a list and then turn that into a formatted list and two paragraphs"&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;This is also a good way to edit with your voice. Referring to specific sentences or paragraphs or describing mechanical changes is very hard to do with voice. It&amp;#8217;s hard to compose those edits in your head, and it&amp;#8217;s hard to say them accurately. &lt;span class="caps"&gt;GPT&lt;/span&gt; is quite good at editing text that is human generated. &lt;a href="/media/voice-2/edit-pronouns.png" title="When we ask to make a substitution with GPT it doesn't just make a string substitution, but also all the changes that keep the text grammatically correct."&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;I think there are entirely new patterns of interaction possible with LLMs&lt;ol&gt;
+&lt;li&gt;Instead of commanding, maybe you speak to your &lt;span class="caps"&gt;AI&lt;/span&gt; agent freely; the emphasis is just to dump a lot of stuff into it. Then you start using that accumulated information as the basis for action. &lt;a href="/media/voice-2/turn-voice-into-todo-list.png" title="Here we take a long and unstructured transcript, brainstorming tasks for the day, and use GPT to turn it into a structured to-do list"&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Maybe it&amp;#8217;s less transactional, less modal. You could be asking it to do something and then instead of pausing and waiting for it to do the thing you could just&amp;#8230; keep going. The &lt;span class="caps"&gt;AI&lt;/span&gt; starts to assemble a plan for complicated actions, while still immediately acting on things that are easy and low-impact, though also respecting any higher-level instructions like ordering or conditionals. &lt;a href="/media/voice-2/decompose-actions.png" title="This is a rough example of trying to take a number of actions and turn them into a plan. A more complete example would find dependencies between actions, determine actions are timed, and which actions require confirmation, and then producing a plan based on that. GPT doesn't have to compose the entire plan if it can categorize the actions so that a more formal algorithm can produce a complete plan."&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;GPT&lt;/span&gt; and probably all LLMs are fairly expensive, more expensive than any of the current techniques.&lt;ol&gt;
+&lt;li&gt;Hopefully this stuff gets cheaper, not because compute gets much cheaper but because smart people just figure things out. But there may be a hard lower bound on the&amp;nbsp;cost.&lt;/li&gt;
+&lt;li&gt;It&amp;#8217;s possible to select different models and approaches in different contexts, most of them more efficient; I expect very eclectic stacks to&amp;nbsp;emerge.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;When we start getting Large Language Models built on &lt;a href="https://twitter.com/ianbicking/status/1612944221199294464"&gt;predicting text &lt;span class="caps"&gt;AND&lt;/span&gt; behavior&lt;/a&gt; I think we&amp;#8217;ll see another burst of&amp;nbsp;capability.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;More Voice&amp;nbsp;Thoughts&lt;/h2&gt;
+&lt;p&gt;So obviously I&amp;#8217;m personally pretty focused on the effect of LLMs, but there&amp;#8217;s more to be&amp;nbsp;said&amp;#8230;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Endpointing remains a major issue. That is, deciding when the person is &amp;#8220;done&amp;#8221; speaking and then acting on that speech.&lt;ol&gt;
+&lt;li&gt;The idea of &amp;#8220;done&amp;#8221; itself imposes very specific ideas on how an interaction&amp;nbsp;works.&lt;/li&gt;
+&lt;li&gt;This whole &amp;#8220;done&amp;#8221; thing is imposed. Every system that uses silence-based endpointing is also capable of listening a little longer, with no real privacy issue. It feels a bit like a &amp;#8220;lalala I&amp;#8217;m not listening to you&amp;#8221; situation, where it&amp;#8217;s better just to not know that the user is continuing to&amp;nbsp;speak.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;TTS&lt;/span&gt; output &lt;em&gt;does&lt;/em&gt; make it difficult to leave the mic open. With the right physical device setup I assume it would be possible to quickly stop &lt;span class="caps"&gt;TTS&lt;/span&gt; when the original speaker continues to speak. Thoroughly designed and vertically integrated physical devices are not the norm, so this pattern doesn&amp;#8217;t become the norm.&lt;ol&gt;
+&lt;li&gt;I feel a sense of both optimism and disappointment about a well integrated physical device; that is a device where the microphone, speaker, physical controls, other input modalities (like an &lt;a href="https://en.wikipedia.org/wiki/Inertial_measurement_unit"&gt;&lt;span class="caps"&gt;IMU&lt;/span&gt;&lt;/a&gt;), speech recognition, speech understanding, command execution, and output systems are all integrated for a more ideal experience. The potential is there at every level but hardware like this requires capital and the total experience requires vision. Will we have to wait for a big player to discover the vision, or for the hardware design to become more accessible for a new entrant? (I wish &lt;a href="https://www.ray-ban.com/usa/ray-ban-stories"&gt;Rayban Stories&lt;/a&gt; were a more open&amp;nbsp;environment!)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Humans have many forms of non-verbal or at least non-speech ways to indicate a desire to continue or interrupt. This is also a point of frequent errors, and requires reading other people in a way that many people find difficult. Still I think there&amp;#8217;s more room to mimic some of these patterns: the &amp;#8220;uh&amp;#8221; call to attention, the stare-at-the-sky please-wait gesture, the facial expression of pausing&amp;nbsp;mid-sentence.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Invocation remains a barrier to fluid voice interactions.&lt;ol&gt;
+&lt;li&gt;Wake words and other voice invocations like special hardware gestures are only accessible when you have control of the &lt;span class="caps"&gt;OS&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;There aren&amp;#8217;t many tools to prototype wake words or keyword spotting. This also gets in the way of using &lt;a href="https://en.wikipedia.org/wiki/Procedure_word"&gt;procedure words&lt;/a&gt; to control things like mic state or make markers in your voice transcript to correspond to other events. I still like the idea of procedure words but I&amp;#8217;ve poor luck actually making them&amp;nbsp;work.&lt;/li&gt;
+&lt;li&gt;I&amp;#8217;m divided on purely wake-word-based initiation and hardware buttons or other ways to initiate. Using a wake word is more socially appropriate because it informs any bystanders what is happening. And if you are going to talk, why not start it by talking? But people – sometimes including myself – seem to like other controls. It also opens up some possibility for multitasking with voice. If you are in a call you don&amp;#8217;t want to use a wake word because the word will end up in the call&amp;#8230; it can mute once you complete, but you&amp;#8217;ve already said something&amp;nbsp;weird.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Speech recognition systems aren&amp;#8217;t just &amp;#8220;better&amp;#8221; and &amp;#8220;worse&amp;#8221;, individual systems have different behavior.&lt;ol&gt;
+&lt;li&gt;Though it&amp;#8217;s seldom used, I like the idea of using spelling to handle difficult-to-recognize words. That is, you might say &amp;#8220;tee oh oh&amp;#8221; if you want to force the system to write &amp;#8220;too&amp;#8221; instead of &amp;#8220;to&amp;#8221;. But support for this is spotty and inconsistent. Systems don&amp;#8217;t frequently distinguish between explicit cases like this or spoken punctuation, and implied&amp;nbsp;text.&lt;/li&gt;
+&lt;li&gt;Punctuation is also handled differently, some systems mostly emit just words, others try to punctuate everything. And somehow even spoken punctuation (e.g., saying &amp;#8220;period&amp;#8221; for &amp;#8220;.&amp;#8221;) is applied inconsistently in a single&amp;nbsp;system.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/openai/whisper"&gt;Whisper&lt;/a&gt; is an impressive speech recognizer but it&amp;#8217;s not real time and not easy to apply to interactions.&lt;ol&gt;
+&lt;li&gt;Right now speech recognition systems usually have &lt;em&gt;partial&lt;/em&gt; and &lt;em&gt;final&lt;/em&gt; transcriptions. We&amp;#8217;ve all seen the partial recognition change as we continue to speak and earlier words are corrected given later context. These represent two levels of recognition. Whisper uses an even wider window of analysis to identify a sensible sentence given the input. Maybe we could have three levels: very fast partial transcriptions, ~1 second transcriptions, and then a ~4+ second &amp;#8220;this time it&amp;#8217;s really final&amp;#8221; transcript? But seeing the transcript update even further back may be confusing or distracting for the user, and it may be hard to trust that errors in the not-quite-final transcription will get fixed with a little patience. And the programming is already hard to get right with just two versions of the&amp;nbsp;transcript.&lt;/li&gt;
+&lt;li&gt;Whisper makes retraining seem more accessible. Are there alternatives to current microphones that get enough information to create a transcription, even if they don&amp;#8217;t get enough information to build an audio recording that other people could recognize? Like a microphone in earbuds, embedded in eyeglass temples, or something touching the nose bridge or neck&amp;#8230; and instead of using tricks to make those microphones sound &amp;#8220;normal,&amp;#8221; train directly on the raw data they&amp;nbsp;produce.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;There&amp;#8217;s room for more voice consumption that doesn&amp;#8217;t have any output at all, or immediately do anything.&lt;ol&gt;
+&lt;li&gt;That isn&amp;#8217;t &lt;em&gt;just&lt;/em&gt; voice recorders. There are tools like Otter or Google Recorder that faithfully listen, but mostly just&amp;nbsp;transcribe.&lt;/li&gt;
+&lt;li&gt;I&amp;#8217;ve imagined a process for recording family photos and documents with voice and photos, so that your photos are directly connected with those&amp;nbsp;stories.&lt;/li&gt;
+&lt;li&gt;Maybe a generalization: you can, without real time feedback, fuse voice with other input if you have a &lt;em&gt;record&lt;/em&gt; of that other input, so that you can fix mistakes later instead of relying on feedback to fix mistakes during the&amp;nbsp;interaction.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;I&amp;#8217;m excited about the possibility for asymmetric I/O: speaking into the &lt;span class="caps"&gt;AI&lt;/span&gt;, but presenting the results visually.&lt;ol&gt;
+&lt;li&gt;This would solve some of the all-or-nothing issue with intent parsing. It&amp;#8217;s much easier to live update something visual so the computer can show its best-effort interpretation at any&amp;nbsp;time.&lt;/li&gt;
+&lt;li&gt;Screens represent a conversation between the human and the computer. The computer is showing what is possible (buttons and fields), what it knows (informational elements), the status of different inputs (cursors, dialog boxes). The standard &lt;span class="caps"&gt;GUI&lt;/span&gt; conversation with a computer is more like whiteboarding than a conversation.&lt;ol&gt;
+&lt;li&gt;Just doing voice control of our screens hasn&amp;#8217;t caught on. But these traditional &lt;span class="caps"&gt;GUI&lt;/span&gt; elements – buttons, etc – are specific to non-voice inputs. What would a &lt;span class="caps"&gt;GUI&lt;/span&gt; designed voice input look like? I genuinely don&amp;#8217;t&amp;nbsp;know!&lt;/li&gt;
+&lt;li&gt;When phrased as an accessibility technology voice will be caught in this not-design-for-voice trap. &amp;#8220;Accessibility&amp;#8221; implies &amp;#8220;small group of people,&amp;#8221; and &amp;#8220;not your real audience,&amp;#8221; and &amp;#8220;applicable to status quo&amp;nbsp;software.&amp;#8221;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Comments welcome on &lt;a href=""&gt;Mastodon&lt;/a&gt;, &lt;a href=""&gt;Twitter&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;ve gotten this far I will also throw in here that I (&lt;a href="https://ianbicking.org"&gt;Ian&lt;/a&gt;) am looking for a job, and maybe the best job for me is one that I don&amp;#8217;t yet know exists. I&amp;#8217;m particularly interested in the area of large language models, new user interactions built on LLMs (especially their abilities to understand us in new ways). I&amp;#8217;m excited about education, aiding in executive function, and human-centered interactions. &lt;a href="mailto:ianbicking@gmail.com"&gt;Let me know if you have ideas&lt;/a&gt;, I would appreciate&amp;nbsp;it!&lt;/p&gt;
+&lt;script&gt;
+    let els = Array.from(document.getElementsByTagName("a"));
+    els = els.filter((e) =&gt; e.textContent.includes("Example"));
+    let activeEl;
+    let overlay;
+    function closeOverlay() {
+        activeEl = null;
+        if (overlay) {
+            overlay.remove();
+        }
+        overlay = null;
+
+    }
+    function activateEl(el) {
+        if (overlay) {
+            closeOverlay();
+        }
+        activeEl = el;
+        event.preventDefault();
+        overlay = document.createElement("div");
+        overlay.style.position = "fixed";
+        overlay.style.height = "100%";
+        overlay.style.width = "100%";
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.zIndex = 9999;
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+        overlay.addEventListener("click", closeOverlay);
+        const inner = document.createElement("div");
+        inner.style.display = "flex";
+        inner.style.alignItems = "center";
+        inner.style.justifyContent = "center";
+        inner.style.height = "100%";
+        overlay.appendChild(inner);
+        const img = document.createElement("img");
+        img.src = el.href;
+        img.style.maxHeight = "80%";
+        img.style.maxWidth = "80%";
+        img.style.marginBottom = "1em";
+        inner.appendChild(img);
+        const x = document.createElement("div");
+        x.textContent = "✖";
+        x.style.position = "absolute";
+        x.style.right = "20px";
+        x.style.top = "10px";
+        x.style.fontSize = "200%";
+        x.style.color = "#fff";
+        overlay.appendChild(x);
+        const caption = document.createElement("caption");
+        caption.textContent = el.getAttribute("title");
+        const pos = els.indexOf(el);
+        caption.textContent += " " + (pos+1) + "/" + els.length;
+        caption.style.color = "#fff";
+        caption.style.textAlign = "center";
+        caption.style.position = "absolute";
+        caption.style.width = "100%";
+        caption.style.padding = "1em 6em";
+        caption.style.bottom = "10px";
+        caption.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+        overlay.appendChild(caption);
+        document.body.appendChild(overlay);
+    }
+    for (const el of els) {
+        el.addEventListener("click", (event) =&gt; {
+            activateEl(el);
+        });
+        var symbol = document.createTextNode("⊕\u00A0");
+        el.insertBefore(symbol, el.firstChild);
+        el.style.textDecoration = "none";
+    }
+    document.addEventListener("keydown", function(event) {
+        if (!overlay) {
+            return;
+        }
+        if (event.key === "Escape") {
+            closeOverlay();
+            event.preventDefault();
+            return;
+        }
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            const cur = els.indexOf(activeEl);
+            const next = (els.length + cur + (event.key === "ArrowLeft" ? -1 : -1)) % els.length;
+            console.log({cur, next, els, el: els[next]});
+            activateEl(els[next]);
+            event.preventDefault();
+        }
+    });
+
+&lt;/script&gt;</content><category term="misc"></category></entry><entry><title>Infinite AI Array</title><link href="https://ianbicking.org/blog/2023/01/infinite-ai-array.html" rel="alternate"></link><published>2023-01-02T00:00:00-06:00</published><updated>2023-01-02T00:00:00-06:00</updated><author><name>Ian Bicking</name></author><id>tag:ianbicking.org,2023-01-02:/blog/2023/01/infinite-ai-array.html</id><summary type="html">&lt;p&gt;&lt;center&gt;&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;making new string and list classes that call gpt3 under the hood so you can access elements beyond the final one. no more index&amp;nbsp;errors!&lt;/p&gt;&amp;mdash; shb (@himbodhisattva) &lt;a href="https://twitter.com/himbodhisattva/status/1606712418587267072?ref_src=twsrc%5Etfw"&gt;December 24, 2022&lt;/a&gt;&lt;/blockquote&gt;&lt;/center&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/p&gt;
 &lt;p&gt;Some ideas are dumb enough you just have to try them, so I introduce to you the Python library: &lt;a href="https://github.com/ianb/infinite-ai-array"&gt;Infinite …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;center&gt;&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;making new string and list classes that call gpt3 under the hood so you can access elements beyond the final one. no more index&amp;nbsp;errors!&lt;/p&gt;&amp;mdash; shb (@himbodhisattva) &lt;a href="https://twitter.com/himbodhisattva/status/1606712418587267072?ref_src=twsrc%5Etfw"&gt;December 24, 2022&lt;/a&gt;&lt;/blockquote&gt;&lt;/center&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;&lt;/p&gt;
 &lt;p&gt;Some ideas are dumb enough you just have to try them, so I introduce to you the Python library: &lt;a href="https://github.com/ianb/infinite-ai-array"&gt;Infinite &lt;span class="caps"&gt;AI&lt;/span&gt; Array&lt;/a&gt;. Let&amp;#8217;s see it in&amp;nbsp;action&amp;#8230;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="err"&gt;$&lt;/span&gt; &lt;span class="n"&gt;pip&lt;/span&gt; &lt;span class="n"&gt;install&lt;/span&gt; &lt;span class="n"&gt;git&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="n"&gt;https&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;github&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;ianb&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;infinite&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;ai&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;git&lt;/span&gt;
@@ -1892,10 +2106,4 @@ $ curl &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&l
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Obviously there could be rules that apply to &lt;span class="caps"&gt;DOM&lt;/span&gt; elements that aren&amp;#8217;t present &lt;em&gt;right now&lt;/em&gt; but could be created.  And I&amp;#8217;m sure it&amp;#8217;s omitting fonts and animations.  But it&amp;#8217;s fun to hack around&amp;nbsp;with.&lt;/p&gt;
-&lt;p&gt;It might be fun to use this hooked up to &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver"&gt;mutation observers&lt;/a&gt; during your testing and find orphaned&amp;nbsp;rules.&lt;/p&gt;</content><category term="mozilla"></category><category term="product-journal"></category></entry><entry><title>Don’t Invest More Emotion Than You Are Willing To Sacrifice</title><link href="https://ianbicking.org/blog/2015/09/dont-invest-more-emotion.html" rel="alternate"></link><published>2015-09-30T00:00:00-05:00</published><updated>2015-09-30T00:00:00-05:00</updated><author><name>Ian Bicking</name></author><id>tag:ianbicking.org,2015-09-30:/blog/2015/09/dont-invest-more-emotion.html</id><summary type="html">&lt;p&gt;At some point in a &lt;a href="http://www.earwolf.com/show/startup-school/"&gt;podcast series&lt;/a&gt; by Seth Godin he advises that you never give your house for collateral on a loan for your business.  Of course you don&amp;#8217;t want to lose your house, but that wasn&amp;#8217;t his reason.  If you put your house on the line …&lt;/p&gt;</summary><content type="html">&lt;p&gt;At some point in a &lt;a href="http://www.earwolf.com/show/startup-school/"&gt;podcast series&lt;/a&gt; by Seth Godin he advises that you never give your house for collateral on a loan for your business.  Of course you don&amp;#8217;t want to lose your house, but that wasn&amp;#8217;t his reason.  If you put your house on the line – and put your family on the line – then you are putting up something you aren&amp;#8217;t willing to lose.  And so you have an upper bound on your risk: you no longer will be willing to make the decisions that could bankrupt your&amp;nbsp;business.&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;ve been thinking about emotional labor lately.  In management it&amp;#8217;s one of the more challenging things for me: because there&amp;#8217;s a lot more emotional labor to be done in management, but also because I feel I can fuck it up much worse.  I also see all the missed opportunities to put in emotional labor, and I wonder about what I can or should ask of my reports in addition to what I ask of myself.  Emotional labor is checking in with how people &lt;em&gt;feel&lt;/em&gt; (explicitly or implicitly).  It&amp;#8217;s not letting conflict slide.  It&amp;#8217;s making sure to explicitly appreciate your coworkers.  It&amp;#8217;s giving bad news fast.  And negative feedback.  It&amp;#8217;s hard work, an uncomfortable&amp;nbsp;hard.&lt;/p&gt;
-&lt;p&gt;Emotional investment is something different.  It&amp;#8217;s what you expect of yourself.  It&amp;#8217;s &lt;em&gt;caring&lt;/em&gt;.  I find the emotional labor hard; it is because of my emotional investment that I want to do it&amp;nbsp;anyway.&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;ve started to question the value of emotional investments.  There&amp;#8217;s passion, yes.  And some degree of having skin in the game – not just wanting to perform sufficiently, or be well regarded, but a direct interest in the success of the project.  But you can make the wrong kinds of investments, invest something that&amp;#8217;s too hard to lose.  Your self-worth, your identity&amp;#8230; these are investments you shouldn&amp;#8217;t ask yourself to make, and I&amp;#8217;d say &lt;em&gt;no thank you&lt;/em&gt; when I see someone else offering that kind of investment if I could.  It&amp;#8217;s the kind of investment that will lead to bad decisions: sticking with safe choices, avoiding bad feedback, being afraid to ship, being afraid to do the work you think is important but you aren&amp;#8217;t sure you can achieve successfully.  Or it may embolden you to drive off an emotional cliff, to burn&amp;nbsp;out.&lt;/p&gt;
-&lt;p&gt;Sadness, frustration, even anger are okay emotions to have about our work.  It&amp;#8217;s okay for work to make us feel, so long as we can bounce back from those feelings.  One kind of emotional labor is to own and respond to your&amp;nbsp;feelings.&lt;/p&gt;
-&lt;p&gt;With a growing skepticism of emotional investment I find myself valuing professionalism a bit more: professionalism as &lt;em&gt;action and impact through discipline&lt;/em&gt;.  But I also think discipline can used as a substitute for engagement.  I&amp;#8217;m still wary of professionalism&amp;#8230; wary of finding a substitute for passion, skeptical those substitutes are genuine, unsure if &amp;#8220;performance&amp;#8221; is a good criteria.  But I&amp;#8217;m feeling more open.  (And of course I much rather Accounting be staffed professionally than with passion, so it must depend on desired&amp;nbsp;outcomes.)&lt;/p&gt;
-&lt;p&gt;At this moment I am trying to disinvest.  For my own health, but I also hope to improve my effectiveness.  It&amp;#8217;s uncomfortable, feels cold, like I have to withdraw in order to set new terms of engagement.  But what do I have to lose?  Maybe a little&amp;nbsp;less.&lt;/p&gt;</content><category term="misc"></category></entry></feed>
+&lt;p&gt;It might be fun to use this hooked up to &lt;a href="https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver"&gt;mutation observers&lt;/a&gt; during your testing and find orphaned&amp;nbsp;rules.&lt;/p&gt;</content><category term="mozilla"></category><category term="product-journal"></category></entry></feed>
