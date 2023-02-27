@@ -1,4 +1,4 @@
-Title: Thoughts On Voice Interfaces Part 2: LLMs
+Title: Thoughts On Voice Interfaces 2 years later: LLMs
 Slug: thoughts-on-voice-interfaces-2-llms
 Date: 2023-01-17
 cover_image: voice-header.png
@@ -92,7 +92,7 @@ So obviously I'm personally pretty focused on the effect of LLMs, but there's mo
         1.  Just doing voice control of our screens hasn't caught on. But these traditional GUI elements – buttons, etc – are specific to non-voice inputs. What would a GUI designed voice input look like? I genuinely don't know!
         2.  When phrased as an accessibility technology voice will be caught in this not-design-for-voice trap. "Accessibility" implies "small group of people," and "not your real audience," and "applicable to status quo software."
 
-Comments welcome on [Mastodon](), [Twitter]().
+Comments welcome on [Mastodon](https://hachyderm.io/@ianbicking/109705273556185280), [Twitter](https://twitter.com/ianbicking/status/1615379603630989312).
 
 If you've gotten this far I will also throw in here that I ([Ian](https://ianbicking.org)) am looking for a job, and maybe the best job for me is one that I don't yet know exists. I'm particularly interested in the area of large language models, new user interactions built on LLMs (especially their abilities to understand us in new ways). I'm excited about education, aiding in executive function, and human-centered interactions. [Let me know if you have ideas](mailto:ianbicking@gmail.com), I would appreciate it!
 
@@ -195,7 +195,7 @@ If you've gotten this far I will also throw in here that I ([Ian](https://ianbic
         }
         if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
             const cur = els.indexOf(activeEl);
-            const next = (els.length + cur + (event.key === "ArrowLeft" ? -1 : -1)) % els.length;
+            const next = (els.length + cur + (event.key === "ArrowLeft" ? -1 : 1)) % els.length;
             console.log({cur, next, els, el: els[next]});
             activateEl(els[next]);
             event.preventDefault();
