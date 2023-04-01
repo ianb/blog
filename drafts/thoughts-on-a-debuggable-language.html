@@ -62,14 +62,15 @@
 <h4>Full introspection of a program&#8217;s&nbsp;state</h4>
 <p>If we&#8217;re going to solve these problems of initial state, we should of course <em>expose</em> state, in absolute every case.  There must be no real data hiding.  This doesn&#8217;t mean data has to be conveniently accessible &#8212; we can suggest good discipline in the use of data even if we don&#8217;t make it impossible to be undisciplined &#8212; data just has to be&nbsp;accessible.</p>
 <p>Here&#8217;s a case in Javascript where there&#8217;s data hiding&nbsp;problems:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">addDeleteButton</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">button</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;&lt;button&gt;x&lt;/button&gt;&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="nx">button</span><span class="p">.</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nx">element</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span><span class="w"></span>
-<span class="w">  </span><span class="p">});</span><span class="w"></span>
-<span class="w">  </span><span class="nx">element</span><span class="p">.</span><span class="nx">prepend</span><span class="p">(</span><span class="nx">button</span><span class="p">);</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
-</code></pre></div>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">addDeleteButton</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">button</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;&lt;button&gt;x&lt;/button&gt;&quot;</span><span class="p">);</span>
+  <span class="nx">button</span><span class="p">.</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">element</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span>
+  <span class="p">});</span>
+  <span class="nx">element</span><span class="p">.</span><span class="nx">prepend</span><span class="p">(</span><span class="nx">button</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
 
 <p>The <span class="caps">DOM</span> is kind of okay, because you can tell that there&#8217;s a new <code>&lt;button&gt;</code> element in that element.  You can&#8217;t introspect event handlers, but it happens that jQuery does leave evidence of its event listeners.  But if you get to that listener you&#8217;ll get a closure, and you can&#8217;t see the value of <code>element</code> in that&nbsp;closure.</p>
 <p>I imagine a language that can, at some moment, take the entirety of its state and save it, and also be able to reconstruct the entirety of that state at will.  Assuming we are using a traditional language with function calls and local variables, this would also imply <a href="http://en.wikipedia.org/wiki/Continuation">continuations</a>.</p>
@@ -101,13 +102,15 @@
 <p>And then, to make everything deterministic, so you can rerun things. This means everything that isn&#8217;t naturally deterministic is mocked. Mocks everywhere!  Or at least mocks everywhere where there&#8217;s input from the&nbsp;outside.</p>
 <p>Sometimes the mocks are something the <span class="caps">API</span> itself can understand.  If you want to mock error handling in file code, file APIs know what kind of exceptions might occur.  If you want to mock reading a file, file APIs are unlikely to know what kind of file contents you might have expected.  And another option is that mockable APIs contain recording options.  All of these are possible and plausible; in a <span class="caps">GUI</span> you might want to record a story, while also randomly executing other stories that can be determined simply by inspecting the controls you&#8217;ve&nbsp;created.</p>
 <p>Exercising an application then invites understanding what was exercised.  This implies code coverage as a top-level concept, so stories can be executed to reach new points in the code, or perhaps so you can even introspect and exercise expressions themselves.&nbsp;E.g.:</p>
-<div class="highlight"><pre><span></span><code>when save_draft.checked and input.value != saved_value: ...
-</code></pre></div>
+<div class="highlight"><pre><span></span><span class="err">when save_draft.checked and input.value != saved_value: ...</span>
+</pre></div>
+
 
 <p>If you have magical introspection abilities, you might be able to determine exactly the state required to trigger that condition.  That seems like it would require pretty heroic effort, to understand the types and instantiation of those objects&#8230; but remember, we can allow for runtime introspection, not just static introspection; we can look at <code>save_draft</code> and <code>input</code> and ask them about what they can do, without complicated inference.  Once you have the ability to execute and replay code, you can analyze the live code, not just the dead source code that is waiting to be&nbsp;animated.</p>
 <p>I wonder if we might place further burdens on the programmer in the service of this execute-anything principal.  For instance, you as the programmer may know that when <code>save_draft</code> is not visible, it cannot become checked, and maybe you only instantiate <code>input</code> when you make the entire form visible, so evaluating <code>input.value != saved_value</code> would be invalid unless the application was in a very particular state.  And so we cannot just <em>set</em> <code>save_draft.checked</code> to true whenever it pleases the testing daemon.  But perhaps we say that yes, the testing daemon can and will do that, and you just better handle that.  Maybe you have to rewrite that&nbsp;as:</p>
-<div class="highlight"><pre><span></span><code>when saved_draft.checked and input and input.value != saved_value:
-</code></pre></div>
+<div class="highlight"><pre><span></span><span class="err">when saved_draft.checked and input and input.value != saved_value:</span>
+</pre></div>
+
 
 <p>even though that condition is impossible outside of testing.  That may be a small price to pay for the other benefits you will accrue from this language.  Or maybe it&#8217;s unnecessary, I&#8217;m not&nbsp;sure.</p></div>
         <!-- /.entry-content -->

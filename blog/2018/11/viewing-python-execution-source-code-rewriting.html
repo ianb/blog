@@ -53,27 +53,30 @@
 <h2>Source code&nbsp;rewriting</h2>
 <p>Instead of using <a href="https://docs.python.org/3/library/trace.html">trace</a> to follow along with the code, I thought we could inject the debugging into the code&nbsp;itself.</p>
 <p>I ended up implementing two kinds of source code rewriting. The first simply prints&nbsp;expressions:</p>
-<div class="highlight"><pre><span></span><code><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
 <span class="n">my_object</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 <span class="n">my_object</span>
-</code></pre></div>
+</pre></div>
+
 
 <p>This normally prints out <code>my_object</code>, but it only works on the last expression (i.e., you wouldn&#8217;t see the value of <code>my_object.execute()</code>). This constraint is built into Python in <a href="https://docs.python.org/3/library/functions.html#compile">compile</a>, with the output being sent to <a href="https://docs.python.org/3/library/sys.html#sys.displayhook">sys.displayhook</a>. You can get around this problem by splitting up the cells carefully, but I find cell management to be an unpleasant part of notebook&nbsp;interfaces.</p>
 <p>I first tried putting an implicit <code>print()</code> around every top-level expression, so it&nbsp;becomes:</p>
-<div class="highlight"><pre><span></span><code><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 <span class="n">display_print</span><span class="p">(</span><span class="n">my_object</span><span class="o">.</span><span class="n">execute</span><span class="p">())</span>
 <span class="n">display_print</span><span class="p">(</span><span class="n">my_object</span><span class="p">)</span>
-</code></pre></div>
+</pre></div>
+
 
 <p>Where <code>display_print()</code> is something simple&nbsp;like:</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">display_print</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">display_print</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">value</span>
-</code></pre></div>
+</pre></div>
+
 
 <p>This turned out to be confusing. What print statement went with which expression? I legitimately couldn&#8217;t tell, even with simple examples. So I made another change, rewriting it like&nbsp;this:</p>
-<div class="highlight"><pre><span></span><code><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 <span class="n">display_print</span><span class="p">(</span><span class="s2">&quot;my_object.execute()&quot;</span><span class="p">,</span> <span class="n">my_object</span><span class="o">.</span><span class="n">execute</span><span class="p">())</span>
 <span class="n">display_print</span><span class="p">(</span><span class="s2">&quot;my_object&quot;</span><span class="p">,</span> <span class="n">my_object</span><span class="p">)</span>
 
@@ -81,24 +84,27 @@
     <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="s2">  </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">value</span>
-</code></pre></div>
+</pre></div>
+
 
 <p>It works great! You can track a bunch of expressions, interleave this with other explicit print statements, and the output is readable and&nbsp;useful.</p>
 <h3>Probes</h3>
 <p>But I had a problem: I could watch top-level expressions, but there were lots of interesting expressions that aren&#8217;t top-level. For this I added a new function <code>watch()</code>. But I still rewrote&nbsp;expressions:</p>
-<div class="highlight"><pre><span></span><code><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">object_enumerator</span><span class="p">():</span>
     <span class="n">my_object</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">watch</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
-</code></pre></div>
+</pre></div>
+
 
 <p>is rewritten&nbsp;to:</p>
-<div class="highlight"><pre><span></span><code><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><span class="n">my_object</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">object_enumerator</span><span class="p">():</span>
     <span class="n">my_object</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">watch_print</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="n">obj</span><span class="p">))</span> <span class="c1"># the 1 is an ID for the expression</span>
-</code></pre></div>
+</pre></div>
+
 
 <p>With an implementation of <code>watch_print()</code> like:</p>
-<div class="highlight"><pre><span></span><code><span class="n">watch_print_counter</span> <span class="o">=</span> <span class="p">{}</span>
+<div class="highlight"><pre><span></span><span class="n">watch_print_counter</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">watch_print_limit</span> <span class="o">=</span> <span class="mi">10</span>
 
 <span class="k">def</span> <span class="nf">watch_print</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -108,19 +114,21 @@
         <span class="k">if</span> <span class="n">watch_print_counter</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">watch_print_limit</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  (omitting further values)&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">value</span>
-</code></pre></div>
+</pre></div>
+
 
 <p>While I initially left out the limit, I quickly realized its importance: it&#8217;s very easy to run a denial of service attack on your own notebook! A more sophisticated implementation could start omitting values while leaving in every 100th or 1000th&nbsp;value.</p>
 <h3>Watching&nbsp;loops</h3>
 <p>I never implemented this, but I&#8217;m pretty sure the next step would be watching all loops, rewriting them as something&nbsp;like:</p>
-<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">watch_enumerator</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="s2">&quot;object_enumerator()&quot;</span><span class="p">,</span> <span class="n">object_enumerator</span><span class="p">()):</span>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">watch_enumerator</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="s2">&quot;object_enumerator()&quot;</span><span class="p">,</span> <span class="n">object_enumerator</span><span class="p">()):</span>
    <span class="o">...</span>
-</code></pre></div>
+</pre></div>
+
 
 <p>This would let you print out useful information, like if the execution is long you can indicate progress and possibly an expected completion time, or you could label inner watch statements or add other&nbsp;information.</p>
 <h1>Implementation</h1>
 <p>To implement this I used the <a href="https://astor.readthedocs.io/en/latest/">astor</a> library, which made this all very simple, though it required some&nbsp;experimentation:</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">RewriteExprToPrint</span><span class="p">(</span><span class="n">astor</span><span class="o">.</span><span class="n">TreeWalk</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RewriteExprToPrint</span><span class="p">(</span><span class="n">astor</span><span class="o">.</span><span class="n">TreeWalk</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">post_Module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_node</span>
@@ -150,10 +158,11 @@
             <span class="p">)</span>
         <span class="n">ast</span><span class="o">.</span><span class="n">fix_missing_locations</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_node</span>
-</code></pre></div>
+</pre></div>
+
 
 <p>Implementing <code>watch()</code> is a little more&nbsp;involved:</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">RewriteWatch</span><span class="p">(</span><span class="n">astor</span><span class="o">.</span><span class="n">TreeWalk</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RewriteWatch</span><span class="p">(</span><span class="n">astor</span><span class="o">.</span><span class="n">TreeWalk</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">astor</span><span class="o">.</span><span class="n">TreeWalk</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -184,7 +193,7 @@
         <span class="p">)</span>
         <span class="n">ast</span><span class="o">.</span><span class="n">fix_missing_locations</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_node</span>
-</code></pre></div></div>
+</pre></div></div>
         <!-- /.entry-content -->
           <div class="comments">
             <h2>Comments</h2>

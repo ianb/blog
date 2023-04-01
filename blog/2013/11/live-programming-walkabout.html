@@ -62,7 +62,7 @@
 <p>With the language laid out like that, I saw that most of it was nice and static and deterministic.  Control structures are deterministic: <code>if COND then IFTRUE else IFFALSE</code> always executes the same code given the same input.  Most everything is: appending to a list always produces the same result, adding numbers always produces the same result.  The list of the non-deterministic building blocks of a program is <em>really small</em>.</p>
 <p>And this is exciting!  If you can find all the non-deterministic parts of a program and come up with a range of viable results to plug in (i.e., mock) then you can run more-or-less the entire program.  And the more I think about it, the more I realize that the list of non-deterministic parts can be quite small for many&nbsp;programs.</p>
 <p>For instance, consider this&nbsp;program:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">random</span>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
 
 <span class="k">def</span> <span class="nf">guesser</span><span class="p">():</span>
     <span class="n">number</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
@@ -81,7 +81,8 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Too small!&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Too large!&quot;</span><span class="p">)</span>
-</code></pre></div>
+</pre></div>
+
 
 <p>This is a simple program, but it can execute in lots of ways.  There&#8217;s two non-deterministic parts: <code>random.randint()</code> and <code>input()</code>. The first can be made deterministic by seeding the random number generator with a known value (and the program can be exercised with multiple runs with multiple seeds).  The second is trickier.  We know <code>input()</code> returns a string that the user inputs, one line long. But if you throw random strings at the program you won&#8217;t get something very interesting.  So we need just a little more help, a suggestion of what the person might return.  E.g., <code>input.suggest_returns = lambda: str(random.randint(-1, 11))</code> &#8212; it&#8217;s still valid that it can return anything, but we&#8217;ll be able to best exercise the program with those inputs.  We still don&#8217;t have a smart player for our game, but it&#8217;s&nbsp;something.</p>
 <p>This approach to exercising code is exciting because it&#8217;s basically automatic: you write your program, and if you are using primitives that have been setup for mocking, then it&#8217;s testable.  You can build tools around it, the tools can find cases where things go wrong and replay those specific cases for the programmer until they are&nbsp;fixed.</p>

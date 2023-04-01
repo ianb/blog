@@ -55,26 +55,28 @@
 <figure style="background-color: rgba(240, 240, 240, 0.4); padding: 5px; width: 90%; border: 1px solid #aaa; border-radius: 3px;"><a href="/media/pageshot-server-pref-screenshot.png"><img style="width: 100%; height: auto" src="/media/pageshot-server-pref-screenshot.png" /></a><figcaption style="font-size: 80%; line-height: 1em; text-align: center;"><tt>about:addons</tt> prefs</figcaption></figure>
 
 <p>After that you can get the shot data from a page with a simple&nbsp;command:</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nv">url</span><span class="o">=</span>https://mail.google.com
+<div class="highlight"><pre><span></span>$ <span class="nv">url</span><span class="o">=</span>https://mail.google.com
 $ <span class="nv">server</span><span class="o">=</span>http://localhost:10082
 $ curl <span class="s2">&quot;</span><span class="si">${</span><span class="nv">server</span><span class="si">}</span><span class="s2">/data/?url=</span><span class="si">${</span><span class="nv">url</span><span class="si">}</span><span class="s2">&amp;allowUnknownAttributes=true&amp;delayAfterLoad=1000&quot;</span> &gt; data.json
-</code></pre></div>
+</pre></div>
+
 
 <p><code>allowUnknownAttributes</code> preserves attributes like <code>data-*</code> attributes that you might find useful in your processing.  <code>delayAfterLoad</code> gives the milliseconds to wait, usually for the page to&nbsp;&#8220;settle&#8221;.</p>
 <p>A fun part of this is that because it&#8217;s in a regular browser it will automatically pick up your profile and scrape the page <em>as</em> you, and you&#8217;ll literally see a new tab open for a second and then close.  Install an ad blocker or anything else and its changes will also be&nbsp;applied.</p>
 <p>The thing you get back will be a big <span class="caps">JSON</span>&nbsp;object:</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;bodyAttrs&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;value&quot;</span><span class="p">],</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;headAttrs&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="s2">&quot;htmlAttrs&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;head&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;html string&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;body&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;html string&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;resources&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="s2">&quot;uuid&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="s2">&quot;url&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">  </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
-</code></pre></div>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;bodyAttrs&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">],</span>
+  <span class="s2">&quot;headAttrs&quot;</span><span class="o">:</span> <span class="p">[],</span> <span class="s2">&quot;htmlAttrs&quot;</span><span class="o">:</span> <span class="p">[],</span>
+  <span class="s2">&quot;head&quot;</span><span class="o">:</span> <span class="s2">&quot;html string&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;body&quot;</span><span class="o">:</span> <span class="s2">&quot;html string&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;resources&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;uuid&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;url&quot;</span><span class="o">:</span> <span class="s2">&quot;...&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
 
 <p>There&#8217;s other stuff in there too (e.g., <a href="http://ogp.me/">Open Graph properties</a>), but this is what you need to reconstruct the page itself.  It has a few nice&nbsp;features:</p>
 <ol>
