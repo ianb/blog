@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Simulating Individual People with GPT</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://ianbicking.org/css/ie.css"/>
+                <script src="https://ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+        <div>
+            <div class="published" title="2023-02-26T00:00:00-06:00">
+                Sunday, February 26th, 2023
+            </div>
+            <h1 class="entry-title">
+                <a
+                    href="https://ianbicking.org/drafts/simulating-individual-people-gpt.html"
+                    rel="bookmark"
+                    title="Permalink to Simulating Individual People with GPT"
+                    >Simulating Individual People with <span class="caps">GPT</span></a
+                >
+            </h1>
+        </div>
+        </header>
+
+        <div class="entry-content"><p>I&#8217;ve been both interested and disinterested with <span class="caps">GPT</span>-powered chatbots with personality. Why am I talking to this thing? Why do they all sound like a historical actor playing a&nbsp;part?</p>
+<p>I&#8217;m also interested in script and story generation, but writing a script is interesting but fundamentally different than actual entities independently interacting with each other. A script is written from above: the author controls the end at the same time they control the beginning, and every character serves the purposes of the&nbsp;author.</p>
+<p>This is an attempt to pull that process apart into multiple independent steps, establishing entities with personal goals and&nbsp;perspectives.</p>
+<h1>The&nbsp;Tool</h1>
+<p>To see this in action, a&nbsp;video:</p>
+<iframe style="width: 100%; aspect-ratio: 16/9; display: block" src="https://www.youtube.com/embed/nsIPC_eqfwg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+<p>The tool&nbsp;has:</p>
+<ol>
+<li>A <strong>description of the physical environment</strong>. This is the &#8220;world&#8221; that everyone lives in. It is visible to everyone. It will be updated as time&nbsp;progresses.</li>
+<li>A <strong>simulation prompt</strong>. This is a description of the general purpose of the simulation and any notes you want to give. It doesn&#8217;t update. This is the where the simulation-author can apply their&nbsp;will.</li>
+<li>A <strong>set of characters</strong>.<ol>
+<li>Each character has a <strong>description</strong>. This description doesn&#8217;t change and is visible to&nbsp;everyone.</li>
+<li>A <strong>current mood</strong>, like &#8220;angry&#8221; or &#8220;happy&#8221;. This is private information (only the character knows their own mood). It can be updated by the&nbsp;character.</li>
+<li>A <strong>current goal</strong>, like &#8220;avoid conflict&#8221; or &#8220;survive&#8221;. This is private and updated just like&nbsp;mood.</li>
+<li><strong>Relationships to each other person</strong>. Like &#8220;Relationship with John: resentful and suspicious&#8221;. These are private and can be updated&nbsp;person-by-person.</li>
+</ol>
+</li>
+</ol>
+<p>Giving this starting point the simulation steps&nbsp;forward:</p>
+<ol>
+<li>People take turns being the active&nbsp;person.</li>
+<li>A prompt is constructed that includes the public status of the world, the private status of that person, and a log of&nbsp;actions.</li>
+<li><span class="caps">GPT</span> will complete this with a list of actions the active person performs. The actions are:<ol>
+<li><strong>Do something</strong>: a natural language action like &#8220;buy a beer for everyone&#8221;.<ol>
+<li>Separately <span class="caps">GPT</span> will be asked something like &#8220;The scene is: [old description] and then [person] tries to do [action]. Now the scene would be described as:&#8221; and it gives a new description of the&nbsp;world.</li>
+</ol>
+</li>
+<li><strong>Say something</strong>: shown and remembered by everyone, but has no direct&nbsp;effect.</li>
+<li><strong>Change mood/goal/relationship</strong>: these update the internal and private attribute, but have no effect and are only privately&nbsp;visible.</li>
+</ol>
+</li>
+</ol>
+<p>The simulation can also run pure-simulation event simulation steps, either once per round or between each&nbsp;person:</p>
+<ol>
+<li>Construct a prompt with all the public status of the world and log of public&nbsp;actions.</li>
+<li>Add the prompt &#8220;After [time period] passes and events transpire, the scene can now be described as:&#8221;. This updates the scene&nbsp;description.</li>
+</ol>
+<h1>Why simulate individuals instead of&nbsp;groups?</h1>
+<p>If you want to put people together in a situation and see what happens, you can ask <span class="caps">GPT</span> to do the entire thing in one step. For the example I&#8217;ll use popular characters since they don&#8217;t need to be explained (to you or <span class="caps">GPT</span>):</p>
+<blockquote>
+<p>Harry Potter, Hermione, and Ron are trapped in a spider web in the Forbidden Forest. The spiders have left but are sure to come back soon and eat them. Write a script for what comes next; include dialog and action&nbsp;descriptions</p>
+</blockquote>
+<p>In response it will come up with a reasonably solid scene. Better than what this tool produces, and with no implementation cost at&nbsp;all.</p>
+<p>I have two goals&nbsp;here:</p>
+<ol>
+<li>Try to model the internal life of characters. Perhaps <em>discover</em> what &#8220;internal life&#8221; in this context would mean. Allow for private information. Allow characters to act in <em>true</em> ignorance, which requires separate prompts with limited information. You can tell <span class="caps">GPT</span> a person doesn&#8217;t know something, but then you are asking <span class="caps">GPT</span> to pretend. Leave it out of the prompt and the person truly doesn&#8217;t know the&nbsp;thing!</li>
+<li>Leave room for human interaction. With this step-by-step model one of the entities could be a human, and the human would truly be a peer with the <span class="caps">GPT</span>&nbsp;entities.</li>
+</ol>
+<p>I also have this sense that scenes are written with main characters and background characters, with all sorts of effects on the plot and the perspective on the world and the emotional saliency provided to those characters. Can we model something where everyone acts as the main character of their life? (Will we find it&nbsp;matters?)</p>
+<h1>How well does it&nbsp;do?</h1>
+<p>Answer: kind of <span class="caps">OK</span>, but could be&nbsp;better.</p>
+<p>Scenes will progress! Dialog will be exchanged! The environment will update! And it&#8217;s all entirely&nbsp;reasonable.</p>
+<p>It&#8217;s also a little boring. Events can turn into a slog. People always rise to the occasion (every mood seems destined to transform into &#8220;determined&#8221;). <a href="https://en.wikipedia.org/wiki/Deus_ex_machina">Deus ex machina</a> events are common. But there&#8217;s been progress. The shape of interaction is there, but it has not been imbued with&nbsp;life.</p>
+<h1>The Zeno&#8217;s Paradox Of Plot&nbsp;Development</h1>
+<p>Imagine a character has decided to leave the room. In their next action they say &#8220;well, I&#8217;m going.&#8221; The scene may update with them standing up and going for the door. Next action they get ready to go. Next action they say goodbye again and reach for the doorknob. Next action they keep reaching. Going out the door doesn&#8217;t seem like an impossible task, but so it has become, trapped forever in anticipation. This is what happened in the first iteration. Like Zeno proposed, in order to achieve something the characters are asked to get halfway to achievement, and halfway yet again, and yet&nbsp;again.</p>
+<p>This anticipation of an event that never arrives is a frequent plot development problem with <span class="caps">GPT</span>.</p>
+<p>Put in the event simulation step and it&#8217;s (mostly) all fixed! During the simulation step the character actually leaves. No longer are they trapped in a world controlled only through personal intention, now <em>events transpire</em>.</p>
+<p>What&#8217;s surprising is how similar the event simulation step prompt is to other prompts. And yet it makes a huge&nbsp;difference.</p>
+<p>The issue still occurs, especially when <span class="caps">GPT</span> decides anticipation is called for. Immediately before a surprise or an unexpected event <span class="caps">GPT</span> will declare this anticipation then hover indefinitely. It&#8217;s possible one or two words in the prompt could fix this, but I&#8217;ve yet to find&nbsp;them.</p>
+<h1>Positivity strikes&nbsp;again</h1>
+<p><span class="caps">GPT</span> is so damn <em>constructive</em> and <em>helpful</em> and <em>positive</em>. There are many attributes given to ChatGPT that are not entirely shared by the <span class="caps">GPT</span> <span class="caps">API</span>. ChatGPT is one manifestation of <span class="caps">GPT</span>. But this positivity goes deep, it&#8217;s not just a personality facade but truly built into the training. I ultimately think <a href="https://twitter.com/ianbicking/status/1631801420142768129">it&#8217;s for the best</a> but it&#8217;s still&nbsp;frustrating.</p>
+<p>Put some people in a room with every reason to be in conflict? They&#8217;ll just decide not to be in conflict. Give people a difficult task to complete, and remove the skills, tools, and willpower to complete the task? They change their mood to &#8220;determined&#8221; and like some cartoon where the only real logic of heroism is <em>wanting it enough</em>, the characters will want to succeed and then just <em>do so by declaration</em>.</p>
+<p>For physical actions I think it could use a more critically-tuned prompt to decide effects. The prompt&nbsp;says:</p>
+<blockquote>
+<p>The scene is: [current description of the&nbsp;scene]</p>
+<p>[Character] does:&nbsp;[action]</p>
+<p>The scene can now be described&nbsp;as:</p>
+</blockquote>
+<p>We could be asking <span class="caps">GPT</span> specific questions like &#8220;will the character succeed?&#8221; or invoking something more&nbsp;step-by-step.</p>
+<h2>Characters change their mood and goal too&nbsp;often</h2>
+<p>Having characters with dynamic moods and goals seems appealing. It gives them some metacognition. But if you give <span class="caps">GPT</span> an option it will take the option. If it&#8217;s possible to update the character&#8217;s mood it will do so every step. In general it&#8217;s hard to tell <span class="caps">GPT</span> &#8220;this option is available but try not to use it.&#8221; More famously that includes getting <span class="caps">GPT</span> to admit&nbsp;ignorance.</p>
+<p>One possible mitigation is to add <em>another</em> command which is <code>ActuallyUpdateMood: true/false</code> so <span class="caps">GPT</span> could generate an update but also admit that it doesn&#8217;t really want to apply that&nbsp;update.</p>
+<h2>Why write the script in&nbsp;steps?</h2>
+<h2>Where are choices&nbsp;made?</h2>
+<p>If we&#8217;re creating autonomy, then <em>where</em>?</p>
+<p>Right now it&#8217;s directly in the completion process. <span class="caps">GPT</span> walks forward token by token and does what&#8217;s most likely. And that&#8217;s what it feels&nbsp;like.</p>
+<p>After discussing this some with <a href="https://twitter.com/KevinAFischer">Kevin Fischer</a> I realized I wanted more creativity from the characters. In <a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">other experiments</a> my go-to for more creativity is: make a list. <span class="caps">GPT</span> will never respond with the same thing three times&nbsp;over.</p>
+<p>Now that you have a list you ask: which of these best satisfies your stated&nbsp;goal?</p>
+<p>I&#8217;ve experimented with this and it works&#8230; but too well. If you ask <span class="caps">GPT</span> to generate options and then choose the one that matches the character&#8217;s goal then the characters become direct, assertive, and mission-oriented, always perfectly pursuing whatever goal you give them. This is not how real people work. Real people are shy, they infer their intentions instead of stating them, they navigate personal goals and social expectations. There is no one statement that alone fully predicts a person&#8217;s&nbsp;behavior.</p>
+<h2>Why use logs some places and attributes&nbsp;other?</h2>
+<p>If a character <em>says</em> something then it&#8217;s just kept in the record. When a character changes mood that updates a bit of&nbsp;state.</p>
+<p>Why the difference? Why the particular states of <em>mood</em>, <em>goal</em>, and <em>relationships</em>?</p></div>
+        <!-- /.entry-content -->
+      </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://ianbicking.org/archives.html">archives</a> &amp; <a href="https://ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://ianbicking.org/category/ai.html">category: ai</a></li>
+                    <li><a href="https://ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://hachyderm.io/@ianbicking">@ianbicking@hachyderm.io</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">World Building With <span class="caps">GPT</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/thoughts-on-voice-interfaces-2-llms.html">Thoughts On Voice Interfaces 2 years later:&nbsp;LLMs</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/infinite-ai-array.html">Infinite <span class="caps">AI</span>&nbsp;Array</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-2442258-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-2442258-1');
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>

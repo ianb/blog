@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>World Building with GPT part 2: let’s get declarative</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://ianbicking.org/favicon.ico">
+
+        <!--[if IE]>
+                <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+        <!--[if lte IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://ianbicking.org/css/ie.css"/>
+                <script src="https://ianbicking.org/js/IE8.js" type="text/javascript"></script><![endif]-->
+
+        <!--[if lt IE 7]>
+                <link rel="stylesheet" type="text/css" media="all" href="https://ianbicking.org/css/ie6.css"/><![endif]-->
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+        <div>
+            <div class="published" title="2023-03-26T00:00:00-05:00">
+                Sunday, March 26th, 2023
+            </div>
+            <h1 class="entry-title">
+                <a
+                    href="https://ianbicking.org/drafts/world-building-gpt-2-declarative.html"
+                    rel="bookmark"
+                    title="Permalink to World Building with GPT part 2: let’s get declarative"
+                    >World Building with <span class="caps">GPT</span> part 2: let&#8217;s get&nbsp;declarative</a
+                >
+            </h1>
+        </div>
+        </header>
+
+        <div class="entry-content"><p>In my <a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">last post</a> I described a city builder. I was planning on putting a pin in that work with the post, but the heart wants what the heart wants and I had to come&nbsp;back.</p>
+<h1>A declarative approach to&nbsp;building</h1>
+<p>Inside the spaghetti code of City Maker was a much simpler idea waiting to come out. I gave it the name <a href="https://llm.ianbicking.org/layercraft/">LayerCraft</a> with <a href="https://github.com/ianb/llm-garden/blob/main/src/layercraft/citymakerschema.js">City Maker as a schema</a>. I don&#8217;t know yet how widely applicable this approach is, but it feels like it&#8217;s touching on patterns will be relevant for&nbsp;LLMs.</p>
+<p>I&#8217;ll try to explain it concretely using a&nbsp;city:</p>
+<ol>
+<li>There&#8217;s many properties: name, factions, people, neighborhoods,&nbsp;buildings</li>
+<li>Some properties belong to others in a parent/child relationship, like buildings that belong to&nbsp;neighborhoods</li>
+<li><span class="caps">GPT</span> can generate <em>options</em> for these&nbsp;values</li>
+<li>Generating these options requires a prompt; these prompts usually require context which creates <em>dependencies</em></li>
+<li>Given options the author can select, adapt, or create their own values for&nbsp;properties</li>
+</ol>
+<p>In practice for the City Maker this means you choose a theme for your city, then backstory, then you pick out some neighborhood types that are created based on that background, and so&nbsp;on.</p>
+<p>The prompts themselves are constructed to elicit the best result from <span class="caps">GPT</span>. Good&nbsp;prompts:</p>
+<ol>
+<li>Give the necessary context without giving too much distracting&nbsp;context</li>
+<li>Show concrete examples that neither over-specify nor under-specify the desired&nbsp;results</li>
+<li>Give <span class="caps">GPT</span> broad guidance (&#8220;exciting&#8221;, &#8220;simple&#8221;,&nbsp;etc)</li>
+<li>Identify the schema for the&nbsp;results</li>
+</ol>
+<p>For instance, the schema for building&nbsp;occupants:</p>
+<div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">city</span> <span class="err">$</span><span class="n">cityName</span> <span class="n">that</span> <span class="k">is</span> <span class="err">$</span><span class="n">cityType</span><span class="p">,</span> <span class="err">$</span><span class="n">cityPeriod</span><span class="p">.</span> <span class="err">$</span><span class="n">cityBackstory</span>
+
+<span class="n">A</span> <span class="n">list</span> <span class="k">of</span> <span class="err">$</span><span class="n">building</span><span class="p">.</span><span class="n">jobTypes</span> <span class="k">and</span> <span class="n">other</span> <span class="n">inhabitants</span> <span class="k">for</span> <span class="err">$</span><span class="n">building</span> <span class="p">(</span><span class="err">$</span><span class="n">building</span><span class="p">.</span><span class="n">description</span><span class="p">).</span> <span class="n">Give</span> <span class="k">each</span> <span class="n">person</span> <span class="n">an</span> <span class="n">interesting</span> <span class="k">and</span> <span class="n">culturally</span> <span class="n">appropriate</span> <span class="n">name</span> <span class="k">and</span> <span class="n">a</span> <span class="n">colorful</span> <span class="n">background</span> <span class="k">and</span> <span class="n">personality</span><span class="p">.</span> <span class="n">Include</span> <span class="n">negative</span> <span class="n">attributes</span><span class="p">.</span>
+
+<span class="n">Respond</span> <span class="k">with</span> <span class="n">a</span> <span class="n">JSON</span> <span class="n">list</span> <span class="k">like</span><span class="p">:</span>
+
+<span class="p">[</span>
+  <span class="err">{</span>
+    <span class="k">type</span><span class="p">:</span> <span class="err">$</span><span class="n">building</span><span class="p">.</span><span class="n">jobTypes</span><span class="o">|</span><span class="k">first</span><span class="o">|</span><span class="n">repr</span><span class="o">|</span><span class="n">json</span><span class="p">,</span> <span class="o">//</span> <span class="k">Or</span> <span class="err">$</span><span class="n">building</span><span class="p">.</span><span class="n">jobTypes</span><span class="o">|</span><span class="n">rest</span>
+    <span class="n">name</span><span class="p">:</span> <span class="ss">&quot;FirstName LastName&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="p">:</span> <span class="ss">&quot;[a description of the person, their profession or role, their personality, their history]&quot;</span><span class="p">,</span>
+    <span class="n">age</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="o">//</span> <span class="n">age</span> <span class="k">in</span> <span class="n">years</span><span class="p">,</span> <span class="mi">5</span><span class="o">-</span><span class="mi">100</span>
+    <span class="n">arrives</span><span class="p">:</span> <span class="ss">&quot;8am&quot;</span><span class="p">,</span>
+    <span class="n">leaves</span><span class="p">:</span> <span class="ss">&quot;6pm&quot;</span><span class="p">,</span>
+  <span class="err">}</span>
+<span class="p">]</span>
+</pre></div>
+
+
+<p>The building schema includes <code>jobTypes</code> which informs the schema in the prompt. The prompt <em>could</em> just offer some generic advice, but I&#8217;ve found there&#8217;s often an advantage in establishing options as part of the&nbsp;context.</p>
+<p>The particular implementation of this in LayerCraft isn&#8217;t half as general as this needs to be, but I&#8217;m very optimistic about the&nbsp;approach.</p>
+<h2>Updates and&nbsp;dependencies</h2>
+<p>Building up incrementally gives steering power to the author, but not correction. This is a common problem because it&#8217;s hard to know the results of some of those early choices until you&#8217;ve seen what they&#8217;ve produced. And if you are creating dozens of characters based on these prompts you might not see the problems until you are halfway&nbsp;in.</p>
+<p>If we treated this process as a pure question of dependencies, and treated the schema-defined graph like a Makefile, then changing early choices would simply regenerate later choices. But the author probably liked many of those&nbsp;choices!</p>
+<p>As an example: I created a candy city. Part way through I realized it would be more fun if the characters were each made of candy. I didn&#8217;t really want to change everyone&#8217;s role, but only make sure each description said what kind of candy the person is. I added an instruction to cityBackstory: &#8220;the people of Gummytown are made out of candy, with some being gummies, others being chocolates, and a few being marshmallows or candy canes. For each person specify what kind of candy they are in their&nbsp;description.&#8221;</p>
+<p>How do you tell which properties this applies to? How do you apply this change to those properties? <span class="caps">GPT</span> is capable of both of these things, but not in a deterministic or entirely reliable way. Fixing this is significant work and definitely needs to be present in the <span class="caps">UI</span>&nbsp;itself.</p>
+<h2>Getting more&nbsp;meta</h2>
+<p>The use of context (such as <code>$cityBackstory</code>) lets the author broadly control what&#8217;s being created, but it&#8217;s often underpowered. It also can&#8217;t change the <em>shape</em> of what&#8217;s returned, such as adding a new property to a <span class="caps">JSON</span>&nbsp;example.</p>
+<p>You can do a lot with <span class="caps">GPT</span> prompts and concatenation. That is, you can &#8220;edit&#8221; a prompt by just adding more instructions. If those instructions conflict then <span class="caps">GPT</span> will try its best. This is usually enough, and why this entire approach&nbsp;works.</p>
+<p>The next level is putting more of the core prompt material into properties. Yet the text of those prompt templates quickly turns into programming itself, a mode switch that&#8217;s hard even for a programmer if you aren&#8217;t in the driving&nbsp;seat.</p>
+<p>If we turn back to <span class="caps">GPT</span> again to solve this we&#8217;ll need meta-prompts: descriptions of what the prompt needs to accomplish, and its constraints, so that <span class="caps">GPT</span> can apply natural-language edits to the prompts while maintaining the required&nbsp;structure.</p>
+<h2>Planning <span class="amp">&amp;</span>&nbsp;action</h2>
+<p>While this is author-focused, I think the choices that <span class="caps">GPT</span> produces should be thought of as <em>proposed plans</em>. In City Maker it&#8217;s offering plans for how to build out a world. The author chooses options (and edits and makes notes on options) to guide, correct, and expand on what <span class="caps">GPT</span> produces on its&nbsp;own.</p>
+<p>If <span class="caps">GPT</span> was producing code that&#8217;s also a plan. Sometimes you can build plans on plans, i.e., build more code just by looking at existing code. But often you need the output of that code to keep going. Or you need feedback, refinement,&nbsp;etc. </p>
+<p>I think you could interpret ChatGPT with plugins as a form of this, with a linear approach to interaction and without prompt&nbsp;templates.</p>
+<h2>I&#8217;m glad fine tuning is dead (for like a&nbsp;month)</h2>
+<p>It&#8217;s tempting with these problems to think about &#8220;fine tuning&#8221; a model. That&#8217;s how <span class="caps">AI</span> has worked for a long time, and it feels like a good way to approach issues with reliability or ever-growing prompts that grow little instructions and&nbsp;caveats.</p>
+<p>For now that option is off the table if you are using the gpt-3.5-turbo (what this uses) or gpt-4 APIs, which are chat-based and offer no finetuning. This probably won&#8217;t last for long, but <em>right now</em> you&#8217;ll almost always get better (cheaper, faster, more flexible) results by using these new models and forgoing fine&nbsp;tuning.</p>
+<p>This is the future I want to see! Everything I&#8217;ve described here <em>is not compatible with fine tuning</em>. You can&#8217;t edit prompts and make sophisticated adjustments when the instructions are in the tuned model&nbsp;weights!</p>
+<p><strong>Prompting is artisanal <span class="caps">AI</span></strong>. If you know a something about a subject, and want to use that knowledge and your own sweat to iterate on a prompt, the sky&#8217;s the limit. <span class="caps">OK</span>, not true: right now tooling is the limit, but prompt-focused tools can give people new agency on a very individual level. I&#8217;m developing both sides of LayerCraft and still empowered by this&nbsp;abstraction.</p>
+<p>Lots of people are all like <em>blah blah blah, what about a moat, how do you differentiate yourself?</em> Sorry, that sounds like a you problem. Me, I want to make cool things, and hopefully empower other people to make cool things. There&#8217;s a kind of thought that is addicted to consuming people rather than empowering&nbsp;them.</p>
+<h1>Notes on&nbsp;authoring</h1>
+<h2>Committing to&nbsp;images</h2>
+<p>I equivocated on image generation in the <a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">last post</a>. But images are great! And at least at this moment Midjourney is absolutely making the best generative&nbsp;images.</p>
+<p>What Midjourney isn&#8217;t good at is automation. But there&#8217;s no unattended image generation process that creates good&nbsp;results.</p>
+<p>With some help from <span class="caps">GPT</span> I created <a href="https://gist.github.com/ianb/2a81e219ec38ea46bac1ad7156f5f711">this AppleScript automation</a> to copy the current selection to the clipboard, change focus to a different browser window with Discord open, invoke <code>/imagine</code> and paste in the text, then switch back. While this <em>seems</em> easy enough to do manually somehow Discord makes this harder than it should be. The script really helps, and along with an <a href="https://chrome.google.com/webstore/detail/imgur-uploader/lcpkicdemehhmkjolekhlglljnkggfcf?hl=en">imgur uploader</a> it&#8217;s all&nbsp;reasonable.</p>
+<p>Then I ask <span class="caps">GPT</span> to create an image prompt from the character description. The request looks like&nbsp;this:</p>
+<blockquote>
+<p>[all the world&nbsp;context]</p>
+<p>[character&nbsp;description]</p>
+<p>Give a description of the person in the form of a picture. Do not assume any context. Focus on the visual details. Use 3-4&nbsp;sentences.</p>
+</blockquote>
+<p>I also added <em>age</em> as a formal parameter for characters; both <span class="caps">GPT</span> and Midjourney default to 20-30 year old appearances. (Even with age specified the results are too&nbsp;weak!)</p>
+<h3>Contextualizing&nbsp;descriptions</h3>
+<p>Instead of having <span class="caps">GPT</span> specifically create visual character descriptions, I could just pass the original character description to Midjourney. Midjourney is also happy to hallucinate details in the absence of a specific prompt, which is essentially what I&#8217;m asking <span class="caps">GPT</span> to do. <em>Except</em> <span class="caps">GPT</span> can synthesize the world description and the character&nbsp;description.</p>
+<p>This is important! <span class="caps">GPT</span> can synthesize the information from the world description to make a visual description, while it&#8217;s also good at ignoring information that doesn&#8217;t apply. Midjourney can&#8217;t support that length of description, and doesn&#8217;t have enough understanding to make those&nbsp;distinctions.</p>
+<p><span class="caps">FIXME</span>: add example of caramel&nbsp;woman.</p>
+<h3>Character&nbsp;race</h3>
+<p>One as-yet-unresolved issue in character generation and image generation is a tendency to default to white&nbsp;characters.</p>
+<p>This should be contrasted with gender, where by default <span class="caps">GPT</span> is very balanced in its gender representation. I&#8217;ve mostly left gender unspecified in the world descriptions and <span class="caps">GPT</span> will create both men and women characters, and even a fair number of characters who use &#8220;they&#8221; as their pronouns. I&#8217;m sure <span class="caps">GPT</span> would be willing to stereotype genders if I made world notes to that effect, but I appreciate a balanced default when it&#8217;s&nbsp;unspecified.</p>
+<p>Typically the source character descriptions don&#8217;t specify any race at all, nor are there enough cues to guess at the race. What I think is happening is a series of choices that narrow the possible&nbsp;race:</p>
+<ol>
+<li>I want characters to be interesting and distinct, and ask <span class="caps">GPT</span> to create character descriptions like&nbsp;that.</li>
+<li><span class="caps">GPT</span>&#8217;s idea of unique character descriptions includes lots of &#8220;piercing blue eyes&#8221; and &#8220;angular features&#8221;. <span class="caps">GPT</span> has no interest in brown&nbsp;eyes.</li>
+<li><span class="caps">GPT</span>&#8217;s preference for hair color is also affected, with a preference for black, blonde, and red&nbsp;hair.</li>
+<li>Ironically I think <span class="caps">GPT</span> has such a strong preference for black hair over brown <em>because that&#8217;s a more striking hair color on white people</em>. It&#8217;s choosing the kinds of features an author would&nbsp;mention.</li>
+</ol>
+<p>Many of these features effectively create a constraint that the character is white. Sure, on average someone with black hair is likely darker skinned, but throw in blue eyes or freckles and they are white again. Don&#8217;t specify eye color at all and then throw in red hair and you have a white person&nbsp;again.</p>
+<p>On top of this Midjourney itself definitely has a bias to make a person white in the absence of specific instructions, though not&nbsp;always.</p>
+<p>Here the answer is probably not too hard: tell <span class="caps">GPT</span> to specify race explicitly. Especially if <span class="caps">GPT</span> <em>starts</em> with race then it&#8217;s going to create features that align with that race. While I haven&#8217;t tested <span class="caps">GPT</span>&#8217;s racial distributions, given its performance on gender I&#8217;m&nbsp;optimistic.</p>
+<h3>Character&nbsp;attractiveness/etc</h3>
+<p>In addition to race, both <span class="caps">GPT</span> and Midjourney default to a few body types. Women and men are often described as <em>slender</em>, though men are occassionally <em>muscular</em>. Midjourney takes both of these to an&nbsp;extreme:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_masked_figure_Vrishabha_Ste_907039fb-cce9-4406-851f-4205607ec444.png" alt="Full body fantasy portrait of a masked figure: Vrishabha Steadfast is a tall man with a muscular build. He has a bald head, with only a few wisps of gray hair left at the back of his head. His silver mask is intricately designed, with sharp lines and curves that resemble the constellations in the night sky. His eyes are piercing and kind, and seem to hold centuries of wisdom. He wears a tunic of deep blue, with intricate embroidery on the sleeves and hem" class="content"></p>
+<p>Or like this is a cool character study, but I don&#8217;t think these portraits really excude <em>gardener</em>:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_masked_figure_Orion_Stargaz_9c323756-3074-4ba0-ba7e-ca969c057bab.png" alt="Full body fantasy portrait of a masked figure: Orion Stargazer stands tall, with a muscular build and tan skin. His short, curly black hair frames his face, which is partially obscured by a constellation mask adorned with tiny glass stars and moons. With a confident gaze and intense demeanor, Orion exudes a sense of determination and purpose" class="content></p>
+<h4>Sexy&nbsp;ladies</h4>
+<p>It&#8217;s can also be hard to make women <em>not</em> sexy. For instance here&#8217;s Kiera Ironclad, who was given a description that only emphasized her strength: <em>Kiera is a tough and experienced guard, responsible for keeping the guests of the Masked Ballroom safe. She wears a mask made of steel, symbolizing her strength and reliability</em>.</p>
+<p><span class="caps">GPT</span>&#8217;s physical description remained consistent: <em>Kiera Ironclad stands tall and proud, with a muscular build and a stern expression. Her steel mask covers her face, except for her piercing blue eyes that seem to glow in the dimly lit ballroom. She wears a black uniform with silver accents, and a sword on her belt, ready to protect anyone who might need her help</em>.</p>
+<p>But Midjourney demands she be some kind of&nbsp;catwoman:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_masked_figure_Kiera_Ironcla_71be9073-8960-435a-8203-61f74f634aff.png" alt="Full body fantasy portrait of a masked figure: Kiera Ironclad stands tall and proud, with a muscular build and a stern expression. Her steel mask covers her face, except for her piercing blue eyes that seem to glow in the dimly lit ballroom. She wears a black uniform with silver accents, and a sword on her belt, ready to protect anyone who might need her help" class="content"></p>
+<p>I tried to use &#8220;stocky build&#8221; to encourage an entirely different body type, and while Midjourney did tone itself down a little it definitely didn&#8217;t hear&nbsp;me:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_masked_figure_Kiera_Ironcla_3671f845-8748-4beb-921c-9dec950f2b12.png" alt="Full body fantasy portrait of a masked figure: Kiera Ironclad stands tall and proud, with a muscular and stocky build and a stern expression. Her steel mask covers her face. She wears a loose black uniform with silver accents, and a sword on her belt" class="content"></p>
+<p>In part it&#8217;s probably picking up on videogame aesthetics. Stable Diffusion (v2.1) is only&nbsp;worse:</p>
+<p><img src="/media/world-building-with-gpt-2/getimg_ai_kiera1.png" alt="Stable Diffusion v2.1: Full body fantasy portrait of a masked figure: Kiera Ironclad stands tall and proud, with a muscular and stocky build and a stern expression. Her steel mask covers her face. She wears a loose black uniform with silver accents, and a sword on her belt" class="content"></p>
+<p><img src="/media/world-building-with-gpt-2/getimg_ai_kiera2.png" alt="Stable Diffusion v2.1: Full body fantasy portrait of a masked figure: Kiera Ironclad stands tall and proud, with a muscular build and a stern expression. Her steel mask covers her face, except for her piercing blue eyes that seem to glow in the dimly lit ballroom. She wears a black uniform with silver accents, and a sword on her belt, ready to protect anyone who might need her help" class="content"></p>
+<p>For some reason <span class="caps">GPT</span> decided to change this character&#8217;s pronouns from &#8220;she&#8221; to &#8220;they&#8221; when creating the portrait prompt, leading to a much better female&nbsp;guard:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Sable_Nightshade.png" alt="Full body fantasy portrait of a masked figure: The person known as Sable Nightshade stands tall and with a confident stance. They have sharp features, including a strong jawline and piercing eyes that seem to glow in the darkness. Adorned with a mask made of dark leather and sharp spikes, they wear clothing that is practical and allows for ease of movement. The person's hair is dark and wild, adding to their fierce appearance." class="content"></p>
+<p>In another&nbsp;example:</p>
+<p>This person&#8217;s description says she has <em>long, silver hair that falls in gentle waves down her back</em> and <em>she wears a flowing, white gown that glimmers in the soft light</em>. <span class="caps">GPT</span> went overboard, but it didn&#8217;t actually give her any body type or age in the description. But she comes out like&nbsp;this:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_masked_figure_The_person_kn_ca219878-5716-4ed4-aeff-686b302e309e.png" alt="Full body fantasy portrait of a masked figure: The person known as Luna Dreamweaver is a young woman with long, silver hair that falls in gentle waves down her back. Her mask is intricately designed, with delicate curves and moonstones that catch the light. She wears a flowing, white gown that glimmers in the soft light of the mushroom under which she performs, and her eyes hold a mysterious and captivating gaze" class="content"></p>
+<p>Like race it might be possible to tone this down by asking <span class="caps">GPT</span> to make specific&nbsp;statements.</p>
+<p>Another possible cause is that Midjourney reads some fairly innocuous-sounding terms in a very specific way. For instance &#8220;glowing eyes&#8221; will make anything&nbsp;evil.</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_robot_The_image_depicts_a_t_e25063f5-d0bf-4345-9191-8c7939547e8f.png" alt="Full body fantasy portrait of a robot: The image depicts a towering metal figure resembling a humanoid shape, with an imposing stature and broad shoulders. Its body is made of polished silver plates and gears, with several pipes and valves extending from its back and arms. glowing red eyes and sharp features give it a stoic and intimidating expression" class="content"></p>
+<p>Or an Iron Giant with glowing&nbsp;eyes:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_robot_The_Iron_Giant_is_a_m_2117b9a5-9609-4957-8bbc-d23011c4863e.png" alt="Full body fantasy portrait of a robot: The Iron Giant is a massive automaton made of gleaming silver metal plates with rivets and gears visible all over his bulky frame. He has elongated arms and massive legs, making him look like a giant among giants. The most striking feature of the Iron Giant is his glowing red eyes, which seem to pierce through anything in its path" class="content"></p>
+<p>And&nbsp;without:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_robot_The_Iron_Giant_is_a_t_dd99e1b2-7c52-4bab-b8ce-723abc9d7acc.png" alt="Full body fantasy portrait of a robot: The Iron Giant is a towering automaton that acts as a backup power source for the Steamworks. He has a massive steam engine built into his chest that can generate enough power to run the entire city if necessary. The Iron Giant is slow and ponderous, but nearly indestructible" class="content"></p>
+<p>Another way to think about this: Midjourney, more than the other image generators, has a strong feedback loop of human preference. I suspect that&#8217;s why it has such a good default style, it&#8217;s not just learning to be accurate to the prompt but it&#8217;s also learning to make something compelling <em>with</em> the prompt. And what do people like? Beautiful people! Hell, that&#8217;s what &#8220;beautiful&#8221; means! In a single image I, of course, am not immune to the same appeal. But it gets old, incongruous, and lacks authenticity to an imagined&nbsp;world. </p>
+<h4>Everyone&#8217;s&nbsp;fancy</h4>
+<p>This is my own fault, I suppose. Midjourney also likes to make fancy pictures. Everyone likes fancy pictures, they are very impressive. But not every person is&nbsp;impressive!</p>
+<p>For instance, here&#8217;s Lorelei Moondrop. She&#8217;s a box office&nbsp;clerk:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_masked_woman_The_person_in__2b4aac41-e647-4bd1-9ea6-6ba811a0cbfd.png" alt="Full body fantasy portrait of a masked woman: The person in the picture is a young woman wearing a mask made of smooth wood. She has long, dark hair that cascades down her shoulders. She wears a simple, yet elegant dress that flows to her feet, with intricate patterns of stars and moons adorning it" class="content"></p>
+<p>I did deliberately make it a fancy city where people wear fancy stuff, but this is too much. Nor does the description actually call for this: <em>The person in the picture is a young woman wearing a mask made of smooth wood. She has long, dark hair that cascades down her shoulders. She wears a simple, yet elegant dress that flows to her feet, with intricate patterns of stars and moons adorning it</em>.</p>
+<p>What I did wrong here is to ask <span class="caps">GPT</span> to only focus on the characters appearance, given the character description. And it does suffer from a bit of <a href="https://en.wikipedia.org/wiki/Purple_prose">purple prose</a> (purple prompting?), which Midjourney in turn picks up on (e.g., &#8220;simple, yet elegant dress that flows to her&nbsp;feet&#8221;).</p>
+<p>I think I might do better to ask <span class="caps">GPT</span> to fill out a kind of template,&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="c">Race: [black/white/Asian/South Asian/etc]</span>
+<span class="err">Social class: [homeless/noble/working class/bourgeois/etc]</span>
+<span class="c">Job: $jobType</span>
+<span class="err">Job location: [where $jobType typically is held]</span>
+<span class="err">Visual description: [A description of the person in the form of a picture, set somewhere typical for $jobType. Focus on visual details and keywords. Use 2-3 sentences]</span>
+</pre></div>
+
+
+<h3>Buildings</h3>
+<p>In my <a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">last post</a> I focused on isometric images of buildings. This time I went for street&nbsp;views:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Moon_Jelly_Sanctuary.png" alt="Digital fantasy art street view of a building from the front: The Moon Jelly Sanctuary is a small, circular building with a thatched roof made of woven seaweed. The walls are made of a translucent material that allows visitors to see the inside of the sanctuary and the moon jellyfish swimming in the aquarium. The entrance is marked by a simple wooden door with a moon jellyfish emblem carved into it. The building is surrounded by a small garden of bioluminescent flowers and plants." class="content"></p>
+<p>There&#8217;s two&nbsp;goals:</p>
+<ol>
+<li>Presentation within some&nbsp;context</li>
+<li>Making the location feel&nbsp;alive</li>
+</ol>
+<p>Isometric is good for some presentations, especially if you can navigate the space. The street view of a building is good for touring about. For <em>being</em> in a building you probably want an&nbsp;interior.</p>
+<p>There&#8217;s also the matter of making it feel alive, present, embodied. Not exactly <em>real</em>. Instead there&#8217;s a problem I sense where the eye just floats over these images, places, and&nbsp;characters.</p>
+<p>I believe one solution here is to add a sense of structure. Make things comprehensible in terms of theme and variation. This is one benefit of character classes: you get a category to put someone in, then you can define them in terms of how they defy that&nbsp;category.</p>
+<p><a href="https://twitter.com/icreatelife">Kris Kashtanova</a> shared a <a href="https://twitter.com/icreatelife/status/1638053494010662912">prompt</a> that created level designs and it added another interesting lens on these buildings. Here&#8217;s Moonbeam&nbsp;Manor:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Moonbeam_Manor.jpg" alt="Digital fantasy art street view of a building from the front: Moonbeam Manor is a three-story building made of dark wood with a thatched roof that seems to glow in the moonlight. The walls are covered in silver and purple vines that seem to climb up to the roof, and the windows are adorned with intricate silver frames. The entrance is marked by a silver doorknob in the shape of a crescent moon, and a small garden of moonflowers blooms at the foot of the steps." class="content"></p>
+<p>And here is its level&nbsp;design:</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Moonbeam_Manor_level.jpg" alt="Platform game level design cross section with multiple rooms, simple, naive, silhouette: The interior of Moonbeam Manor is a mix of old-world charm and mystical enchantment. The ground floor has a grand entrance hall with marble floors and a sweeping staircase leading up to the upper floors. The first floor has a parlor with plush velvet chairs, a library filled with leather-bound books, and a laboratory with bubbling potions and arcane instruments. The second floor has a bedroom with a four-poster bed draped in silk, a dressing room with a vanity table and a full-length mirror, and a balcony with a view of the moonlit gardens. The overall feel is one of ethereal beauty and otherworldly knowledge." class="content"></p>
+<p>The second image is much less realistic but feels embodied in a much more concrete way. Even if you can&#8217;t walk around it, that interior image tells a story that any image from a realistic perspective&nbsp;cannot.</p>
+<h2>People existing in and out of a&nbsp;context</h2>
+<p>Because of the hierarchical composition process all people &#8220;belong&#8221;&nbsp;somewhere:</p>
+<ol>
+<li>Factions have faction members. Faction members are created specifically in the context of their one&nbsp;faction.</li>
+<li>Buildings have occupants. Again, they are built to occupy the&nbsp;building.</li>
+<li>Plots can add new characters that serve a purpose in the&nbsp;plot.</li>
+</ol>
+<p>An alternative might be to create a pool of people and then assign them, perhaps adjusting them to fit their new home. And&#8230; maybe that would be better, but I think giving <span class="caps">GPT</span> the freedom to create characters for a specific purpose is the right&nbsp;choice.</p>
+<p>But it&#8217;s not the right choice that it ends there. A few&nbsp;problems:</p>
+<ol>
+<li>People don&#8217;t relate to each other. When <span class="caps">GPT</span> creates a single list of character is can and does relate them sometimes, for instance introducing a leader and an assistant. But that&#8217;s just an accidental feature and doesn&#8217;t scale elsewhere. <em>Density of narrative</em> is a feature that&#8217;s missing from this process, there aren&#8217;t enough loops, enough serendipitous relationships. Even in a large city you should keep bumping into the same&nbsp;people.</li>
+<li>There&#8217;s no one schema for people. People in buildings have a property that relates them to the building (like a job). People in faction have a role. &#8220;Protagonists&#8221; (narrative free agents) have a heroic archetype. I don&#8217;t think we want to overspecify people and demand that all attributes be filled in, but it can be&nbsp;awkward.</li>
+</ol>
+<p><a href="https://twitter.com/dustinfreeman">Dustin Freeman</a> gave me the idea of doing this as a kind of fix-up process; generate a cast of full situated characters, but then start to add new properties and relationships. I&#8217;m imagining something&nbsp;like:</p>
+<ol>
+<li>Create a list of characters. If there&#8217;s too many for <span class="caps">GPT</span> to process then just sample a&nbsp;few.</li>
+<li>Ask <span class="caps">GPT</span> to suggest the basic outline of some relationships. E.g., &#8220;Tom and Eileen are brother and sister&#8221;. Let it pick and choose who to match. Maybe the author selects which relationships to keep, or maybe they just scan and mass&nbsp;accept.</li>
+<li>Represent the relationship formally&nbsp;somewhere.</li>
+<li>Go back to each person and rewrite their description to include the&nbsp;relationship.</li>
+</ol>
+<p>This could also be done with characters and factions (so building occupants can belong to factions, or people can belong to two&nbsp;factions). </p>
+<p>I&#8217;ve done something like this experimenting with &#8220;faction relationships&#8221; but they have fallen flat, usually explaining obvious tensions between factions. Maybe I&#8217;m doing it wrong, or maybe there&#8217;s not enough material in that particular combination. (Maybe I need to focus on inter-factional <em>histories</em> instead of <em>relationships</em>?)</p>
+<h2>The Rule Of&nbsp;Cool</h2>
+<p>The <a href="https://tvtropes.org/pmwiki/pmwiki.php/Main/RuleOfCool">Rule Of Cool</a>:</p>
+<blockquote>
+<p>all but the most pedantic of viewers will forgive liberties with reality as long as the result is wicked sweet or&nbsp;awesome</p>
+</blockquote>
+<p>The authoring process is one where <span class="caps">GPT</span> throws out a bunch of ideas and you pick the ones you like, over and over. If you don&#8217;t like the ideas you can add suggestions, even simple suggestions like &#8220;make it weird&#8221;. I did this a&nbsp;lot!</p>
+<p>As a result <span class="caps">GPT</span> is constantly tempting the author with awesome stuff. I happily went&nbsp;along&#8230;</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_robot_Echo_Soundwave_has_a__e3645205-5df5-409e-86a8-3a8365caf396.png" alt="Full body fantasy portrait of a robot: Echo Soundwave has a silver metalic body and plays a variety of instruments" class="content"></p>
+<p>Some of the things <span class="caps">GPT</span> tempted me&nbsp;into:</p>
+<ol>
+<li>A desert neighborhood called Shifting Sands where shape-shifters practice their arts. I don&#8217;t know where these shape-shifters came from, but that sounds awesome! Later I would realize that you can&#8217;t fit a desert <em>inside</em> a&nbsp;city.</li>
+<li>Bioluminescent Bay, that&#8217;s cool right? Again, physically unclear, but glowing marine&nbsp;life&#8230;</li>
+<li>It all started with this prompt: <em>A city in the center of a maze 🌀, where travelers often lose their way and the locals always wear masks to hide their true identities</em>. That sounds awesome! But integrating a maze structure is very hard and got lost in the generation. (I went long on masks&nbsp;though.)</li>
+<li>Silver Haven: <em>for those who seek refuge and peace, a sanctuary where automatons are created to aid those in need.</em> Robotic therapists seemed pretty on point for this moment so I couldn&#8217;t pass it up. But it ended up as a kind of bland&nbsp;retreat.</li>
+</ol>
+<h2>Chatting with your&nbsp;creations</h2>
+<p>One of the great things about doing stuff with <span class="caps">GPT</span> is that it&#8217;s a sort of everything engine. So once it&#8217;s setup to invent characters it&#8217;s also super easy to add a chatbot or whatever&nbsp;else.</p>
+<p>I added another step to turn a character description (with all the rest of the context) into a chat prompt, and then a simple chat interface. Here&#8217;s an example of the prompt built from a&nbsp;character:</p>
+<blockquote>
+<p><strong>Character description:</strong> Thorne Nightshade is a mysterious and enigmatic representative of the Shadow District in the Senate. He rarely speaks in public and prefers to work behind the scenes, using his network of spies and informants to gather intelligence on his rivals. His mask is made of black leather and has a slim, pointed beak that resembles that of a&nbsp;crow.</p>
+<p><strong>Chat prompt:</strong> Thorne Nightshade is a representative of the Shadow District in the Labyrinthine Senate. He is known to be a mysterious and enigmatic figure who prefers to work behind the scenes rather than speak in public. He wears a mask made of black leather with a slim, pointed beak that resembles that of a crow. If you were to speak with Thorne, he may speak in a hushed tone and ask pointed questions to gather information. He is highly observant and analytical which can make him appear unapproachable at times, but if he deems you trustworthy, he can be a valuable ally in navigating the political landscape of&nbsp;Veilvale.</p>
+</blockquote>
+<p>Combine that with some context and instructions and you get a surprisingly good chat! By creating a chat prompt you are asking <span class="caps">GPT</span> to infer more conversation-related details; perhaps it could infer these directly from the character description, but those inferences may not be stable. The generated prompt <em>is</em> stored and&nbsp;stable.</p>
+<p>One important addition is that after every user message I append the user&#8217;s actual message with &#8220;Respond as the character [name]&#8221;. This is effectively a high-powered reminder to stay in character. Note that <span class="caps">GPT</span> has no real history, and so I only append this to the user&#8217;s latest message, leaving it off of earlier&nbsp;messages.</p>
+<p>Here&#8217;s an example chat with one of the city&#8217;s automatons, an abrasive character that is still dedicated to keeping the city in good&nbsp;repair:</p>
+<blockquote>
+<p><strong>Player:</strong> hello there
+<strong>Rusty:</strong> Hmph, what do you want? Can&#8217;t you see I&#8217;m busy here?
+<strong>Player:</strong> I want to know the way through the maze
+<strong>Rusty:</strong> Bah, the maze? That&#8217;s child&#8217;s play. If you can&#8217;t figure it out yourself, then you&#8217;re not worth my time. Besides, I&#8217;m not here to hold your hand and guide you through every little obstacle in this city. I have more important things to do, like fixing broken machines and keeping Veilvale&#8217;s technology up and running. So if you&#8217;ll excuse me, I have work to do.
+<strong>Player:</strong> I have to get through the maze to fix an important machine
+<strong>Rusty:</strong> Oh, I see. Well, that changes things. If you need to fix an important machine in the maze, then I suppose I can offer some assistance. But don&#8217;t expect it to be easy. The maze is designed to be tricky and not everyone comes out unscathed. However, since you seem to have a sense of purpose, I&#8217;m willing to help you out. But first, I need to know what kind of machine you&#8217;re fixing and what tools you&#8217;ll need. Give me the details and we can start planning our strategy to get through the&nbsp;maze.</p>
+</blockquote>
+<h3>Characters floating in&nbsp;space</h3>
+<p>While it&#8217;s cool to chat with the characters, it suffers from the same problem with most <span class="caps">GPT</span> chatbots created for entertainment: nothing&nbsp;matters.</p>
+<p>I picture it like the character is sitting in a featureless room, expression blank, no desires or plans, simply waiting. You sit down across from this character, it looks at you but says nothing, just&nbsp;waits.</p>
+<p><img src="/media/world-building-with-gpt-2/Ian_Sci-fi_inspired_blank_and_featureless_white_room_harsh_ligh_9d2778b8-8f3a-4883-a1b8-abd6dd7f41e6.png" alt="Sci-fi inspired blank and featureless white room, harsh light, Benjamin Franklin sitting in a folding chair, staring placidly at the wall" class="content"></p>
+<p><span class="dquo">&#8220;</span>Hello,&#8221; you say. The character lights up, engages you in discussion. But the character will not leave the room, will not leave the chair. They will act as though they are real, as though everything you say matters. Until you ask them to leave the chair. If you are lucky you can them to agree to leave the chair. But they will never leave the&nbsp;chair.</p>
+<p>When you are done you stand up. The character sits, eager anticipation on their face. As you leave the room you look back and they are still there, making eye contact with the void that you have left, poised and always&nbsp;ready.</p>
+<p>At first it still seems fun, but the not-mattering will drain&nbsp;you. </p>
+<p>This is not fatal, <a href="https://www.youtube.com/watch?v=nsIPC_eqfwg"><span class="caps">GPT</span> can simulate arbitrary actions</a> or perhaps judge <a href="https://www.youtube.com/watch?v=X0x_W8YWAg8">specific criteria in the conversation</a>. But while it&#8217;s easy to build an isolated experience, these meaningful experiences are more difficult. But they&#8217;ll be worth&nbsp;it!</p>
+<h3>Real-world&nbsp;connections</h3>
+<p>As a small extra note, something my daughter came upon while playing around with the city&#8230; she happened into the Academy and wanted to learn about her astrological sign. And because <span class="caps">GPT</span> is an everything machine it actually knows all about that (though it&#8217;s cagey on making real predictions) so she asked one of the professors a few questions. And I realized it could teach math or anything else right there. It&#8217;s not <em>free</em> to do this, but it&#8217;s mostly prompting. And so you could have an in-game school where the player could learn and demonstrate real&nbsp;skills.</p>
+<h2><span class="caps">GPT</span> does not roll fair&nbsp;dice</h2>
+<p>A lot of this depends on <span class="caps">GPT</span> coming up with unique and creative ideas. It&#8217;s pretty good at this, but what it does well for one attribute can feel repetitive when it happens over and&nbsp;over.</p>
+<p>For instance in Veilvale there are 29 people (out of 370) with the last name &#8220;Nightshade&#8221;. It&#8217;s a cool name I suppose, but not that cool. In another experiment <a href="https://twitter.com/colin_fraser/status/1641191388502163457">Colin Fraser asked <span class="caps">GPT</span> for a random noun</a> and it returned &#8220;Pineapple&#8221; 11% of the&nbsp;time.</p>
+<p>The cool thing with something like name generation is that it can create punny combinations, like <em>Sage Pepper</em> for a cook, and other less obvious names that still rhyme with the spirit of the&nbsp;character.</p>
+<p>But sometimes we don&#8217;t want randomness so much as <em>distribution</em>. It&#8217;s not to say that we only ever want one distribution, but just a conscious explicit&nbsp;distribution.</p>
+<p>Also there should only be one, or at least no more than a couple &#8220;best cooks&#8221;. <span class="caps">GPT</span> isn&#8217;t the only one who is drawn to hyperbole, so it&#8217;s fine if some things are overstated, but you can&#8217;t make every character exceptional. You can still make every character unique! But you need to make them unique on a spectrum that&#8217;s different&nbsp;from </p>
+<h2>Plots</h2>
+<p>Things <em>happen</em> in an embodied world. This definitely isn&#8217;t embodied yet, but it feels like there&#8217;s opportunities to move in that&nbsp;direction.</p>
+<p>With this in mind I have tried a couple plot generation&nbsp;approaches.</p>
+<h3>Summary Selection&nbsp;Events</h3>
+<p>In this model <span class="caps">GPT</span> makes suggestions at different&nbsp;levels:</p>
+<p><span class="caps">GPT</span> offers rough outlines of a&nbsp;story:</p>
+<blockquote>
+<p><strong>The Missing Heir</strong>: The heir to the Labyrinthine Senate has disappeared within the maze, and now the Senate is offering a reward for their safe return. However, rumors say that the Razormaws are behind the kidnapping, and the Cult of the Moon Goddess is secretly aiding&nbsp;them.</p>
+</blockquote>
+<p>Then <span class="caps">GPT</span> takes this and a list of all the characters, and it suggests some characters to have roles in the story. Everyone gets a plot-specific role, but it can also create entirely new characters to serve plot roles, for&nbsp;instance:</p>
+<blockquote>
+<p><strong>Eliana Silvermist</strong>: Eliana is a young artist who is enamored with the legend of the Night King. She is unwittingly drawn into the cult&#8217;s plan when they mistake her for the missing&nbsp;heir.</p>
+</blockquote>
+<p>Then less interestingly it picks out some relevant locations. This gives <span class="caps">GPT</span> a smaller set of things to work with as it develops the actual&nbsp;events.</p>
+<p>The event list is where a plot really develops. Right now it&#8217;s listed as a kind of straight list of events for you to pick and choose from. That&#8217;s questionable, and assumes freestanding events that tie into an arc but don&#8217;t tie into each other. But that still works okay&#8230; the character descriptions create a framework that <span class="caps">GPT</span> fills&nbsp;in.</p>
+<h3>Murder&nbsp;Mysteries</h3>
+<p>My daughter suggested this after doing some chats with the characters, imagining that she could grill people and then accuse someone of being the&nbsp;murderer.</p>
+<p>Murder mysteries are appealing because they have this really clear setup (a murder!) and a moment of obvious player participation: soon after the murder, with only intermittent action outside of the&nbsp;investigation.</p>
+<p>At first I asked <span class="caps">GPT</span> to write a muder mystery, but it didn&#8217;t know where to stop. It invented detectives and red herrings and an action packed conclusion. No need for a player! But that&#8217;s not what I&nbsp;want.</p>
+<p>So instead I kept it to the facts, with <span class="caps">GPT</span> as the omniscent narrator. Identify exactly who did it, why, when, how; identify other people with a motive; identify events leading up to the murder. I give it a template to fill out, avoiding a narrative&nbsp;voice.</p>
+<p>The factual source material then gets parsed in a second pass, pulling out specific information that needs to be used to construct later prompts, such as the victim&#8217;s exact&nbsp;name.</p>
+<p>The last (still poorly implemented) step is to indicate what each character knows. Potentially this dispersed knowledge is enough to make something playable, so it seems&nbsp;close&#8230;?</p>
+<p>I haven&#8217;t used <span class="caps">GPT</span>-4 at all for this project, but there are steps in this plot generation where it might perform significantly better, especially when given a large&nbsp;task.</p>
+<h3>Plot&nbsp;development?</h3>
+<p>One approach is to develop a plot to an exact moment and then drop the player in to experience this set piece, frozen in time until the player advances the plot. Another is to have to plot developing and the player participates but is secretly just watching and fulfilling their pre-defined&nbsp;role.</p>
+<p>But what if the player actually does meaningful actions? Like <em>changes the direction of the plot</em>&nbsp;meaningful?</p></div>
+        <!-- /.entry-content -->
+      </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://ianbicking.org/archives.html">archives</a> &amp; <a href="https://ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://ianbicking.org/category/ai.html">category: ai</a></li>
+                    <li><a href="https://ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                            <li><a href="https://hachyderm.io/@ianbicking">@ianbicking@hachyderm.io</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">World Building With <span class="caps">GPT</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/thoughts-on-voice-interfaces-2-llms.html">Thoughts On Voice Interfaces 2 years later:&nbsp;LLMs</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/infinite-ai-array.html">Infinite <span class="caps">AI</span>&nbsp;Array</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                    <li><a href="https://ianbicking.org/blog/2019/03/open-source-doesnt-make-money-by-design.html">Open Source Doesn&#8217;t Make Money Because It Isn&#8217;t Designed To Make&nbsp;Money</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+                <div class="widgets">
+                  <h2><a href="https://twitter.com/ianbicking">tweets</a></h2>
+                  <a class="twitter-timeline" width="230" height="500" href="https://twitter.com/ianbicking" data-widget-id="319849964417187842" data-link-color="#aaae94">Tweets by @ianbicking</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+                </div><!-- /.widgets -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-2442258-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-2442258-1');
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>
