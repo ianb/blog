@@ -281,6 +281,11 @@ Time: 10&nbsp;days</p>
 </ol>
 <p>This could also be done with characters and factions (so building occupants can belong to factions, factions can own buildings, or people can belong to two&nbsp;factions). </p>
 <p>I&#8217;ve done something like this experimenting with &#8220;faction relationships&#8221; (like, inter-faction squabbles) but it falls flat, usually explaining obvious tensions between factions. Maybe I&#8217;m doing it wrong, or maybe there&#8217;s not enough material in that particular combination. (Maybe I need to focus on inter-factional <em>histories</em> instead of <em>relationships</em>?)</p>
+<h2><span class="caps">GPT</span> 3.5 vs <span class="caps">GPT</span>&nbsp;4</h2>
+<p>The tool is built to default to use <span class="caps">GPT</span>-3.5 (the gpt-3.5-turbo <span class="caps">API</span>) for all requests. Lots of people are jumping on <span class="caps">GPT</span>-4, and I&#8217;ve now done some work with both, including places where 3.5 definitely wasn&#8217;t sufficient for the task. But here I&#8217;m quite happy with <span class="caps">GPT</span>-3.5.</p>
+<p>My general intuition is that <span class="caps">GPT</span>-4 is able to connect information across greater distances and to simultaneously follow a larger number of directions. This does come up, instructions can get lost as they accumulate. I think there&#8217;s ways to solve that with 3.5, such as refining generic/universal instructions to just those applicable to certain domains. For instance some instructions only apply to buildings (like building material), others only to character generation (like demographics) and so&nbsp;on.</p>
+<p>The overall development pattern for <span class="caps">GPT</span>-4 might also be different than 3.5. There&#8217;s a lot of architecture that is there implicitly to keep down the size of any one prompt and response. With <span class="caps">GPT</span>-4 it may be possible to accomplish much more in one prompt, both because of a greater confidence in the output and because it&#8217;s able to handle more complexity in the&nbsp;request.</p>
+<p>That said, <span class="caps">GPT</span>-3.5 is pretty great and I&#8217;m reluctant to just switch to something that&#8217;s&nbsp;bigger/better/slower/more-expensive.</p>
 <h1><span id="declarative">A declarative approach to&nbsp;building</span></h1>
 <p>Inside the spaghetti code of City Maker was a much simpler idea waiting to come out, and this version is a complete rewrite of the previous code. I gave it the name <a href="https://llm.ianbicking.org/layercraft/">LayerCraft</a> with <a href="https://github.com/ianb/llm-garden/blob/main/src/layercraft/citymakerschema.js">City Maker as a schema</a>. I don&#8217;t know yet how widely applicable this approach is, but it feels like it&#8217;s touching on patterns will be relevant for&nbsp;LLMs.</p>
 <p>I&#8217;ll try to explain it concretely using a&nbsp;city:</p>
@@ -334,17 +339,23 @@ Respond with a JSON list like:
 <p>If we turn back to <span class="caps">GPT</span> again to solve this we&#8217;ll need meta-prompts: descriptions of what the prompt needs to accomplish, and its constraints, so that <span class="caps">GPT</span> can apply natural-language edits to the prompts while maintaining the required&nbsp;structure.</p>
 <h2><span id="planning">Planning <span class="amp">&amp;</span>&nbsp;action</span></h2>
 <p>While this is author-focused, I think the choices that <span class="caps">GPT</span> produces should be thought of as <em>proposed plans</em>. In City Maker it&#8217;s offering plans for how to build out a world. The author chooses options (and edits and makes notes on options) to guide, correct, and expand on what <span class="caps">GPT</span> produces on its&nbsp;own.</p>
-<p>If <span class="caps">GPT</span> was producing code that&#8217;s also a plan. Sometimes you can build plans on plans, i.e., build more code just by looking at existing code. But often you need the output of that code to keep going. Or you need feedback, refinement,&nbsp;etc. </p>
-<p>I think you could interpret ChatGPT with plugins as a form of this, with a linear approach to interaction and without prompt&nbsp;templates.</p>
-<h1><span id="fine-tuning">I&#8217;m glad fine tuning is dead (for like a&nbsp;month)</span></h1>
-<p>It&#8217;s tempting with these problems to think about &#8220;fine tuning&#8221; a model. That&#8217;s how <span class="caps">AI</span> has worked for a long time, and it feels like a good way to approach issues with reliability or ever-growing prompts that grow little instructions and&nbsp;caveats.</p>
-<p>For now that option is off the table if you are using the gpt-3.5-turbo (what this uses) or gpt-4 APIs, which are chat-based and offer no finetuning. This probably won&#8217;t last for long, but <em>right now</em> you&#8217;ll almost always get better (cheaper, faster, more flexible) results by using these new models and forgoing fine&nbsp;tuning.</p>
+<p>If <span class="caps">GPT</span> was producing code instead of options that&#8217;s also a plan. Sometimes you can build plans on plans, i.e., build more code just by looking at existing code. But often you need the output of that code to keep going. Or you need feedback, refinement, etc. I think there could be a&nbsp;pattern:</p>
+<ol>
+<li>The author <em>specifies</em> the&nbsp;goal</li>
+<li><span class="caps">GPT</span> <em>proposes</em> up to the limits of that&nbsp;specification</li>
+<li>The author <em>previews the&nbsp;results</em></li>
+<li>The author <em>adjusts, selects, refines</em> the results, perhaps through choice, through dialog (chat), refined specification,&nbsp;etc</li>
+<li>The choices are <em>committed</em>, expanding the&nbsp;specification</li>
+<li>Any unresolved actions can be taken, code run, output collected,&nbsp;etc</li>
+<li>Repeat at&nbsp;2</li>
+</ol>
+<p>Unfortunately this doesn&#8217;t cover revision, as mentioned in the previous section, and I don&#8217;t know exactly what adding that to the loop would look&nbsp;like.</p>
+<h2><span id="fine-tuning">I&#8217;m glad fine tuning is dead (for like a&nbsp;month)</span></h2>
+<p>It&#8217;s tempting with these problems to think about &#8220;fine tuning&#8221; a model. That&#8217;s how <span class="caps">AI</span> has worked for a long time, and it feels like a good way to approach issues with reliability or ever-growing prompts that keep adding little instructions and&nbsp;caveats.</p>
+<p>For now the fine-tuning option is off the table if you are using the gpt-3.5-turbo (what this uses) or gpt-4 APIs, which are chat-based and offer no finetuning. This probably won&#8217;t last for long, but <em>right now</em> you&#8217;ll almost always get better (cheaper, faster, more flexible) results by using these new models and forgoing fine&nbsp;tuning.</p>
 <p>This is the future I want to see! Everything I&#8217;ve described here <em>is not compatible with fine tuning</em>. You can&#8217;t edit prompts and make sophisticated adjustments when the instructions are in the tuned model&nbsp;weights!</p>
-<p><strong>Prompting is artisanal <span class="caps">AI</span></strong>. If you know a something about a subject, and want to use that knowledge and your own sweat to iterate on a prompt, the sky&#8217;s the limit. <span class="caps">OK</span>, not true: right now tooling is the limit, but prompt-focused tools can give people new agency on a very individual level. I&#8217;m developing both sides of LayerCraft and still empowered by this&nbsp;abstraction.</p>
-<p>Lots of people are all like <em>blah blah blah, what about a moat, how do you differentiate yourself?</em> Sorry, that sounds like a you problem. Me, I want to make cool things, and hopefully empower other people to make cool things. There&#8217;s a kind of thought that is addicted to consuming people rather than empowering&nbsp;them.</p>
-<h2><span class="caps">GPT</span> 3.5 vs <span class="caps">GPT</span>&nbsp;4</h2>
-<p>The tool is build to default to use <span class="caps">GPT</span> 3.5 (gpt-3.5-turbo <span class="caps">API</span>) for all requests. Lots of people are jumping on <span class="caps">GPT</span>-4, and I&#8217;ve now done some work with both, including places where 3.5 definitely wasn&#8217;t sufficient for the task. But here I&#8217;m quite happy with <span class="caps">GPT</span>&nbsp;3.5.</p>
-<p>My general intuition is that <span class="caps">GPT</span> 4 is able to&nbsp;connect </p>
+<p><strong>Prompting is artisanal <span class="caps">AI</span></strong>. If you know a something about a subject, and want to use that knowledge and your own sweat to iterate on a prompt, there is tremendous potential in prompt design. Prompt design isn&#8217;t enough right now because tooling is still limited, but prompt-focused tools can give people new agency on a very individual level. I&#8217;m developing both sides of LayerCraft (the tool and the prompts) and I still feel empowered by this&nbsp;abstraction.</p>
+<p>When proposing prompt-focused functionality lots of people are all like <em>blah blah blah, what about a moat, how do you differentiate yourself?</em> Sorry, that sounds like a you problem. Me, I want to make cool things, and hopefully empower other people to make cool things. There&#8217;s a kind of thought that is addicted to consuming people rather than empowering them. Empowered people don&#8217;t lay down and play the part of your&nbsp;moat.</p>
 <h1><span id="conclusion">Conclusion</span></h1>
 <p>It&#8217;s hard to conclude this because this is just one step along the way. (To where?) Some things that stand out to&nbsp;me:</p>
 <ul>
@@ -361,7 +372,7 @@ Respond with a JSON list like:
 <p>If you&#8217;ve gotten this far I will also throw in here that I (<a href="https://ianbicking.org">Ian</a>) am looking for&#8230; something. A &#8220;job&#8221; doesn&#8217;t seem like quite the right description. Collaborators for the future? <a href="mailto:ianbicking@gmail.com">Let me know if you have ideas</a>, <a href="https://www.linkedin.com/in/ianbicking/">or hit me up on LinkedIn</a> I would appreciate&nbsp;it!</p>
 <script>
 
-    let els = Array.from(document.querySelector("img.content"));
+    let els = Array.from(document.querySelectorAll("img.content"));
     console.log("found images", els);
     let activeEl;
     let overlay;
