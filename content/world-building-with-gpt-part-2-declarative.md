@@ -514,7 +514,7 @@ If you want to try this yourself check out [llm.ianbicking.org](https://llm.ianb
 
 Similarly: when using the site be warned I have not built it carefully for other people to use, stuff will be weird, errors will appear only in the JS Console, there are no promises. And you'll have to bring your own GPT API key!
 
-Comments welcome on [Mastodon]() or [Twitter]().
+Comments welcome on [Mastodon](https://hachyderm.io/@ianbicking/110141107480811400) or [Twitter](https://twitter.com/ianbicking/status/1643265359967924226).
 
 If you've gotten this far I will also throw in here that I ([Ian](https://ianbicking.org)) am looking for... technically I'm looking for a "job", but that doesn't seem quite right. Collaborators for the future? [Let me know if you have ideas](mailto:ianbicking@gmail.com), [or hit me up on LinkedIn](https://www.linkedin.com/in/ianbicking/) I would appreciate it!
 

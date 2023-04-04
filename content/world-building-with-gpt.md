@@ -11,6 +11,8 @@ I've been doing lots of experiments with GPT, though I've only [written about on
 
 This post is for people who are interested in building interactive tools on top of GPT and want to see some of the things I've encountered and what I've found that is successful and what is still a challenge.
 
+**Note:** Also check out my followup post: [World Building with GPT part 2: bigger, better, more declarative](https://ianbicking.org/blog/2023/04/world-building-gpt-2-declarative.html)
+
 # Where it started
 
 I enjoy game worlds where the world seems alive and the details suggest a backstory. The real world both is and isn't this way: every house has stories, people invested in its details, each building is occupied and reoccupied repeatedly. But our world is also quiet, private, less eccentric than we might want, and imaginary worlds can be fun. Procedurally generated roguelike games give some of the excitement of exploration but lack story and depth. A game like Stardew Valley has stories but is necessarily pretty small and static.
