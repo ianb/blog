@@ -41,11 +41,50 @@
         </header>
 
         <div class="entry-content"><p>In my <a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">last post</a> I described a city builder using <span class="caps">GPT</span>. I was planning on putting a pin in that work with the post, but the heart wants what the heart wants and I found myself returning to that&nbsp;work.</p>
-<p>In this post I&#8217;ll talk about <a href="#images">generating images from the source material</a>, some more about the <a href="#authoring">authoring experience</a>, <a href="#chatting">chatting with your characters</a>, <a href="#plots">creating plots</a>, and the <a href="#declarative">move to a more declarative implementation</a>.</p>
+<p>In this post I&#8217;ll talk about <a href="#images">generating images from the source material</a>, <a href="#chatting">chatting with your characters</a>, <a href="#plots">creating plots</a>, some more about the <a href="#authoring">authoring experience</a>, and the <a href="#declarative">move to a more declarative implementation</a>.</p>
 <p>To get an idea of how this works here&#8217;s a&nbsp;video:</p>
 <iframe style="width: 100%; aspect-ratio: 16/9; display: block" src="https://www.youtube.com/embed/4DEibveZ-n8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 <p>As a demonstration of the tool I&#8217;ve created <a href="https://veilvale.ianbicking.org/">Veilvale</a>, a fantastical city powered by esoteric magic and a populace where everyone wears a mask as their identity. It has over 280 characters, 70 buildings and landmarks, and 450 images. I specifically mention its size because while it wasn&#8217;t <em>easy</em> to build, it also wasn&#8217;t that hard and I reached a level of completion that exceeds any other worldbuilding project I&#8217;ve&nbsp;attempted.</p>
+<h2>Table of&nbsp;contents</h2>
+<ol>
+<li><a href="#images">Generating images</a><ol>
+<li><a href="#contextualizing">Contextualizing&nbsp;descriptions</a></li>
+<li><a href="#character-race">Character&nbsp;race</a></li>
+<li><a href="#character-attractiveness">Character attractiveness</a><ol>
+<li><a href="#beautiful">Lots of beautiful&nbsp;ladies</a></li>
+<li><a href="#fancy">Everyone&#8217;s&nbsp;fancy</a></li>
+</ol>
+</li>
+<li><a href="#buildings">Buildings</a></li>
+</ol>
+</li>
+<li><a href="#chatting">Chatting with your creations</a><ol>
+<li><a href="#characters-floating">Characters floating in&nbsp;space</a></li>
+<li><a href="#extending-chat">Chatting about&#8230;&nbsp;anything</a></li>
+</ol>
+</li>
+<li><a href="#plots">Plots</a><ol>
+<li><a href="#summary-selection">Building plots with: summary, selection,&nbsp;events</a></li>
+<li><a href="#murder-mysteries">Murder&nbsp;Mysteries</a></li>
+</ol>
+</li>
+<li><a href="#authoring">The authoring process</a><ol>
+<li><a href="#rule-of-cool">The Rule Of&nbsp;Cool</a></li>
+<li><a href="#gpt-dice"><span class="caps">GPT</span> does not roll fair&nbsp;dice</a></li>
+<li><a href="#people-context">People existing in and out of a&nbsp;context</a></li>
+<li><a href="#gpt-3-4"><span class="caps">GPT</span> 3.5 vs <span class="caps">GPT</span>&nbsp;4</a></li>
+</ol>
+</li>
+<li><a href="#declarative">A declarative approach to building</a><ol>
+<li><a href="#updates-dependencies">Updates and&nbsp;dependencies</a></li>
+<li><a href="#meta-prompting">Getting meta in the&nbsp;prompt</a></li>
+<li><a href="#planning">Planning <span class="amp">&amp;</span>&nbsp;action</a></li>
+<li><a href="#fine-tuning">I&#8217;m glad fine tuning is&nbsp;dead</a></li>
+</ol>
+</li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ol>
 <h1><span id="images">Generating&nbsp;images</span></h1>
 <p>I equivocated on image generation in the <a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">last post</a>. But images are great! And at least at this moment <a href="https://www.midjourney.com/">Midjourney</a> is making the best generative images. What Midjourney isn&#8217;t good at is automation. But there&#8217;s no unattended image generation process that creates good&nbsp;results.</p>
 <p>To make it more feasible I created <a href="https://gist.github.com/ianb/2a81e219ec38ea46bac1ad7156f5f711">a bit of automation</a>. The whole city took about 55 hours of Midjourney <span class="caps">CPU</span>&nbsp;time.</p>
@@ -281,7 +320,7 @@ Time: 10&nbsp;days</p>
 </ol>
 <p>This could also be done with characters and factions (so building occupants can belong to factions, factions can own buildings, or people can belong to two&nbsp;factions). </p>
 <p>I&#8217;ve done something like this experimenting with &#8220;faction relationships&#8221; (like, inter-faction squabbles) but it falls flat, usually explaining obvious tensions between factions. Maybe I&#8217;m doing it wrong, or maybe there&#8217;s not enough material in that particular combination. (Maybe I need to focus on inter-factional <em>histories</em> instead of <em>relationships</em>?)</p>
-<h2><span class="caps">GPT</span> 3.5 vs <span class="caps">GPT</span>&nbsp;4</h2>
+<h2><span id="gpt-3-4"><span class="caps">GPT</span> 3.5 vs <span class="caps">GPT</span>&nbsp;4</span></h2>
 <p>The tool is built to default to use <span class="caps">GPT</span>-3.5 (the gpt-3.5-turbo <span class="caps">API</span>) for all requests. Lots of people are jumping on <span class="caps">GPT</span>-4, and I&#8217;ve now done some work with both, including places where 3.5 definitely wasn&#8217;t sufficient for the task. But here I&#8217;m quite happy with <span class="caps">GPT</span>-3.5.</p>
 <p>My general intuition is that <span class="caps">GPT</span>-4 is able to connect information across greater distances and to simultaneously follow a larger number of directions. This does come up, instructions can get lost as they accumulate. I think there&#8217;s ways to solve that with 3.5, such as refining generic/universal instructions to just those applicable to certain domains. For instance some instructions only apply to buildings (like building material), others only to character generation (like demographics) and so&nbsp;on.</p>
 <p>The overall development pattern for <span class="caps">GPT</span>-4 might also be different than 3.5. There&#8217;s a lot of architecture that is there implicitly to keep down the size of any one prompt and response. With <span class="caps">GPT</span>-4 it may be possible to accomplish much more in one prompt, both because of a greater confidence in the output and because it&#8217;s able to handle more complexity in the&nbsp;request.</p>
