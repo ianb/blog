@@ -2,7 +2,7 @@ Title: World Building With GPT
 Slug: world-building-with-gpt
 Date: 2023-02-27
 Category: ai
-cover_image: world-building-with-gpt.png
+cover_image: world-building-with-gpt.jpg
 header_style: color: #fff; background-color: rgba(0, 0, 0, .3); display: inline-block; padding: 0 0.5em;
 header_inner_style: color: #fff;
 header_cover_image_style: margin-bottom: 1em; background-color: #000; height: 190px;
@@ -389,6 +389,6 @@ If you want to try this yourself check out [llm.ianbicking.org](https://llm.ianb
 
 Similarly: when using the site be warned I have not built it carefully for other people to use, stuff will be weird, errors will appear only in the JS Console, there are no promises. And you'll have to bring your own GPT API key!
 
-Comments welcome on [Mastodon](https://hachyderm.io/@ianbicking/109937462683423813), [Twitter](https://twitter.com/ianbicking/status/1630231712499376130).
+Comments welcome on [Mastodon](https://hachyderm.io/@ianbicking/109937462683423813), [Twitter](https://twitter.com/ianbicking/status/1630231712499376130), [Hacker News](https://news.ycombinator.com/item?id=34967515).
 
 If you've gotten this far I will also throw in here that I ([Ian](https://ianbicking.org)) am looking for a job, and maybe the best job for me is one that I don't yet know exists. I'm particularly interested in the area of large language models, [natural language interfaces](https://ianbicking.org/blog/2023/01/thoughts-on-voice-interfaces-2-llms.html), new user interactions built on LLMs (especially their abilities to understand us in new ways). I'm excited about education, aiding in executive function, and human-centered interactions. [Let me know if you have ideas](mailto:ianbicking@gmail.com), [or hit me up on LinkedIn](https://www.linkedin.com/in/ianbicking/) I would appreciate it!

@@ -35,6 +35,8 @@ COVER_IMAGES_PATH = "media/cover-images"
 TAG_URL = "tag/{slug}.html"
 TAG_SAVE_AS = "tag/{slug}.html"
 WITH_FUTURE_DATES = False
+def ARTICLE_ORDER_BY(article):
+    return article.date
 
 
 def FORMAT_DATE(date):
