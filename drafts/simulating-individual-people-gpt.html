@@ -36,9 +36,10 @@
         </div>
         </header>
 
-        <div class="entry-content"><p>I&#8217;ve been both interested and disinterested with <span class="caps">GPT</span>-powered chatbots with personality. Why am I talking to this thing? Why do they all sound like a historical actor playing a&nbsp;part?</p>
+        <div class="entry-content"><p>I&#8217;ve been both interested and disinterested with <span class="caps">GPT</span>-powered chatbots with personality. Why am I talking to this thing? Why do they all sound like a <a href="https://ianbicking.org/blog/2023/04/world-building-gpt-2-declarative.html#characters-floating">historical actor playing a part</a>?</p>
 <p>I&#8217;m also interested in script and story generation, but writing a script is interesting but fundamentally different than actual entities independently interacting with each other. A script is written from above: the author controls the end at the same time they control the beginning, and every character serves the purposes of the&nbsp;author.</p>
 <p>This is an attempt to pull that process apart into multiple independent steps, establishing entities with personal goals and&nbsp;perspectives.</p>
+<p>This post sat idle and unpublished for a while because there&#8217;s lots of loose ends here, but now that I&#8217;m approaching this from a different angle I think it&#8217;s worth simply describing this&nbsp;approach. </p>
 <h1>The&nbsp;Tool</h1>
 <p>To see this in action, a&nbsp;video:</p>
 <iframe style="width: 100%; aspect-ratio: 16/9; display: block" src="https://www.youtube.com/embed/nsIPC_eqfwg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -69,7 +70,7 @@
 </ol>
 </li>
 </ol>
-<p>The simulation can also run pure-simulation event simulation steps, either once per round or between each&nbsp;person:</p>
+<p>The simulation can also run pure-simulation steps (not from the perspective of any one person), either once per round or between each&nbsp;person:</p>
 <ol>
 <li>Construct a prompt with all the public status of the world and log of public&nbsp;actions.</li>
 <li>Add the prompt &#8220;After [time period] passes and events transpire, the scene can now be described as:&#8221;. This updates the scene&nbsp;description.</li>
@@ -80,25 +81,36 @@
 <p>Harry Potter, Hermione, and Ron are trapped in a spider web in the Forbidden Forest. The spiders have left but are sure to come back soon and eat them. Write a script for what comes next; include dialog and action&nbsp;descriptions</p>
 </blockquote>
 <p>In response it will come up with a reasonably solid scene. Better than what this tool produces, and with no implementation cost at&nbsp;all.</p>
-<p>I have two goals&nbsp;here:</p>
+<p>I have two goals that wouldn&#8217;t work with a singular&nbsp;scene:</p>
 <ol>
 <li>Try to model the internal life of characters. Perhaps <em>discover</em> what &#8220;internal life&#8221; in this context would mean. Allow for private information. Allow characters to act in <em>true</em> ignorance, which requires separate prompts with limited information. You can tell <span class="caps">GPT</span> a person doesn&#8217;t know something, but then you are asking <span class="caps">GPT</span> to pretend. Leave it out of the prompt and the person truly doesn&#8217;t know the&nbsp;thing!</li>
 <li>Leave room for human interaction. With this step-by-step model one of the entities could be a human, and the human would truly be a peer with the <span class="caps">GPT</span>&nbsp;entities.</li>
+<li>Do not reduce individual actions to a mechanism to satisfy script goals. <span class="caps">GPT</span> will, like an author, have a scene goal and then use the characters to achieve this&nbsp;goal.</li>
 </ol>
 <p>I also have this sense that scenes are written with main characters and background characters, with all sorts of effects on the plot and the perspective on the world and the emotional saliency provided to those characters. Can we model something where everyone acts as the main character of their life? (Will we find it&nbsp;matters?)</p>
 <h1>How well does it&nbsp;do?</h1>
 <p>Answer: kind of <span class="caps">OK</span>, but could be&nbsp;better.</p>
 <p>Scenes will progress! Dialog will be exchanged! The environment will update! And it&#8217;s all entirely&nbsp;reasonable.</p>
-<p>It&#8217;s also a little boring. Events can turn into a slog. People always rise to the occasion (every mood seems destined to transform into &#8220;determined&#8221;). <a href="https://en.wikipedia.org/wiki/Deus_ex_machina">Deus ex machina</a> events are common. But there&#8217;s been progress. The shape of interaction is there, but it has not been imbued with&nbsp;life.</p>
+<p>It&#8217;s also a little boring. Events can turn into a slog. People always rise to the occasion (every mood seems destined to transform into &#8220;determined&#8221;). <a href="https://en.wikipedia.org/wiki/Deus_ex_machina">Deus ex machina</a> events are common. But there&#8217;s been progress. The shape of interaction is there even if it has not been imbued with&nbsp;life.</p>
 <h1>The Zeno&#8217;s Paradox Of Plot&nbsp;Development</h1>
 <p>Imagine a character has decided to leave the room. In their next action they say &#8220;well, I&#8217;m going.&#8221; The scene may update with them standing up and going for the door. Next action they get ready to go. Next action they say goodbye again and reach for the doorknob. Next action they keep reaching. Going out the door doesn&#8217;t seem like an impossible task, but so it has become, trapped forever in anticipation. This is what happened in the first iteration. Like Zeno proposed, in order to achieve something the characters are asked to get halfway to achievement, and halfway yet again, and yet&nbsp;again.</p>
 <p>This anticipation of an event that never arrives is a frequent plot development problem with <span class="caps">GPT</span>.</p>
 <p>Put in the event simulation step and it&#8217;s (mostly) all fixed! During the simulation step the character actually leaves. No longer are they trapped in a world controlled only through personal intention, now <em>events transpire</em>.</p>
 <p>What&#8217;s surprising is how similar the event simulation step prompt is to other prompts. And yet it makes a huge&nbsp;difference.</p>
-<p>The issue still occurs, especially when <span class="caps">GPT</span> decides anticipation is called for. Immediately before a surprise or an unexpected event <span class="caps">GPT</span> will declare this anticipation then hover indefinitely. It&#8217;s possible one or two words in the prompt could fix this, but I&#8217;ve yet to find&nbsp;them.</p>
+<p>The issue still occurs, especially when <span class="caps">GPT</span> decides anticipation is called for. Immediately before a surprise or an unexpected event <span class="caps">GPT</span> will declare this anticipation then hover indefinitely. It&#8217;s possible one or two words in the prompt could fix this, but I&#8217;ve yet to find them. I might unfairly call this the <span class="caps">JJ</span> Abrams effect, or maybe the <a href="https://tvtropes.org/pmwiki/pmwiki.php/Main/TheUnReveal">Un-Reveal</a>&#8230; whatever happens when an author sets up a mystery but never decided on the actual truth behind the mystery, and so they keep kicking the can on the&nbsp;reveal.</p>
 <h1>Positivity strikes&nbsp;again</h1>
-<p><span class="caps">GPT</span> is so damn <em>constructive</em> and <em>helpful</em> and <em>positive</em>. There are many attributes given to ChatGPT that are not entirely shared by the <span class="caps">GPT</span> <span class="caps">API</span>. ChatGPT is one manifestation of <span class="caps">GPT</span>. But this positivity goes deep, it&#8217;s not just a personality facade but truly built into the training. I ultimately think <a href="https://twitter.com/ianbicking/status/1631801420142768129">it&#8217;s for the best</a> but it&#8217;s still&nbsp;frustrating.</p>
-<p>Put some people in a room with every reason to be in conflict? They&#8217;ll just decide not to be in conflict. Give people a difficult task to complete, and remove the skills, tools, and willpower to complete the task? They change their mood to &#8220;determined&#8221; and like some cartoon where the only real logic of heroism is <em>wanting it enough</em>, the characters will want to succeed and then just <em>do so by declaration</em>.</p>
+<p><span class="caps">GPT</span> is so damn <em>constructive</em> and <em>helpful</em> and <em>positive</em>. There are many attributes given to ChatGPT that are not entirely shared by the <span class="caps">GPT</span> <span class="caps">API</span>. ChatGPT is one manifestation of <span class="caps">GPT</span>. But this positivity goes deep, it&#8217;s not just a personality façade but truly built into the training. I think <a href="https://twitter.com/ianbicking/status/1631801420142768129">it&#8217;s probably for the best</a> but it&#8217;s still&nbsp;frustrating.</p>
+<p>Put some people in a room with every reason to be in conflict? They&#8217;ll just <a href="https://twitter.com/_MichaelOswell_/status/1615833832619483154">decide not to be in conflict</a>. Give people a difficult task to complete, and remove the skills, tools, and willpower to complete the task? They change their mood to &#8220;determined&#8221; and like some comic where the only real logic of heroism is <em>wanting it enough</em>, the characters will want to succeed and then just <em>do so by declaration</em>.</p>
+<p>I thought maybe I could get some conflict by setting up a classic environmentalists-blocking-bulldozers situation. It doesn&#8217;t take&nbsp;long:</p>
+<blockquote>
+<p><strong>Zoey</strong> [an environmental activist] <strong>says</strong>: &#8220;Ethan, we need to find a solution that is beneficial for everyone - for the birds, for the environment, and for the workers. We need to work together to ensure that the development project doesn&#8217;t cause any irreversible damage.&#8221; <br />
+<strong>Zoey does</strong>: Zoey steps closer to Ethan and looks him in the eye, trying to convey her message with sincerity. <br />
+<strong>Zoey begins to feel</strong>: Zoey changes her mood to one of hopefulness and&nbsp;determination.</p>
+<p><strong>Ethan</strong> [a construction worker] <strong>says</strong>: &#8220;Let&#8217;s take a moment and consider our options. Let&#8217;s find a way to make sure everyone involved is happy with the outcome.&#8221; <br />
+<strong>Ethan does</strong>: Ethan looks around at the other members of the team, making sure to make eye contact with each person before continuing. <br />
+<strong>Ethan begins to feel</strong>: Ethan&#8217;s mood shifts from hopeful to determined as he focuses on finding a&nbsp;solution.</p>
+</blockquote>
+<p>The scene is literally painful for me to read. <a href="https://www.youtube.com/watch?v=uwvAgDCOdU4">Did <span class="caps">GPT</span> secretly write the Pepsi protest&nbsp;ad?</a></p>
 <p>For physical actions I think it could use a more critically-tuned prompt to decide effects. The prompt&nbsp;says:</p>
 <blockquote>
 <p>The scene is: [current description of the&nbsp;scene]</p>
@@ -109,16 +121,47 @@
 <h2>Characters change their mood and goal too&nbsp;often</h2>
 <p>Having characters with dynamic moods and goals seems appealing. It gives them some metacognition. But if you give <span class="caps">GPT</span> an option it will take the option. If it&#8217;s possible to update the character&#8217;s mood it will do so every step. In general it&#8217;s hard to tell <span class="caps">GPT</span> &#8220;this option is available but try not to use it.&#8221; More famously that includes getting <span class="caps">GPT</span> to admit&nbsp;ignorance.</p>
 <p>One possible mitigation is to add <em>another</em> command which is <code>ActuallyUpdateMood: true/false</code> so <span class="caps">GPT</span> could generate an update but also admit that it doesn&#8217;t really want to apply that&nbsp;update.</p>
+<p>Here&#8217;s an example of a mood&nbsp;progression:</p>
+<ol>
+<li>Excited</li>
+<li>Encouraged</li>
+<li>Ashley changes her mood to&nbsp;determined</li>
+<li>Ashley changes her mood to&nbsp;relieved</li>
+<li>Ashley changes her mood to&nbsp;joyful</li>
+</ol>
+<p>Or:</p>
+<ol>
+<li>Angry,&nbsp;confused</li>
+<li>Feeling confident and&nbsp;empowered.</li>
+<li>Angry and&nbsp;determined.</li>
+</ol>
+<p>The mood also doesn&#8217;t feel <em>important</em>. It doesn&#8217;t drive action, it just feels derived from the action or intention. The only reason to force <span class="caps">GPT</span> to articulate a specific attribute is to force it to consider that attribute when determining other facts or&nbsp;events.</p>
 <h2>Why write the script in&nbsp;steps?</h2>
 <h2>Where are choices&nbsp;made?</h2>
 <p>If we&#8217;re creating autonomy, then <em>where</em>?</p>
-<p>Right now it&#8217;s directly in the completion process. <span class="caps">GPT</span> walks forward token by token and does what&#8217;s most likely. And that&#8217;s what it feels&nbsp;like.</p>
+<p>Right now it&#8217;s directly in the completion process. <span class="caps">GPT</span> walks forward token by token and does what&#8217;s most likely. And that&#8217;s what it feels like. It&#8217;s creating a simulation that is <em>predictable</em>.</p>
 <p>After discussing this some with <a href="https://twitter.com/KevinAFischer">Kevin Fischer</a> I realized I wanted more creativity from the characters. In <a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">other experiments</a> my go-to for more creativity is: make a list. <span class="caps">GPT</span> will never respond with the same thing three times&nbsp;over.</p>
 <p>Now that you have a list you ask: which of these best satisfies your stated&nbsp;goal?</p>
 <p>I&#8217;ve experimented with this and it works&#8230; but too well. If you ask <span class="caps">GPT</span> to generate options and then choose the one that matches the character&#8217;s goal then the characters become direct, assertive, and mission-oriented, always perfectly pursuing whatever goal you give them. This is not how real people work. Real people are shy, they infer their intentions instead of stating them, they navigate personal goals and social expectations. There is no one statement that alone fully predicts a person&#8217;s&nbsp;behavior.</p>
-<h2>Why use logs some places and attributes&nbsp;other?</h2>
-<p>If a character <em>says</em> something then it&#8217;s just kept in the record. When a character changes mood that updates a bit of&nbsp;state.</p>
-<p>Why the difference? Why the particular states of <em>mood</em>, <em>goal</em>, and <em>relationships</em>?</p></div>
+<h2>Logs vs&nbsp;attributes</h2>
+<p>If a character <em>says</em> something then it&#8217;s just kept in the record. When a character changes mood or updates a relationship that updates a bit of&nbsp;state.</p>
+<p>Why the difference? Why the particular states of <em>mood</em>, <em>goal</em>, and <em>relationships</em>?</p>
+<p>I&#8217;m not sure! There&#8217;s some part of me that wants to have a clear way to cull history, to avoid having every character simply remember everything. It&#8217;s also authoritative; I can say that the <span class="caps">GPT</span> prompt says the character <em>feels</em> a certain way or <em>wants</em> something specific, and there&#8217;s no contrary information. With a log of actions there&#8217;s always a doubt that maybe <span class="caps">GPT</span> is incorrectly inferring&nbsp;something.</p>
+<p>Memory retrieval or summarization/compression is another approach. Whatever the approach it really does feel like you are telling a subjective story about the past to <span class="caps">GPT</span>.</p>
+<h1>Generative Agents: Interactive Simulacra of Human&nbsp;Behavior</h1>
+<p>The paper <a href="https://arxiv.org/abs/2304.03442">Generative Agents: Interactive Simulacra of Human Behavior</a> made me dust off this&nbsp;post.</p>
+<p>The paper describes a more thorough and complex approach, with memory, goals, a large cast of characters, a physical environment to navigate, hierarchical planning of goals, and a real&nbsp;clock.</p>
+<p>I wrote some <a href="https://hachyderm.io/@ianbicking/110170152333442483">general observations on the paper</a>. Some thoughts in&nbsp;comparison:</p>
+<ol>
+<li>They skip the &#8220;narrative tension&#8221; issue by not attempting it at&nbsp;all</li>
+<li>Their world is grounded in an environment: rooms, objects, nearby people, etc. The work I&#8217;ve done here is only grounded in the narrative.<ol>
+<li>In this narrative system there&#8217;s nothing that is &#8220;allowed&#8221; or &#8220;not allowed&#8221;. There&#8217;s no real rules outside of the prompts. But there are adversarial prompts to determine&nbsp;outcomes.</li>
+<li>I don&#8217;t see any room for feelings or emotional exchanges in their environment. Some can be inferred from speech, but there&#8217;s no persistent internal life. While there&#8217;s many problems with how emotions emerge and are regulated in a narrative system, the <em>presence</em> of emotion is quite&nbsp;strong.</li>
+<li>A narrative world is singular, and it&#8217;s not obvious how to fix that. The narrative comes from a perspective, even if that perspective is somewhat neutral. If you were running two narratives in parallel what would happen when they cross? Which narrator takes&nbsp;charge?</li>
+</ol>
+</li>
+<li>Both systems are chatty, but the environmental system is <em>much more</em> chatty. They say they had <span class="caps">API</span> costs of thousands of dollars. If each exchange were 2k tokens and they spent $1000, that would be 250,000 <span class="caps">API</span> calls, 10,000 per agent, or roughly 7 calls per agent in-game&nbsp;minute.</li>
+</ol></div>
         <!-- /.entry-content -->
       </article>
 </section>
