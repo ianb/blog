@@ -6,9 +6,7 @@ You've reached my homepage on the world wide web. Hello!
 
 On the internet I'm a computer programmer. Not on the internet I am also a computer programmer, but I also have a [wife](http://emilymurphy.com) and two daughters. I live in Minneapolis, in the Powderhorn Park neighborhood. On the internet I live here; I can't find a social media home, but I'm trying [Mastodon](https://hachyderm.io/@ianbicking) and still use [Twitter](https://twitter.com/ianbicking).
 
-I worked at Mozilla for 10 years until 2020, then Meta Reality Labs until 2022. You can read more about what I'm doing on my [**projects page**](/projects.html).
-
-**I am currently looking for a job.**
+I worked at Mozilla for 10 years until 2020, then Meta Reality Labs until 2022. In 2023 I began work at Brilliant.org. You can read more about what I'm doing on my [**projects page**](/projects.html).
 
 ## Getting in contact
 

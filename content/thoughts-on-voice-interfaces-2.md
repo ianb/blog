@@ -94,8 +94,6 @@ So obviously I'm personally pretty focused on the effect of LLMs, but there's mo
 
 Comments welcome on [Mastodon](https://hachyderm.io/@ianbicking/109705273556185280), [Twitter](https://twitter.com/ianbicking/status/1615379603630989312).
 
-If you've gotten this far I will also throw in here that I ([Ian](https://ianbicking.org)) am looking for a job, and maybe the best job for me is one that I don't yet know exists. I'm particularly interested in the area of large language models, new user interactions built on LLMs (especially their abilities to understand us in new ways). I'm excited about education, aiding in executive function, and human-centered interactions. [Let me know if you have ideas](mailto:ianbicking@gmail.com), I would appreciate it!
-
 [1]: /media/voice-2/math-inference.png 'This is the most kind of "reasoning" referred to in GPT, being able to decompose and explain a formal multi-step problem.'
 [2]: /media/voice-2/decomposing-steps.png "These queries are personalized, and can't be answered by GPT, but GPT can come up with a plan to answer the questions. That plan could also be reused or treated like a trigger, it's not a single concrete answer."
 [3]: /media/voice-2/decode-intent-to-instructions.png "Here we take examples of typical intents and have GPT translate them into a made-up programming language"

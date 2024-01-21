@@ -78,9 +78,10 @@ THEME = "./mystyle/"
 # Social widget
 SOCIAL = (
     # ("Mastodon", "https://mastodon.technology/@ianbicking"),
-    ("@ianbicking", "https://twitter.com/ianbicking"),
     ("@ianbicking@hachyderm.io", "https://hachyderm.io/@ianbicking"),
     ("Github", "https://github.com/ianb"),
+    ("LinkedIn", "https://www.linkedin.com/in/ianbicking/"),
+    ("@ianbicking", "https://twitter.com/ianbicking"),
 )
 
 DEFAULT_PAGINATION = 10
@@ -93,7 +94,9 @@ GITHUB_ACTIVITY_FEED = "https://github.com/ianb.atom"
 GITHUB_ACTIVITY_MAX_ENTRIES = 10
 
 # DISQUS_SITENAME = "ianbicking"
-GOOGLE_ANALYTICS = "UA-2442258-1"
+# This is the old ID (pre-2023):
+# GOOGLE_ANALYTICS = "UA-2442258-1"
+GOOGLE_ANALYTICS = "G-FKT4HDGBE4"
 
 MENUITEMS = [
     # ("About", "/about.html"),

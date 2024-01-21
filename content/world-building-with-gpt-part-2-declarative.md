@@ -57,9 +57,9 @@ To make it more feasible I created [a bit of automation](https://gist.github.com
 I have GPT create prompts from character descriptions. The request looks like this:
 
 > [all the world context]
-> 
+>
 > [character description]
-> 
+>
 > Give a description of the person in the form of a picture. Do not assume any context. Focus on the visual details. Use 3-4 sentences.
 
 I could just pass the original character description to Midjourney. Midjourney is also happy to hallucinate details in the absence of a specific prompt, which is essentially what I'm asking GPT to do. _Except_ GPT can synthesize the world description and the character description, and then pull out just the important visual details.
@@ -115,7 +115,7 @@ It can also be hard to make women who _aren't_ beautiful or sexy. For instance h
 
 > Kiera is a tough and experienced guard, responsible for keeping the guests of the Masked Ballroom safe. She wears a mask made of steel, symbolizing her strength and reliability.
 
-GPT's physical description is consistent: 
+GPT's physical description is consistent:
 
 > Kiera Ironclad stands tall and proud, with a muscular build and a stern expression. Her steel mask covers her face, except for her piercing blue eyes that seem to glow in the dimly lit ballroom. She wears a black uniform with silver accents, and a sword on her belt, ready to protect anyone who might need her help.
 
@@ -141,7 +141,7 @@ In another example:
 
 This person's description:
 
-> Long, silver hair that falls in gentle waves down her back_ and _she wears a flowing, white gown that glimmers in the soft light_. 
+> Long, silver hair that falls in gentle waves down her back_ and _she wears a flowing, white gown that glimmers in the soft light_.
 
 GPT went overboard with this description but didn't actually give her any body type or age in the description. She comes out like this:
 
@@ -161,7 +161,7 @@ And without:
 
 So GPT may be producing terms that seem neutral but infer more than we want.
 
-Another way to think about this: Midjourney, more than the other image generators, has a strong feedback loop of human preference. I suspect that's why it has such a good default style, it's not just learning to be accurate to the prompt but it's also learning to make something compelling _with_ the prompt. And what do people like? Beautiful people! That's basically what "beautiful" means! In a single image I, of course, am not immune to the same appeal. But it gets old, incongruous, and lacks authenticity to an imagined world. 
+Another way to think about this: Midjourney, more than the other image generators, has a strong feedback loop of human preference. I suspect that's why it has such a good default style, it's not just learning to be accurate to the prompt but it's also learning to make something compelling _with_ the prompt. And what do people like? Beautiful people! That's basically what "beautiful" means! In a single image I, of course, am not immune to the same appeal. But it gets old, incongruous, and lacks authenticity to an imagined world.
 
 ### <span id="fancy">Everyone's fancy</span>
 
@@ -171,7 +171,7 @@ For instance, here's Lorelei Moondrop. She's a box office clerk; not a sorceress
 
 <img src="/media/world-building-with-gpt-2/Ian_Full_body_fantasy_portrait_of_a_masked_woman_The_person_in__2b4aac41-e647-4bd1-9ea6-6ba811a0cbfd.jpg" title="Full body fantasy portrait of a masked woman: The person in the picture is a young woman wearing a mask made of smooth wood. She has long, dark hair that cascades down her shoulders. She wears a simple, yet elegant dress that flows to her feet, with intricate patterns of stars and moons adorning it" class="content">
 
-The description doesn't call for this: 
+The description doesn't call for this:
 
 > The person in the picture is a young woman wearing a mask made of smooth wood. She has long, dark hair that cascades down her shoulders. She wears a simple, yet elegant dress that flows to her feet, with intricate patterns of stars and moons adorning it.
 
@@ -266,7 +266,7 @@ I picture it like the character is sitting in a featureless room, expression bla
 
 When you are done you stand up. The character still sits, eager anticipation on their face. As you leave the room you look back and they are still there, making eye contact with the void that you have left, poised and always ready.
 
-At first it still seems fun, but the not-mattering will drain you. 
+At first it still seems fun, but the not-mattering will drain you.
 
 This is not fatal, [GPT can simulate arbitrary actions](https://www.youtube.com/watch?v=nsIPC_eqfwg) or perhaps judge [specific criteria in the conversation](https://www.youtube.com/watch?v=X0x_W8YWAg8). But while it's easy to build an isolated experience, these meaningful experiences are more difficult. But they'll be worth it!
 
@@ -389,7 +389,7 @@ But it's not the right choice that it ends there. A few problems:
 3. Represent the relationship formally somewhere.
 4. Go back to each person and rewrite their description to include the relationship.
 
-This could also be done with characters and factions (so building occupants can belong to factions, factions can own buildings, or people can belong to two factions). 
+This could also be done with characters and factions (so building occupants can belong to factions, factions can own buildings, or people can belong to two factions).
 
 I've done something like this experimenting with "faction relationships" (like, inter-faction squabbles) but it falls flat, usually explaining obvious tensions between factions. Maybe I'm doing it wrong, or maybe there's not enough material in that particular combination. (Maybe I need to focus on inter-factional _histories_ instead of _relationships_?)
 
@@ -516,8 +516,6 @@ Similarly: when using the site be warned I have not built it carefully for other
 
 Comments welcome on [Mastodon](https://hachyderm.io/@ianbicking/110141107480811400) or [Twitter](https://twitter.com/ianbicking/status/1643265359967924226).
 
-If you've gotten this far I will also throw in here that I ([Ian](https://ianbicking.org)) am looking for... technically I'm looking for a "job", but that doesn't seem quite right. Collaborators for the future? [Let me know if you have ideas](mailto:ianbicking@gmail.com), [or hit me up on LinkedIn](https://www.linkedin.com/in/ianbicking/) I would appreciate it!
-
 <script>
 
     let els = Array.from(document.querySelectorAll("img.content"));
@@ -616,3 +614,7 @@ If you've gotten this far I will also throw in here that I ([Ian](https://ianbic
     margin: 0;
   }
 </style>
+
+<meta property="og:image" content="https://veilvale.ianbicking.org/assets/images/icon-128.png" />
+<meta property="og:image:width" content="128" />
+<meta property="og:image:height" content="128" />
