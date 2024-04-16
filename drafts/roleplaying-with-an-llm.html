@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Roleplaying with an LLM: open questions</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://ianbicking.org/favicon.ico">
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header        style="background-image: url(https://ianbicking.org/media/cover-images/roleplay-header.jpg); background-size: cover; background-position: center; height: 300px; width: 100%;        margin-bottom: 1em; background-color: #000; height: 190px;"
+>
+        <div        style="color: #fff; background-color: rgba(0, 0, 0, .3); display: inline-block; padding: 0 0.5em;"
+>
+            <div class="published" title="2024-03-30T00:00:00-05:00"            style="color: #fff;"
+>
+                Saturday, March 30th, 2024
+            </div>
+            <h1 class="entry-title">
+                <a
+                    href="https://ianbicking.org/drafts/roleplaying-with-an-llm.html"
+                    rel="bookmark"
+                    title="Permalink to Roleplaying with an LLM: open questions"
+                    style="color: #fff;"
+                    >Roleplaying with an <span class="caps">LLM</span>: open&nbsp;questions</a
+                >
+            </h1>
+        </div>
+        </header>
+
+        <div class="entry-content"><p>I&#8217;ve been doing some experiments with roleplaying and LLMs. I&#8217;m not sure where to go next, so this post describes some of the experimentation path and some of the questions and thoughts I have about where to go&nbsp;next&#8230;</p>
+<h2>Table of&nbsp;contents</h2>
+<div id="toc"></div>
+
+<ol>
+<li>Roleplay as chat&#8230;<ol>
+<li><a href="#simple-chat">Simple&nbsp;chat</a></li>
+<li><a href="#situated-chat">Situated&nbsp;chat</a></li>
+<li><a href="#activity">Activity alongside&nbsp;dialog</a></li>
+<li><a href="#saying-goodbye">Saying&nbsp;goodbye</a></li>
+<li><a href="#hallucination-and-memory">Hallucination and&nbsp;memory</a></li>
+</ol>
+</li>
+<li>Experiments&#8230;<ol>
+<li><a href="#first-experiment">A first&nbsp;experiment</a></li>
+<li><a href="#second-experiment">A second&nbsp;experiment</a></li>
+</ol>
+</li>
+<li><a href="#thoughts-and-questions">Thoughts and open questions</a><ol>
+<li><a href="#action-and-resolution">Action and&nbsp;resolution</a></li>
+<li><a href="#world-and-context">World and&nbsp;context</a></li>
+<li><a href="#interface-and-interaction">Interface and&nbsp;interaction</a></li>
+<li><a href="#player-goals-motivation">Player goals and&nbsp;motivation</a></li>
+<li><a href="#medium">The medium of&nbsp;gameplay</a></li>
+</ol>
+</li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ol>
+<h2><span id="glossary">Glossary</span></h2>
+<p><strong>Player:</strong> the person playing the game, &#8220;the user&#8221;. <br />
+<strong>(Player) Character:</strong> the character the player is playing. <br />
+<strong>(<span class="caps">NPC</span>) Character:</strong> the character the <span class="caps">LLM</span> is playing. <br />
+<strong>Game:</strong> the thing the player plays, whether or not it&#8217;s &#8220;game-like&#8221; or &#8220;fun&#8221;. <br />
+<strong>Gamemaster:</strong> the <span class="caps">LLM</span> role that directs the story by mediating player actions, describing how time advances, etc. <br />
+<strong>Feat:</strong> Some action that is hard enough you might fail, generally requiring a roll with a random chance of failure or&nbsp;success</p>
+<p>To set the scene I will describe the basic progression I&#8217;ve gone through with <span class="caps">LLM</span>-assisted&nbsp;roleplay:</p>
+<h2><span id="simple-chat">Simple&nbsp;chat</span></h2>
+<p>The easiest thing is just to set the system prompt and chat away! This works wildly better than anything from 2022, but it&#8217;s still just <em><span class="caps">OK</span></em>.</p>
+<p>If you want to improve the chat itself – keep it from breaking character, make it act more decisively, give the character desires and goals – then there&#8217;s some techniques that&nbsp;help:</p>
+<ol>
+<li>Make it collaborative dialog writing instead of interacting directly with <span class="caps">LLM</span> (i.e., role: assistant doesn&#8217;t mean &#8220;<span class="caps">NPC</span> character&#8221;, role: user doesn&#8217;t mean &#8220;player&nbsp;character&#8221;)</li>
+<li>Include instructions on how to respond at the end of the prompt, not just the system prompt. Both repeat the most important instructions and give instructions on how to&nbsp;respond.</li>
+<li>Generate internal dialog or an internal thought process in addition to the normal dialog. Give the <span class="caps">LLM</span> room to think. (I learned this from <a href="https://www.socialagi.dev/">Open Souls</a>)</li>
+<li>Summarize periodically (replacing the older transcript with the summary) so that the context stays more limited and&nbsp;fresh.</li>
+<li>Think hard about what attributes you want to capture in that&nbsp;summary.</li>
+<li>Initialize the chat with a summary to set the&nbsp;stage.</li>
+<li>Compress dialog to remove some of the idle chatter and repetition that tends to arise, again keeping the context&nbsp;on-point.</li>
+</ol>
+<p>These all require some coding (though it&#8217;s not very complex), and you can&#8217;t do them in a Custom <span class="caps">GPT</span>.</p>
+<p>The prompts you use for each technique is also important. Prompting&nbsp;matters!</p>
+<p>To see some of these approaches (and others) you can look at <a href="https://platform.openai.com/playground/p/VCIhCAkLPNKhfrHbKR4BXCZg?mode=chat">this example of a full&nbsp;prompt</a></p>
+<h2><span id="situated-chat">Situated&nbsp;chat</span></h2>
+<p>All those techniques are helpful but the result is still a weird situation where there&#8217;s an entity floating in the ether and some nameless faceless entity known only as &#8220;user&#8221; comes up and says&nbsp;&#8220;hi&#8221;.</p>
+<p>So the next thing you try is creating a setting. Name and describe the player. Create some sort of purpose to the&nbsp;conversation.</p>
+<p>As an example of this I compared <a href="https://hachyderm.io/@ianbicking/110359139615510487">my William Shakespeare chat to Khanmigo&#8217;s</a>, to give some sense of what both setting and good prompting techniques can do compared to Khanmigo&#8217;s apparently bare system&nbsp;prompting.</p>
+<h2><span id="activity">Activity alongside&nbsp;dialog</span></h2>
+<p>A quick extension here is to add scene and action descriptions. Again once you&#8217;ve set this up as a kind of collaborative writing process this is as simple as asking descriptions to go in <code>&lt;description&gt;...&lt;/description&gt;</code>.</p>
+<p>Now potentially you have some action, a setting that can be updated, and potentially consequences. But <em>vague</em> consequences, relying on the stream of descriptions to keep track of the world state is kind of&nbsp;mushy.</p>
+<h2><span id="saying-goodbye">Saying&nbsp;goodbye</span></h2>
+<p>All that stuff above is cool, but if you&#8217;ve ever used one of these <span class="caps">LLM</span> chats you&#8217;ve probably come to the point when a conversation should end&#8230; but it can&#8217;t. You can never stop talking. Like ghosts cursed to a never ending conversation, or <a href="https://www.urbandictionary.com/define.php?term=Minnesota%20Goodbye">Minnesotans</a>.</p>
+<p>It&#8217;s not hard to detect or have the <span class="caps">LLM</span> signal that a conversation should complete. But then what? If the player was in conversation and now they are not, then where are they? Something as simple as goodbye requires a whole world to return&nbsp;to&#8230;</p>
+<h2><span id="hallucination-and-memory">Hallucination and (lack of)&nbsp;memory</span></h2>
+<p>One thing I didn&#8217;t mention as an enhancement is <a href="https://github.blog/2024-04-04-what-is-retrieval-augmented-generation-and-what-does-it-do-for-generative-ai/">Retrieval Augmented Generation</a> (<span class="caps">RAG</span>). You might think of <span class="caps">RAG</span> as &#8220;looking up information/memories and giving them to the <span class="caps">LLM</span>&#8221;.</p>
+<p>A <span class="caps">RAG</span> system includes context in the prompt based on what seems most relevant at the moment. This might be conversation history that wouldn&#8217;t otherwise fit in the context or world details. (To see an example of roleplay-focused <span class="caps">RAG</span> using very simple retrieval techniques: <a href="https://rentry.co/world-info-encyclopedia#lore">SillyTavern Lorebooks</a>)</p>
+<p>I haven&#8217;t mentioned <span class="caps">RAG</span> because I&#8217;ve never implemented it, and feel little motivation to do so&#8230; it&#8217;s just not that interesting to talk to a character for that long, or have details perfectly&nbsp;recorded.</p>
+<p>I find <em>guided summarization</em> is sufficient: periodically (when the transcript gets big enough, or there&#8217;s an event like a goodbye) have the <span class="caps">LLM</span> summarize the conversation up to that point, and then use that summary in place of the earlier&nbsp;transcript.</p>
+<p>But summarization does lose details: did either character learn specific facts during the conversation? Did someone describe a specific memory or personal history? The <span class="caps">LLM</span> will readily (and helpfully!) hallucinate all kinds of details, but without an explicit memory it&#8217;s all only as real as a&nbsp;dreamstate.</p>
+<p>(This will come up again in the last&nbsp;section.)</p>
+<h2><span id="first-experiment">A first&nbsp;experiment&#8230;</span></h2>
+<div style="float: right"><a href="../media/roleplay-lifelived.png" target="_blank"><img class="content full-width" src="../media/roleplay-lifelived.png" width="300" height="212" alt="Amrit appears tense and alert, scanning his surroundings with a cautious gaze as he moves through the market. He's in a state of heightened awareness, knowing that any mistake could cost him dearly.&#10;&#10;Baldev Sekhon&#10;Baldev is a stocky, muscular man with intense eyes and a permanent scowl. He often wears traditional attire, and his presence is commanding and somewhat intimidating. His hands are calloused from years of physical labor, and he carries himself with an air of defiance.&#10;&#10;Baldev stands with a group of fellow revolutionaries, his arms crossed and his expression stern. He seems to be in a state of quiet agitation, ready to confront any perceived betrayal to the cause.&#10;&#10;Amrit Singh&#10;&quot;Surinder, it's been too long. The market is as lively as ever, isn't it? But let's not talk shop here; too many ears. Walk with me.&quot;&#10;&#10;Amrit gestures discreetly towards a less crowded alleyway, his eyes scanning for any signs of eavesdroppers or British officers.&#10;&#10;Amrit, are you sure we should be doing this?&#10;&#10;Amrit Singh&#10;&quot;Of course, I understand your concern, but it's precisely because of prying eyes that we must find a quieter place. Trust me, it's for the best.&quot;&#10;&#10;Amrit places a reassuring hand on Surinder's shoulder, giving him a firm, confident look before leading the way to the alley."></a></div>
+
+<p>Every previous step seemed clearly additive to an experience that led only as far as a dissociated conversation. That&#8217;s not to say I fully explored singular conversations, but I had some other things I wanted to&nbsp;try&#8230;</p>
+<p>The first idea I pursued is also the more ambitious: I really liked the idea of play-acting an entire life. In particular by roleplaying pivotal or symbolically important moments in the character&#8217;s&nbsp;life.</p>
+<div style="float: right"><img class="content full-width" src="../media/cyoa-terrible-news.jpg" width="300" height="450" alt="AI generated cover for the book: So You've Received Some Terrible News"></div>
+
+<p>This idea took root in my head early when experimenting with <span class="caps">GPT</span> Choose Your Own Adventure authoring. <span class="caps">GPT</span> suggested a scenario that began with the player receiving a diagnosis for a terminal illness. Do you (a) call a family member, (b) take a walk to clear your head, (c) ask your doctor more questions. It feels absurd, but <span class="caps">GPT</span> was 100% straight-faced about the whole thing, and it didn&#8217;t feel absurd at&nbsp;all.</p>
+<p>The idea of roleplaying serious rather than just fantastical scenarios stuck with me, and I thought about some of the choices and situations that we encounter through our lives as a source of&nbsp;material.</p>
+<p>I imagined a few kinds of&nbsp;scenarios:</p>
+<ol>
+<li>Making a life decision: what profession to pursue, who to marry, and so&nbsp;on.</li>
+<li>Finding what&#8217;s important in your life: politics, art, family,&nbsp;etc.</li>
+<li>Expressing your personality: how you react, how you interact with others, how you respond to loss or&nbsp;success.</li>
+</ol>
+<p>Because this would involve multiple scenarios over decades then you have to think about the character changing&#8230; but also the world changes around the character. Then you have to think about birth years, and locations, and then it turned into a historical roleplay.&nbsp;https://youtu.be/u49KwijAwm8</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/u49KwijAwm8?si=35Qo8zNm4BfD4Jfv" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+<p>That in turn leads into a whole digression with selecting a place and time in history, a character, a family, status, and so on&#8230; all of which is a fun little character creation game of its own, but still leads back to those pivotal&nbsp;moments.</p>
+<p>What does it mean to play out these moments? That I haven&#8217;t figured&nbsp;out.</p>
+<p>Specifically I&#8217;ve found it hard to create a compelling <em>moment</em> that is worth roleplaying, where the player can feel real autonomy and drive to accomplish something in the&nbsp;roleplay.</p>
+<p>One of the problems is more technical: I&#8217;ve created an environment where the player has unlimited ability to engage in dialog, but physical actions are at best vague and&nbsp;dreamlike.</p>
+<p>The freedom of dialog mirrors the real world: we are truly capable of saying just about anything at any time. We don&#8217;t exercise this ability, but it is entirely our choice. Unlike dialog we cannot physically <em>do</em> anything we choose. Though realistically we are as unlikely to exercise our physical freedom as we are our verbal freedom. The player as a character is divorced from the fullness of being that is a real person, they don&#8217;t know fear, shame, awkwardness&#8230; all of which is a <em>feature</em> (encouraging exploration) and yet makes it very hard to simulate. There&#8217;s not much&nbsp;structure.</p>
+<p>Some other questions I have about creating good&nbsp;scenarios:</p>
+<ol>
+<li>Am I giving the player the ability to exercise their preferred alignment via the character? To be a hero, villain,&nbsp;etc?</li>
+<li>Does the player want to be tested? And in what&nbsp;way?</li>
+<li>What pushback is fun? What is unwelcome? In other words, how freely do I allow the player to act? How much will the system disallow a character to make unreasonable&nbsp;actions?</li>
+<li>If the character exemplifies something (deviousness, intelligence, ignorance, etc), to what degree is that something the game should do, vs the player? If you are a well educated Babylonian merchant is it a requirement of the play that you actually become well educated for that&nbsp;time?</li>
+<li>Physical activities have some of the same questions&#8230; how many rules do we handle with the gameplay (like locations, entrances, objects, etc), and how many are conjured into being in the narrative? Does the player directly perform the actions (mashing buttons) or do you let the narrative and dice rolls direct the&nbsp;outcome?</li>
+<li>If the player enters text, what voice or frame is that text? Are they speaking as the character? Describing an action? Describing a request, such as asking for an extended description? Which of these happen effortlessly? (I.e., with no gamemaster&nbsp;mediation)</li>
+</ol>
+<h2><span id="second-experiment">And my second&nbsp;experiment&#8230;</span></h2>
+<p>I felt/feel stuck on the first project, without any clear theory for another version of the gameplay. And perhaps I had too many expectations about what I wanted to accomplish in that&nbsp;game.</p>
+<div style="display: flex; justify-content: center; align-items: center;"><iframe width="560" height="315" src="https://www.youtube.com/embed/1EoYmNGIMgo?si=GH5ZBFbN0YAM8Na0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+
+<p>I decided to take a step back and work on something more relaxed. I had created an imaginary city builder a while back (<a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt">part 1</a>, <a href="https://ianbicking.org/blog/2023/04/world-building-gpt-2-declarative">part 2</a>). I personally still find the tool fun and I like the building process, though the tool is weird and not really accessible to other&nbsp;people.</p>
+<p>Using one of these cities solves one of my problems: where are you once you&#8217;ve said goodbye? So I started putting together another similar game with a more fantasy tone and with a pre-existing set of locations and cast of&nbsp;characters.</p>
+<p>There are three notable parts I experimented&nbsp;with:</p>
+<ol>
+<li>Intent parsing: this separates the input into dialog, intent to do an action, and a few direct commands: movement, ending the conversation, and inspecting something. The action types in turn invoke different <span class="caps">LLM</span> prompts and&nbsp;pipelines.</li>
+<li>Ability, stats, and action resolution: the <span class="caps">LLM</span> determines what abilities are needed to perform an action, and at what difficulty, and then between <span class="caps">LLM</span> calls the dice are rolled and the <span class="caps">LLM</span> determines the effects given the success/failure&nbsp;results.</li>
+<li>Some ad hoc but updateable attributes like inventory and&nbsp;injuries.</li>
+</ol>
+<p>In this game you can walk around, do actions at about any granularity (&#8220;search for a fallen nickel&#8221; or &#8220;take over the world&#8221;), and talk with the&nbsp;characters.</p>
+<p>The three things fit&nbsp;together:</p>
+<ol>
+<li>Intent parsing clarifies what prompts to invoke and separates simple actions (like saying something) from&nbsp;feats.</li>
+<li>The action resolution handles those&nbsp;feats.</li>
+<li>Updatable attributes make the resolution feel more sticky, like &#8220;real&#8221; things are being updated as a&nbsp;result.</li>
+</ol>
+<div style="float: right"><a href="../media/roleplay-action-resolution.png" target="_blank"><img class="content full-width" src="../media/roleplay-action-resolution.png" width="300" height="154" alt="action&#10;Pickpocket someone&#10;With his dexterous hands and keen eye for opportunity, Winston seamlessly slipped his fingers into the pocket of a well-dressed socialite, expertly relieving them of their wallet. His cleverness in choosing the perfect moment and his heightened perception ensured the act went unnoticed, leaving the victim none the wiser.&#10;Winston swiftly pocketed his new acquisitions in his discreet pouch, a sly grin playing upon his charming features as he slipped back into the crowd, already eyeing his next potential mark.&#10;-   A well-crafted leather wallet containing S$120 and a few credit cards.&#10;dexterity: success (11/1)&#10;    Given Winston Winters' graceful nature and ability to perform delicate, precise tasks with ease and style, pickpocketing someone would be a trivial task for him in terms of the required dexterity.&#10;    1=Trivial: Winston Winters would easily complete the task with the necessary precision&#10;    cleverness: success (8/4)&#10;    With his average cleverness, Winston Winters would likely be able to pickpocket someone by carefully observing and choosing the right target and timing, though he may struggle with more complex scenarios.&#10;    2=Normal: Winston Winters would likely solve the problem&#10;    perception: success (19/4)&#10;    With his average perception abilities, Winston Winters would likely notice or perceive the necessary details for successful pickpocketing, but might miss some subtle cues or risks.&#10;    2=Normal: Winston Winters would likely notice or perceive the situation" /></a></div>
+
+<p>Action resolution is the most interesting and takes several&nbsp;steps:</p>
+<ol>
+<li>Player skills are represented with natural language, such as &#8220;feeble&#8221;, &#8220;weak&#8221;, &#8220;strong&#8221;, etc. (<a href="https://gist.github.com/ianb/724ffdbf5ede48801225c9066bbfa61b">Here&#8217;s an example of the complete structure for a couple skills</a>)<ol>
+<li>This doesn&#8217;t offer a lot of granularity (4-5 levels), but LLMs don&#8217;t operate well simply on numbers without some kind of rubric. Instead of creating a rubric that will struggle produce numbers I decided to make the rubric the&nbsp;canon.</li>
+</ol>
+</li>
+<li>Given an attempted action the <span class="caps">LLM</span> will determine what skills are relevant (knowledge, strength, speed, etc) and begin to think about how challenging the task is in terms of this skill.<ol>
+<li>The <span class="caps">LLM</span> tends to give a longer list of skills (2-3) than a normal gamemaster (who will usually choose one). Maybe that&#8217;s too many, or maybe it&#8217;s just&nbsp;right?</li>
+</ol>
+</li>
+<li>Analyze the difficulty of the action with respect to each skill. I.e., <em>for this character</em> will the action be trivial, normal, difficult, very difficult, or impossible.<ol>
+<li>Now the granularity is even worse! The two ends (trivial and impossible) are not very interesting, so there&#8217;s really just 3 levels of&nbsp;difficulty.</li>
+<li>And then how often should these&nbsp;succeed?</li>
+</ol>
+</li>
+<li>The game rolls dice and based on the roll and difficulty it assigns success/failure (maybe a critical) to each&nbsp;skill.</li>
+<li>The list of success/failure is given to the <span class="caps">LLM</span> and it is asked to describe the results of the attempt, including concrete results like gaining or losing inventory or being&nbsp;injured.</li>
+</ol>
+<p>It&#8217;s fun to see the breakdown, the success/failures, and the ultimate effect of your&nbsp;action.</p>
+<p>Still the game notably lacks a <em>point</em>, there&#8217;s no goals, you just wander interminably. Also the world you inhabit is static, there are small and limited updates but most action is forgotten and inconsequential at the code/persistence&nbsp;level.</p>
+<h2><span id="thoughts-and-questions">Thoughts and open&nbsp;questions</span></h2>
+<p>Given all that, I&#8217;m going to write down a big list of thoughts: questions I have, ideas that might work, things to look&nbsp;into.</p>
+<h3><span id="action-and-resolution">Action and&nbsp;resolution</span></h3>
+<ol>
+<li>
+<p>In my own implementation I make a strong distinction between feats that require action resolution and simple actions that happen automatically/without&nbsp;failure.</p>
+<ol>
+<li>Should a gamemaster step always happen? Moving around is usually fine, but while you can <a href="https://www.instagram.com/ryanharby/p/C5JY503rCC6/">leave a store easily</a> it&#8217;s not so easy to leave a&nbsp;jail</li>
+<li>I&#8217;m not worried too much about the prompt overhead (cost and latency) of the gamemaster step&#8230; I assume both that this will get faster and cheaper with time, and that once I have something I like then there&#8217;s more reason to&nbsp;optimize.</li>
+<li>Also I have no idea what I&#8217;m going to do with any of this, so what am I even optimizing&nbsp;for?</li>
+</ol>
+</li>
+<li>
+<p>Given natural language descriptions of skill levels it&#8217;s hard to have more than a couple levels, such as feeble/weak/average/strong/powerful; usually 4-5&nbsp;levels.</p>
+<ol>
+<li>The number of levels is not the same for all skills. I only have 4 levels of cleverness, 5 for knowledge, 4 for dexterity&#8230; and sometimes &#8220;average&#8221; is level 2 and sometimes level 3. But I don&#8217;t think it matters, there&#8217;s no real need to normalize&nbsp;these.</li>
+<li>But because of the limited levels there&#8217;s big jumps between levels, and the probabilities for action resolution are hard to balance. It feels like there should be some mathematical modifier on top of the descriptions. Like you might have a dexterity of &#8220;nimble&#8221; but it can be +1 nimble which isn&#8217;t as good as graceful but is better than +0&nbsp;nimble.</li>
+<li>The finer points of the math don&#8217;t feel as important when the <span class="caps">LLM</span> itself is quite arbitrary. I&#8217;m not sure if a human gamemaster is any less arbitrary, it&#8217;s just easier to ask the <span class="caps">LLM</span> the exact same question multiple times and get different answers while the human will stick to a&nbsp;decision.</li>
+<li>Creating the levels was a <span class="caps">GPT</span>-heavy task. The result is about 400 lines of <span class="caps">JSON</span>, and is a good example of <span class="caps">AI</span> assist: I <em>don&#8217;t</em> want to hand over all those distinctions to a <span class="caps">LLM</span>, but it was a big help in expanding the structures and brainstorming terms and&nbsp;phrases.</li>
+</ol>
+</li>
+<li>
+<p>The ability to spam action attempts may make it too easy to make big swings and eventually hit. You aren&#8217;t just swinging for a favorable roll of the dice, but also a favorable analysis by the <span class="caps">LLM</span>.</p>
+<ol>
+<li>Human gamemasters use their memory and a sense of annoyance to stop&nbsp;this.</li>
+<li>Another approach is an escalating cost of failure, so that if you fail multiple times in a row the results become more dire. Though a quick hack around this might be to attempt trivial feats (&#8220;I chew gum and walk at the same time&#8221;) to break a sequence of&nbsp;failures.</li>
+<li>Or just increasing the consequentiality of all attempts; make failure real and sticky. Even ask the <span class="caps">LLM</span> to come up with consequences that specifically punish multiple&nbsp;attempts.</li>
+<li>Given history the <span class="caps">LLM</span> does naturally apply some of these&nbsp;principles.</li>
+</ol>
+</li>
+<li>
+<p>The gamemaster role is an arbiter; I think there&#8217;s another entity worth exploring that I might call a &#8220;goalmaster&#8221; <span id="goalmaster"></span></p>
+<ol>
+<li>The goalmaster is there to inspire the player to action, to arrange things behind the scenes so that plot moves forward, so that world isn&#8217;t arbitrary, revisiting themes, and so&nbsp;on.</li>
+<li>Traditionally the gamemaster does both roles, but separating roles is both easy and desirable with the <span class="caps">LLM</span>; each role is just a different&nbsp;prompt.</li>
+<li>It&#8217;s less clear to me exactly when the goalmaster is invoked. It feels like it should be more anticipatory than immediate. Some insulation is even preferable, it&#8217;s no fun if every interaction feels like it is telegraphing some ultimate purpose. The goalmaster shouldn&#8217;t be the hand of fate, it&#8217;s more a combination of serendipity and a sense of&nbsp;import.</li>
+<li>I imagine the goalmaster implanting details, changing character histories, creating and scheduling events, creating secrets that characters can hold onto, influencing conversation initialization, and so&nbsp;on.</li>
+<li>I can imagine goalmasters that are specialized to different structures or genres. For instance a murder mystery or progressing through the <a href="https://en.wikipedia.org/wiki/Hero%27s_journey">Hero&#8217;s Journey</a>.</li>
+</ol>
+</li>
+<li>
+<p>How direct should the player&#8217;s roleplaying be? Should the player be acting <em>as</em> their character (speaking directly as their character), or indirectly (describing broad strokes of what the character should do) and let the game actually run the&nbsp;character?</p>
+<ol>
+<li>While it would be cool to wire the game up to some kind of <a href="https://en.wikipedia.org/wiki/Strength_tester_machine">strength-o-meter</a>, realistically attempts to do physical actions have to be resolved on behalf of the player, not through the player&#8217;s direct&nbsp;actions.</li>
+<li>&#8230; though arcade games do simulate physicality through dexterity and skill with the&nbsp;controllers.</li>
+<li>If you roleplay directly then how do you play an alien? An ancient Sumerian? Someone much smarter or much dumber than you? Someone charming and attractive or someone&nbsp;repulsive?</li>
+<li>If the player is more direct in their roleplay that could give them a bonus. So if you describe exactly <em>how</em> you do something, or how you behave, or what you know, then you have a higher likelihood of&nbsp;succeeding.</li>
+<li>This could even be supported in the interface&#8230; especially in the historical roleplay I like the idea of learning history on demand to support your in-game goals. The game as an open book&nbsp;test.</li>
+<li>Maybe during difficulty analysis the <span class="caps">LLM</span> could offer bonus points, while still keeping to the simple difficulty&nbsp;levels.</li>
+<li><a href="https://infiniteworlds.app/">Infinite Worlds</a> is an example of indirect action: from what I can tell it&#8217;s basically writing a story, and the player gives points of direction. Those can be specific or not, but either way it&#8217;s all rewritten to create a singular&nbsp;narrative.</li>
+</ol>
+</li>
+<li>
+<p><em>How an action is described</em> is a possible new gameplay&nbsp;element.</p>
+<ol>
+<li>The <span class="caps">LLM</span> is deciding what skills come into play for a certain activity. The finer points of how you describe the action can affect that, and thus affect which skills are used and your likelihood of success. &#8220;Use subterfuge to pickpocket the guard&#8221; vs &#8220;make a distraction to pickpocket the guard&#8221; vs &#8220;pickpocket the&nbsp;guard&#8221;.</li>
+<li>These action descriptions also inform how success and failure will be resolved. None of this even requires special implementation, it just happens naturally in the&nbsp;prompts.</li>
+</ol>
+</li>
+<li>
+<p>For another gameplay the player could be very specific about how the character presents themselves. For example if you say &#8220;I walk up to the person confidently&#8221; that can/should effect the&nbsp;interaction.</p>
+<ol>
+<li>Like action descriptions this will naturally affect the interactions as long as the descriptions aren&#8217;t scrubbed from the&nbsp;prompts.</li>
+<li>Players won&#8217;t naturally describe things like body language and attitude. How can we solicit that kind of input? How can we prove to the player that it&nbsp;matters?</li>
+<li><a href="https://en.wikipedia.org/wiki/Comedy_of_manners">Comedy of manners</a> is an interesting genre to imagine (as in <a href="https://if50.substack.com/p/2013-a-family-supper">A Family Supper</a>)</li>
+<li>This is most salient in environments where there are strong social rules: court intrigue, playing ambassador, a Jane Austen style social gathering, a Babylon 5 style environment. The social rules will be much more interesting and salient if they are&nbsp;articulated.</li>
+</ol>
+</li>
+<li>
+<p>To what degree should the <span class="caps">NPC</span> function similarly to the player character? Specifically, should the <span class="caps">NPC</span> perform feats with action&nbsp;resolution?</p>
+<ol>
+<li>The <span class="caps">LLM</span> self-censors more easily than a human, and with appropriate prompting the <span class="caps">NPC</span> won&#8217;t attempt strange&nbsp;actions.</li>
+<li>Surprising actions would require imbuing these characters with additional willpower (through prompts) to make gamemaster mediation of characters more&nbsp;meaningful.</li>
+<li><span class="caps">NPC</span> feats do offer an element of surprise that could be very appealing. Failures are interesting, and the <span class="caps">LLM</span> is unlikely to script failures entirely on its&nbsp;own.</li>
+<li>Because everything is normalized to text it&#8217;s fairly easy to apply the same rules to players and NPCs. Things like skill levels might be created on&nbsp;demand.</li>
+</ol>
+</li>
+</ol>
+<h3>World and&nbsp;Context</h3>
+<ol>
+<li>
+<p>When considering how to represent any aspect of the world (location descriptions, people&#8217;s attitudes, location and connections, etc) there&#8217;s a couple implementation&nbsp;options:</p>
+<ol>
+<li><strong>Full code:</strong> create data structures around each attribute, allow many aspects to be resolved automatically, create custom prompts to manage and update the structures, and so on. It&#8217;s easy to imagine creating this for an inventory&nbsp;system.</li>
+<li><strong>Casual natural language:</strong> describe pertinent aspects of the attribute in natural language, using prompts and output templates to guide the <span class="caps">LLM</span> towards salience. All resolution is done by the <span class="caps">LLM</span> since to the code it&#8217;s just a bunch of words. <span class="caps">NPC</span> character descriptions fit here. For instance you might care about the social status of the <span class="caps">NPC</span>, and want prompts and templates that encourage specifying that social status, but it doesn&#8217;t have to be a formal attribute that can be&nbsp;isolated.</li>
+<li><strong>Pile of words:</strong> let the attribute be described in general purpose summaries, transcripts, or descriptions. Allow the attribute to be unspecified, or maybe it comes into being when necessary. <span class="caps">NPC</span> clothing or attitudes might fit&nbsp;here.</li>
+<li><strong>Hallucinate it all:</strong> don&#8217;t worry about saving anything, just let the <span class="caps">LLM</span> make it up as needed, without even ensuring consistency across time. If the attribute is easy enough to infer from other details then maybe this is fine. This might be sufficient for a room description&#8230; at least until the player tries to inspect or interact with the room or its&nbsp;contents.</li>
+<li><strong>Embrace incremental specificity:</strong> for many aspects of the world and characters you can imagine going up through this list, beginning with just vibes that allow for <span class="caps">LLM</span> imagination/hallucination, then remembering those for later use, then formalizing them when a mechanism asks for a formal value (such as a skill&nbsp;level).</li>
+</ol>
+</li>
+<li>
+<p>Let&#8217;s revisit Retrieval Augmented Generation (<span class="caps">RAG</span>): retrieving a portion of the game/world/character knowledge and inserting it into the&nbsp;prompt.</p>
+<ol>
+<li>When you include information in a prompt the <span class="caps">LLM</span> isn&#8217;t forced to make use of that knowledge, but it is available. In a game that can be things like location descriptions, past events, character personalities or factoids,&nbsp;etc.</li>
+<li>My hand-coded prompts <em>are</em> doing a kind of <span class="caps">RAG</span>, in that I fetch and insert knowledge I believe will be relevant to the current&nbsp;task.</li>
+<li>In my hand-written prompts I&#8217;m not just inserting information, I&#8217;m also contextualizing that information. That can be as simple as &#8220;The room is described as&nbsp;{room_description}&#8221;</li>
+<li>Context <em>really</em> matters. Especially in a somewhat adversarial situation like in a game: it&#8217;s quite important that the <span class="caps">LLM</span> not confuse the player with another character. This is a common issue and can happen quite often even with a custom&nbsp;prompt.</li>
+<li><span class="caps">RAG</span> is usually imagined as a more automated system: a bag of facts, roughly tagged and labeled, that get inserted into prompts. How they are selected is probably some combination of heuristics, structured search, and fuzzy (<a href="https://www.pinecone.io/learn/vector-embeddings/">embedding</a>)&nbsp;search.</li>
+<li>Determining what facts are memorable is a big task of its own. This should be informed by the game mechanics, so that facts that are likely to impact the gameplay are remembered and other facts allowed to fade into&nbsp;history.</li>
+<li>Some facts should probably be saved in a structured form rather than relying on <span class="caps">RAG</span>. For instance if the <span class="caps">LLM</span> invents rooms and passageways those would probably best be remembered as a formal series of locations, not put into a pool of&nbsp;memories.</li>
+<li>The intent parsing prompt could easily do the additional work to create <span class="caps">RAG</span>-related queries that will support the gamemaster and <span class="caps">NPC</span>&nbsp;prompts.</li>
+<li>As memorable facts are created I can imagine preprocessing facts to target them for different contexts. For instance if a character named Jane Doe says &#8220;I&#8217;m a big fan of chili dogs&#8221; then you might index on something like &#8220;Jane Doe is a big fan of chili dogs&#8221;. But when you use the fact you may combine it into a list of &#8220;likes&#8221; for the&nbsp;character.</li>
+<li>This preprocessing might also be applicable to other aspects of the prompts. For instance I can imagine a dozen ways you can present the world building background given the needs of a prompt. You could have a very long document describing the world and then distill that down to smaller passages that describe architecture, social mores, a magic system, social movements or tensions, and so on. These wouldn&#8217;t have to be retrieved by a <span class="caps">RAG</span>/search system, but could be inserted more manually into prompts. Then you can leave out architecture guidance from an <span class="caps">NPC</span> character response&nbsp;prompt.</li>
+</ol>
+</li>
+<li>
+<p>Using multiple prompts isn&#8217;t just helpful for focusing the instructions and purpose of the prompt, but also for limiting the&nbsp;information.</p>
+<ol>
+<li>Games built on Custom GPTs or as a prompt to ChatGPT are terrible in this regard, not only is everything visible to every interaction, but it&#8217;s also all visible to the&nbsp;user.</li>
+<li>When there&#8217;s complete information it&#8217;s also very hard to separate the narrative goals from specific interactions. If it&#8217;s a space adventure then they are always adventuring, there&#8217;s no normalcy. When every detail is created in service of the narrative it can feel confining, and details begin to telegraph parts of the story as you learn everything is created in service to the&nbsp;story.</li>
+<li>Generally I think these separate prompts and limited information gives the player (and potentially NPCs) more true autonomy and&nbsp;surprise.</li>
+</ol>
+</li>
+<li>
+<p>LLMs have some biases and tendencies to repeat themselves. <span class="caps">GPT</span> loves the word &#8220;delve&#8221;. It&#8217;s also partial to the name&nbsp;&#8220;Silas&#8221;.</p>
+<ol>
+<li>The <span class="caps">LLM</span> is much better at diversity of responses (and overall more interesting responses) when it makes lists instead of coming up with a singular&nbsp;answer.</li>
+<li>I think humans are like this too, we just think up lists in our head but only say one item out loud. An <span class="caps">LLM</span> can&#8217;t think of things&nbsp;privately.</li>
+<li>Maybe a solution here is to have the <span class="caps">LLM</span> produce and draw from more lists. For instance you might make a list of possible locations: florist, dilapidated theater, abandoned well, and so on. Give the <span class="caps">LLM</span> a shuffled sampling of some of these and let it choose the most appropriate next location (and still let it invent a new type of location if the plot calls for it). If you are building a medieval city this will keep everything from being a tavern, or every building in a wealthy neighborhood from being a&nbsp;mansion.</li>
+<li>In the case of creating things from lists (similar to rolling dice to resolve actions), you need an additional prompting step: a prompt to identify the missing information or action, then code that rolls some dice, and another prompt to handle the result of those rolls.<ol>
+<li>But you don&#8217;t want to run long chains of large prompts that include all the context. Most of the context really isn&#8217;t necessary for these chains. But if you don&#8217;t have <em>any</em> context then there&#8217;s no reason to use the <span class="caps">LLM</span> at all. This is where some careful context construction is&nbsp;useful.</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>
+<p>The world feels much more alive if there&#8217;s things happening in the&nbsp;background.</p>
+<ol>
+<li>Running a full &#8220;simulate the world in <span class="caps">LLM</span> calls&#8221; system is expensive and slow and&nbsp;chaotic.</li>
+<li>I can imagine a simpler roll-for-activity, where a setting might have a list of possible background activities that happen and one gets picked randomly. Some might be simple, like someone starts a round of singing. Another might trigger other events, like a fight breaking out.<ol>
+<li>In general there&#8217;s a pattern of asking the <span class="caps">LLM</span> to imagine patterns of behavior or activity instead of imagining activity from scratch at each step. For instance imagining a list of possible locations an <span class="caps">NPC</span> might&nbsp;visit.</li>
+</ol>
+</li>
+<li>The precalculation is also to achieve balance. If you just ask the <span class="caps">LLM</span> to invent background activity it&#8217;s going to invent the same activity over and over&#8230; because why not?<ol>
+<li>Generally you have to look at prompts and think: is there enough new information, or novel combinations of information, that would engender a unique and interesting response? If not then either you have to expand the prompt context, or consider other approaches to ensure&nbsp;variety.</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>
+<p>What is the right amount of world setup? That is, how much should the <span class="caps">LLM</span> work out on the fly and in response to player actions, and how much should be created ahead of time (maybe still by the <span class="caps">LLM</span>)?</p>
+<ol>
+<li>There&#8217;s both setup of concrete things (locations, characters, backstory) and potentially setting up the rules&nbsp;themselves.</li>
+<li>That is: when you run much of the game on natural language it&#8217;s possible to invent new rules, new facets, new verbs. Maybe you are in a situation where everyone has an allegiance, or a magical power, or secret name. It&#8217;s a bit annoying to code this flexibility, but much easier than ever&nbsp;before.</li>
+<li>Allowing the <span class="caps">LLM</span> to invent new rules feels chaotic and hard to control when engineering the system, but is awfully fun when playing with the system. Making it work is probably a case of careful interconnected prompting with a smaller and more constant core&nbsp;ruleset.</li>
+</ol>
+</li>
+<li>
+<p>An <span class="caps">LLM</span> brings a wide array of knowledge to&nbsp;everything.</p>
+<ol>
+<li>Sometimes that feels like a bug, like asking a peasant to solve an algebra equation (and getting the&nbsp;answer)</li>
+<li>But the <span class="caps">LLM</span> can also legitimately roleplay not just the personality of a character, but also their knowledge. In one session my daughter encountered a Professor of Astrology, and quite enjoyed learning actual Astrology from&nbsp;her.</li>
+<li>The <span class="caps">LLM</span> can also speak other languages, critique etiquette, and all kinds of other peculiar skills. Bringing those skills out in the characters feels&nbsp;productive.</li>
+<li>The <span class="caps">LLM</span> also gets things wrong but that feels less concerning in a&nbsp;game.</li>
+</ol>
+</li>
+<li>
+<p>I&#8217;ve thought a lot about MUDs and multi-user worlds. But only in vague pie-in-the-sky&nbsp;ways&#8230;</p>
+<ol>
+<li>Players implicitly or explicitly creating the world seems really compelling&#8230; but only if it&#8217;s&nbsp;shared.</li>
+<li>A lot of the action resolution and other fairly fuzzy techniques are not well attached to a clock. If you have multiple synchronous players then everything has to happen on a central&nbsp;clock.</li>
+<li>There&#8217;s also lots of race conditions if you allow players to make &#8220;big&#8221; moves. What if I setup a bank heist that takes weeks of game time to put together, and another person just does a stick-up job? How do I split that larger event to include that smaller&nbsp;event?</li>
+<li>Given the right pretense for the world, maybe you can avoid some issues. That is, you can invent a world with particular and maybe peculiar rules that make multi-user play&nbsp;easier.</li>
+<li>Non-synchronous play is also possible, but players never get to meet. But just the evidence that other real people have been in this would make everything feel so much more concrete.<ol>
+<li>Maybe the players only meet in certain places where the rules are different and more compatible with social play. That space might only allow discussion, trading items, etc., but not concurrent interaction with the game&nbsp;world.</li>
+<li>I can imagine something with portals, time warps&#8230; with something like a League Of Time Travelers club where people&nbsp;meet.</li>
+</ol>
+</li>
+<li>Another simpler approach might just be a complete serialization of user&#8217;s actions: one user&#8217;s action has to be completely resolved before another action by any user will be considered. There are several Discord games that effectively work that&nbsp;way.</li>
+<li>I&#8217;ve ignored traditional &#8220;safety&#8221; concerns about misuse of the <span class="caps">LLM</span> or abuse in the world. In a single-player game I feel fine leaving that to the player. But in a multi-player game this would come up&nbsp;quickly.</li>
+</ol>
+</li>
+</ol>
+<h3><span id="interface-and-interaction">Interface and&nbsp;interaction</span></h3>
+<ol>
+<li>
+<p>Text input feels pretty weighty, each turn can lead to blank page&nbsp;syndrome.</p>
+<ol>
+<li>Every time I consider a simplified interface my mind pushes back because I <em>really want</em> the player to be generative. Multiple choice just doesn&#8217;t excite&nbsp;me.</li>
+<li>Maybe I&#8217;m wrong. Multiple choice appears to be just a tree of choices, but with all the other inputs to the system there&#8217;s no real chance of repeatability. And if you start blending in the player&#8217;s (or the player character&#8217;s) general attitudes then it feels very&nbsp;bendable.</li>
+<li>In real life you may have experienced the feeling: &#8220;I could do anything right now, I don&#8217;t have to be anywhere or do anything&#8230;&#8221; and then you still don&#8217;t know what to do with that freedom? That&#8217;s kind of what the roleplay creates, and maybe that&#8217;s just too&nbsp;much.</li>
+<li>A common solution is to give multiple choice options. With the <span class="caps">LLM</span> an <em>Other</em> option can also be available where the player can enter any text. Is that good enough? You can find these games all over the place but I haven&#8217;t fallen in&nbsp;love.</li>
+<li>Multiple choice isn&#8217;t just about pre-filled options, it also has an effect on the rhythm and pace of the game. The story will be driven by those questions, bouncing from pivotal choice to pivotal choice. Just having an <em>Other</em> option doesn&#8217;t let you explore the scenario at different paces or with different&nbsp;focuses.</li>
+<li>Multiple choice isn&#8217;t just about restricting answers, it&#8217;s about presenting everything as a <em>Choice</em>. That kind of presentation literally doesn&#8217;t exist in a chat&nbsp;interface.</li>
+</ol>
+</li>
+<li>
+<p>Learning how to use the game is actually pretty&nbsp;simple!</p>
+<ol>
+<li>I&#8217;ve been reading some discussions and commentaries about different <a href="https://medium.com/@williamson.f93/multi-user-dungeons-muds-what-are-they-and-how-to-play-af3ec0f29f4a">MUDs</a> and learnability is a major issue. There&#8217;s so many <em>mechanisms</em>. Natural language input really&nbsp;helps!</li>
+<li>Natural language input with <span class="caps">LLM</span> resolution is <em>not</em> like a traditional text adventure (e.g., Zork). In a text adventure there&#8217;s underlying finite mechanisms, and the parser translates your text into something like underlying commands. The <span class="caps">LLM</span> with <span class="caps">LLM</span> resolution is not translating your action to an intermediate representation! It is quite hard to enter a command that <em>doesn&#8217;t</em> do&nbsp;something.</li>
+<li>In fact, always doing <em>something</em> is probably itself an issue. One issue LLMs have in general is that when they are asked to perform a task they will perform it, even if the task is underspecified, nonsensical, improbable. There&#8217;s ways to mitigate that, but it&#8217;s always&nbsp;lurking.</li>
+<li>There is an open question about how to speak to the gamemaster, out of character. An example might be to ask &#8220;how hard would it be to &#8230;&#8221;. Or just to understand the rules or&nbsp;expectations.</li>
+</ol>
+</li>
+<li>
+<p>What rhythm should the game&nbsp;have?</p>
+<ol>
+<li>The most obvious way to do a chat-based game is one long stream of&nbsp;activity.</li>
+<li>In terms of implementation it&#8217;s very helpful to have summative moments, when the past is compressed into something smaller and certain effects can be applied. For instance updating &#8220;reputation&#8221; on a turn-by-turn basis is undesirable: it shouldn&#8217;t change that quickly, and should be based on a set of actions rather than any single action.<ol>
+<li>Changing location or ending a conversation are obvious moments to do this, but are there&nbsp;others?</li>
+</ol>
+</li>
+<li>Gameplay also seems like it benefits from moments of reflection and a pause from action. There has to be a moment when you can tell the world has actually changed due to your&nbsp;actions.</li>
+</ol>
+</li>
+<li>
+<p>Instead of a singular game experience I&#8217;ve also thought about little mini-games. These might share many <span class="caps">UI</span> elements, but be driven by different prompts and have different goals and outcomes. Some possible&nbsp;mini-games:</p>
+<ol>
+<li><strong>Debate:</strong> the player debates some issue pertinent to the setting. Setup emphasizes clear conflict and opposing ideas, conclusion is about how convincing the argument&nbsp;was.</li>
+<li><strong>Deceit:</strong> conning someone (an <span class="caps">NPC</span>). A little like prompt hacking as a game, but &#8220;prompt hacking in&nbsp;character&#8221;.</li>
+<li><strong>Wandering/exploring:</strong> leads to an emphasis on setting. Could be generative itself: wandering as a way to build the world. The player&#8217;s gaze literally makes things come into being. This would be much simpler if the player themselves didn&#8217;t perform many feats or impactful actions during this&nbsp;wandering.</li>
+<li><strong>Scavenger hunt:</strong> like wandering but with a little more purpose. Some kinds of quests are scavenger hunts with the pretense of a plot. The <span class="caps">LLM</span>&#8217;s ability to judge could make things interesting. For instance: &#8220;find a sad&nbsp;person.&#8221;</li>
+<li><strong>Day in the life:</strong> successfully navigate a normal day for the character. Do <em>not</em> make a fuss, do not attempt crazy things, be the person people expect you to be. It feels a little tedious but depends on the novelty of the character and their life. What&#8217;s it like to be a person of a different gender? But not some caricature, just&#8230; normal. The patience and credulity of the <span class="caps">LLM</span> makes this&nbsp;feasible.</li>
+<li><strong>The hard conversation:</strong> a breakup, an intervention, a confrontation, a terrible job interview. Might work best in real-world (including historical) scenarios, though perhaps a veneer of fantasy would soften the scene. Can start with a clear conflict, and perhaps determine the desired outcome up&nbsp;front.</li>
+<li><strong>Attempt a feat:</strong> such as a heist, a jailbreak, etc. Create a plan. Gather your crew. Maybe the actual act doesn&#8217;t have to be roleplayed, and instead it&#8217;s all setup and then let the gamemaster tell the story of the outcome. The resulting story could be presented as a kind of minute-by-minute&nbsp;timeline.</li>
+<li><strong>Relationship building:</strong> ala <a href="https://stardewcommunitywiki.com/Friendship">Stardew Valley</a>, or like the conclusion to Groundhogs Day where you pursue a perfectly benevolent day. Spend your time checking in with folks. Make smalltalk. Setup is arranged to add just a little new flavor each day, some interconnected events and relationships between NPCs, but the action is low and the friendliness is high.<ol>
+<li>Unlike a game like Stardew Valley, it&#8217;s not just you trying to endear yourself to the NPCs, the NPCs can get to know your character as&nbsp;well.</li>
+</ol>
+</li>
+<li>I worry the idea of mini-games is a kind of avoidance: unable to create <em>one</em> compelling experience I instead imagine several, none of which&nbsp;exist&#8230;</li>
+<li>A positive point: if you have a diverse set of interactions (ala mini-games) it&#8217;s very easy to normalize them all to the core game mechanics. All you have to do is present the finished game/interaction/scene textually and have the <span class="caps">LLM</span> translate that into&nbsp;effects.</li>
+</ol>
+</li>
+<li>
+<p>Maybe there should be a Jiminy Cricket sort of character, the <a href="https://tvtropes.org/pmwiki/pmwiki.php/Main/HonestAdvisor">Honest Advisor</a>/<a href="https://tvtropes.org/pmwiki/pmwiki.php/Main/SpiritAdvisor">Spirit Advisor</a>. A secret companion that helps out. A voice in the player character&#8217;s head. A magical&nbsp;entity.</p>
+<ol>
+<li>Is this just another way to present a help system? To keep the player from getting lost or misunderstanding the&nbsp;goals?</li>
+<li>If it&#8217;s more than that, then what is it? Maybe it&#8217;s a <em>source</em> of&nbsp;goals.</li>
+<li>One pretense might be that you, the player, has teleported into the consciousness of another person. <a href="https://en.wikipedia.org/wiki/Quantum_Leap_(1989_TV_series)#Premise_and_characters">Quantum Leap-style</a>.</li>
+<li>Or instead of completely replacing that character it&#8217;s more consensual or complementary, making that secondary consciousness the&nbsp;companion.</li>
+</ol>
+</li>
+</ol>
+<h3><span id="player-goals-motivation">Player goals and&nbsp;motivation</span></h3>
+<ol>
+<li>
+<p>Games are more fun and make more sense when there is a goal. Even a vague goal like &#8220;level up&#8221; or &#8220;get lots of&nbsp;money&#8221;.</p>
+<ol>
+<li>Everyone wants to know if they are winning! Though I&#8217;m not sure that&#8217;s&nbsp;true.</li>
+<li>It creates a <em>purpose</em>, a reason to do one thing instead of another thing. Especially if you are pretending to be a person (with an incomplete psyche and history) it helps to have suggestions about what you <em>want</em>.</li>
+<li>Should goals be part of character creation? A character-specific goal rather than a singular goal like &#8220;level&nbsp;up&#8221;.</li>
+<li>The <a href="#second-experiment">life simulator</a> creates scenarios which have some direction and purpose, but often two goals. This is because I&#8217;ve focused on <em>choices</em>, meaning scenarios where there&#8217;s two plausible directions. Maybe that&#8217;s bad? Or at least I shouldn&#8217;t combine the choice and the scenario roleplay. The result feels&nbsp;mushy.</li>
+<li>If there&#8217;s no tension then people make tension. I think a lot of bad behavior is a kind of acting out. If you don&#8217;t have anything to do, any purpose or relationship to the medium, then it&#8217;s fun to just stir the pot with inflammatory&nbsp;statements.</li>
+</ol>
+</li>
+<li>
+<p>What kind of game is this&nbsp;really?</p>
+<ol>
+<li><span class="dquo">&#8220;</span>Roleplaying game&#8221; is a really broad category, too&nbsp;broad.</li>
+<li><a href="https://thegameofnerds.com/2022/02/23/what-are-solo-journaling-games/">Journaling games</a> are a genre worth thinking about more deeply. These games are more journey than goal, with a lot of generative aspects, and result in an artifact (the &#8220;journal&#8221;). They are often one-player tabletop roleplaying games, with lots of rolling to look up effects in tables.<ol>
+<li>I think much of the magic of journaling games is the combinatorial results. LLMs are also good at mixing and combining. Like you pick randomly from an event table and get &#8220;tragedy&#8221;, &#8220;politics&#8221;, &#8220;baking&#8221;, all set in London circa <span class="caps">1200AD</span>: &#8220;A beloved baker, known for his innovative breads that fed both the rich and poor of London, tragically dies in a suspicious fire during political riots sparked by a royal decree imposing heavy taxes on&nbsp;grain.&#8221;</li>
+</ol>
+</li>
+<li>I don&#8217;t really &#8220;get&#8221; life simulation games. But I haven&#8217;t really tried. (What should I try?) The Sims don&#8217;t seem quite right, but there&#8217;s a ton of mobile games where you &#8220;make life&nbsp;choices&#8221;.</li>
+</ol>
+</li>
+<li>
+<p>Is building relationships fun? Maybe&#8230; it&#8217;s an important part of Stardew Valley, for instance. <em>How</em> are they&nbsp;fun?</p>
+<ol>
+<li><a href="https://tvtropes.org/pmwiki/pmwiki.php/Main/MinMaxing">Minmaxing</a> relationships makes them feel hollow and like <span class="caps">XP</span> grinding. Do you win just by being cloyingly nice to&nbsp;everyone?</li>
+<li>I see potential in giving characters secret backstories. Maybe even an overarching secret, something that you can discover by puzzling together the bits and pieces you get from several characters. This is a good <a href="#goalmaster">goalmaster</a> task: create the underlying secret, partition it into distinct and incomplete observations or pieces of knowledge, then distribute that to characters.<ol>
+<li>It still has to have a conclusion, the secret alone isn&#8217;t enough. The secret must <em>do</em> something. Maybe it&#8217;s an accusation against a murderer. Access to some secret organization. So in addition to constructing the secret the goalmaster must construct the criteria to decide the secret can be&nbsp;utilized.</li>
+</ol>
+</li>
+<li>A common relationship building task in regular games is to do quests on behalf of the <span class="caps">NPC</span>. While that might be a ok sometimes I think it&#8217;s used so heavily because there&#8217;s no real relationships to be built with a traditional <span class="caps">NPC</span>. But the idea is magnetic, I keep coming back to it even though I&#8217;m not that interested in it. Or rather quests are <em>fine</em>, but they aren&#8217;t relationship builders.<ol>
+<li>Another false path: no riddles. The <span class="caps">LLM</span> will love to propose riddles. It knows like 3 riddles. Do not let it make&nbsp;riddles.</li>
+</ol>
+</li>
+<li>While it is somewhat ethically fraught, I am interested in scenarios where the player &#8220;fixes&#8221; characters. Helping a despondent character, a self-hating character, a fearful character. And at least it&#8217;s less fraught than trying to get the <span class="caps">AI</span> to fix the user.<ol>
+<li>But you can&#8217;t really use this idea of amateur player psychologist without a theory about how the character can be helped. You can&#8217;t just set up the psychological issue, you have to offer the <span class="caps">LLM</span> a theory of change and have it check in on both the theory and the interactions to see if there&#8217;s&nbsp;progress.</li>
+</ol>
+</li>
+<li>To keep going with this inversion of roles: instead of the <span class="caps">AI</span> teaching the user, can the player teach an <span class="caps">NPC</span> character? Again this requires very specific prompting, both to create the initial veil of ignorance in the character and to judge how the character learns. But it&#8217;s definitely doable. And maybe the result is <em>more</em> educational than having the <span class="caps">LLM</span>&nbsp;teach.</li>
+</ol>
+</li>
+<li>
+<p>What can we learn from traditional <span class="caps">NPC</span>&nbsp;interactions?</p>
+<ol>
+<li>Normal <span class="caps">NPC</span> interactions turn into: does the person like or not like you? Will they tell you a secret? Will they tell you something you can later tell someone else to unlock something (a kind of password). It always comes back to the &#8220;core&#8221; gameplay. So what&#8217;s the core gameplay for this roleplay game?<ol>
+<li>There is none! No wonder I&#8217;m having a hard&nbsp;time&#8230;</li>
+</ol>
+</li>
+<li>Life simulation games are maybe more about making pivotal choices, but also opening up choices by dialog. For instance, endearing yourself to someone so you can choose a relationship. Often&nbsp;romance&#8230;</li>
+</ol>
+</li>
+<li>
+<p>Games with romantic elements often turn into a scoring game. How many likeability points can you get? This is not a good model of&nbsp;romance.</p>
+<ol>
+<li>Romantic goals powered by an <span class="caps">LLM</span> could turn into something like a pickup artist game: can you prompt hack (socially manipulate) someone into liking&nbsp;you?</li>
+<li>Scoring encourages you to just pester someone into liking you, throwing <a href="https://en.wikipedia.org/wiki/Love_bombing">lovebomb</a> shit at the wall. In real life that kind of works&#8230; but not that well, and the <span class="caps">LLM</span> is probably much more easily hackable in this respect than a real&nbsp;person.</li>
+<li>Pursuing a real romance you can&#8217;t just run up the score. If you want to start a relationship with someone it&#8217;s helpful if they like you but also requires something qualitatively different than just being continually&nbsp;likable.</li>
+<li>Being relentlessly nice doesn&#8217;t create this qualitative shift in a relationship. And just pushing forward will raise a person&#8217;s defense&nbsp;mechanisms.</li>
+<li>The <span class="caps">LLM</span> can actually do some of this! It can become skeptical and defensive. It can push back against bland&nbsp;niceness.</li>
+<li>Is a relationship shift a kind of feat? Is the feat that&#8217;s only accessible when you&#8217;ve done some of the score-building&nbsp;legwork?</li>
+<li>Romance feels kind of weird and salacious to include, but it&#8217;s one of the big pivotal acts we engage in during our lives, something where we can&#8217;t predict the outcome or even understand the pursuit. And romance receives much more attention <em>outside</em> of games as the most common book genre, movie genre, and a constant plot driver in <span class="caps">TV</span>.</li>
+<li>Fame could be an alternative to romance with some of the same issues. It feels accessible to scoring but you also can&#8217;t just score lots of small fame points, lots of little interactions don&#8217;t add up to something big&#8230; you need dramatic actions. Maybe it just means each &#8220;fame point&#8221; is really hard to achieve. Maybe that should be a pattern for more&nbsp;activities.</li>
+</ol>
+</li>
+<li>
+<p>The metagame is part of the fun, knowing that you are playing a game that is designed to be played. The idea you can definitely win and that it&#8217;s balanced to be challenging before you&nbsp;win.</p>
+<ol>
+<li>Games on rails are generally more balanced. Without rails you might be doing something pointless, exploring something that doesn&#8217;t lead anywhere, or pursuing something that is still too hard for you. There&#8217;s a comfort to the&nbsp;rail.</li>
+<li>The natural <span class="caps">LLM</span> exercise of removing all rails may be too much. But maybe you can build rails Just In Time. The player can jump the rails, but new rails&nbsp;appear.</li>
+</ol>
+</li>
+</ol>
+<h2><span id="gameplay-medium">The medium of&nbsp;gameplay</span></h2>
+<p>Everything I&#8217;ve talked about is extremely text-heavy, but there are other&nbsp;options&#8230;</p>
+<ol>
+<li>
+<p>Voice&nbsp;output:</p>
+<ol>
+<li>Voice generation is expensive, more expensive than a lot of the <span class="caps">LLM</span> calls. It&#8217;s <em>oddly</em>&nbsp;expensive.</li>
+<li>Voice generation also adds more latency when it&#8217;s chained with other <span class="caps">LLM</span> calls. I&#8217;ve chosen not to worry much about latency but it <em>feels</em> worse with voice output. Maybe because you wait wait wait, then you have to listen because it comes up all at once. With text you wait, but the text also waits for&nbsp;you.</li>
+<li>Having a variety of voices is pretty fun&nbsp;though.</li>
+</ol>
+</li>
+<li>
+<p>Voice&nbsp;input:</p>
+<ol>
+<li>Cheaper than voice output. Also feels&nbsp;odd.</li>
+<li>There&#8217;s lots of technical bits to get it right. Handling voice input, turn taking, activation, endpointing, etc. It&#8217;s <em>really hard</em>. I&#8217;ve done it many times and it&#8217;s still <em>really hard</em>. But simple push-to-talk is not very hard. Push to talk works better now that new voice recognition systems like Whisper are high enough quality that record-and-send is feasible without any&nbsp;verification/editing.</li>
+<li>Does voice input change how the interaction feels? It can invite longer, less carefully composed inputs. (The <span class="caps">LLM</span> can handle long inputs well!) Does the lack of editing help or&nbsp;hurt?</li>
+<li>I&#8217;ve been playing <a href="https://www.playsuckup.com/">Suck Up</a> which is a game that uses voice as its primary input (and an <span class="caps">LLM</span>).<ol>
+<li>That game gives a limited time for input. That&#8217;s not exactly necessary, but maybe it&#8217;s good to both avoid something like a stuck button, and to generally encourage turn-taking, without long&nbsp;soliloquies.</li>
+<li>When I first tried Suck Up I was someplace I couldn&#8217;t freely speak and tried the alternate keyboard input. It wasn&#8217;t very fun! It felt&nbsp;burdensome.</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>
+<p>Image&nbsp;generation:</p>
+<ol>
+<li>Custom <span class="caps">GPT</span> games frequently use Dall-E image generation. I generally haven&#8217;t enjoyed those games (they tease but never deliver), but I <em>also</em> haven&#8217;t been impressed with the image&nbsp;generation.</li>
+<li>There&#8217;s something about the fully hallucinated but also throw-away images that feel trivial and&nbsp;untrustworthy.</li>
+<li>Also I just don&#8217;t like Dall-E. Its indirect prompting makes it hard to control. This doesn&#8217;t lead to chaos, but instead to laziness: because prompting effort isn&#8217;t rewarded, people let it produce its default style which has become tedious and noisy. Midjourney&#8217;s default style isn&#8217;t particularly better, but people don&#8217;t stick to Midjourney&#8217;s default&nbsp;style.</li>
+<li>Just generally images are slow and expensive to create. One-off images are hard to justify. Persistent images in a persistent world are more&nbsp;reasonable.</li>
+<li>I can imagine a shared-world game where some players contribute a lot of images that they make semi-manually (e.g. with Midjourney). The system could show entities missing pictures and offer a prompt, and a player could go off and do their thing and come back with an image. I&#8217;m pretty sure for some players this would be a relaxing and rewarding&nbsp;activity.</li>
+</ol>
+</li>
+<li>
+<p>How can we make the setting and characters feel more embodied? There&#8217;s a sameness in the text that can become&nbsp;tedious.</p>
+<ol>
+<li>In my <a href="#first-experiment">first experiment</a> I made ~100 tiled backgrounds representing different settings (a hut, a yurt, a dungeon, an apartment, etc). I give the <span class="caps">LLM</span> the list and ask it to pull out the most fitting background. This doesn&#8217;t require live generation, but still makes the setting feel more&nbsp;custom.</li>
+<li>It&#8217;s interesting to think about background noise being selected in the same way. A site like <a href="https://www.ambient-mixer.com/">ambient-mixer.com</a> shows how you can use simple mixing to create a wide variety of&nbsp;soundscapes.</li>
+</ol>
+</li>
+<li>
+<p>Another option for a more embodied world generation is to have the <span class="caps">LLM</span> create structure, but instantiate that via a more traditional generative&nbsp;algorithm.</p>
+<ol>
+<li>For instance an <span class="caps">LLM</span> could define a room size, floor type, furniture, etc., but an algorithm could turn that into an actual game&nbsp;map.</li>
+<li>Looking through other procedural generation work would give other ideas for how LLMs could give parameters that algorithms actually fill&nbsp;out.</li>
+</ol>
+</li>
+</ol>
+<h2>Conclusion</h2>
+<p>Thanks for coming along. I&#8217;m not sure what I&#8217;m going to do next with this stuff, both details and broad&nbsp;directions.</p>
+<p>Are there examples of games exploring some of these directions? Places where people are discussing these ideas&nbsp;seriously?</p>
+<p>Comments encouraged on <a href="">Mastodon</a></p>
+<style>
+  img.content {
+    border-radius: 5px;
+  }
+  #toc + ol, #toc + ol li ol {
+    margin: 0 0 0 1.5em;
+  }
+  #toc + ol li, #toc + ol li ol li {
+    margin: 0;
+  }
+  img.content.full-width {
+    max-width: 100%;
+  }
+</style></div>
+        <!-- /.entry-content -->
+      </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://ianbicking.org/archives.html">archives</a> &amp; <a href="https://ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://ianbicking.org/category/ai.html">category: ai</a></li>
+                    <li><a href="https://ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://hachyderm.io/@ianbicking">@ianbicking@hachyderm.io</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                            <li><a href="https://www.linkedin.com/in/ianbicking/">LinkedIn</a></li>
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://ianbicking.org/blog/2023/04/world-building-gpt-2-declarative.html">World Building with <span class="caps">GPT</span> part 2: bigger, better, more&nbsp;declarative</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">World Building With <span class="caps">GPT</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/thoughts-on-voice-interfaces-2-llms.html">Thoughts On Voice Interfaces 2 years later:&nbsp;LLMs</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/infinite-ai-array.html">Infinite <span class="caps">AI</span>&nbsp;Array</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                    <li><a href="https://ianbicking.org/blog/2019/07/kling-axes-of-politics-technocrats.html">Kling&#8217;s Axes of Politics, and the&nbsp;Technocrats</a></li>
+                    <li><a href="https://ianbicking.org/blog/2019/04/users-want-control-is-a-shrug.html"><span class="dquo">&#8220;</span>Users want control&#8221; is a shoulder&nbsp;shrug</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FKT4HDGBE4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-FKT4HDGBE4');
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>
