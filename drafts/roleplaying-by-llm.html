@@ -41,8 +41,8 @@
         </header>
 
         <div class="entry-content"><p>I&#8217;ve been making some experiments with roleplaying and LLMs (Large Language Models, such as ChatGPT). After a lot of coding I think it&#8217;s time to step back and think about what I&#8217;ve done and what I might want to&nbsp;do.</p>
-<p>In this post I will <a href="#simple-chat">describe some of the techniques I&#8217;ve used to improve <span class="caps">LLM</span> character behavior</a>, <a href="#lifelived">larger experiments I&#8217;ve made</a>, and then a long list of <a href="#thoughts-and-questions">thoughts and questions</a>.</p>
-<p>This post assumes you have some familiarity with LLMs and constructing&nbsp;prompts.</p>
+<p>In this post I will describe some of the techniques I&#8217;ve used to <a href="#simple-chat">improve <span class="caps">LLM</span> character behavior</a>, <a href="#lifelived">larger experiments I&#8217;ve made</a>, and then a long list of <a href="#thoughts-and-questions">thoughts and questions</a>.</p>
+<p>This post assumes you have some familiarity with LLMs and constructing prompts (but I tried to give the <a href="#what-is-a-prompt">tiniest introduction</a>).</p>
 <h2>Table of&nbsp;contents</h2>
 <div id="toc"></div>
 
@@ -214,7 +214,7 @@
 <li>
 <p>In my own implementation I make a strong distinction between feats that require action resolution and simple actions that happen automatically/without&nbsp;failure.</p>
 <ol>
-<li>Should a gamemaster step always happen? For example moving around is usually uninhibited, but while you can <a href="https://www.instagram.com/ryanharby/p/C5JY503rCC6/">leave a store easily</a> it&#8217;s not so easy to leave a&nbsp;jail</li>
+<li>Should a gamemaster step always happen? For example moving around is usually uninhibited, but while you can <a href="https://www.instagram.com/ryanharby/p/C5JY503rCC6/">leave a store easily</a> it&#8217;s not so easy to leave a&nbsp;jail.</li>
 <li>I&#8217;m not worried too much about the prompt overhead (cost and latency) of the gamemaster step&#8230; I assume both that this will get faster and cheaper with time, and that once I have something I like then there&#8217;s more reason to&nbsp;optimize.</li>
 <li>Also I have no idea what I&#8217;m going to do with any of this, so what am I even optimizing&nbsp;for?</li>
 </ol>
@@ -238,7 +238,7 @@
 </ol>
 </li>
 <li>
-<p>The gamemaster role is an arbiter; I think there&#8217;s another role worth exploring that I might call a &#8220;goalmaster&#8221; <span id="goalmaster"></span></p>
+<p>The gamemaster role is an arbiter; I think there&#8217;s another role worth exploring that I might call a &#8220;goalmaster&#8221;. <span id="goalmaster"></span></p>
 <ol>
 <li>The goalmaster is there to inspire the player to action, to arrange things behind the scenes so that plot moves forward, so that world isn&#8217;t arbitrary, revisiting themes, and so&nbsp;on.</li>
 <li>Traditionally the gamemaster does both roles, but separating roles is both easy and desirable with the <span class="caps">LLM</span>; each role is just a different&nbsp;prompt.</li>
@@ -271,7 +271,7 @@
 <ol>
 <li>Like action descriptions this will naturally affect the interactions as long as the descriptions aren&#8217;t scrubbed from the&nbsp;prompts.</li>
 <li>Players won&#8217;t naturally describe things like body language and attitude. How can we solicit that kind of input? How can we prove to the player that it&nbsp;matters?</li>
-<li><a href="https://en.wikipedia.org/wiki/Comedy_of_manners">Comedy of manners</a> is an interesting genre to imagine (as in <a href="https://if50.substack.com/p/2013-a-family-supper">A Family Supper</a>)</li>
+<li><a href="https://en.wikipedia.org/wiki/Comedy_of_manners">Comedy of manners</a> is an interesting genre to imagine (as in <a href="https://if50.substack.com/p/2013-a-family-supper">A Family Supper</a>).</li>
 <li>This is most salient in environments where there are strong social rules: court intrigue, playing ambassador, a Jane Austen style social gathering, a Babylon 5 style environment. The social rules will be much more interesting and salient if they are articulated as part of the initial world building&nbsp;setup.</li>
 </ol>
 </li>
@@ -302,7 +302,7 @@
 <ol>
 <li>When you include information in a prompt the <span class="caps">LLM</span> isn&#8217;t forced to make use of that knowledge, but it is available. In a game that can be things like location descriptions, past events, character personalities or factoids,&nbsp;etc.</li>
 <li>My hand-coded prompts <em>are</em> doing a kind of <span class="caps">RAG</span>, in that I fetch and insert knowledge I believe will be relevant to the current&nbsp;task.</li>
-<li>In my hand-written prompts I&#8217;m not just inserting information, I&#8217;m also contextualizing that information. That can be as simple as &#8220;The room is described as&nbsp;{room_description}&#8221;</li>
+<li>In my hand-written prompts I&#8217;m not just inserting information, I&#8217;m also contextualizing that information. That can be as simple as &#8220;The room is described as&nbsp;{room_description}&#8221;.</li>
 <li>Context <em>really</em> matters. Especially in a somewhat adversarial situation like a game: it&#8217;s quite important that the <span class="caps">LLM</span> not confuse the player with another character. This is a common issue and can happen quite often even with a custom&nbsp;prompt.</li>
 <li><span class="caps">RAG</span> is usually imagined as a more automated system: a bag of facts, roughly tagged and labeled, that get inserted into prompts. How they are selected is probably some combination of heuristics, structured search, and fuzzy (<a href="https://www.pinecone.io/learn/vector-embeddings/">embedding</a>)&nbsp;search.</li>
 <li>Determining what facts are memorable is a big task of its own. This should be informed by the game mechanics, so that facts that are likely to impact the gameplay are remembered and other facts allowed to fade into&nbsp;history.</li>
