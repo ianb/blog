@@ -36,8 +36,7 @@ TAG_URL = "tag/{slug}.html"
 TAG_SAVE_AS = "tag/{slug}.html"
 WITH_FUTURE_DATES = False
 def ARTICLE_ORDER_BY(article):
-    return article.date
-
+    return -article.date.timestamp()
 
 def FORMAT_DATE(date):
     d = date.strftime("%A, %B ")
@@ -110,3 +109,6 @@ GETATTR = getattr
 
 with open(os.path.join(base, "content/old/archive-fragment.html")) as fp:
     EXTRA_ARCHIVE = fp.read()
+
+NEWEST_FIRST_ARCHIVES = True
+CACHE_CONTENT = False
