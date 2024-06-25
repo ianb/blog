@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>An LLM dev stack</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://ianbicking.org/favicon.ico">
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+        <div>
+            <div class="published" title="2023-12-25T00:00:00-06:00">
+                Monday, December 25th, 2023
+            </div>
+            <h1 class="entry-title">
+                <a
+                    href="https://ianbicking.org/drafts/llm-dev-stack.html"
+                    rel="bookmark"
+                    title="Permalink to An LLM dev stack"
+                    >An <span class="caps">LLM</span> dev&nbsp;stack</a
+                >
+            </h1>
+        </div>
+        </header>
+
+        <div class="entry-content"><p>I&#8217;ve been working with <span class="caps">LLM</span>/<span class="caps">GPT</span>-based processes and interfaces for a bit over a year and a half now&#8230; first independently and now also professionally at <a href="https://brilliant.org/">Brilliant.org</a>. Along the way I&#8217;ve built up a stack to do that work<sup id="fnref:0"><a class="footnote-ref" href="#fn:0">1</a></sup>. It&#8217;s very particular, with positive and negative attributes, but I&#8217;ve personally found it very pleasant to work&nbsp;in.</p>
+<p>This work is still very trapped in my own work process and not open, but I thought it would be useful to at least share the shape of&nbsp;it.</p>
+<p>If you&#8217;ve watched <a href="https://www.youtube.com/playlist?list=PLzoCgYJlxwLtELaZdMHkgiHvwhuqjtHZ0">any of my videos</a> you&#8217;ll have seen different iterations of what I describe&nbsp;below.</p>
+<h2>From a high&nbsp;level&#8230;</h2>
+<p>The tools I make are transparent and generally represent some kind of experiment. The &#8220;user&#8221; is also a trusted collaborator, a fellow employee, or just another <span class="caps">LLM</span> enthusiast. As a result the tools are both internal and external: internal because they show all the inner workings and generally trust the user, and external because I also try to present the finished work in a consumable&nbsp;fashion.</p>
+<p>Since my time at Mozilla I&#8217;ve shifted to the frontend, using minimal and generalized backend services. These tools for working with LLMs also are almost entirely in the browser: taking user input, fetching additional data, sending requests to <span class="caps">LLM</span> services, orchestrating and visualizing the results. I like having a live view of the running system, including all the intermediate steps. I never abstract away or hide the actual prompts and requests (an enthusiastic yes to: <a href="https://hamel.dev/blog/posts/prompt/">Fuck You, Show Me The Prompt.</a>).</p>
+<p>I have <em>not</em> built a framework. There are common components and I&#8217;ve used those to make chat interfaces, data analysis, math feedback and critique, sometimes with cameras and voice, and with human-in-the-loop at many steps. The web is very flexible and it&#8217;s possible to experiment with lots of different ways to package functionality in a <span class="caps">UI</span>.</p>
+<p>Instead of a framework I have a number of complementary&nbsp;libraries:</p>
+<ol>
+<li><a href="#llm-api">Basic access to LLMs</a> (<code>llm.chat({messages: [...]}))</code>)</li>
+<li><a href="#llm-logging">A logging component</a> for <span class="caps">LLM</span> requests that displays request/response in the&nbsp;browser</li>
+<li><a href="#templating">A templating&nbsp;language</a></li>
+<li><a href="#prompt-templates">An abstraction over <code>llm.chat()</code> to create &#8220;app prompts&#8221;</a>. This is the biggest and most framework-like piece, with considerable effort to <a href="#typing">add types to templates and&nbsp;tools</a></li>
+<li><a href="#signals-persistence">A simple persistence layer built on signals</a>, both to serialize state and update the <span class="caps">UI</span></li>
+<li><a href="#component-library">Higher-level React components</a> for form input, Markdown, tabs, and other <span class="caps">UI</span> I frequently make use of. These integrate closely with&nbsp;signals.</li>
+<li><a href="#not-implemented">Topics where I neither write nor use a library&#8230;</a><ol>
+<li><a href="#pipelines">Pipelines</a></li>
+<li><a href="#rag"><span class="caps">RAG</span></a></li>
+<li><a href="#evaluation">Evaluation</a></li>
+</ol>
+</li>
+</ol>
+<p>Lastly I discuss <a href="#what-doesnt-work-well">what doesn&#8217;t work&nbsp;well</a></p>
+<h3>Dependencies</h3>
+<p>I try to keep my dependencies under control and use larger conventional&nbsp;libraries:</p>
+<ol>
+<li>React</li>
+<li>Tailwind <span class="caps">CSS</span></li>
+<li>Next.js on&nbsp;Vercel</li>
+<li><a href="https://preactjs.com/guide/v10/signals/">Preact&nbsp;Signals</a></li>
+<li>Some simple server functions and PostgreSQL on the&nbsp;backend</li>
+</ol>
+<p>And some miscellany: <a href="https://github.com/kpdecker/jsdiff">diff</a>, <a href="https://highlightjs.org/">highlight.js</a>, <a href="https://www.npmjs.com/package/@cfworker/json-schema">json-schema</a>, some <a href="https://github.com/angus-c/just">just</a> libraries, <a href="https://katex.org/">katex</a>, <a href="https://github.com/markedjs/marked">marked</a>, <a href="https://ohmjs.org/">ohm</a></p>
+<h2><span id="llm-api"><span class="caps">LLM</span> <span class="caps">API</span></span></h2>
+<p>The <span class="caps">API</span> I use for all the <span class="caps">LLM</span> calls looks like the underlying <span class="caps">GPT</span>&nbsp;call:</p>
+<div class="highlight"><pre><span></span><span class="kr">const</span> <span class="nx">resp</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">llm</span><span class="p">.</span><span class="nx">chat</span><span class="p">({</span>
+    <span class="nx">messages</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nx">role</span><span class="o">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+            <span class="nx">content</span><span class="o">:</span> <span class="s2">&quot;You&#39;re a happy cat.&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="nx">role</span><span class="o">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="nx">content</span><span class="o">:</span> <span class="s2">&quot;Hello!&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">],</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p>You can specify the model or temperature or just leave it as the default, with settings in the <span class="caps">UI</span> to override it. There&#8217;s also caching (which I usually don&#8217;t&nbsp;use).</p>
+<p>Rate limiting and retries are handled automatically at this layer. Tool calls are also validated and the request retried if necessary.<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">2</a></sup></p>
+<p>The <code>LlmResponse</code> object (<code>resp</code>) contains some helpful getters for content, functions/tool-calls, and parsing out code blocks.<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">3</a></sup></p>
+<p>Because at work I use a lot of LaTeX for our math content, I also have special fixups for LaTeX escaping. <span class="caps">GPT</span> regularly mixes up how many backlashes to use when including LaTeX in <span class="caps">JSON</span>. It&#8217;s a reminder that <span class="caps">GPT</span> is really responding textually even when it generates <span class="caps">JSON</span>, it&#8217;s not generating raw data&nbsp;structures.</p>
+<p>I&#8217;ve never implemented streaming. It would be nice to be able to <em>see</em> things stream, but the complexity of <em>using</em> a stream seems overwhelming and error-prone. Seeing how other frameworks handle streaming reinforces this perception. I prefer&nbsp;patience.</p>
+<p>For supporting different LLMs besides <span class="caps">GPT</span> I use <a href="https://openrouter.ai/">OpenRouter.ai</a>, though <a href="https://withmartian.com/">Martian</a> and <a href="https://www.braintrustdata.com/">Braintrust</a> are also good options. They all do <span class="caps">API</span> translation as a service as well as handle the billing across&nbsp;services.</p>
+<h2><span id="llm-logging">Logging <span class="caps">LLM</span>&nbsp;requests</span></h2>
+<p><a href="../media/llm-dev-stack/screenshot-plain-log.png" target="_blank"><img style="float: right; width: 30%; border-radius: 5px; margin-left: 4px;" src="../media/llm-dev-stack/screenshot-plain-log.png" alt="An example of the LLM log" /></a></p>
+<p>It&#8217;s very important to me to see each prompt exactly as it is sent. For this I have a component <code>&lt;llm.Log /&gt;</code>.</p>
+<p>I can see how many requests there are running, see previous requests and responses, how much time the request is taking, and the exact tools in the request and response. I spend a <em>lot</em> of time looking at this&nbsp;log.</p>
+<h2><span id="templating">A templating&nbsp;language</span></h2>
+<p>This part feels a bit indulgent, but I like it. The very beginning of the language was adding a simple conditional to JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates">tagged string templates</a>:</p>
+<div class="highlight"><pre><span></span><span class="nx">llm</span><span class="p">.</span><span class="nx">chat</span><span class="p">({</span>
+    <span class="nx">role</span><span class="o">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+    <span class="nx">content</span>: <span class="kt">tmpl</span><span class="sb">`</span>
+<span class="sb">    Invent 100 words for </span><span class="si">${</span><span class="nx">inspiration</span><span class="si">}</span><span class="sb"></span>
+
+<span class="sb">    [[Make note of these user instructions: </span><span class="si">${</span><span class="nx">instructions</span><span class="si">}</span><span class="sb">]]</span>
+<span class="sb">    `</span><span class="p">,</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p><code>tmpl()</code> makes that act&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="sb">`Invent 100 words for </span><span class="si">${</span><span class="nx">toString</span><span class="p">(</span><span class="nx">inspiration</span><span class="p">)</span><span class="si">}</span><span class="sb"></span>
+
+<span class="si">${</span>
+    <span class="nx">instructions</span>
+        <span class="o">?</span> <span class="sb">`Make note of these user instructions: </span><span class="si">${</span><span class="nx">toString</span><span class="p">(</span><span class="nx">instructions</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span>
+        <span class="o">:</span> <span class="s2">&quot;&quot;</span>
+<span class="si">}</span><span class="sb"></span>
+<span class="sb">`</span><span class="p">;</span>
+</pre></div>
+
+
+<p><a href="../media/llm-dev-stack/screenshot-html-log.png" target="_blank"><img style="float: right; width: 30%; border-radius: 5px; margin-left: 4px;" src="../media/llm-dev-stack/screenshot-html-log.png" alt="Screenshot example of the LLM log with HTML and colored markup" /></a></p>
+<p><code>toString()</code> prints out objects as their <span class="caps">JSON</span> instead of <code>[Object object]</code>, changes null to <code>""</code>, and other handy things. Whitespace is always&nbsp;trimmed.</p>
+<p>Since that beginning I&#8217;ve added a bunch of features and finally made a real parser (using <a href="https://ohmjs.org/">Ohm</a>), an <span class="caps">AST</span>, and an interpreter for the language, adding loops, conditionals, expressions, and more. It&#8217;s good at producing reasonably formatted English text, like you want to give to an <span class="caps">LLM</span>, and can be run as a tagged template or as a more normal template language with variables passed in. I&#8217;ve started using all-caps for keywords like <code>IF {{var}} [[output]]</code> – the norm in templating languages is to use punctuation around any syntax (like <code>&lt;% ... %&gt;</code> or <code>{% ... %}</code>), and neither like that nor think it&#8217;s&nbsp;necessary.</p>
+<p>The template can also render to <span class="caps">HTML</span> for use in the logs. I find this very helpful for understanding both the rendered template and the underlying&nbsp;structure.</p>
+<p><a href="../media/llm-dev-stack/screenshot-of-template-error.png" target="_blank"><img style="float: right; width: 30%; border-radius: 5px; margin-left: 4px;" src="../media/llm-dev-stack/screenshot-of-template-error.png" alt="Screenshot of a template error message" /></a></p>
+<p>Lastly I&#8217;ve begun to add some type checking so I can statically determine if the template uses unexpected variables. Ultimately I&#8217;d like to use this to combine some the concept &#8220;template&#8221; and &#8220;function&#8221; and structured input and&nbsp;output.</p>
+<h2><span id="prompt-templates">Prompt&nbsp;templates</span></h2>
+<p>A &#8220;prompt&#8221; in my system is generally one kind of task for the <span class="caps">LLM</span>. It has a name and example template, and anyone can make variant templates to try out different&nbsp;prompts.</p>
+<p>This concept grew organically until it became overwhelmingly complex, at which point I had to really put some design thought and perhaps too much effort into the code. But I&#8217;m happy with the&nbsp;result.</p>
+<p>At the code level a prompt often has a <a href="https://platform.openai.com/docs/guides/function-calling">&#8220;Tool&#8221; or &#8220;function&#8221;</a>. When using tools I almost always provide and require one tool response, effectively using it as a way to getting schema-driven output from the <span class="caps">LLM</span>.<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">4</a></sup></p>
+<p>I treat users as aspiring prompt engineers. They can create a variant of any of the prompts by adding a new template. When running the pipeline they can choose that variant, or choose to use multiple variants for comparison.<sup id="fnref:4"><a class="footnote-ref" href="#fn:4">5</a></sup></p>
+<p>While I&#8217;ve tried to expose the prompts as much as I can, I have learned that it&#8217;s not easy to jump in and write these prompts. It&#8217;s not <em>technically</em> hard, but knowing what to do and what to try is hard, or intimidating. Still it is <a href="https://www.linkedin.com/posts/ianbicking_gpt-activity-7166539285007921152-aHo1">invaluable to have a domain expert drive these instructions</a>; I wish I knew better how to facilitate this codevelopment between engineer and domain&nbsp;expert.</p>
+<p>One notable feature of variants is that in addition to modifying the prompt they can also change the parameter descriptions of the Tools. This is very important! The only right way to think about Tools is that the schema and descriptions are part of the prompt.<sup id="fnref:5"><a class="footnote-ref" href="#fn:5">6</a></sup></p>
+<p>Someday I&#8217;d like to make a kind of schema mini-language for the prompt templates so whole pipelines can be composed using&nbsp;these.</p>
+<p>The templates look like this (for a prompt that uses a Tool with a <code>greetings</code> parameter):</p>
+<div class="highlight"><pre><span></span>&gt;&gt;&gt; system
+You&#39;re a happy cat
+
+&gt;&gt;&gt; user
+{{userInput}}
+
+&gt;&gt;&gt; greeting.description
+Be silly
+</pre></div>
+
+
+<p>In my own work I seldom include a chat history in the prompt, though I do separate system from user.<sup id="fnref:6"><a class="footnote-ref" href="#fn:6">7</a></sup> When I do need to include history then that is done in&nbsp;code.</p>
+<h3><span id="typing">Typing</span></h3>
+<p>After making a complicated pipeline with lots of prompts that fed into each other I kept getting bugs where I did not providing or store all the data I promised for the template, or the template referred to incorrect variables. Data integrity became quite difficult and it was one of several things left me exhausted and lacking confidence in any&nbsp;changes.</p>
+<p>I then started rewriting <em>everything</em> in TypeScript. I&#8217;ve used TypeScript in the past, but never happily. This time with ChatGPT and Copilot it was much more successful&#8230; small things that might trip me up no longer did when I could ask ChatGPT questions, and some of the more boring/repetitive/error-prone transformation were well handled by&nbsp;Copilot.</p>
+<p>I also started adding types to the prompt input. Prompts now look like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="kr">interface</span> <span class="nx">HelloPromptInputType</span> <span class="p">{</span>
+    <span class="nx">userInput</span>: <span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">const</span> <span class="nx">helloPrompt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AppPrompt</span><span class="o">&lt;</span>
+    <span class="nx">HelloPromptInputsType</span><span class="p">,</span>
+    <span class="nx">promptTypes</span><span class="p">.</span><span class="nx">HelloPromptResponseType</span>
+<span class="o">&gt;</span><span class="p">({</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+    <span class="nx">description</span><span class="o">:</span> <span class="s2">&quot;Used when the first message comes in&quot;</span><span class="p">,</span>
+    <span class="nx">inputSchema</span>: <span class="kt">promptTypes.helloPromptSchema</span><span class="p">,</span>
+    <span class="nx">temperature</span>: <span class="kt">0.7</span><span class="p">,</span>
+    <span class="nx">starterTemplate</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    &gt;&gt;&gt; system</span>
+<span class="sb">    You&#39;re a happy cat</span>
+<span class="sb">    &gt;&gt;&gt; user</span>
+<span class="sb">    {{userInput}}</span>
+<span class="sb">    `</span><span class="p">,</span>
+    <span class="nx">functionResponse</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;sayHello&quot;</span><span class="p">,</span>
+        <span class="nx">parameters</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="nx">required</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;greeting&quot;</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">],</span>
+            <span class="nx">properties</span><span class="o">:</span> <span class="p">{</span>
+                <span class="nx">greeting</span><span class="o">:</span> <span class="p">{</span>
+                    <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="nx">description</span><span class="o">:</span> <span class="s2">&quot;The greeting to put in the header&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="nx">message</span><span class="o">:</span> <span class="p">{</span>
+                    <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="nx">description</span><span class="o">:</span> <span class="s2">&quot;The friendly message for the user&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p>(I use <code>functionResponse</code> when I want the <span class="caps">LLM</span> to always respond with that one function, as opposed to offering a suite of tools that it can pick&nbsp;from.)</p>
+<p>Things get a bit complicated as I bridge the world of TypeScript types and the <a href="https://json-schema.org/"><span class="caps">JSON</span> Schema</a> that is used to define Tools. I ended up deciding to use TypeScript types (like <code>HelloPromptInputType</code>) to define the input variables, and a <span class="caps">JSON</span> schema (<code>functionResponse</code>) to define the Tool. I use <em>both</em> <a href="https://github.com/YousefED/typescript-json-schema">typescript-json-schema</a> and <a href="https://github.com/bcherny/json-schema-to-typescript">json-schema-to-typescript</a> to generate the accompanying <code>promptTypes.ts</code> file that both translates the functionResponse schema into a type (<code>promptTypes.HelloPromptResponseType</code>) and <code>HelloPromptsInputType</code> into a schema (<code>promptTypes.helloPromptSchema</code>). This is a&nbsp;hassle.</p>
+<p>The <code>inputSchema</code> is used as documentation and to check that templates don&#8217;t use invalid&nbsp;variables.</p>
+<h2><span id="signals-persistence">Signals <span class="amp">&amp;</span>&nbsp;Persistence</span></h2>
+<p>This feels off-topic, as this is really just web frontend development and not related to LLMs. But to be productive I need a productive environment. And I really love&nbsp;signals.</p>
+<p>Preact Signals are boxes with a <code>.value</code> attribute that you can get or set. It&#8217;s kind of like a global variable or a reference. The magic is that if you access <code>.value</code> in a React Component then if the value of the signal changes then the component will be rerendered. You can also listen and react to changes from&nbsp;elsewhere.</p>
+<p>Most of my persistence is one big <code>session</code> signal that both renders the page, and when updated it serializes the new session object to the database. I use lots of &#8220;views&#8221; like <code>signalView()</code> to create signals that reference just a part of the session tree, but appear as a stand-alone&nbsp;signal:</p>
+<div class="highlight"><pre><span></span><span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="nx">makeSessionSignal</span><span class="p">();</span>
+<span class="kr">const</span> <span class="nx">username</span> <span class="o">=</span> <span class="nx">signalView</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">session</span><span class="p">,</span> <span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">);</span>
+<span class="c1">// Now this:</span>
+<span class="nx">username</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="s2">&quot;ian&quot;</span><span class="p">;</span>
+<span class="c1">// Is equivalent to this:</span>
+<span class="nx">session</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">...</span><span class="nx">session</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span>
+    <span class="nx">username</span><span class="o">:</span> <span class="s2">&quot;ian&quot;</span><span class="p">,</span>
+<span class="p">};</span>
+<span class="c1">// And this is always true:</span>
+<span class="nx">username</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="nx">session</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">username</span><span class="p">;</span>
+</pre></div>
+
+
+<p>I have a similar view for arrays and a bunch of data structure helpers around&nbsp;this.</p>
+<h2><span id="component-library">Component&nbsp;library</span></h2>
+<p>I&#8217;ve tried and failed to use React component libraries. Frankly Copilot and Tailwind make it too easy to write my own. And everthing works better when I use signals in the&nbsp;components.</p>
+<p>An input field looks&nbsp;like:</p>
+<div class="highlight"><pre><span></span>return (
+    <span class="nt">&lt;div&gt;</span>
+        <span class="nt">&lt;TextInput</span> <span class="na">signal=</span><span class="s">{username}</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;TextArea</span> <span class="na">signal=</span><span class="s">{bio}</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+);
+</pre></div>
+
+
+<p>Now the session data is live-editable. This way I avoid most event handlers, instead exchanging&nbsp;signals.</p>
+<p>I take good care of my <code>&lt;Markdown /&gt;</code> component because <span class="caps">GPT</span> loves Markdown (and LaTeX). I also use a lot of tabs which often get <em>very</em> nested. There&#8217;s a lot of information to make visible, and a lot of ways to present that information (rendered, source, diffs, code execution, tags, and more), which leads to a lot of&nbsp;nesting.</p>
+<p><a href="../media/llm-dev-stack/screenshot-resultviewer.png" target="_blank"><img style="float: right; width: 30%; border-radius: 5px; margin-left: 4px;" src="../media/llm-dev-stack/screenshot-resultviewer.png" alt="Screenshot example of the result viewer" /></a></p>
+<p>I have just a couple <span class="caps">LLM</span>-specific components. One views lists of <span class="caps">LLM</span> responses which allows comparing output, seeing the underlying prompt and response, and selecting the preferred response. Generating and displaying multiple responses is a feature that I&#8217;m pretty sure only I use. It&#8217;s a little too obscure, and a little too attached to the underlying pipeline and data design that I understand well and often no one else&nbsp;does.</p>
+<p><a href="../media/llm-dev-stack/screenshot-prompt-editor.png" target="_blank"><img style="float: right; width: 30%; border-radius: 5px; margin-left: 4px;" src="../media/llm-dev-stack/screenshot-prompt-editor.png" alt="Screenshot example of the prompt editor" /></a></p>
+<p>The other notable <span class="caps">LLM</span>-specific component is the prompt editor. Simple and a bit too information&nbsp;dense.</p>
+<h2><span id="not-implemented">Things that aren&#8217;t&nbsp;code</span></h2>
+<p>I haven&#8217;t seen a reason to create libraries or special code for some things other <span class="caps">LLM</span> frameworks&nbsp;include:</p>
+<h3><span id="pipelines">Pipelines</span></h3>
+<p>There is nothing like a &#8220;pipeline&#8221; in the&nbsp;library.</p>
+<p>I do conventionally make a module named &#8220;pipelines.ts&#8221; and it contains functions. The functions assemble and convert information, they call one or more prompts, and return or save the information. Occassionally they have loops (usually when I have to deal with partial output and retries). The functions are all hand-coded and usually quite&nbsp;short.</p>
+<p>Pipelines are very important to getting good results from an <span class="caps">LLM</span>! I <em>usually</em> have multiple prompts with the output of one prompt feeding into another. But programming languages already have all the tools to implement pipelines: <a href="https://en.wikipedia.org/wiki/Structured_programming">structured programming</a>.</p>
+<p>Because I allow selecting and running multiple prompt variants in parallel, the response from pipeline calls are always lists of responses. This is&#8230; awkward. Any place you have one response you might actually have many, and pluralizing something <em>makes the programming hard</em>. I can&#8217;t decide if these plurality of responses are really worth it. But when I consider removing it I think: they <em>should</em> be worth it, because we <em>should</em> be doing more careful prompt&nbsp;comparisons.</p>
+<h3><span id="rag">Retrieval Augmented Generation (<span class="caps">RAG</span>)</span></h3>
+<p><a href="https://www.promptingguide.ai/techniques/rag"><span class="caps">RAG</span></a> is a set of techniques to include source information in your <span class="caps">LLM</span>&nbsp;prompts.</p>
+<p>You can&#8217;t go very far with LLMs without giving them source information: facts, examples, references, and so on. Common sense knowledge only goes so far, and if that&#8217;s all you need then you might as well use the ChatGPT&nbsp;frontend.</p>
+<p>Most of the time when I retrieve information to augment the generation I explicitly query the information. In some sense if you are fetching the &#8220;appropriate&#8221; data from a database and inserting it into the prompt you have implemented &#8220;<span class="caps">RAG</span>&#8221;. I have periodically experimented with more implicit retrieval using <a href="https://platform.openai.com/docs/guides/embeddings/what-are-embeddings">embeddings</a> but most of the time I have found it both feasible and preferable to decide exactly what data you want to put into the&nbsp;prompt.</p>
+<p>I also find it is very important to contextualize any information you give to the <span class="caps">LLM</span>. Why is this data important, how does it relate to the task, how do different pieces of data relate to each other? It&#8217;s hard to contextualize if you have a pool of heterogeneous data. Once you&#8217;ve segmented the data into distinct types there&#8217;s often specific ways to fetch the appropriate data instead of fuzzy techniques like&nbsp;embeddings.</p>
+<p>But even now I&#8217;m starting a phase of a project where I plan to use embeddings. I expect the code I write for this to look very&nbsp;imperative.</p>
+<p>If I was more serious about <span class="caps">RAG</span> I&#8217;d probably want a system to support multiple strategies in parallel for comparison, as well as tools to update and manage processes based on different&nbsp;strategies.</p>
+<h3><span id="evaluation">Evaluation</span></h3>
+<p>I mentioned that I allow for multiple versions of prompts and comparison between the output. There&#8217;s no accompanying tools to compare entirely different pipelines, besides implementing those pipelines in&nbsp;parallel.</p>
+<p>I also haven&#8217;t used general evaluation frameworks. The prompts are hand-crafted artisanal affairs. Development of prompts is usually concurrent with developing an idea of what exactly we want the prompt to do. Editorial rules have to become much clearer, and things that we&#8217;d previously call &#8220;good taste&#8221; have to be reified into instructions and pipelines. I don&#8217;t have reams of output and teams of people to rate that&nbsp;output.</p>
+<p>In general I think working with an <span class="caps">LLM</span> is very amenable to <em>thinking</em> and <em>being clear</em>. It&#8217;s not a black box (at least if you can see the prompts). Machine Learning has taken on a strongly behavioral perspective: the only way to know something is to see its effect. That&#8217;s the wrong attitude for developing with an <span class="caps">LLM</span>.</p>
+<h2><span id="what-doesnt-work-well">What doesn&#8217;t work well?<span></h2>
+<p>Here are my biggest complaints (which I can only direct at&nbsp;myself):</p>
+<ol>
+<li>It&#8217;s hard to do large batches of work. Doing 1000 completions in the browser is a Bad Time.<ul>
+<li>That said, the browser is a powerful execution&nbsp;environment.</li>
+<li>State management and transfer is the hardest part of making this work, and I haven&#8217;t designed the system to work well with things like&nbsp;queues.</li>
+<li>But I shouldn&#8217;t try that hard to fix it, instead I should be thinking of ways to take some of the small-batch work in the browser (such as prompt development) and easily rephrase it for large batch execution. It&#8217;s just a matter of&nbsp;work.</li>
+</ul>
+</li>
+<li>It&#8217;s not particularly easy to repurpose this work for other environments, such as embedding functionality into a <span class="caps">CMS</span> or site.<ul>
+<li>First: this is always&nbsp;hard.</li>
+<li>I could &#8220;go native&#8221; and program it directly in one of these environments&#8230; but even at a modestly sized company like Brilliant there&#8217;s no <em>one</em>&nbsp;environment.</li>
+<li>I could make it easier to turn functionality into an <span class="caps">API</span>, and then re-code the <span class="caps">UI</span> in a new environment once the prompts are working and validated, using the <span class="caps">API</span> as the <span class="caps">UI</span> backend. This shares a lot of work with batch&nbsp;processing.</li>
+<li>I think we underestimate the overhead of separating <span class="caps">UI</span> and backend, maybe because it often means a split team where neither sees the total overhead and can retain a sense of mystery about what the other team&nbsp;does.</li>
+<li>Alternately these other environments can grow APIs where my tools and <span class="caps">UI</span> can interact with them. This starts to feel a bit like a microservice, though a more &#8220;naked&#8221; microservice where the services have <span class="caps">UI</span> and the interfacing points may themselves be <span class="caps">UI</span> and not raw&nbsp;APIs.</li>
+</ul>
+</li>
+<li>It&#8217;s hard to make the tools public.<ul>
+<li>I have a few like the <a href="https://llm.ianbicking.org/"><span class="caps">LLM</span> Garden</a>, <a href="https://www.a-life-lived.com/">A Life Lived</a>, and <a href="https://www.worldwanderer.xyz/">World Wanderer</a>, but they all have issues and feel precarious. As far as I know no one really uses&nbsp;them.</li>
+<li>Everything is built with public prompts in mind. I can (and sometimes do) hide them in the <span class="caps">UI</span> to reduce the complexity, but you could find them just by opening a the browser&nbsp;console.</li>
+<li>The browser requests completions directly from the <span class="caps">LLM</span> <span class="caps">API</span>. This makes key management quite hard. <span class="caps">LLM</span> calls are cheap enough for some things, but not open-it-up-to-the-internet&nbsp;cheap.</li>
+<li>Key management is fine when building internal tools, I trust my fellow employees not to run up an <span class="caps">API</span> bill. (They all have the ability to run up bills&nbsp;somewhere.)</li>
+<li>Those public sites all end up being bring-your-own-key. As long as the prompt is assembled on the client there&#8217;s no way to open up a gateway for prompt completion that isn&#8217;t also effectively an open&nbsp;proxy.</li>
+</ul>
+</li>
+</ol>
+<h2>What else should I&nbsp;try?</h2>
+<p>I have a hobby project in mind (reproducing <a href="https://en.wikipedia.org/wiki/Colossal_Cave_Adventure">Colossal Cave Adventure
+</a>) that might also be a good chance to try someone else&#8217;s framework. What would be worth my time to try? This is my short list at the&nbsp;moment:</p>
+<ol>
+<li><a href="https://github.com/deepset-ai/haystack">Haystack</a> (Maybe too <span class="caps">RAG</span>-focused?)</li>
+<li><a href="https://github.com/langroid/langroid">Langroid</a> (Maybe too&nbsp;Agent-focused?)</li>
+<li><a href="https://js.langchain.com/">LangChain/<span class="caps">JS</span></a> (Given its popularity it would be good to have first-hand&nbsp;experience)</li>
+</ol>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn:0">
+<p>A lot of that work happened pretty early in the <a href="https://github.com/ianb/llm-garden"><span class="caps">LLM</span> Garden</a>, and then in a simplification/refactor in <a href="https://github.com/ianb/fungpt">FunGPT</a> that I used for a <a href="https://www.youtube.com/watch?v=qzczZABGzbQ">presentation</a>.&#160;<a class="footnote-backref" href="#fnref:0" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:1">
+<p>There&#8217;s some cleverness to allow more permissive validation than the tool call specifies; LLMs take the <span class="caps">JSON</span> Schema as a suggestion, not a strict requirement, and sometimes that&#8217;s <span class="caps">OK</span> (for example, returning a number where a string is expected).&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>More completely the response contains the original prompt, <span class="caps">JSON</span> response, error messages, and information about information about the timing. It can both represent one response <span class="caps">JSON</span> with multiple choices when using the <a href="https://platform.openai.com/docs/api-reference/chat/create#chat-create-n"><code>n</code> parameter</a> or explode that into multiple response objects.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Tools work really well with <span class="caps">GPT</span>, <em><span class="caps">OK</span></em> with Claude, and terrible with everyone else (including Gemini). Most ways you use an <span class="caps">LLM</span> today are shockingly non-proprietary, but tools are something only OpenAI is really good at. (Anyone else <em>could</em> be good at it, they just aren&#8217;t; OpenAI&#8217;s moat here is only as strong as the indifference of their competitors.)&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>It&#8217;s also possible to choose to get multiple copies of the same prompt. This is useful to test for <em>stability</em>: given the same input and prompt, how much will the output vary?&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>One missing feature: it <em>should</em> be possible to override the parameter order, but unfortunately I haven&#8217;t implemented that; order of generation is <em>very important</em> and it should be possible to experiment with different orders.&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:6">
+<p>My personal rule is that <code>role: system</code> is for general instructions, and that <code>role: user</code> is for the very specific action the <span class="caps">LLM</span> is being asked to do. Does it matter? I&#8217;m not even sure. I almost never put unadorned text in the user message (unlike the example <code>{{userInput}}</code>).&#160;<a class="footnote-backref" href="#fnref:6" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+        <!-- /.entry-content -->
+      </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://ianbicking.org/archives.html">archives</a> &amp; <a href="https://ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://ianbicking.org/category/ai.html">category: ai</a></li>
+                    <li><a href="https://ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://hachyderm.io/@ianbicking">@ianbicking@hachyderm.io</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                            <li><a href="https://www.linkedin.com/in/ianbicking/">LinkedIn</a></li>
+                            <li><a href="https://twitter.com/ianbicking">@ianbicking</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://ianbicking.org/blog/2024/05/ai-aita.html"><span class="caps">AI</span> <span class="caps">AITA</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm.html">Roleplaying driven by an <span class="caps">LLM</span>: observations <span class="amp">&amp;</span> open&nbsp;questions</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/04/world-building-gpt-2-declarative.html">World Building with <span class="caps">GPT</span> part 2: bigger, better, more&nbsp;declarative</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">World Building With <span class="caps">GPT</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/thoughts-on-voice-interfaces-2-llms.html">Thoughts On Voice Interfaces 2 years later:&nbsp;LLMs</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/infinite-ai-array.html">Infinite <span class="caps">AI</span>&nbsp;Array</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice&nbsp;Interfaces</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FKT4HDGBE4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-FKT4HDGBE4');
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>
