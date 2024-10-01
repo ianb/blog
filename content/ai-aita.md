@@ -414,7 +414,7 @@ I don't have good enough stories so I made ChatGPT write some...
 
 Personally, I can tell I grew a lot just from reading those.
 
-I'm not sure why, but I guess you could comment on [Mastodon]() or [Twitter]()...?
+I'm not sure why, but I guess you could comment on [Mastodon](https://hachyderm.io/@ianbicking/112473454420192649) or [Twitter](https://twitter.com/ianbicking/status/1792535455461765474)...?
 
 <style>
 .aita {
