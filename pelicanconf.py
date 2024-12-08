@@ -78,9 +78,10 @@ THEME = "./mystyle/"
 SOCIAL = (
     # ("Mastodon", "https://mastodon.technology/@ianbicking"),
     ("@ianbicking@hachyderm.io", "https://hachyderm.io/@ianbicking"),
+    ("Blue Sky", "https://bsky.app/"),
+    ("Threads", "https://www.threads.net/@ibicking"),
     ("Github", "https://github.com/ianb"),
     ("LinkedIn", "https://www.linkedin.com/in/ianbicking/"),
-    ("@ianbicking", "https://twitter.com/ianbicking"),
 )
 
 DEFAULT_PAGINATION = 10
