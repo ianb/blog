@@ -2,9 +2,23 @@ PageTitle: Projects
 Title: Projects
 slug: projects
 
-This is a list of projects I am working on, or have worked on. All are open source.
+This is a list of projects I am working on, or have worked on. Most are open source.
 
--   [Recent(ish) work](#currentwork)
+**Note:** As of December 2024 I am currently [looking for work](https://www.linkedin.com/feed/update/urn:li:activity:7265435901009231872/). I really [enjoy working with LLMs](/projects.html#llm), and I believe there is important work to be done at this moment; I want to find people who feel the same and are approaching this moment with both ambition and care.
+
+-   [LLM period](#llm)
+    -   [Memory Atlas](#memory-atlas)
+    -   [Intra: the game](#intra-game)
+    -   [At Brilliant](#brilliant)
+    -   [Helping an LLM Reason Using Z3](#z3)
+    -   [A Life Lived / World Wanderer](#lifelived)
+    -   [FunGPT](#fungpt)
+    -   [LLM Garden](#llm-garden)
+    -   [Infinite AI Array](#iaia)
+-   [The Mozilla period](#mozilla)
+    -   [Firefox Voice](#firefox-voice)
+    -   [Firefox Screenshots](#firefox-screenshots)
+    -   And others: [Email Tabs](#email-tabs), [Personal History Archive](#personal-history), [Test Pilot Experiment Backlog](#test-pilot)
 -   [Projects I've Retired From:](#retired)
     -   [Collaboration / general](#collaboration)
     -   [Python Packaging](#packaging)
@@ -15,39 +29,132 @@ This is a list of projects I am working on, or have worked on. All are open sour
 -   [Small projects](#smallcurrent)
 -   [Toys](#toys)
 
-## <span id="currentwork">Recent Work</span>
+## <span id="llm">LLM period</span>
+
+I started using GPT in October 2022 (GPT-3 text-davinci-002), applying it to some long-standing frustrations I had using NLP with voice interfaces. It immediately solved problems I had struggled with for years, and at that point I was hooked. Here's some of what I've done with LLMs (newest-first):
+
+<dl>
+<dt id="memory-atlas"><a href="https://youtu.be/xjJRB9i9220?si=cMvorYNro34mg0FF">Memory Atlas (video demo)</a></dt>
+<dd>This is a (prototype) app for making personal catalogs of your household items (or maybe anything?). It uses voice for the data input, with the LLM structuring the transcript and managing the resulting database. I started this as a personal project for my own decluttering, using ad hoc AI tools to make lists of belongs in my house. But it's a concept I've been thinking about for years. I think I'll do more with this.</dd>
+
+<dt id="intra-game"><a href="https://github.com/ianb/intra-game">Intra: the game</a></dt>
+<dd>I wrote this for a <a href="https://textadventurehack.com/">Retro AI Quest</a> hackathon (which I won!) You can play it on <a href="https://www.playintra.win/">www.playintra.win</a> (you will need to bring your own API access using <a href="https://openrouter.ai/">OpenRouter</a>). You can also see a <a href="https://youtu.be/k4xybFjEONw?si=uV8fg2uq5ZhuK74s">demo video</a> of the entry, though I've made a lot of changes and improvements since then.
+<br /><br />
+This is the most recent incarnation of various LLM-based roleplaying experiments I've done. The most interesting features are:
+<ol>
+<li>Concrete world state managed outside the LLM. There are locations and characters, with mutable but concrete attributes, and the LLM prompts make use of this state and can update it.</li>
+<li>The history log lets the game construct history from different perspectives. Character prompts include just the history items the character would have directly viewed.</li>
+<li>User input is mediated, so that instead of directly talking or acting, the input is reinterpreted within the constraints of the game.</li>
+<li>Characters have (limited) schedules and purposes, and the game runs on a clock. Lunchtime discussion can get pretty excitable.</li>
+<li>LLM-generated summaries. Like in a text adventure you go in a room and get a description of the room; in the game the LLM takes the room, the characters, what the characters are up to, and creates a brief description.</li>
+<li>Some action resolution with dice rolling.</li>
+</ol>
+Still I'm struggling to make it into a "game". Specifically: clear, achievable goals, with a larger arc to the game, and enough feedback for the player to know they are on track.
+</dd>
+
+<dt id="brilliant">At Brilliant</dt>
+<dd>There's nothing public to show here, but some of the projects I worked on during my time at <a href="https://brilliant.org/">Brilliant.org</a>.
+<dl>
+<dt>LLM Infrastructure</dt>
+<dd>Typed prompts, tools, and pipelines; typed prompt templates; prompt and model comparison tools; using Wolfram Language to verify math; self-critique pipelines</dd>
+<dt>Content Enhancement &amp; Generation</dt>
+<dd>Generating practice problems (interpolated from existing problems); precalculating (helpful) feedback for common wrong answers to open-form questions; feedback for multiple choice wrong answers; contextualized word definitions and explanations; on-demand translation (like into Spanish); experimenting with auxiliary voice output with LLM rewriting (to translate equations to a spoken form); review tools and human-in-the-loop tools for generated content</dd>
+<dt>Code Generation</dt>
+<dd>LLM migration of proprietary code; chat-based modification of Interactives code; pipelines to distill and understand hybrid code/text documents</dd>
+<dt>Search &amp; Analysis</dt>
+<dd>Embedding search across the CMS and interactive codebase; tool for ad hoc analysis of our lessons; SQL chat tool</dd>
+</dl>
+</dd>
+
+<dt id="z3">Helping an LLM Reason Using Z3</dt>
+<dd>This was an experiment in having LLMs write <a href="https://github.com/Z3Prover/z3">z3 code</a> to solve <a href="https://en.wikipedia.org/wiki/Zebra_Puzzle">Zebra Puzzles</a>. It took a fair amount of prompting, but they were able to solve pretty difficult puzzles. Or at least Claude Sonnet 3.5 was. I made a <a href="https://youtu.be/UjSf0rA1blc?si=6XjAnBaXH5rz953D">20min demo video</a> and also had a <a href="https://youtu.be/TUAmfi8Ws1g?si=0KBQuN66nZyK357K">conversation about it</a> at the <a href="https://bstn.cc/">Boston Computation Club</a>.</dd>
+
+<dt id="lifelived"><a href="http://a-life-lived.com/">A Life Lived</a> and <a href="http://worldwanderer.xyz/">World Wanderer</a></dt>
+<dd>These are a pair of experimental games that I reflected on in <a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm">Roleplaying driven by an LLM: observations &amp; open questions.</a>
+<br /><br />
+<strong>A Life Lived</strong>: I developed this one first, and it's the more important of the two to me. The goal: place yourself (or rather your character) with a family in a place and time in history. Then, playing your character, you make a series of choices that affect how your life develops, finally creating a biography of the full life of this character.
+<br /><br />
+You can play this on <a href="http://a-life-lived.com/">a-life-lived.com</a> (also bring your own key). And there's a <a href="https://youtu.be/u49KwijAwm8">16min demo video.</a>
+<br /><br />
+I feel pretty good about the character setup. But "making a series of choices for your character" is a trick I haven't really figured out. What I implemented is a kind of scenario builder and then it plays out via chat/roleplay. Like "Greta's loyalty and moral compass are tested as she navigates family bonds versus the potential risk to her family's safety (Berlin, 1961)" – interesting premise, but actually playing it out felt confusing and mushy.
+<br /><br />
+<strong>World Wanderer</strong>: I wanted to step back from <em>Life Lived</em> and tried out another version. Instead of ambiguous life goals, I thought I'd take the worldbuilding examples I'd created before and make them an explorable world.
+<br /><br />
+This is available on <a href="https://worldwanderer.xyz/">worldwanderer.xyz</a>, and has a <a href="https://youtu.be/1EoYmNGIMgo">12min demo video</a>.
+<br /><br />
+Character setup is a simpler skill level system (e.g., cleverness: <em>foolish</em> and charisma: <em>magnetic</em>), and another structured relationship system (so NPCs can grow to have an opinion or reaction to you). The funnest part by far is the action resolution: you can make attempts at actions (as varied as <em>befriend a sparrow</em> and <em>haggle to buy a potion</em>), your skills are engaged, roll dice, and you get an outcome.
+<br /><br />
+But the rest of the game isn't really that fun. You are wandering around an imaginary city frozen in time. Every location just sits there, every NPC stares at a wall, until you engage them.
+<br /><br />
+I tried to improve on several of the issues I bumped into when making <a href="#intra-game">Intra</a>. But there's still a lot left in these games that I still want to explore further.
+</dd>
+
+<dt id="fungpt"><a href="https://github.com/ianb/fungpt">FunGPT</a></dt>
+<dd>I created this framework for the purpose of <a href="https://www.youtube.com/watch?v=qzczZABGzbQ">a 45min presentation I gave</a> at <a href="https://minnestar.org/minnebar/">Minnebar</a>.
+<br /><br />
+I tried to make something a bit simpler than the LLM Garden, and experimented with some different control flows to make programming in the browser feel a little more like programming in a text console (more like input/output). Though I don't use these patterns in my newer work, they do really work pretty well for chat.
+<br /><br />
+I made a few little things using this framework (all of which are in the repository). But I probably played the most with chat, with <a href="https://github.com/ianb/fungpt/blob/main/src/routes/chat/summary-chat.js">&quot;summary chat&quot;</a> probably being the most complete implementation. A lot of what I did in this chat would show up in later games. I think it's one of these versions that I used when comparing <a href="https://hachyderm.io/@ianbicking/110359139615510487">my William Shakespear to Khanmigo's</a>. The chat isn't that complicated, but it has several features to manage context size and ensure chat history saliency.
+</dl>
+
+<dt id="llm-garden"><a href="https://llm.ianbicking.org/">LLM Garden</a></dt>
+<dd>Available on <a href="https://github.com/ianb/llm-garden">GitHub</a>, this is the first playground I setup to experiment with LLMs, starting in the GPT3 text-davinci-003 era.
+<br /><br />
+There's a series of experiments in it:
+<dl>
+<dt>Make Your Own Adventure</dt>
+<dd>This is a Choose Your Own Adventure builder/authoring tool. It doesn't make these on the fly, but instead uses the LLM to fill out the story and choices. It was a good lesson (which is to say, not successful), and I learned a lot about the issues of hallucination and establishing ground truth, as the stories would meander terribly.</dd>
+<dt>People Sim</dt>
+<dd>I suppose you would call this a "multi-agent story teller". But really I was just trying to drive scenes using a prompt for each character, and having them react to each other. It was a good lesson in GPT's difficulty with plot resolution and definitive action. Characters in these stories would vamp forever just to avoid revealing the (actually undetermined) conclusion. I made a <a href="https://youtu.be/nsIPC_eqfwg?si=EWbw1eYSwScZ9ahl">15min demo video</a>.</dd>
+<dt>Zork player</dt>
+<dd>I ran Zork in the browser and had GPT try to act as the player. <a href="https://youtu.be/clENPDMFP_k?si=oOuHRccjWDknIvi9">7min demo</a>. Mostly it didn't do that well. Going in I thought a text adventure might be a good grounding for LLM-based agents/NPCs, so they could only act independently through the text interface while the game checked the validity of their moves. After I came to see text adventures as pretty limited point-and-click games, except you point and click using words.</dd>
+<dt>p5.js Drawing</dt>
+<dd>This was an experiment to have GPT write code for <a href="https://p5js.org/">p5.js</a>, a JavaScript successor to the Processing learning environment. <a href="https://youtu.be/IMcvNIGayjo?si=DjkNR0KBubvWfHyN">10min demo video</a>. I guess I didn't find it that interesting, as I didn't continue experimenting.</dd>
+<dt>LayerCraft</dt>
+<dd>This is the engine underneath the worldbuilding tool that I made (see <a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt">World Building With GPT</a> and particularly <a href="https://ianbicking.org/blog/2023/04/world-building-gpt-2-declarative">part 2</a>, as well as this <a href="https://youtu.be/4DEibveZ-n8?si=_GOn9ar-slSWIZ1v">16min demo </a>).
+<br /><br />
+The actual tool is fairly generic. It is meant to generate hierachical imaginative <em>stuff</em> with (human) authorial direction. A specific domain like building a city is defined in <a href="https://github.com/ianb/llm-garden/blob/main/src/layercraft/citymakerschema.js">a series of prompts</a>. A parent prompt sets up the context – like "medieval city" – and then further down prompts cover neighborhoods, buildings, people, etc. At each level you can make choices and influence the generation. Once all the prerequisite information is created then entities lower down in the hierarchy can be created (e.g., once you've defined a neighborhood, the LLM will start brainstorming the buildings in that neighborhood).
+<br /><br />
+I have had a lot of fun with this tool, as much as anything I've created. While I filled it out most for this particular worldbuilding task, I did some other smaller personal projects that also worked well. It uses the prompt templates themselves to define the dependency structure of the pipelines, which is kind of cool. I'd like to come back to it.</dd>
+</dl>
+
+<dt id="iaia"><a href="https://ianbicking.org/blog/2023/01/infinite-ai-array">Infinite AI Array</a></dt>
+<dd>I wrote it as an extended gag, though <a href="https://github.com/ianb/infinite-ai-array/blob/main/iaia/infinite_ai_array.py">it's also real code</a>. Transparent LLM access through Python lists and dicts! Created-on-demand functions! And it uses some pretty gnarly Python introspection. So... it's a gag, but it's also cool in its own weird way.</dd>
+
+</dl>
+
+## <span id="mozilla">Mozilla Period</span>
+
+This is some of what I worked on in the second phase of my career at Mozilla.
 
 <dl>
 
-<dt><a href="https://github.com/mozilla-extensions/firefox-voice/">Firefox Voice</a></dt>
+<dt id="firefox-voice"><a href="https://github.com/mozilla-extensions/firefox-voice/">Firefox Voice</a></dt>
 <dd>Firefox Voice was our project out of the now-defunct Consumer Voice Products team, in the now-defunct voice program in Mozilla, part of the now-defunct Emerging Technologies division.<br><br>
 Firefox Voice is a voice assistant for the browser, allowing the simple commands like "new tab" as well as routing and interpreting messages to Google ("what's the weather"), integrating with music services ("play David Bowie") and many other commands.<br><br>
 At least for a while (I'm writing this in August 2020) it's available <a href="https://addons.mozilla.org/en-US/firefox/addon/firefox-voice/">on addons.mozilla.org</a>.<br><br>
 I wrote some thoughts coming out of this project in <a href="https://www.ianbicking.org/blog/2020/08/thoughts-on-voice-interfaces.html">Thoughts on Voice Interfaces</a>.</dd>
 
-<dt><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">Test Pilot Firefox experiment backlog</a></dt>
-<dd>Although I was able to ship some things in Test Pilot, there was a long backlog of ideas, and experiments I started but didn't work out or weren't able to be shipped. I made a list of them!</dd>
-
-<dt><a href="https://github.com/mozilla-services/screenshots"><strong>Firefox Screenshots</strong></a></dt>
+<dt id="firefox-screenshots"><a href="https://github.com/mozilla-services/screenshots"><strong>Firefox Screenshots</strong></a></dt>
 <dd>I started Page Shot (which became Firefox Screenshots) in October 2014. During that time I went from doing it as a small side project, to managing the project during its nascent stages, then when I left management I rejoined development to get it launched as a <a href="https://testpilot.firefox.com/experiments/page-shot">Test Pilot experiment</a>. During that period it went from being a page freezing tool (similar to the Way Back Machine) to a screenshot tool.<br><br>
 It was popular inside Test Pilot experiment channel, and it wasn't much later when it re-launched as a core Firefox feature in September 2017. When it launched it was the first Mozilla product built that took unencrypted user content, that used Google Analytics, the first Firefox feature to ship as a <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions">WebExtension</a>, and the first use of <a href="https://sentry.io/welcome/">Sentry</a> to monitor errors in the browser. <br><br>
 For myself, Screenshots has been a lesson in managed expectations, but also a lesson in <a href="https://www.ianbicking.org/blog/2018/02/web-small-composable-tools.html">providing simple tools</a> without worrying about how hard they are to create. <br><br>
 Despite being popular, in 2019 the server component of Screenshots is being shut down, though the tool will otherwise remain in Firefox. During its life 36 million people used the Screenshots server with over 100 million screenshots uploaded. About 20% of screenshots created are uploaded (instead of being downloaded or copied to the clipboard), so it would be reasonable to estimate 500 million screenshots taken in the course of two years.</dd>
 
-<dt><a href="https://github.com/mozilla/side-view"><strong>Side View</strong></a></dt>
+<dt id="side-view"><a href="https://github.com/mozilla/side-view"><strong>Side View</strong></a></dt>
 <dd>Another <a href="https://testpilot.firefox.com/experiments/side-view">Test Pilot experiment</a>, this makes it easy to open a mobile view of a website in the Firefox sidebar. I'm mostly proud that we kept it simple and usable.</dd>
 
-<dt><a href="https://github.com/mozilla/email-tabs"><strong>Email Tabs</strong></a></dt>
+<dt id="email-tabs"><a href="https://github.com/mozilla/email-tabs"><strong>Email Tabs</strong></a></dt>
 <dd>Another <a href="https://addons.mozilla.org/en-US/firefox/addon/email-tabs/">Test Pilot experiment</a>. This was strongly influenced by <a href="https://blog.mozilla.org/ux/2015/02/save-share-revisit/">Mozilla's user research</a>. The results of our research was clear: everyone loves to save and share things by email. And yet it took me a few years to sit down and quickly hack out a tool that makes emailing articles work well. Working with email, and poking around in other company's email products, is a bit like science: you have to see what works, nothing works by default or because you want it to work a certain way.<br><br>
 I'm excited by Email Tabs, in no small part because of the simplicity and power of prepopulating compositions. Composing (but not sending) an email is transparent, manipulable, and open-ended. I hope I have the chance to use this lesson elsewhere. The browser is a great location for this, because the browser can integrate with systems in the same way a user integrates with systems, which isn't just handy but also is a kind of working in the open: you can see and understand what the automation does, because it does what you might have done. I wrote some thoughts in <a href="https://www.ianbicking.org/blog/2018/11/thoughts-on-email-tabs.html">Thoughts on the Firefox Email Tabs experiment</a></dd>
 
-<dt><a href="https://github.com/ianb/personal-history-archive/"><strong>Personal History Archive</strong></a></dt>
+<dt id="personal-history"><a href="https://github.com/ianb/personal-history-archive/"><strong>Personal History Archive</strong></a></dt>
 <dd>I've been poking around at this project for a long time, never really finishing it or deciding exactly what to do with it. The underlying goal is to support local, personal experimentation with the data that can come out of a browser. Most collection like this emphasizes data collected from many aggregate sources, either from select sources or with anonymization, and with only a rough outline of user behavior. A user agent (like a browser) sees everything! It doesn't just see that you visited a site, it sees exactly what that site displayed. It doesn't just see that you have an email, every email you read is displayed by the browser.<br><br>
 So this is a tool to try to collect all that intimate data in a way that supports personal experimentation. Especially experimentation that can produce tools uniquely suited for a user agent that belongs to the user, touching data you'd never want to give to an external service.<br><br>
 Also I have just been poking around with creating highly usable data dumps, where the data is clean, always well-formed, and where behavioral and more static data is mixed together in a usable way.</dd>
 
-<dt><a href="https://github.com/ianb?tab=repositories">Other GitHub miscellany</a></dt>
-<dd>Working in the open at Mozilla I have had the opportunity to try things out. Sometimes they work out, and sometimes they don't. At that stage you'll find my work in GitHub, which is updated more frequently than this page.</dd>
+<dt id="test-pilot"><a href="https://www.ianbicking.org/blog/2019/03/firefox-experiments-i-would-have-liked.html">Test Pilot Firefox experiment backlog</a></dt>
+<dd>Although I was able to ship some things in Test Pilot, there was a long backlog of ideas, and experiments I started but didn't work out or weren't able to be shipped. I made a list of them!</dd>
 
 </dl>
 
@@ -328,6 +435,9 @@ In addition to those bigger projects, there's a bunch of small stuff I did that 
 ## <span id="smallcurrent">Small (maybe not current) Stuff</span>
 
 <dl>
+
+<dt><a href="https://github.com/ianb?tab=repositories">Other GitHub miscellany</a></dt>
+<dd>Working in the open at Mozilla I have had the opportunity to try things out. Sometimes they work out, and sometimes they don't. At that stage you'll find my work in GitHub, which is updated more frequently than this page.</dd>
 
 <dt><a href="https://github.com/ianb/misc-recipes">Misc recipes</a></dt>
 <dd>Before GitHub when I want to try out an idea, I throw it in an SVN directory.  There's a grab bag of experiments here, all from quite a while ago.</dd>
