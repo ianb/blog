@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Embodied In The Software</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://ianbicking.org/favicon.ico">
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+        <div>
+            <div class="published" title="2025-05-17T00:00:00-05:00">
+                Saturday, May 17th, 2025
+            </div>
+            <h1 class="entry-title">
+                <a
+                    href="https://ianbicking.org/drafts/embodied-in-the-software.html"
+                    rel="bookmark"
+                    title="Permalink to Embodied In The Software"
+                    >Embodied In The&nbsp;Software</a
+                >
+            </h1>
+        </div>
+        </header>
+
+        <div class="entry-content"><p><a href="https://en.wikipedia.org/wiki/Embodied_cognition"><span class="dquo">&#8220;</span>Embodied Cognition&#8221;</a> generally refers to integrating physical senses and action into the <span class="caps">AI</span>. But instead of preconceptions of what embodiment might be, I have been thinking about how the <span class="caps">AI</span> can embody whatever it is. (<a href="https://en.wikipedia.org/wiki/Interoception">&#8220;Interoception&#8221;</a>)</p>
+<p>More specifically: how can the <span class="caps">AI</span> embody its software, application, or&nbsp;environment?</p>
+<h2>Inputs</h2>
+<p>For instance I&#8217;ve been developing a voice-based chat interface. The voice is transcribed into text for a variety of reasons<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>, so the <span class="caps">AI</span> cannot interpret the audio, its senses are in this respect dulled. And yet I can at least give it the context that <em>is</em>&nbsp;available:</p>
+<div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">speechTranscript</span><span class="o">&gt;</span>
+<span class="p">[</span><span class="n">insert</span> <span class="n">transcript</span><span class="p">]</span>
+<span class="o">&lt;/</span><span class="n">speechTranscript</span><span class="o">&gt;</span>
+</pre></div>
+
+
+<p>That alone tells the <span class="caps">AI</span> how the text was collected and what it should expect. And it works&#8230; the <span class="caps">AI</span> will interpret the text more generously, assuming that it may be mistranscribed. I haven&#8217;t tried providing a confidence score or alternate word transcriptions, but I&nbsp;should.</p>
+<p>There are lots of inputs that can help explain the context of the application, but won&#8217;t be included in the <span class="caps">AI</span>&#8217;s context unless you go to some&nbsp;effort:</p>
+<ol>
+<li>The local time of&nbsp;day</li>
+<li>The timespan between&nbsp;messages</li>
+<li>Any diversions the user took between&nbsp;messages</li>
+<li>The device being&nbsp;used</li>
+<li>The screen the user is looking at, and any information on the&nbsp;screen</li>
+<li>The provenance of the information it is provided (such as the transcript having the provenance of recorded&nbsp;speech)</li>
+<li>For information provided to the <span class="caps">AI</span>: the date at which the information was collected or&nbsp;verified</li>
+<li>Knowledge about context or history that has been trimmed because of space&nbsp;concerns</li>
+</ol>
+<p>This information can keep expanding, but it shouldn&#8217;t be provided literally at each step. For instance for 2 I only make note of timespans over 10 minutes, and specify timespans instead of timestamps, allowing the <span class="caps">AI</span> to see those notable pauses without having to calculate time differences or scan each message. You must treat the <span class="caps">AI</span> as another user and apply a kind of user interface design, finding out how to best present the information and&nbsp;controls.</p>
+<h2>Capabilities</h2>
+<p>This is easier because we have a widely used way to give the <span class="caps">AI</span> capabilities: Tools. A Tool is simply a definition of a structured command the <span class="caps">AI</span> can output alongside its textual response. For instance if there is a <code>setAlarm()</code> tool then the <span class="caps">AI</span> can assume it is capable of setting an&nbsp;alarm.</p>
+<p>There&#8217;s still a few things frequently&nbsp;missing:</p>
+<ol>
+<li>There may be other actions that aren&#8217;t represented as&nbsp;tools.</li>
+<li>It&#8217;s seldom specified that the tools are comprehensive and no other actions are&nbsp;possible.</li>
+<li>Even with both these, the <span class="caps">AI</span> will need more documentation when it consistently guesses incorrectly at some boundaries of its&nbsp;abilities.</li>
+</ol>
+<h2>Cognitive&nbsp;limits</h2>
+<p>The <span class="caps">AI</span> has been trained on enough truncated transcripts that it has adapted to filling in missing past history and expecting that some old history will be&nbsp;lost.</p>
+<p>If the software is doing more to modify and curate the prompt then that may also be worth specifying. For instance in my application I send photos the user uploads on the first request, but leave the photos out of the history. I <em>should</em> be telling the <span class="caps">AI</span> that it has one chance to look at the photos, and if it needs to remember any details it should make note of those&nbsp;details.</p>
+<p>Things you might want to&nbsp;specify:</p>
+<ol>
+<li>Can the <span class="caps">AI</span> think or act without the user initiating an&nbsp;interaction?</li>
+<li>How much of its history is missing? (How many conversation turns or how much&nbsp;time.)</li>
+<li>If it responds with some information: an estimate of how long it will have access to that information before it is culled from&nbsp;history</li>
+<li>Will it have another chance to respond after invoking a&nbsp;Tool?</li>
+<li>If you give it thinking scratchpads<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, will it see that scratchpad in the next&nbsp;request?</li>
+</ol>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn:1">
+<p>It is possible to send the raw audio to an <span class="caps">LLM</span> and have it respond directly, giving it more ability to respond to tone and pauses, as well as adjust its transcript based on the context. But this is more expensive, harder to debug, and less flexible in certain cases.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>a scratchpad is a place where you let the <span class="caps">AI</span> write down a thought process before creating the &#8220;real&#8221; output. <a href="https://en.wikipedia.org/wiki/Reasoning_language_model">Reasoning models</a> typically do this automatically, but any model can be asked to follow this step.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+        <!-- /.entry-content -->
+  
+        <hr />
+
+        <!-- <div>
+            Hello! Did you know as of December 2024 I'm looking for a job? <a href="https://www.linkedin.com/feed/update/urn:li:activity:7265435901009231872/">I am!</a> I really like working with LLMs, especially in the domain of education, wellness, and <a href="https://en.wikipedia.org/wiki/Executive_functions">executive function</a>. Maybe <a href="mailto:ianbicking@gmail.com">drop me an email</a>?
+        </div> -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://ianbicking.org/archives.html">archives</a> &amp; <a href="https://ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://ianbicking.org/category/ai.html">category: ai</a></li>
+                    <li><a href="https://ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://hachyderm.io/@ianbicking">@ianbicking@hachyderm.io</a></li>
+                            <li><a href="https://bsky.app/profile/ianbicking.org">Blue Sky</a></li>
+                            <li><a href="https://www.threads.net/@ibicking">Threads</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                            <li><a href="https://www.linkedin.com/in/ianbicking/">LinkedIn</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://ianbicking.org/blog/2025/05/the-hungry-ghost.html">The Hungry&nbsp;Ghost</a></li>
+                    <li><a href="https://ianbicking.org/blog/2024/05/ai-aita.html"><span class="caps">AI</span> <span class="caps">AITA</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm.html">Roleplaying driven by an <span class="caps">LLM</span>: observations <span class="amp">&amp;</span> open&nbsp;questions</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/04/world-building-gpt-2-declarative.html">World Building with <span class="caps">GPT</span> part 2: bigger, better, more&nbsp;declarative</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">World Building With <span class="caps">GPT</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/thoughts-on-voice-interfaces-2-llms.html">Thoughts On Voice Interfaces 2 years later:&nbsp;LLMs</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/infinite-ai-array.html">Infinite <span class="caps">AI</span>&nbsp;Array</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/09/project-ideas-2020.html">Project ideas for (what&#8217;s left of)&nbsp;2020</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/09/a-history-of-projects.html">A History Of&nbsp;Projects</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FKT4HDGBE4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-FKT4HDGBE4');
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>
