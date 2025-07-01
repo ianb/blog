@@ -55,7 +55,7 @@ A [video](https://www.youtube.com/watch?v=1EoYmNGIMgo) of World Wanderer: **Role
 
 <div class="centered"><iframe width="560" height="315" src="https://www.youtube.com/embed/1EoYmNGIMgo?si=ULwi6U1-agur50Y8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
 
-I created a more playable game that is [open source]. Blog post: [**Intra: design notes on an LLM-driven text adventure**](https://ianbicking.org/blog/2025/06/intra-llm-text-adventure.html) (July 2025)
+I created a more playable game that is [open source](https://github.com/ianb/intra-game). Blog post: [**Intra: design notes on an LLM-driven text adventure**](https://ianbicking.org/blog/2025/06/intra-llm-text-adventure.html) (July 2025)
 
 Finally a [video](https://www.youtube.com/watch?v=CWReNVF3Ark) on the text adventure [Intra](https://www.playintra.win): **LLM-driven text adventure: implementation notes (Intra)**
 
