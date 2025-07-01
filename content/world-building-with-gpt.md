@@ -9,6 +9,8 @@ header_cover_image_style: margin-bottom: 1em; background-color: #000; height: 19
 
 I've been doing lots of experiments with GPT, though I've only [written about one](https://ianbicking.org/blog/2023/01/infinite-ai-array.html) until now... the more serious something is the harder it is to call it finished or identify the outcomes. Here I'll describe something a bit lighter: world building, or specifically city building, with GPT.
 
+<aside>This post is part of the series <a href="/blog/2025/05/creating-worlds-with-llms.html">Creating worlds with LLMs</a></aside>
+
 This post is for people who are interested in building interactive tools on top of GPT and want to see some of the things I've encountered and what I've found that is successful and what is still a challenge.
 
 **Note:** Also check out my followup post: [World Building with GPT part 2: bigger, better, more declarative](https://ianbicking.org/blog/2023/04/world-building-gpt-2-declarative.html)

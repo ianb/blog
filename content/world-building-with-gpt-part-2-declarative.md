@@ -9,6 +9,8 @@ Date: 2023-04-04
 
 In my [last post](https://ianbicking.org/blog/2023/02/world-building-with-gpt.html) I described a city builder using GPT. I was planning on putting a pin in that work with the post, but the heart wants what the heart wants and I found myself returning to that work.
 
+<aside>This post is part of the series <a href="/blog/2025/05/creating-worlds-with-llms.html">Creating worlds with LLMs</a></aside>
+
 In this post I'll talk about [generating images from the source material](#images), [chatting with your characters](#chatting), [creating plots](#plots), some more about the [authoring experience](#authoring), and the [move to a more declarative implementation](#declarative).
 
 To get an idea of how this works here's a video:

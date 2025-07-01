@@ -2,13 +2,10 @@ Title: Intra: design notes on an LLM-driven text adventure
 Slug: intra-llm-text-adventure
 Date: 2025-06-01
 Category: ai
-Status: draft
-
-## Table of Contents
-
-<div id="toc"></div>
 
 ## Introduction
+
+<aside>This post is part of the series <a href="/blog/2025/05/creating-worlds-with-llms.html">Creating worlds with LLMs</a></aside>
 
 Last year I participated in a [text adventure hackathon](https://textadventurehack.com/) to build a text-based game using AI. I'd [already been thinking about it](https://ianbicking.org/blog/2024/04/roleplaying-by-llm) but it was a great opportunity to put together those thoughts into something real. Since then I made many improvements, and while I've shelved the project for other endeavors I still want to write up what I've learned along the way.
 
