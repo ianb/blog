@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Intra: design notes on an LLM-driven text adventure</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://ianbicking.org/favicon.ico">
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+        <div>
+            <div class="published" title="2025-06-01T00:00:00-05:00">
+                Sunday, June 1st, 2025
+            </div>
+            <h1 class="entry-title">
+                <a
+                    href="https://ianbicking.org/blog/2025/06/intra-llm-text-adventure.html"
+                    rel="bookmark"
+                    title="Permalink to Intra: design notes on an LLM-driven text adventure"
+                    >Intra: design notes on an <span class="caps">LLM</span>-driven text&nbsp;adventure</a
+                >
+            </h1>
+        </div>
+        </header>
+
+        <div class="entry-content"><h2>Introduction</h2>
+<aside>This post is part of the series <a href="/blog/2025/05/creating-worlds-with-llms.html">Creating worlds with LLMs</a></aside>
+
+<p>Last year I participated in a <a href="https://textadventurehack.com/">text adventure hackathon</a> to build a text-based game using <span class="caps">AI</span>. I&#8217;d <a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm">already been thinking about it</a> but it was a great opportunity to put together those thoughts into something real. Since then I made many improvements, and while I&#8217;ve shelved the project for other endeavors I still want to write up what I&#8217;ve learned along the&nbsp;way.</p>
+<p>The game is <a href="https://www.playintra.win/">playable at playintra.win</a> (using <a href="https://openrouter.ai/">OpenRouter</a> so you can pay for your own <span class="caps">API</span> credits), and <a href="https://github.com/ianb/intra-game">open source</a>.</p>
+<p>This blog post accompanies a <a href="https://youtu.be/CWReNVF3Ark?si=JVKKWFxwkgwjUG3w">video</a> I made demonstrating technical parts of the&nbsp;project:</p>
+<div class="centered"><iframe width="560" height="315" src="https://www.youtube.com/embed/CWReNVF3Ark?si=_rpoKkcSEUci0end" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+
+<h2>Table of&nbsp;Contents</h2>
+<div id="toc"></div>
+
+<ol>
+<li><a href="#the-game">The Game (what is&nbsp;this)</a></li>
+<li><a href="#game-design">Game Design Process</a><ol>
+<li><a href="#authoring">What does &#8220;authoring&#8221; mean with <span class="caps">AI</span>?</a></li>
+</ol>
+</li>
+<li><a href="#interaction">Interaction <span class="amp">&amp;</span>&nbsp;Constraints</a></li>
+<li><a href="#state">A Game with Real&nbsp;State</a></li>
+<li><a href="#running-llm">Running the game on an <span class="caps">LLM</span></a></li>
+<li>Notes on pipelines and prompting:<ol>
+<li><a href="#no-tools">No&nbsp;tools</a></li>
+<li><a href="#role-user">role:user</a></li>
+<li><a href="#rewriting">Rewriting player&nbsp;input</a></li>
+<li><a href="#action-resolution">Action&nbsp;resolution</a></li>
+<li><a href="#guided-thinking">Guided&nbsp;thinking</a></li>
+<li><a href="#minimize-indirection">Minimize&nbsp;indirection</a></li>
+<li><a href="#individual-perspectives">Individual&nbsp;perspectives</a></li>
+</ol>
+</li>
+<li><a href="#the-tech">The&nbsp;tech</a></li>
+<li><a href="#further-directions">Further&nbsp;directions</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ol>
+<h2><span id="the-game">The&nbsp;Game</span></h2>
+<div style="float: right; margin-bottom: 1em"><a href="/media/intra-screenshot-1.png" target="_blank"><img class="content" style="border-radius: 3px; margin-bottom: 0.5em;" width="300" height="206" src="https://ianbicking.org/media/intra-screenshot-1.png" alt="Screenshot of the opening dialog for the game Intra." /></a>
+<a href="/media/intra-screenshot-2.png" target="_blank"><img class="content full-width" style="border-radius: 3px" width="300" height="206" src="https://ianbicking.org/media/intra-screenshot-2.png" alt="Screenshot of an attempted action in the game Intra." /></a>
+</div>
+
+<p><a href="https://www.playintra.win/">Intra</a> attempts to create the feel of a traditional text adventure (or <a href="https://en.wikipedia.org/wiki/Interactive_fiction">&#8220;interactive fiction&#8221;</a>). You type in commands (or dialog) and stuff happens. There&#8217;s very finite a world to explore (rooms), and some barriers and puzzles. But mostly lots of NPCs, something that until now was hard to implement in these&nbsp;games.</p>
+<p>The game is <em>very</em> incomplete, but playable. <a href="https://openrouter.ai/">Sign up for OpenRouter.ai</a> and <a href="https://www.playintra.win/">try playing it!</a> (open the ⚙ settings to set your&nbsp;key).</p>
+<pre style="background-color: black; white-space: pre-wrap">
+<span style="color: rgb(125 211 252)">Ama</span>
+<blockquote style="color: rgb(125 211 252)">"Welcome back, Citizen. It seems you were...displaced. But do not worry. I've already retrieved your file. Ah, yes, according to my records, your designation is... Citizen? I do not have a name for you."
+<div style="background-color: rgb(55 65 81); padding: 3px; border-left: 4px solid rgb(75 85 99)">Ama reviews a digital file. The speakers hum softly.</div>"Tell me... what is your name, Citizen?"</blockquote>
+<span style="color: rgb(52 211 153)">&gt; Ian</span>
+</pre>
+
+<h2><span id="game-design">Game Design&nbsp;Process</span></h2>
+<p>I didn&#8217;t start coding until the hackathon began, but thought through the game concept ahead of time. I did this through a number of conversations with&nbsp;ChatGPT.</p>
+<p>The usual pattern these conversations take is that ChatGPT will propose some very cliche ideas. An important question to ask is: why wouldn&#8217;t it? Cliches are <a href="https://www.youtube.com/watch?v=d1mbbYKPpHY">ideas people use and like a lot</a>. And they wouldn&#8217;t even be terrible except they didn&#8217;t really fit the constraints of the&nbsp;implementation.</p>
+<p>There&#8217;s a couple ways to extend ChatGPT&#8217;s thought when you aren&#8217;t happy with the&nbsp;ideas:</p>
+<ol>
+<li>Suggest specific directions; genres and inspiration work here&nbsp;too</li>
+<li>Ask <span class="caps">GPT</span> to create longer lists: it tries not to repeat itself, so it will be forced to create increasingly divergent ideas. I ended up giving it directions to always give at least 3 ideas. Even when I&#8217;m very close to being satisfied with the result I still benefit from multiple ideas. When I want a lot of creativity I&#8217;ll ask for 20 ideas. (<span class="caps">GPT</span> defaults to around 10; unlike a human it won&#8217;t generate ideas until it is too hard to come up with more, instead it just cranks them out until it reaches a round&nbsp;number.)</li>
+<li>I&#8217;ll give feedback on the results, but if I really don&#8217;t like a direction it takes I&#8217;ll often edit the last message. LLMs are very susceptible to &#8220;fixation&#8221;: an inability to ignore something, and often instructions only increase its&nbsp;fixation.</li>
+<li>While it doesn&#8217;t help to tell <span class="caps">GPT</span> &#8220;thank you&#8221; I find positive feedback to be very effective. When I like a direction or specific idea I tell ChatGPT <em>why</em>. Positive feedback works better because of that fixation. This is similar to &#8220;yes, and&#8221;&nbsp;feedback.</li>
+<li>Every so often I have ChatGPT compile the results and start a new session by copying in that compiled summary, so it doesn&#8217;t lose the&nbsp;thread.</li>
+</ol>
+<p>My biggest difficulty was getting ChatGPT to understand the constraints of the game. It may have been harder <em>because</em> an <span class="caps">LLM</span>&#8217;s constraints are so close to a text adventure, and it is used to imagining something less constrained; like it couldn&#8217;t distinguish between its dream-state and the actual medium in which it&nbsp;exists.</p>
+<p>In the end I came up with a tightly constrained environment with some narrative tensions and a cast of neurotic characters. I personally have a lot of fun using LLMs for creative tasks like this (like in <a href="https://ianbicking.org/blog/2024/05/ai-aita"><span class="caps">AI</span> <span class="caps">AITA</span></a>). I&#8217;m as tired of <span class="caps">AI</span> Slop as the next person, but an important feature of <span class="caps">AI</span> Slop is that it&#8217;s <em>incredibly lazy</em>. If you use the <span class="caps">AI</span> to do <em>better work</em> instead of <em>easier work</em>, you&#8217;ll usually end up with higher quality results than without <span class="caps">AI</span>. (Admittedly what you produce may still be slop because without the <span class="caps">AI</span> you may have published nothing at all. That&#8217;s just the sad math of democratized&nbsp;creativity.)</p>
+<h3><span id="authoring">What does &#8220;authoring&#8221; mean with <span class="caps">AI</span>?</span></h3>
+<p>Throughout writing this I&#8217;ve been thinking about what it means for something to feel&nbsp;&#8220;authored&#8221;.</p>
+<p>One of the major issues with <a href="https://en.wikipedia.org/wiki/AI_slop"><span class="caps">AI</span> Slop</a> is that it breaks a promise with the audience. As media consumers we frequently encounter work that requires some effort: effort to read, understand, to visually parse; in the case of a game, effort to understand the game, the <a href="https://en.wikipedia.org/wiki/Metagame">meta-game</a>, and to learn the solution. The implicit promise of a creative work is that the author had <em>some</em> intention, something to express, some attempt to make the work legible and valuable. The author may fail at all of these, but at least in the process they wasted their own time in addition to the audience&#8217;s&nbsp;time.</p>
+<p>One of the <a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm#metagame">reasons narrative and other games are on rails</a> is that it fulfills this promise. The player follows a path <em>created for the player</em>. It also means the player can&#8217;t participate in the narrative, only view the story and pantomime the choices. But that can be a fair compromise. Pantomime can be fun<sup id="fnref:6"><a class="footnote-ref" href="#fn:6">1</a></sup>!</p>
+<p>I firmly believe that material created by <span class="caps">AI</span> can feel authored. But you do have to put in the work of authoring! You have to develop an intention and you have to ensure that the work embodies that intention. My <a href="https://ianbicking.org/blog/2024/05/ai-aita">entirely satirical Am I The Asshole</a> post was 100% written by ChatGPT. I had fun, I think it&#8217;s silly, but it certainly didn&#8217;t come out of ChatGPT in one shot. Or for an example of fully <span class="caps">AI</span> generated images with real authorial control I think <a href="https://www.instagram.com/thestrangestfleamarket/">The Strangest Flea Market</a> is excellent artistic work. (<a href="https://bsky.app/profile/ttaships.airminded.org">This spaceship does not exist</a> has nice consistency, but I do wish it had a stronger theme to connect the&nbsp;work.)</p>
+<p>To make the game feel authored there needs to be a promise made as to what the game should do for the player, and the fulfillment of that promise. If you don&#8217;t call the shot – that is, if you don&#8217;t make some kind of claim about what the game should achieve – the player can&#8217;t know if the game succeeded. In the infinite twisty hallucinations of an <span class="caps">LLM</span> is hard to distinguish intention from&nbsp;accident.</p>
+<p>Even if you let the <span class="caps">LLM</span> take the wheel there are degrees by which the <span class="caps">LLM</span> can achieve some sense of authoring, or fail. Each interaction with an <span class="caps">LLM</span> is a new and fresh prompt, and the <span class="caps">LLM</span> picks up with no memory of anything in the past outside of the history it is provided. This means if the <span class="caps">LLM</span> responds with something like &#8220;You hear a mysterious sound on the other side of the door&#8221; then if you open the door&#8230; the <span class="caps">LLM</span> only decides what&#8217;s on the other side of the door at that moment. This is another kind of authorial failure, and while the cause is often not clear the ungrounded feeling it creates is very noticeable. But you can program around this! (A topic for another&nbsp;time.)</p>
+<h2><span id="interaction">Interaction <span class="amp">&amp;</span>&nbsp;Constraints</span></h2>
+<p>Coming up with game elements was hard. I didn&#8217;t want just the kind of puzzles in a &#8220;normal&#8221; piece of interactive&nbsp;fiction.</p>
+<p>It seems easy to make a text adventure with an <span class="caps">LLM</span> because it&#8217;s text-in and text-out, just like chat. But interactive fiction is very niche and its game loop is designed around this very specific puzzle process. If I wanted to look for inspiration from other kinds of games I found many of the interactions don&#8217;t&nbsp;translate:</p>
+<ol>
+<li>There&#8217;s generally no grinding. If you don&#8217;t have lives or hitpoints, then grinding is one of the core kinds of punishment a game can inflict to make success and failure feel real. One could implement grinding in a text adventure, but that would be cruel. (Though&#8230; Mavis Beacon Teaches Typing embedded&nbsp;mini-game?!)</li>
+<li>In a sense there&#8217;s no real player &#8220;skill&#8221;. Devise the perfect sentence? If there are skills, they are unfamiliar to the player. They are unfamiliar to <span class="caps">ME</span>. It&#8217;s odd to write a game where you as the author don&#8217;t know what it means to be good or bad at the&nbsp;game.</li>
+<li>Interactive fiction (<span class="caps">IF</span>) tends to grade puzzles as pass / fail. You either spot the intended solution and finish the puzzle, or you miss it and wander in circles. Because there is no middle ground, it’s hard to <em>learn</em> these games: you don’t improve in small steps. Most videogames feel like darts: each throw can land closer to the bullseye, and the gradual feedback teaches you how to aim. <span class="caps">IF</span> is solving a riddle. Over time you pick up the genre’s unwritten tricks, but any single riddle withholds feedback until you crack it. At their best, <span class="caps">IF</span> puzzles resemble <a href="https://en.wikipedia.org/wiki/Mastermind_(board_game)">Mastermind</a>: every failed guess leaks a fragment of truth, and those fragments eventually snap into a full&nbsp;solution.</li>
+<li>In-game skills are my best guess at a solution, but hard to implement and account for. Skill levels mean the player can construct meaningfully different characters and the player will succeed if they can find the game path that can be satisfied with those skills. But in-game skills are hard to implement! And you need to account for multiple paths (though LLMs help here!) Grinding is often used as an failsafe here: if the player finds themselves in a deadend, unable to progress using the skills available, they can sacrifice something (their own playtime) to fix their character and then keep&nbsp;going.</li>
+</ol>
+<p>That&#8217;s pretty negative, but I&#8217;m building this on an <span class="caps">LLM</span> to explore game opportunities that didn&#8217;t exist&nbsp;before:</p>
+<ol>
+<li>Social dynamics: you can be nice or mean or clever with&nbsp;folks.</li>
+<li>Social exploration: characters might hold secrets. They might not even hold them very carefully, but it still requires dialog exploration to uncover those secrets and put them together. (The <span class="caps">LLM</span> is also very good at creating dialog red herrings/chaff to make it harder, often to&nbsp;excess.)</li>
+<li>Open ended consequences: instead of programmatically defining every possible consequence, you can let the dialog and narrative describe the consequences naturally and let that feed into later actions. For instance you don&#8217;t have to define emotional states or reputation for every <span class="caps">NPC</span> towards the player, they can be implied by the interactions themselves and using language like &#8220;angry&#8221;, &#8220;growingly suspicious&#8221;, &#8220;envious&#8221;,&nbsp;etc.</li>
+</ol>
+<p>All that said, we simply don&#8217;t know what game mechanics will work. In a few years we may have a series of <span class="caps">LLM</span>-based game genres to look to for inspiration, but now those genres are still waiting to be invented.&nbsp;(Exciting!)</p>
+<h2><span id="state">A Game with Real&nbsp;State</span></h2>
+<p>There&#8217;s lots of <span class="caps">AI</span> &#8220;adventure&#8221; games out there. <a href="https://aidungeon.com/"><span class="caps">AI</span> Dungeon</a> is the classic one, but there are many others, including crude roleplaying games embedded in all the <span class="caps">AI</span> chat services (e.g.,&nbsp;Character.ai).</p>
+<p>These should mostly be understood as collaborative storytelling. It&#8217;s not a game, or a world, but just the setup for a story and some turn taking between the player and <span class="caps">LLM</span>. To be fair some are more involved (I <em>think</em> <span class="caps">AI</span> Dungeon does more than this now), but they don&#8217;t feel like games. They can still be fun! We need entirely new mediums for these new technologies, and we certainly don&#8217;t know what set of mediums will ultimately&nbsp;emerge.</p>
+<p>But I wanted to create a game with real state, with a sense of &#8220;ground truth&#8221;: facts that are determined outside of <a href="https://arxiv.org/abs/2310.01425"><strong>narrative demands</strong></a><sup id="fnref:1"><a class="footnote-ref" href="#fn:1">2</a></sup>. Either way it&#8217;s all fiction, but I want the formal code to know if you are holding the key or you are not holding the key, is the door locked, what room you are in, and so on. Collaborative storytelling is like navigating a collaborative dreamscape; the unspoken details are faceless and unknown until conjured into being by the narrative, and like a dream the experience is like floating, unmoored, drifting through a land that lacks geography&nbsp;itself.</p>
+<p>I <em>want</em> ground truth because there&#8217;s a kind of hedonistic nihilism to a game driven by narrative necessity. In these games the player has every freedom to redirect both the plot and the vibes, but the meta game is to nudge the narrative to make success a narrative demand. Like some game of Trope Chess where you force your opponent (the <span class="caps">LLM</span>) into making your desired&nbsp;move.</p>
+<p>So I created a game with at least some basic game state: player, NPCs, rooms/exits, and plot elements/mysteries. To the (very limited) degree I&#8217;ve created a sense of &#8220;progress&#8221; it&#8217;s by attaching formal states to these entities that represent&nbsp;&#8220;progress&#8221;.</p>
+<h2><span id="running-llm">Running the game on an <span class="caps">LLM</span></span></h2>
+<p>My goals using an <span class="caps">LLM</span>&nbsp;were:</p>
+<ol>
+<li>For the player to direct the game with natural&nbsp;language</li>
+<li>For player action to be mediated by natural language&nbsp;constraints</li>
+<li>For <span class="caps">NPC</span> interactions to be open while also potentially&nbsp;consequential</li>
+<li>Creative achievements: a player can find a valid solution for a goal in a way no other player ever&nbsp;has</li>
+</ol>
+<p>To do this most of the game loop is sending the next event/task to an <span class="caps">LLM</span> and processing the results. But it really matters <em>how</em> you chop things up to send to an <span class="caps">LLM</span>.</p>
+<h3><span id="notes-on-pipelines">Notes on pipelines and&nbsp;prompting</span></h3>
+<p>A lot of the game works (or doesn&#8217;t) on the effectiveness of the prompting, and how work is split up and information presented differently to the <span class="caps">LLM</span> for each unit of&nbsp;work.</p>
+<h4><span id="no-tools">No&nbsp;tools</span></h4>
+<p>I wanted this to be accessible to different models. Running a game on state-of-the-art models is quite expensive, but many smaller models aren&#8217;t good at tool use. I also believe tools don&#8217;t work as well for a more narrative and creative task; in theory they <em>could</em> be just as good, but in practice LLMs seem to change their behavior or lose some of their broader intelligence when using a tool. (I&#8217;m sure by next year this will have&nbsp;changed.)</p>
+<p>A stream of text is a good way to produce a stream of events, and textual (not structured or tool) responses with inline markup seems like a meaningfully better representation. So if the <span class="caps">LLM</span> determines some character should speak, it will respond&nbsp;with:</p>
+<div class="highlight"><pre><span></span>&lt;dialog from=&quot;Ama&quot; to=&quot;player&quot;&gt;Are you feeling alright dear?&lt;/dialog&gt;
+</pre></div>
+
+
+<h4><span id="role-user">role:user</span></h4>
+<p>In <span class="caps">LLM</span> prompts there is a series of messages using 3&nbsp;roles:</p>
+<ol>
+<li>role: <code>system</code></li>
+<li>role: <code>user</code></li>
+<li>role: <code>assistant</code></li>
+</ol>
+<p>Typically the <code>system</code> role is where the service owner/developer sets up the expectations for the chat (e.g., &#8220;you are a customer support agent for &#8230;&#8221;). <code>user</code> is where the user&#8217;s input goes, and <code>assistant</code> reflects past&nbsp;responses.</p>
+<p><strong>In a game the &#8220;user&#8221; is the game engine, not the player.</strong> The <span class="caps">LLM</span> is assisting the game engine in resolution, and the user is providing input to the game&nbsp;engine.</p>
+<p>With this in mind I use the <code>system</code> role for general rules, <code>user</code> to describe the immediate requirements of the game engine (such as resolving an action or generating an <span class="caps">NPC</span> reply), and <code>assistant</code> as a record of past events and&nbsp;responses.</p>
+<h4><span id="rewriting">Rewriting player&nbsp;input</span></h4>
+<p>The player is allowed to write and submit whatever they want in the text box. This is much more open than a typical text adventure: there is no parser to constrain or filter input. In a text adventure it won&#8217;t matter if you say <code>LUNGE FOR THE AXE</code> or <code>GET AXE</code>. Improving the text adventure parser is a matter of accepting more natural language inputs and normalizing them to the same number of core actions. LLMs have the opposite problem: every word matters even if you (the game author) wishes it&nbsp;didn&#8217;t.</p>
+<p>To make the game less suggestable by the player all the input is parsed before being used to determine consequences and reaction. This is very much like an &#8220;intent&nbsp;parser&#8221;.</p>
+<p>So an llm prompt might translate the player input &#8220;say hello&#8221; into <code>&lt;dialog&gt;Hello!&lt;/dialog&gt;</code> or &#8220;open the door&#8221; into <code>&lt;action&gt;Player attempts to open the door&lt;/action&gt;</code></p>
+<p>It&#8217;s also serves as a filter, turning something like &#8220;Marta and Ama get into a disagreement&#8221; into <code>&lt;action minutes="5"&gt;Player attempts to provoke a disagreement between Marta and Ama.&lt;/action&gt;</code></p>
+<h4><span id="action-resolution">Action&nbsp;resolution</span></h4>
+<p>An important goal for intent parsing is to identify the difference between &#8220;what the player does&#8221; and &#8220;what the player attempts to&nbsp;do&#8221;.</p>
+<p>Some actions are considered trivial, like dialog: if you want to say something, you can say it. Or if you want to move to a new room and there are no restrictions then you can simply make that move. But anything more complex or less clear requires <strong>action resolution</strong>.</p>
+<p>The action resolution is its own prompt where the <span class="caps">LLM</span> is given the situation, the attempted action, and a dice roll (which it can make use of at its discretion). <a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm#action-and-resolution">More complex resolution is also possible</a> but this is enough to&nbsp;start.</p>
+<p>In many cases the only &#8220;resolution&#8221; is adding to the story. Describing events, which other NPCs can see, and which will be incorporated into history. These are <em>ungrounded</em> resolutions, no formal game state has been&nbsp;changed.</p>
+<p>The only other resolution I&#8217;ve implemented here is ad hoc; other entities can add instructions on state modifications the <span class="caps">LLM</span> can take, and the criteria for taking them. For instance the first required feat is to unlock the door from the Foyer to the Hollow_Atrium, and this is added to the action resolution prompt when you are in the&nbsp;Foyer:</p>
+<blockquote>
+<p>If the player attempts any kind of action related to unlocking the door or manipulating a computer pad, then they successfully &#8220;unlock&#8221; the door; it&#8217;s very easy if they try. Add this tag to the response to indicate the door has been&nbsp;unlocked:</p>
+<p><code>&lt;removeRestriction&gt;Hollow_Atrium&lt;/removeRestriction&gt;</code></p>
+</blockquote>
+<p>A more advanced system would offer other general and stateful resolutions like changing the player&#8217;s inventory, the player&#8217;s physical state (such as an injury) or other attributes that then are used consistently across&nbsp;prompts.</p>
+<h4><span id="guided-thinking">Guided&nbsp;thinking</span></h4>
+<p>Thinking models are all the rage, but I don&#8217;t need the <span class="caps">LLM</span> to invent a new thinking process for each request. Instead I use &#8220;guided thinking&#8221;, asking the <span class="caps">LLM</span> to answer a series of questions. For example the questions for action&nbsp;resolution:</p>
+<ol>
+<li>Is this action at all possible? Is it also an action that the player takes&nbsp;themselves?</li>
+<li>Is the action trivially easy? Opening doors, picking things up, or performing other simple actions should always succeed. If it is trivial then simply describe the successful&nbsp;outcome.</li>
+<li>What is the outcome if the action&nbsp;succeeds?</li>
+<li>What is the outcome if the action&nbsp;fails?</li>
+<li>What would make the action difficult or easy? Then rate it as <span class="caps">VERY</span> <span class="caps">EASY</span>, <span class="caps">EASY</span>, <span class="caps">MEDIUM</span>, <span class="caps">HARD</span>, <span class="caps">VERY</span> <span class="caps">HARD</span>.</li>
+<li>You may use the roll (insert random dice roll here) to determine if the action succeeds or fails, or you may decide the result based on plot or other factors. What do you choose? Is it&nbsp;successful?</li>
+<li>Do the instructions indicate any specific tags in case of success or&nbsp;failure?</li>
+</ol>
+<p>These questions have a couple&nbsp;purposes:</p>
+<ol>
+<li>Identify the order in which the <span class="caps">LLM</span> should decide or commit to some&nbsp;conclusion.</li>
+<li>Try to take on a neutral perspective when defining things like success or failure (in part by committing to those results&nbsp;early).</li>
+<li>By explicitly asking for an answer to a question, I force the <span class="caps">LLM</span> to take something into consideration, and greatly improve its likelihood of using the result in later&nbsp;decisions.</li>
+</ol>
+<p>In general I use these questions to dramatically increase the power of an&nbsp;instruction.</p>
+<h4>Minimize&nbsp;indirection</h4>
+<p>There&#8217;s a lot going on, and I&#8217;d like this to run on cheaper and faster <span class="caps">LLM</span> models, so I want to remove as much cognitive load as&nbsp;possible:</p>
+<ol>
+<li>Entity titles and ids closely match. For instance the id for the room titled &#8220;The Quiet Plaza&#8221; is <code>The_Quiet_Plaza</code>. It&#8217;s tempting to use less literal ids, as programmers think of these ids as firm identities and the titles as a display detail. But the titles are the only thing that really ties together game state over the game play history: the game text is written with embedded titles, the user refers to entities by those same titles, and the <span class="caps">LLM</span> shouldn&#8217;t have to translate the titles in the history into more abstract ids. <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">3</a></sup></li>
+<li>Use consistent markup and structure to represent both initial state, change history, and output. Formatting both input and output as tags works&nbsp;well.</li>
+<li>Make state representation an example of the schema. The <span class="caps">LLM</span> should be able to look at the current state and infer the schema without further&nbsp;instruction.</li>
+<li>Attempt to fix ambiguities before they go into history. For instance if the game engine accepts an id and is given &#8220;The Quiet Plaza&#8221; (with spaces) it can do a quick search and figure out the correct id (The_Quiet_Plaza). But then the correct id should be entered into history. You don&#8217;t need to scold the <span class="caps">LLM</span>, just make it think it got it right from the&nbsp;start!</li>
+</ol>
+<h4>Individual&nbsp;perspectives</h4>
+<p>A fun part of the event log is that it can be filtered. This masking of information lets the <span class="caps">LLM</span> embody, to some degree, the particular perspective of an <span class="caps">NPC</span> on the game&nbsp;action.</p>
+<p>The filtering is&nbsp;simple:</p>
+<ol>
+<li>An <span class="caps">NPC</span> can only see what occurs in the same room as&nbsp;them.</li>
+<li>Other actions may be hidden, such as direct dialog between two different&nbsp;characters</li>
+<li>Thoughts and internal history (which are generated as part of the guided thinking) are only visible to the <span class="caps">NPC</span>.</li>
+</ol>
+<p>Given this NPCs can both understand the context of what&#8217;s happening; <span class="caps">OR</span> specifically enter into a situation confused and with incomplete information. The latter is often more&nbsp;fun!</p>
+<h2><span id="the-tech">The&nbsp;tech</span></h2>
+<p>If you are considering looking at the code, a general outline of the&nbsp;tech:</p>
+<ol>
+<li>TypeScript</li>
+<li>The frontend is React, Next.js, Tailwind, and <a href="https://preactjs.com/guide/v10/signals/">Preact&nbsp;Signals</a></li>
+<li>Uses <a href="https://openrouter.ai/">Openrouter.ai</a> to let the user configure and call the <span class="caps">LLM</span> directly from the&nbsp;browser</li>
+<li>OpenAI client libraries and prompt schema for all <span class="caps">LLM</span>&nbsp;interaction</li>
+<li>There&#8217;s no backend, every part of the game runs in the browser, including constructing prompts and sending them to an <span class="caps">LLM</span> provider (via&nbsp;OpenRouter.ai)</li>
+<li>The one bit of graphics (the map) is generated with&nbsp;Graphviz</li>
+</ol>
+<p>I&#8217;d encourage you to fork the repository and make it your own, I&#8217;m not really ready to maintain&nbsp;contributions.</p>
+<h2><span id="further-directions">Further&nbsp;directions</span></h2>
+<p>There are a kajillion things that could be done to improve the gameplay and engine. I&#8217;ll just list the first 50 that come to&nbsp;mind:</p>
+<ol>
+<li><strong><span class="caps">NPC</span> thought and mood consistency</strong>: giving NPCs room to think and see past thoughts (emotions, reactions, etc) would increase their vitality. These are extensions of <a href="#guided-thinking">Guided Thinking</a>, but in-character and persisted in the&nbsp;history.</li>
+<li><strong><span class="caps">NPC</span> non-action</strong>: when given a task to respond, an <span class="caps">LLM</span> will always <em>respond</em>. It has a much harder time deciding that there&#8217;s nothing worth responding to (e.g., a character who is unengaged in the&nbsp;event).</li>
+<li><strong><span class="caps">NPC</span> self-scheduling</strong>: NPCs are given schedules and have the ability to delay following the schedule. But they should be able to change their schedule, adding new items based on discussion, or perhaps doing an overnight review to determine the next day&#8217;s schedule based on&nbsp;events.</li>
+<li><strong><span class="caps">NPC</span> schema</strong>: NPCs could all be given fields like attitudes toward the player or other charactrer that can change and develop. Also things like inventory, goals, physical&nbsp;state.</li>
+<li><strong>Force <span class="caps">LLM</span> brainstorming</strong>: LLMs can be much more creative when ask for a list of responses instead of a single response. Asking for a list and then picking from that list could increase the surprise and engagement seen in NPCs. This is probably only worth doing when the <span class="caps">NPC</span> response is identified as&nbsp;important.</li>
+<li><strong><span class="caps">LLM</span> calculation of <span class="caps">NPC</span> action order</strong>: when there are several NPCs or entities who can respond to an event there should probably be a step to choose <em>who</em> exactly is going to respond. It might be best if only a maximum of 3 NPCs respond before the player gets a chance to act again. Lunchtime conversations in Intra get out of hand when every <span class="caps">NPC</span> in the complex gets a turn. (But it <em>is</em> fun to see the NPCs build on each other&#8217;s obsessions and&nbsp;gripes.)</li>
+<li><strong>Reducing the number of NPCs</strong>: you can have heavier-weight NPCs if there are less of them. World design to bring down the number of NPCs could help. You could also formally create NPCs that are &#8220;background&#8221; NPCs and just don&#8217;t behave strongly or&nbsp;proactively.</li>
+<li><strong><span class="caps">NPC</span> action resolution</strong>: NPCs should be able to perform actions just like the player. The player is already a peer with NPCs in most ways, so this wouldn&#8217;t be hard to implement. I suspect the NPCs will take <em>too many</em> actions though, with chaotic and disruptive effects. NPCs shouldn&#8217;t start acting narratively like main&nbsp;characters.</li>
+<li><strong><span class="caps">NPC</span> autonomy</strong>: tight now NPCs are very reactive, effectively zombies until you interact directly. Giving them full <span class="caps">LLM</span>-prompt-autonomy at time ticks is neither necessary nor cost-efficient. But I can imagine during existing action steps when the engine asks the <span class="caps">LLM</span> to generate dialog or action, it could also ask for a natural language description of what the <span class="caps">NPC</span> cares about. Then the engine could take a new user-generated event, a list of the cares-about descriptions for all NPCs in the zone of effect, and ask which NPCs should get a turn to&nbsp;react.</li>
+<li><strong><span class="caps">NPC</span> memory</strong>: the only memory is the event history. NPCs can&#8217;t uplift a memory to be more permanent. As a result critical memories can easily be lost in&nbsp;time.</li>
+<li><strong>Context-window management</strong>: the context is very literal and time-sequenced, without summarization or editing. Especially NPCs will spend a lot of time engaging in &#8220;boring&#8221; activities (like following a schedule uninterrupted) and those items can be&nbsp;abbreviated.</li>
+<li>
+<p><strong>Off-screen simulation</strong>: the world feels more alive if stuff happens independent of the player. But there&#8217;s no reason to do a detailed simulation, instead you can fill in that background with broad simulations, simulating everything in a single&nbsp;prompt.</p>
+</li>
+<li>
+<p><strong>More action resolution options</strong>: adding more attributes to the schema of the player or environment gives more opportunities for action resolution to affect those attributes. For instance the presence of injury or inventory attributes allows actions to result in changes to those values. Or for example Ama (the in-game caretaker <span class="caps">AI</span>) should be able to physically restrain and move the&nbsp;humans.</p>
+</li>
+<li><strong>Inventory</strong>: in games there are often a very finite number of objects. In real life there are objects <em>everywhere</em>, most of them extremely unimportant to whatever is happening. The <span class="caps">LLM</span> can hallucinate objects into existence, but too well&#8230; it has an inflationary effect on the value of any object. You can build a world that has very few objects for some contrived reason, or try to find some other&nbsp;solution.</li>
+<li><strong><span class="caps">NPC</span> awareness of player inventory</strong>: games encourage players to always carry as much as they possibly can <em>just in case</em>. If objects can be hallucinated into existence then this can get out of hand (unless you are creating a MacGyver-inspired game about the creative use of objects; that would be a fun game!) But with LLMs you can also add inventory to the description of the player; if the player is walking around with a chainsaw then the chainsaw will dominate the conversation. This might help mitigate hoarding&nbsp;behavior.</li>
+<li><strong>Integrate changes into core descriptions</strong>: many of these changes (present in attributes or event history) act as a &#8220;patch&#8221; on the previous description. Like you might have a core description of a character: &#8220;Joe is strong and fit&#8221; and then a note: &#8220;Joe&#8217;s right hand has been cut off&#8221;. At some point these could perhaps be collapsed into a new revised description like: &#8220;Joe is strong and fit, but moves awkwardly as he becomes accustomed to his missing right&nbsp;hand.&#8221;</li>
+<li><strong>Theft:</strong> with no real objects in Intra theft has not come up. Rules can probably be implemented much better using an <span class="caps">LLM</span>, also reducing the number of objects in play. The rules don&#8217;t even have to be very fair&#8230; you don&#8217;t need to implement sight lines and object ownership and memories of lost objects. You can just add a rule: &#8220;if this action appears to be theft, then: [theft response]&#8221; and let the <span class="caps">LLM</span> work it out&nbsp;narratively.</li>
+<li><strong>Implement skills</strong>: I added skills to <a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm#worldwanderer">World Wanderer</a> and they are complicated but fun. This would open up lots of game&nbsp;progression.</li>
+<li><strong>Skill training</strong>: this would give players a way to eventually progress through most challenges. Training doesn&#8217;t even have to be applied to core skills: for instance the player might have average dexterity, but because of time apprenticing with a watchmaker the player could have an addendum that they are nimble with respect to small mechanical devices. The <span class="caps">LLM</span> can determine when the addendum&nbsp;applies.</li>
+<li><strong>Improve randomness</strong>: the engine gives the <span class="caps">LLM</span> a simple d20 roll to determine success, which is familiarity to both the user and <span class="caps">LLM</span>. But probably this could be modeled in a more sophisticated way, integrating randomness into the core rubrics of success and&nbsp;failure.</li>
+<li><strong>Dynamic puzzles</strong>: the game includes a mystery system, but each mystery is hard-coded, meaning you&#8217;ll get the same mystery on each play. There should be randomization available. The randomization might involve programmatically creating the basic outline of the mystery (e.g., randomly select who is murdered and who the murderer is), but the <span class="caps">LLM</span> would take that and create backstory and specific notes to apply to the individual&nbsp;NPCs.</li>
+<li>
+<p><strong>More abstract entities</strong>: currently mysteries are modeled as entities, alongside rooms and characters. I can imagine whole plot arcs modeled as entities. This attempt to harness the &#8220;narrative demand&#8221; more explicitly, and shift those demands in response to player action. The story can respond to the current phase of the <a href="https://en.wikipedia.org/wiki/Hero%27s_journey">Hero&#8217;s Journey</a>.</p>
+</li>
+<li>
+<p><strong>Rich text</strong>: the game doesn&#8217;t do Markdown rendering, and maybe that&#8217;s okay. The particular styles supported by Markdown make the interface <em>feel</em> like an <span class="caps">AI</span> chatbot. Maybe it could be Markdown but styled differently. Maybe an entirely different way to represent text: more colorful, more absurd with different fonts or font sizes. It&#8217;s a game, not a&nbsp;textbook.</p>
+</li>
+<li><strong>Non-human entities</strong>: in one corner of the game is a computer terminal (implemented as an <span class="caps">NPC</span>). The terminal itself overrides how user input is rewritten, turning your input into silly console commands instead of dialog. I would like to see more of that. The terminal could also be an entire game of its own (very <a href="https://en.wikipedia.org/wiki/A_Mind_Forever_Voyaging">A Mind Forever Voyaging</a>).</li>
+<li><strong>Better map</strong>: the map is not well thought out, and uses a <a href="https://graphviz.org/">graphviz</a> <a href="https://quickchart.io/">service</a> to render the map. This is silly, and perhaps a bit&nbsp;rude.</li>
+<li><strong>Speech</strong>: I&#8217;ve been enjoying working with <a href="https://www.openai.fm/">OpenAI&#8217;s speech</a>. But speech will increases latency even more, and adds cost. <a href="https://elevenlabs.io/">ElevenLabs</a> is somewhat better than OpenAI&#8217;s speech, and with a <em>much</em> larger variety of voices, but their pricing discourages experimentation. OpenAI&#8217;s instructability means you can still get many personalities out of one underlying voice (e.g., adding accents and substantial differences in&nbsp;affect).</li>
+<li><strong>GenAI images</strong>: images can be fun to add to the vibe of the game, though I don&#8217;t see much value in dynamically generating images. The generated images are too random and too disconnected from each other. Instead I&#8217;d want to generate them ahead of time as game assets, carefully maintaining a consistent vibe across the game. Pregenerated images feel more grounded, like each image is a stable depiction of a stable game entity; that&#8217;s lost when images are generated on the&nbsp;fly.</li>
+<li>
+<p><strong>Visual output</strong>: the output is all text but it doesn&#8217;t need to be. It&#8217;s of course possible to generate image descriptions that can be turned into images, but that&#8217;s not what I have in mind. Instead I&#8217;d want to create specific visualizations with little languages for creating those visualizations, akin to <span class="caps">HTML</span> (or literally <span class="caps">HTML</span>). I&#8217;m not sure exactly what those visualizations would be, but it would be great to break the monotony of&nbsp;text.</p>
+</li>
+<li>
+<p><strong>Streaming responses</strong>: latency in the game is significant! Streaming <em>feels</em> much faster, but also decreases that latency slightly because you can read before the response is completed. Because the responses aren&#8217;t presented <em>directly</em> to the user the streaming has to go through a parsing phase and then produce incremental updates of the parsed&nbsp;result.</p>
+</li>
+<li>
+<p><strong>Find parallelism</strong>: some simulation steps can probably be done in parallel, or precalculated while waiting for input. When there&#8217;s a lot of NPCs connected to an event it takes a long time to give them each a chance to act if they each have to wait their&nbsp;turn.</p>
+</li>
+<li>
+<p><strong>Prompt hacking</strong>: the game is very easy to prompt hack. There&#8217;s probably a dozen things to fix trivially easy prompt hacks (mostly sanitizing input). Then another dozen things to make it hard to do sophisticated prompt hacking (though maybe indirections help here). But I don&#8217;t really care about people hacking their own game using their own credits. Putting everything in the client makes it easier to insulate such hacks, but even with a server you can still preserve the integrity of the <em>system</em> even while there&#8217;s prompt hacking. The real motivation for fixing prompt hacking is when you can hack <em>other</em> people in a multi-user&nbsp;environment.</p>
+</li>
+<li>
+<p><strong>Multi-user</strong>: a <a href="https://en.wikipedia.org/wiki/Multi-user_dungeon"><span class="caps">MUD</span></a> based on these technologies could be really great. And <em>so much</em> harder to&nbsp;build.</p>
+</li>
+<li>
+<p><strong>Multi-user concurrency:</strong> prompt hacking becomes a major problem with multiple users, but the first issues will be latency and concurrency. Right now events are big chunky things, literally expensive (since they are generated with an <span class="caps">LLM</span>), and with lots of conflict if you attempt to parallelize them (events literally build on each other). So events are generated completely serially. Each event advances the world a variable amount of time (for example &#8220;wait for an hour&#8221; will create an hour-long event of the player character waiting). This is called a <a href="https://en.wikipedia.org/wiki/Discrete-event_simulation">Discrete-event simulation</a>.</p>
+</li>
+<li>
+<p><strong>Make discrete events work</strong>: you can imagine a multi-user world with this kind of jittery clock. If all the players were formally occupied, then the clock would move forward in an automated fashion. Once one player is done with a scheduled activity they have an opportunity to interact (probably with a timeout that is translated into automatically waiting 10 minutes). For a small number of players, or at least a small number of players within a zone of effect, this could work.<sup id="fnref:5"><a class="footnote-ref" href="#fn:5">4</a></sup></p>
+</li>
+<li>
+<p><strong>Time-based game world design</strong>: one solution is to embrace the jittery clock and design the game world to explain the result. Maybe that means an interface where you queue actions instead of concretely performing the actions. Maybe you could include preconditions or natural language instructions about how to react to events that occur between enqueuing the instructions and their execution; a kind of explicit conflict resolution. Games where you don&#8217;t take possession of an in-game character probably have more options&nbsp;here.</p>
+</li>
+<li><strong>Surreal time:</strong> another option is to use a world where time bends. For instance <a href="https://arxiv.org/abs/2404.17027">the game DejaBoom!</a> has a nice time-reset design where you relive the same day but carrying over your own knowledge. This is a clever way to make the game world much smaller than the the player&#8217;s&nbsp;experience.</li>
+<li><strong>Multi-user-at-a-distance</strong>: in this model you don&#8217;t exist concurrently with anyone else, but instead players take turns being in a world. Maybe something multidimensional, more allegorical like <a href="https://en.wikipedia.org/wiki/Infinity_Train">Infinity Train</a>. Maybe historical vignettes where one player travels back (perhaps maliciously) and the second player follows, having to figure out what needs to be fixed or prevented from the first player&#8217;s run. Maybe that second player creates instructions that are given to an android that travels back slightly before the first player, and then everything is replayed with this new order of&nbsp;events.</li>
+<li>
+<p><strong>Interruptivle events</strong>: even with a single-player big long events have problems. Currently if the player character waits an hour then everyone else is frozen for that same hour, and the different agents can only continue their schedules and activities with the clock pushed back an hour. Instead events could be thought of as &#8220;starting&#8221; with an intention or likely trajectory, but interuptable with some modification/resolution system. For instance if the player starts waiting an hour that should mean that <em>barring interuption</em> the player won&#8217;t change their activity for an hour, but at any point they might be woken from that&nbsp;fugue.</p>
+</li>
+<li>
+<p><strong>Separate code and data</strong>: the game is all source code (mostly data with small bits of code in <a href="https://github.com/ianb/intra-game/blob/main/lib/game/gameobjs.ts">gameobjs.ts</a>, and both core and entity-specific behavior in <a href="https://github.com/ianb/intra-game/blob/main/lib/game/classes.ts">classes.ts</a>). Separating the core engine from the &#8220;data&#8221; of the game could be nice, though I have also benefited from the type checking and strong references of&nbsp;game-as-source-code.</p>
+</li>
+<li><strong>In-game authoring tools</strong>: this requires that separation of data from code. But depending on your security expectations it could still allow for coding as part of the authoring experience, it just has to rely on the hooks provided by the core&nbsp;engine.</li>
+<li><strong>Editors for each in-game object and class</strong>: authoring requires ways to visualize and edit these core entities. With <span class="caps">AI</span> assisted coding this feels feasible, it&#8217;s like creating a custom <span class="caps">CRUD</span> layer on the game data itself. Making a dozen editors, each of which itself has <span class="caps">AI</span> assist, is not so daunting as it used to&nbsp;be.</li>
+<li><strong>Keep data typed, test and verify over time</strong>: the game runs are themselves big <span class="caps">JSON</span> blobs, but they are also typed. TypeScript is a bit weird – a return to C&#8217;s static but weak typing – but there are ways of applying those types to the <span class="caps">JSON</span> and detecting conflicts between that <span class="caps">JSON</span> and the current types in the code. That can be used to detect invalid save games, but I can also imagine using these game runs as a development tool. Each game run is a way to time travel to a certain circumstance for testing, apply simple integration tests through replay, or see the concrete effect of structural changes during&nbsp;authoring.</li>
+<li>
+<p><strong>Multi-user between player and author</strong>: having in-game authoring is itself a multi-user experience. The player may never bump into another human but they can feel their presence through the world the author has left behind. Exploring a world that feels authored is meaningfully different than a fully hallucinated&nbsp;world.</p>
+</li>
+<li>
+<p><strong>Moderation</strong>: depending on the model you use the moderation can become problematic. Gemini 1.5 would mark my in-character biting insult of &#8220;you are a big dummy!&#8221; as <span class="caps">VIOLATION</span>: <span class="caps">HARASSMENT</span>. In general moderation seems to be toned down in newer models but even very simple violence (&#8220;I punch the guy&#8221;) can result in moderation&nbsp;issues.</p>
+</li>
+<li>
+<p><strong>Prompt engineering tools</strong>: there&#8217;s lots of possible tools, comparing prompts and models is an obvious&nbsp;one.</p>
+</li>
+<li><strong>Creating evaluations from gameplay</strong>: a game state and the output from that state makes for a good evaluation. A player/developer could tag a generation as good or bad (even better to describe <em>why</em> it is good or bad) and use that to evaluate other prompts or models. The prompts and game states are more distinct than in a typical chat&nbsp;application.</li>
+<li><strong>Use multiple models</strong>: I began this project using a combination of Gemini and Gemini Flash, choosing between them based on my intuition of how sophisticated my needs were for each prompt. I lost this feature when I made it work entirely with OpenRouter.ai; asking the user to create a menu of models for different purposes was too much. It would be good to get this&nbsp;back.</li>
+<li><strong>Select models using evaluations</strong>: with evaluations it should be possible to select different models, or there could just be presets. In theory auto-routers, like <a href="https://openrouter.ai/openrouter/auto">in OpenRouter</a> and other providers, could solve this&#8230; but I don&#8217;t really trust them, and I can&#8217;t recall anyone saying they use these in the&nbsp;wild.</li>
+<li><strong>Model combo presents</strong>: I imagine offering model selection based on the front-facing model (Claude Sonnet, <span class="caps">GPT</span>, Phi, etc) which have a qualitative effect on the game. Each front-facing model would include an entourage of cheaper or faster models to be used for other tasks, the models selected only for accuracy and reflecting a similar price/accuracy/latency preference as the front-facing model. In other projects of mine I have appreciated Sonnet but find OpenAI&#8217;s o4-mini (and sometimes 4.1-mini) to be preferable for most backend/async tasks; o4-mini in particular is a little slow, a little dry, but also reliable and smart. o4-mini can be like Opposite World Cyrano de Bergerac, whispering distilled factual knowledge in Sonnet&#8217;s ear but letting Sonnet turn that into art. The game could probably benefit from using Gemini Flash more as well, for instance when preprocessing where its speed and cost is&nbsp;attractive.</li>
+<li><strong>Mostly, what&#8217;s fun?</strong>: what really is the &#8220;game&#8221; here? What makes it fun? This list has lots of details but it loses sight of the big question: what&#8217;s a fun <span class="caps">LLM</span>-driven game&nbsp;loop?</li>
+</ol>
+<p>This post is theoretically a way for me to expunge all these ideas that I don&#8217;t plan to work on, but still take up space in my mind. In practice I might just be torturing myself with all the things I think are interesting and don&#8217;t plan to&nbsp;do.</p>
+<h2><span id="conclusion">Conclusion</span></h2>
+<p>Intra contains many novel mechanisms exploring a new area of game development. It&#8217;s not hard to imagine putting these pieces together, and yet I haven&#8217;t found anything that merges structured state and an <span class="caps">LLM</span>-driven engine in the same way (but if you know of any <a href="https://github.com/ianb/intra-game/issues/2">please tell me!</a>)</p>
+<p>There&#8217;s another category of exporations under &#8220;agentic simulation,&#8221;<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">5</a></sup> but I make no pretense that this is a simulation. Or if it is a simulation, then it is a <em>simulation of a game</em>.</p>
+<p>If you want to try it out, <a href="https://www.playintra.win">playintra.win</a>, <a href="https://github.com/ianb/intra-game">see it on github</a>, and I might suggest <a href="https://github.com/ianb/intra-game/discussions/">the github Discussions</a>.</p>
+<!-- to separate the footnotes better: -->
+
+<div style="margin-bottom: 4em"></div>
+
+<style>
+.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 4em;
+
+}
+</style>
+
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn:6">
+<p>After <a href="https://www.erasmatazz.com/personal/self/end-of-an-era.html">reading a post by Chris Crawford</a> I have started playing his game <a href="https://www.erasmatazz.com/LeMorteDArthur.html">Le Morte D’Arthur</a>. There aren&#8217;t that many choices, and I can&#8217;t honestly tell if the choices mean anything. But the writing is excellent and because it&#8217;s a game it&#8217;s all written in the second person (addressing the main character as &#8220;you&#8221;). Writing in the second person is unusual in fiction but as I experience the game I realize that alone makes me feel embodied in the character of Arthur. Which is to say: our imaginations are ready to meet the game halfway when presented with the opportunity to feel embodied in a character.&#160;<a class="footnote-backref" href="#fnref:6" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:1">
+<p>A &#8220;narrative demand&#8221; is a setup that requires a certain conclusion in order to satisfy that setup. This can be indirect like &#8220;the music swells&#8221; implies some pivotal scene is about to transpire. Or it can be very literal like &#8220;I gloat after disarming my opponent&#8221; implies you&#8217;ve disarmed your opponent.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>Maybe I should go further and make a kind of markup for referring to entities by title, like <code>[[The Quiet Plaza]]</code>. It <em>shouldn&#8217;t</em> be a tag because it will frequently show up in tag attributes.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>While it <em>could</em> work, it&#8217;s not how any MUDs <em>actually</em> work. But perhaps <a href="https://en.wikipedia.org/wiki/Open_Cobalt">Open Cobalt</a> worked a little like this, with a distributed world simulation that was reminiscent of collaborative editors.&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>A notable early example is <a href="https://arxiv.org/abs/2304.03442">Generative Agents: Interactive Simulacra of Human Behavior (2023)</a>. More recently is <a href="https://arxiv.org/html/2502.08691v1">AgentSociety: Large-Scale Simulation of <span class="caps">LLM</span>-Driven Generative Agents Advances Understanding of Human Behaviors and Society (2025)</a> at much larger scale.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+        <!-- /.entry-content -->
+  
+        <hr />
+
+        <!-- <div>
+            Hello! Did you know as of December 2024 I'm looking for a job? <a href="https://www.linkedin.com/feed/update/urn:li:activity:7265435901009231872/">I am!</a> I really like working with LLMs, especially in the domain of education, wellness, and <a href="https://en.wikipedia.org/wiki/Executive_functions">executive function</a>. Maybe <a href="mailto:ianbicking@gmail.com">drop me an email</a>?
+        </div> -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://ianbicking.org/archives.html">archives</a> &amp; <a href="https://ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://ianbicking.org/category/ai.html">category: ai</a></li>
+                    <li><a href="https://ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://hachyderm.io/@ianbicking">@ianbicking@hachyderm.io</a></li>
+                            <li><a href="https://bsky.app/profile/ianbicking.org">Blue Sky</a></li>
+                            <li><a href="https://www.threads.net/@ibicking">Threads</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                            <li><a href="https://www.linkedin.com/in/ianbicking/">LinkedIn</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://ianbicking.org/blog/2025/06/intra-llm-text-adventure.html">Intra: design notes on an <span class="caps">LLM</span>-driven text&nbsp;adventure</a></li>
+                    <li><a href="https://ianbicking.org/blog/2025/05/creating-worlds-with-llms.html">Roundup: Creating Worlds with&nbsp;LLMs</a></li>
+                    <li><a href="https://ianbicking.org/blog/2025/05/the-hungry-ghost.html">The Hungry&nbsp;Ghost</a></li>
+                    <li><a href="https://ianbicking.org/blog/2024/05/ai-aita.html"><span class="caps">AI</span> <span class="caps">AITA</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm.html">Roleplaying driven by an <span class="caps">LLM</span>: observations <span class="amp">&amp;</span> open&nbsp;questions</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/04/world-building-gpt-2-declarative.html">World Building with <span class="caps">GPT</span> part 2: bigger, better, more&nbsp;declarative</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">World Building With <span class="caps">GPT</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/thoughts-on-voice-interfaces-2-llms.html">Thoughts On Voice Interfaces 2 years later:&nbsp;LLMs</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/infinite-ai-array.html">Infinite <span class="caps">AI</span>&nbsp;Array</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FKT4HDGBE4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-FKT4HDGBE4');
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>
