@@ -1,6 +1,6 @@
 Title: Intra: design notes on an LLM-driven text adventure
 Slug: intra-llm-text-adventure
-Date: 2025-06-01
+Date: 2025-07-01
 Category: ai
 
 ## Introduction

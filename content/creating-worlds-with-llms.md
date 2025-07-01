@@ -1,6 +1,6 @@
 Title: Roundup: Creating Worlds with LLMs
 Slug: creating-worlds-with-llms
-Date: 2025-05-30
+Date: 2025-06-30
 
 I've been experimenting with using LLMs for worldbuilding and other generative/creative endevours. This post is a round-up of writing and videos related to that work.
 
