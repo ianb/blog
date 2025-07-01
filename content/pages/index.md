@@ -8,7 +8,7 @@ On the internet I'm a computer programmer. Not on the internet I am also a compu
 
 I worked at Mozilla for 10 years until 2020, Meta Reality Labs until 2022, and Brilliant.org until 2024. You can read more about what I'm doing on my [**projects page**](/projects.html).
 
-As of December 2024 I am currently [looking for work](https://www.linkedin.com/feed/update/urn:li:activity:7265435901009231872/). I really [enjoy working with LLMs](/projects.html#llm), and I believe there is important work to be done at this moment; I want to find people who feel the same and are approaching this moment with both ambition and care.
+<!-- As of December 2024 I am currently [looking for work](https://www.linkedin.com/feed/update/urn:li:activity:7265435901009231872/). I really [enjoy working with LLMs](/projects.html#llm), and I believe there is important work to be done at this moment; I want to find people who feel the same and are approaching this moment with both ambition and care. -->
 
 ## Getting in contact
 

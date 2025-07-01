@@ -180,5 +180,3 @@ It tries one time to fix an exception, though if you keep calling the function u
 ## Following up...
 
 Comments welcome on [Mastodon](https://hachyderm.io/@ianbicking/109621627461377616), [Twitter](https://twitter.com/ianbicking/status/1610018555222695936), [Hacker News discussion](https://news.ycombinator.com/item?id=34224664). Contributions [kind of welcome](https://github.com/ianb/infinite-ai-array#contributing).
-
-If you've gotten this far I will also throw in here that I ([Ian](https://ianbicking.org)) am looking for a job, and maybe the best job for me is one that I don't yet know exists. I'm particularly interested in the area of large language models (not just as a joke), new user interactions built on LLMs (especially their abilities to understand us in new ways). I'm excited about education, aiding in executive function, and human-centered interactions. [Let me know if you have ideas](mailto:ianbicking@gmail.com), I would appreciate it!
