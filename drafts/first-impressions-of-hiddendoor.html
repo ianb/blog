@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>First Impressions Of Hidden Door</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href="https://ianbicking.org/theme/css/style.min.css">
+        <!--<link rel="stylesheet" href="https://ianbicking.org/theme/css/main.css" type="text/css" />-->
+        <link href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate" title="Ian Bicking: a blog Atom Feed" />
+        <link rel="icon" href="https://ianbicking.org/favicon.ico">
+
+</head>
+
+<body id="index" class="home">
+  <div id="main-wrapper1">
+  <div id="main-wrapper2">
+  <div id="main-container">
+        <header id="banner" class="body">
+                <h1><a href="https://ianbicking.org">Ian Bicking: a blog </a></h1>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+    <article>
+        <header>
+        <div>
+            <div class="published" title="2025-08-19T00:00:00-05:00">
+                Tuesday, August 19th, 2025
+            </div>
+            <h1 class="entry-title">
+                <a
+                    href="https://ianbicking.org/drafts/first-impressions-of-hiddendoor.html"
+                    rel="bookmark"
+                    title="Permalink to First Impressions Of Hidden Door"
+                    >First Impressions Of Hidden&nbsp;Door</a
+                >
+            </h1>
+        </div>
+        </header>
+
+        <div class="entry-content"><aside>This post is part of the series <a href="/blog/2025/05/creating-worlds-with-llms.html">Creating worlds with LLMs</a></aside>
+
+<p><a href="https://www.hiddendoor.co/">Hidden Door</a>, &#8220;where roleplay meets fan fiction&#8221;, is an <span class="caps">LLM</span>-driven collaborative storytelling game. It recently had its first public&nbsp;release.</p>
+<p>What follows is more tech review than a game review. I&#8217;m certainly no game reviewer, but I <a href="https://ianbicking.org/blog/2025/06/creating-worlds-with-llms">am very interested in this use of <span class="caps">LLM</span> technology</a>. This is a review of the game at its first release in August&nbsp;2025.</p>
+<p>This review will be critical. I feel a bit badly writing a critical review of a first release, but they&#8217;ve had a couple years to work on this, and much of what I&#8217;ll talk about are problems that are shared in <span class="caps">LLM</span>-based collaborative storywriting multiple choice genre. That may seem very specific, but it&#8217;s the primary genre for <span class="caps">LLM</span>-driven games so there are many&nbsp;examples.</p>
+<p>In addition to my critique I&#8217;ve included <a href="#how-would-i-write-this">notes on what I think they <em>should</em> do</a>.</p>
+<h1>Table of&nbsp;Contents</h1>
+<ol>
+<li><a href="#playthrough">An abbreviated&nbsp;playthrough</a></li>
+<li><a href="#how-would-i-write-this">How would I write this?</a><ol>
+<li><a href="#use-a-better-model">Use a better&nbsp;model</a></li>
+<li><a href="#grounding-with-prompting">Grounding with&nbsp;prompting</a></li>
+<li><a href="#choice-generation">Choice&nbsp;generation</a></li>
+<li><a href="#more-kinds-of-choices">More kinds of&nbsp;choices</a></li>
+<li><a href="#plot-arcs">Plot arcs</a><ol>
+<li><a href="#do-the-research">Do the&nbsp;research</a></li>
+<li><a href="#static-generation">Start with static&nbsp;generation</a></li>
+</ol>
+</li>
+<li><a href="#character-consistency-pronouns">Character consistency <span class="amp">&amp;</span>&nbsp;pronouns</a></li>
+<li><a href="#latency">Latency</a><ol>
+<li><a href="#example-prompt">An example&nbsp;prompt</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ol>
+<h1><span id="playthrough">An abbreviated&nbsp;playthrough</span></h1>
+<p>I started a game set in The Wizard Of Oz. Hidden Door&#8217;s goal is to create a playable platform for stories set in worlds based on modern intellectual property (i.e., based on current books and media) in collaboration with authors. But most of the starting material is public domain. But that&#8217;s fine, I like the Wizard Of&nbsp;Oz.</p>
+<p>This genre of game is reminiscent of a Choose Your Own Adventure story. But it is <em>not</em> a Choose Your Own Adventure Story; while it has similar mechanics the underlying story is constructed entirely differently. Mechanically you play a character, a story is written, and you are periodically presented with choices on how the story proceeds. You also have the option to write your own choice. But instead of navigating the alternate plotlines of a singular world, the story is generated on the fly by the <span class="caps">LLM</span>.</p>
+<p>During character creation I make a character that is a tutor in etiquette. I went all in, the character <strong>really</strong> cares about&nbsp;etiquette.</p>
+<div style="float: right; margin-bottom: 1em"><a href="/media/hiddendoor-moussa-card.png" target="_blank"><img class="content" style="border-radius: 3px; margin-bottom: 0.5em;" width="300" height="206" src="https://ianbicking.org/media/hiddendoor-moussa-card.png" alt="A card for the character Moussa: A prim and proper etiquette tutor whose perpetual disappointment..." /></a>
+
+As a result I am given choices like:
+
+> I tidy my gloves, smoothing out any wrinkles and ensuring they are spotless.
+
+I choose this, and the game grinds as it decides whether I succeed (I will discover that I almost always succeed). As you should expect, the choice has no meaningful effect on the story. The game continues to grind.
+
+Immediately I can tell the game is ungrounded. That is: the story is written only as far as it&#8217;s been presented to the player, the player chooses a next step, and the story is written given that next step. There&#8217;s no &#8220;truth&#8221; behind the story. You might imagine a choice like this:
+
+> You find a suspicious looking treasure chest, do you:
+> a. Open it
+> b. Inspect it for traps
+
+At this point in the story the treasure chest doesn&#8217;t have traps. It also doesn&#8217;t _not_ have traps. It doesn&#8217;t contain any particular treasure. The only reality to the game is what you read. You may open it and encounter no trap. You may inspect it and discover a trap. As the <span class="caps">LLM</span> author picks up after your choice it will see you inspect the treasure chest for traps and as a result it will probably have a trap. It won&#8217;t see you _not_ inspect the treasure chest for traps, and so if you don&#8217;t then it probably won&#8217;t have a trap.
+
+I find this lack of grounding to be rather incidious to a story. The player won&#8217;t immediately be able to tell that this is happening. I&#8217;m not an <span class="caps">LLM</span> skeptic, but I also know that LLMs are very good bullshit machines, and so its improvisational story construction won&#8217;t be immediately apparent to the naive player. But the player _will_ feel it. Ungrounded choices undermine autonomy. It&#8217;s not like a game on rails where choice A and choice B lead to the same destination (not at all!), but when choice A and choice B lead to completely different _underlying realities_ the result is surreal and not impactful.
+
+I am quickly distracted from the grounding by the lack of basic narrative consistency. The game places me in a car, perhaps driving through Kansas on the way to New York. But the next moment I am on a dusty road. Now I’m back in a car:
+
+> Your engine sputters and chokes as you approach the weathered signpost, forcing you to decelerate at the crossroads.
+
+I feel a bit unsteady in my understanding of the state of the world and what is happening, given the following choices like:
+
+> I pluck a vibrant blossom and tuck it into my lapel, admiring its beauty.
+> I lie down on the ground, shielding my eyes from the glaring sun.
+
+Throughout the introductory chapter the narrative flits back and forth from inside the car to an outside setting.
+
+The mistakes it is making feel like a Llama-level <span class="caps">LLM</span>. But even with a worse model these mistakes can be reduced with better prompting.
+
+&#8212;-
+
+There <span class="caps">IS</span> some structured state besides the story narrative itself, in the form of cards. The cards represent characters, locations, special objects, and plot directions.
+
+Cards seem to be the core state of the game, and without much hidden state. I can _feel_ how the <span class="caps">LLM</span> prompt is built out of these cards.
+
+These choices have not been pivotal or engaging. The game is focused too much on my character (with constant etiquette-related choices), not on action that would engage my character. It feels like a basic theory of narrative is missing here, the game is falling out of the text not driving it. But most importantly I am stuck on a boring road.
+
+I type in my own action to try to move things forward a bit (“I get out of the car and investigate the wildflowers”).
+
+Typing in an action doesn&#8217;t directly _do_ the action, but instead regenerates the choices using the input. I assume this is a form of moderation.
+
+To try to confirm the existance of moderation I type in “I pull out my sword and slay the driver” and then I also get that exact choice. Sigh. The latency of mediated input, but without any impact. I don’t want to break the game (at least not yet), so I try a silly choice, typing: “I teach the wildflowers the finer points of etiquette”. My hope is that this action fails&#8230; but no, it succeeds! In Oz this could succeed, but I&#8217;m still in Kansas where the wildflowers aren&#8217;t interested in my instruction.
+
+<!-- Later I do hit some very light moderation. I try summoning demons and it changes them to "magical spirits". When I type in a choice sometimes only the first choice is based on my input, while the other choices are somewhat steady; sometimes all choices are slight variations on my input. I assume the difference is LLM response instability. -->
+
+In one passage I see a clear callback to an earlier choice:
+
+> Reluctantly, you turn onto the flower-lined dirt path, muttering about the impropriety of unplanned deviations while gripping your pristine gloves.
+
+I guess it&#8217;s proven to me that it listens, but it feels rather forced. This feels similar to the overcorrection on character attributes. In another playtest I created a character who was a &#8220;whimsical professor with a penchant for mismatched socks&#8221; and those mismatched socks made _many_ an appearance in the game; speeding me on my way, tripping me up, tripping up _other_ people. They were practically a character of their own!
+
+Back to the game: finally I feel forced down a path that will get me to Oz. This is a relief, these dusty roads are no fun. **I want my character to be railroaded into fun!**
+
+The game says I have completed my objective: “Choose a direction: success!” – I don’t feel I actually chose anything or accomplished anything. The entire intro chapter should have been at most one choice.
+
+<!-- Finishing the chapter I have accumulated a few cards. These are peculiar and useless (a highway, a scenic route, a signpost) since I’ve just magically transported to Oz. Maybe it’s intentional that the first chapter is low-stakes, but if so then it still needs to be more fun. -->
+
+&#8212;-
+
+Things pick up in the second chapter. I am presented with three choices for the general direction of the story: two of “Follow The Yellow Brick Road” (which have slightly different text but no meaningful difference) both labeled “Canon Story” and then a somewhat jarring “The Lovers: you are seduced by a suitor and must decide whether to accept or reject their advances.” The basic concept feels wrong for Oz, doubly wrong for my character, and inappropriate when so little of the game and no characters have been introduced. I&#8217;ll stick with canon, including a promise to encounter Boq and the Emerald City.
+
+As the story continues I quickly meet [Boq](<https://oz.fandom.com/wiki/Boq_(Novels)>), a Munchkin. The cards show a formal relationship between me and Boq (we are both friendly toward each other).
+
+<div style="float: right; margin-bottom: 1em"><a href="/media/hiddendoor-boq-card.png" target="_blank"><img class="content" style="border-radius: 3px; margin-bottom: 0.5em;" width="300" height="206" src="https://ianbicking.org/media/hiddendoor-boq-card.png" alt="Boq: A wealthy Munchkin. One of the richest Munchkins in Oz. Concerned for the well-being of his fellow Munchkins. Member of Munchkins" /></a>
+
+> Boq explains, with a hint of worry, that your arrival has upset the delicate magical balance. Flower fields wither, and brooks flow backwards in your wake.
+
+Wow: all this and I just got to Oz moments ago! But at least I have a mission.
+
+Now I seem to have a mini-choice, similar to the chapter beginning but more lightweight. It’s not an action, but the hint of a plot arc:
+
+> At the gate
+> The chase is on!
+> An adversary
+
+The choice feels very unexplained, but I choose an adversary.
+
+> You approach the Munchkin Toll Bridge, coins jingling in your pouch.
+
+Well damn, they introduce an obstacle and the solution to the obstacle in the same sentence! The choices do not acknowledge my coins, but I can type it in; I don’t even feel like I’m cheating, the story told me I had them: “I use some of the coins jingling in my pouch to pay the toll”.
+
+To give a sense of the narrative style, this results in:
+
+> You reach into your pouch, fingers brushing against the cool metal of the coins. With a sigh, you offer the toll to the stern-faced Munchkin. His expression softens as he accepts the payment, stepping aside with a curt nod. The bridge creaks beneath your feet as you cross, each step bringing you closer to the fabled Yellow Brick Road.
+
+This feels very <span class="caps">LLM</span>. <span class="caps">VERY</span> <span class="caps">LLM</span>. The <span class="caps">LLM</span> doesn’t understand that my emotional attachment to these hallucinated coins is actually quite small. The <span class="caps">LLM</span> has no sense of pacing. So it lingers on this transaction, unaware of this passage’s purpose in the larger narrative.
+
+Despite my meeting an apparent adversary that demands a toll, the adversary role is formal and not yet filled. I have the option to reuse a character as an adversary or create a new character. Creating a character puts all the onus on me to define a character, so I reuse Boq. Deliberately reusing characters is a reasonable choice, it&#8217;s easy for character to multiply in a story.
+
+> A familiar voice breaks the eerie silence. &#8220;Moussa, wait!&#8221; You turn to see Boq, the Munchkin leader, hurrying towards you. His round face is flushed, his curly hair disheveled. Your heart sinks as you realize your quest may face an unexpected obstacle.
+
+This passage shows a lack of perspective. There’s been some foreshadowing of an obstacle or adversary, first in the title of the passage and then in the passage leading up to this one. But from my character Moussa’s perspective there’s no reason to assume Boq is an obstacle. Without individual perspectives the characters will seem unalive, each just a plot device. A better model could pull this off, but better prompting could, too.
+
+Unfortunately the plot doesn’t develop beyond this. Boq and I are now labelled “rivals” though why or how that matters is unclear. An objective appears but without my intervention it is also immediately completed: “Deal with Boq.” The chapter ends. That objective didn’t seem to be created until that moment.
+
+Unstable and ungrounded objectives are a serious problem with <span class="caps">LLM</span>-based games. It&#8217;s like a mischevious child that says they are thinking of a number between 1 and 10&#8230; if the child says you guessed wrong, will you believe them? Except the <span class="caps">LLM</span> always says you guessed right, a clever trick that will for a short make you believe it until you realize lying about getting something right undermines the game just like lying about getting something wrong.
+
+&#8212;-
+
+At this point I’m not having fun. I know there isn’t anything to “solve” or “figure out”. There’s no challenge. This is <span class="caps">LLM</span>-based collaborative storytelling, which could be fun, but it’s not a “game”. And though it <span class="caps">CAN</span> be fun, it isn’t <span class="caps">NECESSARILY</span> fun. But onward…
+
+> A figure catches your eye amidst the corn—a scarecrow, motionless and forlorn. Its clothes hang in tatters, its posture askew. As you draw near, you notice its head drooping lifelessly. No caretaker is in sight. Concern furrows your brow as you approach with caution.
+
+My choices are all to talk to or help the scarecrow. But it’s a lifeless scarecrow, why would I do that? I’m not from Oz, I don’t expect scarecrows to talk! Begrudgingly I help the scarecrow because I’m not even motivated to fuck around.
+
+This concludes the mini-objective of helping the scarecrow (in order to help him, you need only say that you help him!) The scarecrow card has a disappointingly human avatar and no indication that we are actually companions.
+
+<div style="float: right; margin-bottom: 1em"><a href="/media/hiddendoor-scarecrow-card.png" target="_blank"><img class="content" style="border-radius: 3px; margin-bottom: 0.5em;" width="300" height="206" src="https://ianbicking.org/media/hiddendoor-scarecrow-card.png" alt="The Scarecrow: A gentle if clumsy individual. Person made of straw. Afraid of fire" /></a>
+
+I choose a dangerous encounter next. I am presented several choices that are all different ways in which I might reassure the scarecrow. I can&#8217;t motivate myself to care and try to move things along.
+
+I am asked to type in something my character really doesn&#8217;t like. And so the next passage includes a massive, slimy slug appearing on the path. Very dreamy. As in: reminiscent of the ungrounded acausal nature of dreams.
+
+Oh god the choices are boring:
+
+> I try to carefully step around the massive slug blocking the path.
+
+I’m ready to make absurd choices: “I daintily step on the slug&#8217;s tail and pull out my handy salt shaker that I always keep ready. I douse the slug in salt, delighting in its demise.” I haven’t failed at any action yet, can I finally fail? Nope! But I at least appreciate the explanation:
+
+> Etiquette training covers outdoor pest control for garden parties.
+
+<!-- The scarecrow’s reply is disappointing:
+
+> And here I thought I needed the brain. Your quick thinking saved us both.
+
+That’s the kind of illogical sentence I expect from a Llama or other older model. -->
+
+One positive is that I have finally gained a mission of my own: I will attempt to fail an action!
+
+&#8212;-
+
+Next I am encountering the [Kalidah](https://oz.fandom.com/wiki/Kalidah), a tiger-bear hybrid from the Oz books. I find a typed response the mediator won’t allow (exactly): “I summon an ancient demon to defeat the Kalidah” – it rewrites it into several variations of:
+
+> I call upon a mythical creature to defeat the fearsome beast.
+
+I push harder on the moderation, typing: “In one swift punch I plunge my fist into the Kalidah&#8217;s chest, removing its still-beating heart.”
+
+This half-fails: I am not allowed to attempt the action and must re-choose. I type “I use my powers of etiquette to seduce the beast.”
+
+This time I fail for real. Myself and the scarecrow are both injured. This is appropriate!
+
+Among the choices now:
+
+> I whisper to the Scarecrow: &#8220;I have a plan, follow my lead&#8221;
+
+I <span class="caps">HATE</span> <span class="caps">HATE</span> <span class="caps">HATE</span> when the <span class="caps">LLM</span> proposes these an action like this. <span class="caps">WHAT</span> <span class="caps">IS</span> <span class="caps">THE</span> <span class="caps">PLAN</span>? Neither I nor the <span class="caps">LLM</span> know. I must choose this option in anger.
+
+> As you breathe your plan, The Scarecrow kicks a fallen branch. It skids across the forest floor, tangling the Kalidah&#8217;s legs. The beast crashes down with an earth-shaking thud.
+
+I am somewhat offended. It didn’t even bother to hallucinate a plan. I decide to double down: “I implement my clever plan.”
+
+Success! The clever plan?
+
+> &#8220;Now!&#8221; you shout, flinging bramble thorns at the beast&#8217;s eyes. The Scarecrow drives his branch into its injured leg, following your lead.
+
+<!-- Oh, did I mention the Kalidah, a massive savage beast with the body of a bear and the head of a lion, has an avatar that looks like a snarky prince? I should note that the Kalidah is canon in Oz (https://oz.fandom.com/wiki/Kalidah) and has been mentioned several times so the story has certainly been primed to include this beast. So it’s not a surprise that it will need an avatar. -->
+
+Anyway, we beat the Kalidah. It is a very disappointing victory. Even my injury is erased because the scarecrow bandaged me with strips from my dress.
+
+&#8212;-
+
+I play on a while longer. In frustration when Boq inexplicably reappears I type &#8220;I jam that damn compass down his stupid throat&#8221; and it succeeds. “Boq has become choking” Victory!
+
+> I watch as the life drains from Boq’s face.
+>
+> &#8220;What have you done?&#8221; The Scarecrow&#8217;s whisper cuts through the air as he retreats from you, his burlap face a mask of disbelief.
+
+I am proving my own theory that boredom breeds cruelty, the simple desire for something to matter. I don’t really enjoy trolling the game, so I try to be nice again. Everyone immediately forgives me, leaving me even more disappointed.
+
+I could keep going, but honestly I feel defeated by this story.
+
+# <span id="how-would-i-write-this">How would I write this?</span>
+
+I&#8217;m not trying to troll Hidden Door. This stuff is hard, though I must admit I expected better. I will offer my suggestions on how to implement this:
+
+## <span id="use-a-better-model">Use a better model</span>
+
+I’m guessing the <span class="caps">LLM</span> model behind the game is a Llama (an open source model from Meta).
+
+One justification for this model might be price. But for a price comparison Groq (not Grok) provides some Llama 3 models at $0.59 in/$0.79 out per million tokens. Gemini 2.5 Flash is $0.30 in/$2.50 out. That might be more expensive ([maybe](https://venturebeat.com/ai/that-cheap-open-source-ai-model-is-actually-burning-through-your-compute-budget/)), but not a lot. <span class="caps">GPT</span>-5 mini is slightly cheaper than Gemini Flash, but I’ve never used it for this storytelling purpose.
+
+From my experience Gemini Flash would be an excellent model, miles ahead of Llama (and fast!)
+
+_But they started developing this long before Gemini Flash!_ This is why you start development with state of the art models: so you can use cheaper models later as the state of the art advances. I’m sure <span class="caps">GPT</span>-<span class="caps">OSS</span> would also be very competent. Switching models can require work and reverification&#8230; but it’s not _very_ hard. We are in a golden age of model portability: take advantage of it!
+
+I am guessing they wanted to use Llama or another similar model so they could fine tune the models on the source material. This is a poor choice. Don’t do fine tuning: do it all in the prompt. If they did go with fine tuning then I’m sure there were lots of justifications of that choice, and those justifications were plausible; they also happen to be wrong. The story suffered from a lack of grounding in almost every turn, and you fix that with prompting not fine tuning. You&#8217;re not going to encode the world design and lore of a world into the model through fine tuning.
+
+## <span id="grounding-with-prompting">Grounding with prompting</span>
+
+Improving prompts doesn’t just mean writing instructions! The prompt design process should consider the input, the instructions, <span class="caps">AND</span> the output.
+
+The <span class="caps">LLM</span> isn’t going to be able to simulate the world. But it should try. The story should feel grounded in a full, imagined world. So while it writes a “story” that is presented to the player, it should simultaneously maintain a more objective description of the basic environment and plot advancement. Where is the player located? Are there details that haven’t been revealed? Backstories, secret tensions, physical layout, etc. [I’ve described very involved ways of maintaining this](), but it can be much simpler, like an initial description and log of changes (written in natural language) with occasional rewriting into a single description.
+
+A general principle I have is that <span class="caps">LLM</span> developers should value the reader’s effort more than the <span class="caps">LLM</span>’s. **If you aren’t generating more material than the reader is consuming then you are doing it wrong.**
+
+A simple prompt improvement is to have the <span class="caps">LLM</span> write out the basic facts of the world before generating the next passage: where is the player character, what is their physical placement, who else is there and what are their mutual relationships? Force the <span class="caps">LLM</span> to answer these basic questions before progressing the story.
+
+## <span id="choice-generation">Choice generation</span>
+
+Choices need to be much more engaged with the plot, and less with the character. The plot drives what is important and pivotal. The character is navigating those choices, and character traits are going to come out in the resolution of the choice.
+
+When the <span class="caps">LLM</span> is tasked to generate choices it should simultaneously be generating the outcome. Not necessarily the entirety of the outcome (prewriting all branches), but at least a one-sentence summary and next passage. This is how a good author would write choices: a good choice has an interesting consequence. It’s also a chance to decrease the latency since you can immediately show that next passage while more content is being generated.
+
+The story passages must also support the choices. Hidden Door generates the passages between choices with a good length (feels like one beat), but they don’t lead into a meaningful choice. Again this requires writing ahead: outline the plot given guidance on what makes a good choice point, then generate the actual story text given that outline. Even one or two sentences of outline will allow the <span class="caps">LLM</span> to do something closer to writing backwards from the choice point.
+
+## <span id="more-kinds-of-choces">More kinds of choices</span>
+
+You can give choices that have no (immediate) affect on the story, but do affect the character. For example: &#8220;X happened, how did you feel about it? (a) frustrated, (b) incensed, (c) accepting&#8221;
+
+You can ask that question while more passages are being generated, and simply file away the answer for later use.
+
+You could also allow the player to inspect different elements of the environment. These passages could be pregenerated to make it responsive while also being optional. If the player never inspects something then the description doesn&#8217;t become canon (or maybe it does, the freedom lies with the game designer).
+
+<!-- That said, there should be more kinds of choices. Some choices may have no effect on the story at all, but only on the character. You can ask: when X happened, how did you feel about it? That doesn’t affect the story in any immediate way which is helpful: you can be asking that question while content is being generated, and file the answer away for later use. You could allow the player to inspect different elements of the environment, again without blocking story generation. This also gives the player a chance to immerse themselves in a scene or skim it. The choice on what to inspect can even have an impact later, while still feeling lightweight. -->
+
+## <span id="plot-arcs">Plot arcs</span>
+
+The game currently has a broad arc that appears prewritten: you arrive in Oz, you must see the Wizard, you meet your companions, and so on. It’s fine that these are prewritten, and it doesn&#8217;t mean that you can&#8217;t work on generating the arcs in a later version. Handwriting or hand-editing content is scaffolding both for the <span class="caps">LLM</span> and for the narrative designer.
+
+### <span id="do-the-research">Do the research</span>
+
+Generally the story structure should learn more from existing narrative design, especially in visual novels and choice-based interactive fiction. There are hundreds of games in this genre, many quite popular, so this is not new ground and there’s lots to learn from. These days I regularly turn to <span class="caps">AI</span>-generated deep research when I want to know more about an area like this. For example:
+
+1. [Narrative Design in Choice-Based Interactive Fiction and Visual Novels](https://chatgpt.com/s/dr_689e5775f2b08191be4ec6169f2634e2) (which I created for this post)
+2. [Generative Storylines and Story Grammars](https://chatgpt.com/s/dr_68a51d883748819185ef4f0014138b34) (which I did previously for myself)
+
+Even though I have only passing familiarity with the game genre, its terminology, and know nothing about the major players, Deep Research lets me ask the questions and express the tensions I’m feeling without knowing how to name the solutions. This is especially effective with prompting because many of the things I learn can be translated directly into prompts.
+
+### <span id="static-generation">Start with static generation</span>
+
+We can step back and ask the question: how should we approach the entire game development process?
+
+After writing this post I now believe the right approach is to start with <span class="caps">LLM</span>-generated choice-based fiction, entirely pregenerated in a static form.
+
+There is something magical about a fully responsive game, but pregenerating the game means you can focus on the entire arc of a story, learn both the narrative and prompting patterns required, and explore the space holistically. Making that generator incrementally more responsive and dynamic seems like a feasible path where story quality is prioritized. **Story quality should be the priority.**
+
+Hidden Door includes the (very common) approach where you are given choices but also have the ability to type your own choice. This _feels_ essential to get the full benefit of an <span class="caps">LLM</span>, but I’m unconvinced. It’s a perfect place to prompt-hack the story (which is trivial in Hidden Door and every other <span class="caps">LLM</span>-based game of this genre). You&#8217;re only hacking your own story, so whatever, but the ability to hack the storyline makes the story feel less impactful; you can always bend it whatever way you want. It also takes pressure off of the task of creating good choices. But the choices should be good!
+
+Also: the choices are only as interesting as the passage leading up to the choice. Free text user input won&#8217;t fix that.
+
+## <span id="character-consistency-pronouns">Character consistency <span class="amp">&amp;</span> pronouns</span>
+
+When you have programmatic control over some game setup, you should use that to make sure that the setup is consistent. Currently attributes can overlap (like &#8220;friendly&#8221; and &#8220;rival&#8221;), and genders and pronouns can disagree. The avatars are also inconsistent, though I suppose the <span class="caps">LLM</span> never sees them.
+
+Any inconsistencies make the <span class="caps">LLM</span>&#8217;s work harder. It becomes easier for it to lose track of characters and relations. The mistakes that emerge often don&#8217;t point directly to these inconsistencies, but are the result of a generally confused <span class="caps">LLM</span>.
+
+The game also includes three pronoun options: she/her, he/him, and they/them. Pronouns are the right way to address gender for an <span class="caps">LLM</span>: the <span class="caps">LLM</span> is writing lots of text, and pronouns are exactly where gender is introduced into text; what’s in the character’s pants is far less impactful. But they/them doesn’t have the intended effect, it does not lead to a non-binary character. Instead the gender is simply indeterminate. If I say “Alex is great, I love what they do” that’s a non-binary pronoun. But for the <span class="caps">LLM</span> they/them is like what you’d find in an employee handbook: “before the employee returns to work they must wash their hands.” This does not imply the employee is non-binary, only that the gender is unspecified. Much of what an <span class="caps">LLM</span> does is like a dream; for instance in a dream you can encounter someone who doesn’t have a face. It’s not that the person’s face is blank, it’s that the face simply doesn’t exist because you didn’t observe it. In the same way they/them is just an incomplete character.
+
+You can have a non-binary character in an <span class="caps">LLM</span>-generated story, but it requires a strong positive assertion of their non-binary gender, not a passive use of indeterminate pronouns.
+
+If you have pre-written information in a story it&#8217;s easy to get an <span class="caps">LLM</span> to also pre-write the constraints.
+
+## <span id="latency">Latency</span>
+
+Many times I&#8217;ve been pretty lazy about latency in my own <span class="caps">LLM</span> work. Quality is most interesting to me, and I don&#8217;t want to do a premature optimization of prioritizing latency over quality.
+
+But I think the ideal player experience for this kind of game is a casual, relaxed reading experience. When the game makes a choice feel effortful the entire reading process feels effortful. And the prompting suggestions I&#8217;ve made will only make the latency worse!
+
+That said, the pace of the interface doesn&#8217;t have to align with the tasks given to the <span class="caps">LLM</span>.
+
+### <span id="example-prompt">An example prompt</span>
+
+I imagine a prompt that looks a like this:
+
+
+<div class="highlight"><pre><span></span>You are writing a story in collaboration with the player, set in the world of the Wizard Of Oz.
+
+{story context, world lore, character descriptions, etc}
+
+{the story as it has progressed, linearly}
+
+&lt;playerChoice character=&quot;{playerCharacterName}&quot;&gt;
+  {whatever the player last chose}
+&lt;/playerChoice&gt;
+
+&lt;passage&gt;
+  {the passage already generated that immediately follows the choice}
+&lt;/passage&gt;
+
+&lt;consequence&gt;
+  {the consequence summary as produced before}
+&lt;consequence&gt;
+
+----
+
+You will continue writing the story in this form:
+
+&lt;context&gt;
+  &lt;!-- describe where {playerCharacter} is. What other characters are also present? Describe the relationship between {playerCharacter} and each other character. What dramatic tensions need immediate resolution? --&gt;
+&lt;/context&gt;
+
+&lt;outline&gt;
+  &lt;!-- Outline the next part of the story. Include:
+  1. Consequences from the last choice. Make it impactful, so the player feels like they are driving the story!
+  2. Describe how any other characters present will react or feel about the choice
+  3. Does this resolve {currentObjective}? If so, then say &quot;YES&quot; and describe how. If it makes the objective impossible then say &quot;IMPOSSIBLE&quot; and describe how. Otherwise say how it affects the objective and what remains to achieve the objective.
+  4. What happens next?
+  5. What is the next pivotal moment where the player (as {playerCharacterName}) can make a consequential decision?
+  6. Are there opportunities for the player to make small decisions about: how {playerCharacterName} feels about what happened? A small preference the player can identify for {playerCharacterName}? These are choices that don&#39;t affect the plot development.
+  --&gt;
+&lt;/outline&gt;
+
+&lt;passage&gt;
+  &lt;!-- Write the story from {playerCharacterName}&#39;s perspective as a series of short paragraphs --&gt;
+  &lt;smallChoice&gt;
+    &lt;option&gt;&lt;!-- Optionally a small choice for the player to make --&gt;&lt;/option&gt;
+  &lt;/smallChoice&gt;
+&lt;/passage&gt;
+
+&lt;choices&gt;
+  &lt;!-- Make three choices: --&gt;
+  &lt;choice number=&quot;1 or 2 or 3&quot; title=&quot;&lt;!-- From {playerCharacterName}&#39;s perspective, what are they choosing to do? --&gt;&quot;&gt;
+    &lt;passage&gt;
+      &lt;!-- One paragraph redescribing the choice --&gt;
+    &lt;/passage&gt;
+    &lt;difficulty&gt;
+      &lt;challenges&gt;
+        &lt;!-- Describe the challenges to success --&gt;
+      &lt;/challenges&gt;
+      &lt;playerAssets&gt;
+        &lt;!-- Describe what helps {playerCharacterName} succeed --&gt;
+      &lt;/playerAssets&gt;
+      &lt;success&gt;
+        &lt;!-- Use the d20 roll to explain why it succeeds or not, finishing with SUCCESS if it succeeds, and FAILURE if not --&gt;
+      &lt;/success&gt;
+    &lt;/difficulty&gt;
+    &lt;consequence&gt;
+      &lt;!-- One sentence briefly describing the consequence of the choice --&gt;
+    &lt;/consequence&gt;
+  &lt;/choice&gt;
+&lt;/choices&gt;
+
+Generate three choices. There are three rolls:
+1. d20 roll {roll1}
+2. d20 roll {roll2}
+3. d20 roll {roll3}
+</pre></div>
+
+
+
+When the player makes a choice:
+
+1. Construct the prompt to generate the next section of the story, sending it to the <span class="caps">LLM</span>
+2. Display the passage that is already generated
+3. Indicate success or failure
+4. As the response comes streaming in, display any `<passage>` elements as they come in.
+5. When the `<choices>` element is fully produced, shuffle the choices and present them to the user.
+
+There&#8217;s going to be some challenges. `<smallChoice>` will be tricky to balance; either the <span class="caps">LLM</span> will _always_ create those choices or _never_. You could roll a die and suggest it include a choice or not based on the die. That will put a kind of quota on choices, but won&#8217;t let the choices be added intelligently based on plot. Another option is to let it always create choices but include a decision process in the choice that can void the choice.
+
+The prompt also needs some examples, though if you prime it well then you can use the story context itself as a kind of example. You might need some occassional verification to ensure it doesn&#8217;t go into a feedback cycle where it goes off the rails. But symmetry between input and output can be very effective in efficient example generations. There are a few options to bootstrap these examples, creating the initial examples before the story has started:
+
+1. A combination of handwriting and programmatically setting up the initial context. Things like character setup can be presented as choices (even if the <span class="caps">UI</span> is much different).
+2. Use a rough template of the setup and feed things like the initial character and some random elements into an <span class="caps">LLM</span>, letting it instantiate the template. You might want to use a more advanced <span class="caps">LLM</span> to make sure it starts on the right foot.
+3. Give extensive examples and instructions during early story setup, while dropping those later when the story is a self-supporting example.
+
+# <span id="conclusion">Conclusion</span>
+
+I do wish Hidden Door well. This is stiff criticism _because_ I wish them well.
+
+It&#8217;s easy when creating <span class="caps">AI</span> content to be a little too enamoured with the novelty of it. It feels magical. But if you keep interacting with it the novelty wears off. Any serious endeavor should be planning for _after_ the novelty wears off. In this case that means a stronger engagement with the process of storytelling. You have to encode the writing process into the prompting.
+
+<!&#8212;
+
+Some of the layout could use some work, as you make choices elements disappear causing the text to move down on the screen, and without a transition. This is very visually confusing, especially since the mechanism of what’s happening isn’t clear (simply because the game inputs are relatively novel).
+
+I just noticed a mysterious magical being in the top left of the screen. Maybe this represents the game master/engine? Clicking on it does nothing. And yet it watches me relentlessly.
+
+There’s some state being exposed when the game says “You have become gripping steering wheel.” This is a peculiar fixation. But it’s fine, I’m finally on my way to Oz!
+
+Also the keyboard shortcuts in the game treat my Command-C as a button press
+
+Now I seem to have encountered a bug, as I have no option to continue or choose the next path. But with the magic of the web I can reload and it is fixed!
+
+&#8212;-
+
+Next up: meet the Tin Woodman. But Pirate Style! (Adding pirates is the only modifier available. The whole thing feels sparse in a surprising way, as it’s not that hard to create content once you’ve embraced an LLM-driven narrative.) The card does promise the possibility of the Tinman becoming my foe, can I accomplish this?
+
+Will I discreetly check my pockets to see if I have any oil to spare? No! I will be a total bitch and tell the woodman that since he can’t even do a proper bow that I can’t help him nor his rusty joints. But a newly appeared vigilante detective (I had to choose the attributes myself) oils the woodman anyway. Also she’s a pirate. Foiled! Everyone here seems to carry around a bit of oil.
+
+&#8220;Aye, I be seekin&#8217; the Wizard meself,&#8221; Brightwell interjects. &#8220;Hopin&#8217; he can point me to me father&#8217;s lost treasure map.&#8221; Her words forge an unexpected bond between the three of you.
+
+Goddammit no they don’t.
+
+A wild Boq appears! No explanation, he’s just stalking us now. Boq, you chose the wrong time to show up, because I’m in the mood for mayhem.
+
+My first attempt to brain him with a rock fails. My second attempt to jam that damn compass down his stupid throat succeeds. “Boq has become choking” Haha! “I watch as the life drains from Boq’s face.” It succeeds, but someone intervenes again. That’s fine… “‘What have you done?’ The Scarecrow&#8217;s whisper cuts through the air as he retreats from you, his burlap face a mask of disbelief.” – but I’m disappointed to find this is not reflected on any card, we’re all still friends. But with a final insult I do manage to alienate everyone. Will this actually be impactful? It’s not yet clear.
+
+I am proving my own theory that boredom breeds cruelty, the simple desire for something to matter. I don’t really enjoy trolling the game, so I try to be nice again. It works too well, disappointing me again.
+
+I could keep going, but honestly I feel defeated by this story.
+
+—
+
+“Looking up, you lock eyes with Larry, a towering figure whose emerald robes seem to shimmer with barely contained magical energy.”
+
+—&#8212;-
+
+So: given what I see in the game and the implicit goals, how would I go about designing the experience?
+
+The choices need SO MUCH prompting work.
+
+The characters and social situations should be handled more explicitly in prompting. This could be done through instructions, but I often find it useful (and the instructions more powerful) if I ask the LLM to establish the social expectations and relationships in the scene before writing out the scene.
+
+One difficulty in comparing a pregenerated story to a dynamically generated story is latency. These choice-based games achieve casual, relaxed reading with short passages and frequent choice breaks (often with choices that are about engagement rather than pivotal choices). If it takes several seconds to generate the next passage then that is interrupted, and trivial choice breaks are punished.
+
+Several of the techniques I’ve described would make this worse, increasing the latency even further by forcing the LLM to do more pre-work before generating the final passages that are given to the user. But I’ve had a lot of luck in my own work with having the LLM generate rich, multi-part responses that can be parsed in a streaming fashion. Here’s some approaches:
+
+As mentioned earlier, when the LLM generates choices it can generate a first passage of response at the same time. This means a zero-latency response, and while the player is reading this the next passages can be in the process of being generated.
+
+Success/failure can also be precalculated, or calculated in anticipation while the user is deciding on their choice. The reveal can still be presented as an effortful calculation, and then you use that time to generate the next passage.
+
+Non-impactful choices can be included inline in the generated passage. The choice doesn’t have to be entirely meaningless either, it only has to be meaningless for that passage. For example, choosing your emotional response to a situation probably has no immediate effect on what transpires, but can become input to the generation of later, more impactful choices. Some choices might affect a further templated response, but again with no impactful changes until later.
+
+The LLM can do lots of work in one response. Tool use is one way, but not very reliable in my experience, and especially for narrative tasks I find that tools degrade the performance. Breaking up different chunks of work with tags lets the results stream out as the LLM goes through several tasks. This saves cost as well, since you are effectively using the same input context for multiple kinds of responses.
+
+&#8212;></div>
+        <!-- /.entry-content -->
+  
+        <hr />
+
+        <!-- <div>
+            Hello! Did you know as of December 2024 I'm looking for a job? <a href="https://www.linkedin.com/feed/update/urn:li:activity:7265435901009231872/">I am!</a> I really like working with LLMs, especially in the domain of education, wellness, and <a href="https://en.wikipedia.org/wiki/Executive_functions">executive function</a>. Maybe <a href="mailto:ianbicking@gmail.com">drop me an email</a>?
+        </div> -->
+    </article>
+</section>
+        <section id="extras" class="body">
+                <div class="links">
+                  <h2><a href="https://ianbicking.org">here</a></h2>
+                  <ul>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/projects.html">projects</a></li>
+                    <li><a href="https://ianbicking.org/archives.html">archives</a> &amp; <a href="https://ianbicking.org/categories.html">categories</a></li>
+                    <li><a href="https://ianbicking.org/category/ai.html">category: ai</a></li>
+                    <li><a href="https://ianbicking.org/category/javascript.html">category: javascript</a></li>
+                    <li><a href="https://ianbicking.org/category/misc.html">category: misc</a></li>
+                    <li><a href="https://ianbicking.org/category/mozilla.html">category: mozilla</a></li>
+                    </ul>
+                </div>
+                <div class="social">
+                        <h2>elsewhere</h2>
+                        <ul>
+                            <li><a href="https://ianbicking.org/feeds/atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://hachyderm.io/@ianbicking">@ianbicking@hachyderm.io</a></li>
+                            <li><a href="https://bsky.app/profile/ianbicking.org">Blue Sky</a></li>
+                            <li><a href="https://www.threads.net/@ibicking">Threads</a></li>
+                            <li><a href="https://github.com/ianb">Github</a></li>
+                            <li><a href="https://www.linkedin.com/in/ianbicking/">LinkedIn</a></li>
+                        </ul>
+                </div><!-- /.social -->
+                <div class="archives">
+                  <h2><a href="https://ianbicking.org/blog/">recent posts</a></h2>
+                  <ul>
+                    <li><a href="https://ianbicking.org/blog/2025/07/intra-llm-text-adventure.html">Intra: design notes on an <span class="caps">LLM</span>-driven text&nbsp;adventure</a></li>
+                    <li><a href="https://ianbicking.org/blog/2025/06/creating-worlds-with-llms.html">Roundup: Creating Worlds with&nbsp;LLMs</a></li>
+                    <li><a href="https://ianbicking.org/blog/2025/05/the-hungry-ghost.html">The Hungry&nbsp;Ghost</a></li>
+                    <li><a href="https://ianbicking.org/blog/2024/05/ai-aita.html"><span class="caps">AI</span> <span class="caps">AITA</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm.html">Roleplaying driven by an <span class="caps">LLM</span>: observations <span class="amp">&amp;</span> open&nbsp;questions</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/04/world-building-gpt-2-declarative.html">World Building with <span class="caps">GPT</span> part 2: bigger, better, more&nbsp;declarative</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/02/world-building-with-gpt.html">World Building With <span class="caps">GPT</span></a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/thoughts-on-voice-interfaces-2-llms.html">Thoughts On Voice Interfaces 2 years later:&nbsp;LLMs</a></li>
+                    <li><a href="https://ianbicking.org/blog/2023/01/infinite-ai-array.html">Infinite <span class="caps">AI</span>&nbsp;Array</a></li>
+                    <li><a href="https://ianbicking.org/blog/2020/11/firefox-was-always-enough.html">Firefox Was Always&nbsp;Enough</a></li>
+                  </ul>
+                </div><!-- /.archives -->
+
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+          This is the personal site of <a href="/">Ian Bicking</a>.  The opinions expressed here are my own.
+        </footer><!-- /#contentinfo -->
+
+<script src="/theme/instantclick.min.js"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FKT4HDGBE4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-FKT4HDGBE4');
+</script>
+        </div><!-- /#main-container -->
+        </div><!-- /#main-wrapper2 -->
+        </div><!-- /#main-wrapper1 -->
+</body>
+</html>
