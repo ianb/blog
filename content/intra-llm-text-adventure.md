@@ -36,6 +36,7 @@ This blog post accompanies a [video](https://youtu.be/CWReNVF3Ark?si=JVKKWFxwkgw
 7. [The tech](#the-tech)
 8. [Further directions](#further-directions)
 9. [Conclusion](#conclusion)
+10. [Comments & Feedback](#comments)
 
 ## <span id="the-game">The Game</span>
 
@@ -82,9 +83,9 @@ One of the [reasons narrative and other games are on rails](https://ianbicking.o
 
 I firmly believe that material created by AI can feel authored. But you do have to put in the work of authoring! You have to develop an intention and you have to ensure that the work embodies that intention. My [entirely satirical Am I The Asshole](https://ianbicking.org/blog/2024/05/ai-aita) post was 100% written by ChatGPT. I had fun, I think it's silly, but it certainly didn't come out of ChatGPT in one shot. Or for an example of fully AI generated images with real authorial control I think [The Strangest Flea Market](https://www.instagram.com/thestrangestfleamarket/) is excellent artistic work. ([This spaceship does not exist](https://bsky.app/profile/ttaships.airminded.org) has nice consistency, but I do wish it had a stronger theme to connect the work.)
 
-To make the game feel authored there needs to be a promise made as to what the game should do for the player, and the fulfillment of that promise. If you don't call the shot – that is, if you don't make some kind of claim about what the game should achieve – the player can't know if the game succeeded. In the infinite twisty hallucinations of an LLM is hard to distinguish intention from accident.
+To make the game feel authored there needs to be a promise made as to what the game should do for the player, and the fulfillment of that promise. If you don't call the shot – that is, if you don't make some kind of claim about what the game should achieve – the player can't know if the game succeeded. In the infinite twisty hallucinations of an LLM it is hard to distinguish intention from accident.
 
-Even if you let the LLM take the wheel there are degrees by which the LLM can achieve some sense of authoring, or fail. Each interaction with an LLM is a new and fresh prompt, and the LLM picks up with no memory of anything in the past outside of the history it is provided. This means if the LLM responds with something like "You hear a mysterious sound on the other side of the door" then if you open the door... the LLM only decides what's on the other side of the door at that moment. This is another kind of authorial failure, and while the cause is often not clear the ungrounded feeling it creates is very noticeable. But you can program around this! (A topic for another time.)
+<span id="ungrounded"></span>Even if you let the LLM take the wheel there are degrees by which the LLM can achieve some sense of authoring, or fail. Each interaction with an LLM is a new and fresh prompt, and the LLM picks up with no memory of anything in the past outside of the history it is provided. This means if the LLM responds with something like "You hear a mysterious sound on the other side of the door" then if you open the door... the LLM only decides what's on the other side of the door at that moment. This is another kind of authorial failure, and while the cause is often not clear the ungrounded feeling it creates is very noticeable. But you can program around this! (A topic for another time.)
 
 [^6]: After [reading a post by Chris Crawford](https://www.erasmatazz.com/personal/self/end-of-an-era.html) I have started playing his game [Le Morte D’Arthur](https://www.erasmatazz.com/LeMorteDArthur.html). There aren't that many choices, and I can't honestly tell if the choices mean anything. But the writing is excellent and because it's a game it's all written in the second person (addressing the main character as "you"). Writing in the second person is unusual in fiction but as I experience the game I realize that alone makes me feel embodied in the character of Arthur. Which is to say: our imaginations are ready to meet the game halfway when presented with the opportunity to feel embodied in a character.
 
@@ -322,6 +323,12 @@ There's another category of exporations under "agentic simulation,"[^3] but I ma
 [^3]: A notable early example is [Generative Agents: Interactive Simulacra of Human Behavior (2023)](https://arxiv.org/abs/2304.03442). More recently is [AgentSociety: Large-Scale Simulation of LLM-Driven Generative Agents Advances Understanding of Human Behaviors and Society (2025)](https://arxiv.org/html/2502.08691v1) at much larger scale.
 
 If you want to try it out, [playintra.win](https://www.playintra.win), [see it on github](https://github.com/ianb/intra-game), and I might suggest [the github Discussions](https://github.com/ianb/intra-game/discussions/).
+
+### <span id="comments">Comments and Feedback</span>
+
+Reply on [Blue Sky](https://bsky.app/profile/ianbicking.org/post/3lswo5h6rh22p) or [Mastodon](https://hachyderm.io/@ianbicking/114784685455331040) or even [email](mailto:ianbicking@gmail.com)
+
+Also [the GitHub discussions](https://github.com/ianb/intra-game/discussions)
 
 <!-- to separate the footnotes better: -->
 <div style="margin-bottom: 4em"></div>
