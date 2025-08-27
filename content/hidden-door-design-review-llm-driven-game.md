@@ -1,6 +1,6 @@
 Title: Hidden Door At Launch: Design Review of an LLM-Driven Story Game
 Slug: hidden-door-design-review-llm-driven-game
-Date: 2025-08-19
+Date: 2025-08-27
 Category: ai
 
 <aside>This post is part of the series <a href="/blog/2025/05/creating-worlds-with-llms.html">Creating worlds with LLMs</a></aside>
