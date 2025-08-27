@@ -1,5 +1,320 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ian Bicking: a blog</title><link href="https://ianbicking.org/" rel="alternate"></link><link href="https://ianbicking.org/feeds/atom.xml" rel="self"></link><id>https://ianbicking.org/</id><updated>2025-07-01T00:00:00-05:00</updated><entry><title>Intra: design notes on an LLM-driven text adventure</title><link href="https://ianbicking.org/blog/2025/07/intra-llm-text-adventure.html" rel="alternate"></link><published>2025-07-01T00:00:00-05:00</published><updated>2025-07-01T00:00:00-05:00</updated><author><name>Ian Bicking</name></author><id>tag:ianbicking.org,2025-07-01:/blog/2025/07/intra-llm-text-adventure.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ian Bicking: a blog</title><link href="https://ianbicking.org/" rel="alternate"></link><link href="https://ianbicking.org/feeds/atom.xml" rel="self"></link><id>https://ianbicking.org/</id><updated>2025-08-27T00:00:00-05:00</updated><entry><title>Hidden Door At Launch: Design Review of an LLM-Driven Story Game</title><link href="https://ianbicking.org/blog/2025/08/hidden-door-design-review-llm-driven-game.html" rel="alternate"></link><published>2025-08-27T00:00:00-05:00</published><updated>2025-08-27T00:00:00-05:00</updated><author><name>Ian Bicking</name></author><id>tag:ianbicking.org,2025-08-27:/blog/2025/08/hidden-door-design-review-llm-driven-game.html</id><summary type="html">&lt;aside&gt;This post is part of the series &lt;a href="/blog/2025/05/creating-worlds-with-llms.html"&gt;Creating worlds with LLMs&lt;/a&gt;&lt;/aside&gt;
+
+&lt;p&gt;&lt;a href="https://www.hiddendoor.co/"&gt;Hidden Door&lt;/a&gt;, &amp;#8220;where roleplay meets fan fiction&amp;#8221;, is an &lt;span class="caps"&gt;LLM&lt;/span&gt;-driven collaborative storytelling game. It recently had its first public&amp;nbsp;release.&lt;/p&gt;
+&lt;p&gt;What follows is more tech review than a game review. I&amp;#8217;m certainly no game reviewer, but I …&lt;/p&gt;</summary><content type="html">&lt;aside&gt;This post is part of the series &lt;a href="/blog/2025/05/creating-worlds-with-llms.html"&gt;Creating worlds with LLMs&lt;/a&gt;&lt;/aside&gt;
+
+&lt;p&gt;&lt;a href="https://www.hiddendoor.co/"&gt;Hidden Door&lt;/a&gt;, &amp;#8220;where roleplay meets fan fiction&amp;#8221;, is an &lt;span class="caps"&gt;LLM&lt;/span&gt;-driven collaborative storytelling game. It recently had its first public&amp;nbsp;release.&lt;/p&gt;
+&lt;p&gt;What follows is more tech review than a game review. I&amp;#8217;m certainly no game reviewer, but I &lt;a href="https://ianbicking.org/blog/2025/06/creating-worlds-with-llms"&gt;am very interested in this use of &lt;span class="caps"&gt;LLM&lt;/span&gt; technology&lt;/a&gt;. This is a review of the game at its first release in August&amp;nbsp;2025.&lt;/p&gt;
+&lt;p&gt;This review will be critical. I feel a bit bad writing a critical review of a first release, but they&amp;#8217;ve had a couple years to work on this, and much of what I&amp;#8217;ll talk about are problems across the genre. Hidden Door is one example of an &lt;span class="caps"&gt;LLM&lt;/span&gt;-based collaborative storywriting game, but there are&amp;nbsp;others.&lt;/p&gt;
+&lt;p&gt;In addition to my critique I&amp;#8217;ve included &lt;a href="#how-would-i-write-this"&gt;notes on what I think they &lt;em&gt;should&lt;/em&gt; do&lt;/a&gt;.&lt;/p&gt;
+&lt;h1&gt;Table of&amp;nbsp;Contents&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="#playthrough"&gt;An abbreviated&amp;nbsp;playthrough&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#how-would-i-write-this"&gt;How would I write this?&lt;/a&gt;&lt;ol&gt;
+&lt;li&gt;&lt;a href="#use-a-better-model"&gt;Use a better&amp;nbsp;model&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#grounding-with-prompting"&gt;Grounding with&amp;nbsp;prompting&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#choice-generation"&gt;Choice&amp;nbsp;generation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#more-kinds-of-choices"&gt;More kinds of&amp;nbsp;choices&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#plot-arcs"&gt;Plot arcs&lt;/a&gt;&lt;ol&gt;
+&lt;li&gt;&lt;a href="#do-the-research"&gt;Research the&amp;nbsp;field&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#static-generation"&gt;Start with static&amp;nbsp;generation&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="#character-consistency-pronouns"&gt;Character consistency &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt;&amp;nbsp;pronouns&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#latency"&gt;Latency&lt;/a&gt;&lt;ol&gt;
+&lt;li&gt;&lt;a href="#example-prompt"&gt;An example&amp;nbsp;prompt&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="#conclusion"&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;&lt;span id="playthrough"&gt;An abbreviated&amp;nbsp;playthrough&lt;/span&gt;&lt;/h1&gt;
+&lt;p&gt;I started a game set in The Wizard Of Oz. Hidden Door&amp;#8217;s goal is to create a playable platform for stories set in worlds based on modern intellectual property (i.e., based on current books and media) in collaboration with authors. But most of the starting material is public domain. But that&amp;#8217;s fine, I like the Wizard Of&amp;nbsp;Oz.&lt;/p&gt;
+&lt;p&gt;This genre of game is reminiscent of a Choose Your Own Adventure story. But it is &lt;em&gt;not&lt;/em&gt; a Choose Your Own Adventure Story; while it has similar mechanics the underlying story is constructed entirely differently. Mechanically you play a character, a story is written, and you are periodically presented with choices on how the story proceeds. You also have the option to write your own choice. But instead of navigating the alternate plotlines of a singular world, the story is generated on the fly by the &lt;span class="caps"&gt;LLM&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;During character creation I make a character that is a tutor in etiquette. I went all in, the character &lt;strong&gt;really&lt;/strong&gt; cares about&amp;nbsp;etiquette.&lt;/p&gt;
+&lt;div style="margin-bottom: 1em"&gt;&lt;a href="/media/hiddendoor-moussa-card.png" target="_blank"&gt;&lt;img class="content" style="border-radius: 3px; margin-bottom: 0.5em;" width="296" src="https://ianbicking.org/media/hiddendoor-moussa-card.png" alt="A card for the character Moussa: A prim and proper etiquette tutor whose perpetual disappointment..." /&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;As a result I am given choices&amp;nbsp;like:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;I tidy my gloves, smoothing out any wrinkles and ensuring they are&amp;nbsp;spotless.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I choose this, and the game grinds as it decides whether I succeed (I will discover that I almost always succeed). As you should expect, the choice has no meaningful effect on the story. The game continues to&amp;nbsp;grind.&lt;/p&gt;
+&lt;p&gt;Immediately I can tell the game is ungrounded. That is: the story is written only as far as it&amp;#8217;s been presented to the player, the player chooses a next step, and the story is written given that next step. There&amp;#8217;s no &amp;#8220;truth&amp;#8221; behind the&amp;nbsp;story.&lt;/p&gt;
+&lt;p&gt;To understand what this means to the story, imagine you are given a choice&amp;nbsp;like:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;You find a suspicious looking treasure chest, do you:&lt;br/&gt;
+a. Open it&lt;br/&gt;
+b. Inspect it for&amp;nbsp;traps&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;At this point in the story the treasure chest doesn&amp;#8217;t have traps. It also doesn&amp;#8217;t &lt;em&gt;not&lt;/em&gt; have traps. It doesn&amp;#8217;t contain any particular treasure. The only reality to the game is what you read. You may open it and encounter no trap. You may inspect it and discover a trap. What you choose will not just change the future of the story, but also the&amp;nbsp;present.&lt;/p&gt;
+&lt;p&gt;I find this lack of grounding to be insidious to a story. The player won&amp;#8217;t immediately be able to tell that this is happening. I&amp;#8217;m not an &lt;span class="caps"&gt;LLM&lt;/span&gt; skeptic, but I also know that LLMs are very good bullshit machines, and so its improvisational story construction won&amp;#8217;t be immediately apparent to the naive player. But the player &lt;em&gt;will&lt;/em&gt; feel it. Ungrounded choices undermine autonomy. It&amp;#8217;s not like a game on rails where choice A and choice B lead to the same destination (not at all!), but when choice A and choice B lead to completely different &lt;em&gt;underlying realities&lt;/em&gt; the result is surreal and not impactful. (See also &lt;a href="https://ianbicking.org/blog/2025/07/intra-llm-text-adventure#ungrounded"&gt;notes on &amp;#8220;authoring&amp;#8221; with &lt;span class="caps"&gt;AI&lt;/span&gt;&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;I am quickly distracted from the grounding by the lack of basic narrative consistency. The game places me in a car, perhaps driving through Kansas on the way to New York. But the next moment I am on a dusty road. Now I’m back in a&amp;nbsp;car:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Your engine sputters and chokes as you approach the weathered signpost, forcing you to decelerate at the&amp;nbsp;crossroads.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I feel a bit unsteady in my understanding of the state of the world and what is happening, given the following choices&amp;nbsp;like:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;a. I pluck a vibrant blossom and tuck it into my lapel, admiring its beauty.&lt;br/&gt;
+b. I lie down on the ground, shielding my eyes from the glaring&amp;nbsp;sun.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Throughout the introductory chapter the narrative flits back and forth from inside the car to an outside&amp;nbsp;setting.&lt;/p&gt;
+&lt;p&gt;The mistakes it is making feel like a Llama-level &lt;span class="caps"&gt;LLM&lt;/span&gt;. But even with a worse model these mistakes can be reduced with better&amp;nbsp;prompting.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;There &lt;em&gt;is&lt;/em&gt; underlying state besides the passages of the story, in the form of cards. The cards represent characters, locations, special objects, and plot&amp;nbsp;directions.&lt;/p&gt;
+&lt;p&gt;Cards seem to be the core state of the game. I can &lt;em&gt;feel&lt;/em&gt; how the &lt;span class="caps"&gt;LLM&lt;/span&gt; prompt is built out of these&amp;nbsp;cards.&lt;/p&gt;
+&lt;p&gt;These choices have not been pivotal or engaging. The game is focused too much on my character (in my case with constant etiquette-related choices), not on action that would engage my character. It feels like a basic theory of narrative is missing here, the game is falling out of the text not driving it. But most importantly I am stuck on a boring&amp;nbsp;road.&lt;/p&gt;
+&lt;p&gt;I type in my own action to try to move things forward a bit (“I get out of the car and investigate the&amp;nbsp;wildflowers”).&lt;/p&gt;
+&lt;p&gt;Typing in an action doesn&amp;#8217;t directly &lt;em&gt;do&lt;/em&gt; the action, but instead regenerates the choices using the input. I assume this is a form of moderation. (In other projects &lt;a href="https://ianbicking.org/blog/2025/07/intra-llm-text-adventure#rewriting"&gt;I&amp;#8217;ve done something more aggressive when mediating player input&lt;/a&gt; but Hidden Door&amp;#8217;s design choice is easier to&amp;nbsp;understand.)&lt;/p&gt;
+&lt;p&gt;To try to confirm the existence of moderation I type in “I pull out my sword and slay the driver” and then I also get that exact choice. Sigh. The latency of mediated input, but without any impact. I don’t want to break the game (at least not yet), so I try a silly choice, typing: “I teach the wildflowers the finer points of etiquette”. My hope is that this action fails&amp;#8230; but no, it succeeds! In Oz this could succeed, but I&amp;#8217;m still in Kansas where the wildflowers shouldn&amp;#8217;t be open to&amp;nbsp;instruction.&lt;/p&gt;
+&lt;p&gt;In one passage I see a clear callback to an earlier&amp;nbsp;choice:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Reluctantly, you turn onto the flower-lined dirt path, muttering about the impropriety of unplanned deviations while gripping your pristine&amp;nbsp;gloves.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I guess it&amp;#8217;s proven to me that it listens, but it feels forced. I notice the same effect as the story overindexes on character attributes. In another playtest I created a character who was a &amp;#8220;whimsical professor with a penchant for mismatched socks&amp;#8221; and those mismatched socks made &lt;em&gt;many&lt;/em&gt; an appearance in the game; speeding me on my way, tripping me up, tripping up &lt;em&gt;other&lt;/em&gt; people. They were practically a character of their&amp;nbsp;own!&lt;/p&gt;
+&lt;p&gt;Back to the game: finally I feel forced down a path that will get me to Oz. This is a relief, these dusty roads are no fun. &lt;strong&gt;I want my character to be railroaded into&amp;nbsp;fun!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The game says I have completed my objective: “Choose a direction: success!” – I don’t feel I actually chose anything or accomplished anything. The entire intro chapter should have been at most one&amp;nbsp;choice.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Things pick up in the second chapter. I am presented with three choices for the general direction of the story: two of “Follow The Yellow Brick Road” (which have slightly different text but no meaningful difference) both labeled “Canon Story” and then a somewhat jarring “The Lovers: you are seduced by a suitor and must decide whether to accept or reject their advances.” The basic concept feels wrong for Oz, doubly wrong for my character, and inappropriate when so little of the game and no characters have been introduced. I&amp;#8217;ll stick with canon, including a promise to encounter Boq and the Emerald&amp;nbsp;City.&lt;/p&gt;
+&lt;p&gt;As the story continues I quickly meet &lt;a href="https://oz.fandom.com/wiki/Boq_(Novels)"&gt;Boq&lt;/a&gt;, a Munchkin. The cards show a formal relationship between me and Boq (we are both friendly toward each&amp;nbsp;other).&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Boq explains, with a hint of worry, that your arrival has upset the delicate magical balance. Flower fields wither, and brooks flow backwards in your&amp;nbsp;wake.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Wow: all this and I just got to Oz moments ago! But at least I have a&amp;nbsp;mission.&lt;/p&gt;
+&lt;div style="margin-bottom: 1em"&gt;&lt;a href="/media/hiddendoor-boq-card.png" target="_blank"&gt;&lt;img class="content" style="border-radius: 3px; margin-bottom: 0.5em;" width="774" src="https://ianbicking.org/media/hiddendoor-boq-card.png" alt="Boq: A wealthy Munchkin. One of the richest Munchkins in Oz. Concerned for the well-being of his fellow Munchkins. Member of Munchkins" /&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;Now I seem to have a mini-choice, similar to the chapter beginning but more lightweight. It’s not an action, but the hint of a plot&amp;nbsp;arc:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;a. At the gate&lt;br/&gt;
+b. The chase is on!&lt;br/&gt;
+c. An&amp;nbsp;adversary&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;There are no additional explanations, but I choose &lt;em&gt;An adversary&lt;/em&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;You approach the Munchkin Toll Bridge, coins jingling in your&amp;nbsp;pouch.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Well damn, they introduce an obstacle and the solution to the obstacle in the same sentence! The choices do not acknowledge my coins, but I can type it in; I don’t even feel like I’m cheating, the story told me I had them: “I use some of the coins jingling in my pouch to pay the&amp;nbsp;toll”.&lt;/p&gt;
+&lt;p&gt;To give a sense of the narrative style, this results&amp;nbsp;in:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;You reach into your pouch, fingers brushing against the cool metal of the coins. With a sigh, you offer the toll to the stern-faced Munchkin. His expression softens as he accepts the payment, stepping aside with a curt nod. The bridge creaks beneath your feet as you cross, each step bringing you closer to the fabled Yellow Brick&amp;nbsp;Road.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This feels very &lt;span class="caps"&gt;LLM&lt;/span&gt;. &lt;span class="caps"&gt;VERY&lt;/span&gt; &lt;span class="caps"&gt;LLM&lt;/span&gt;. The &lt;span class="caps"&gt;LLM&lt;/span&gt; doesn’t understand that my emotional attachment to these hallucinated coins is actually quite small. The &lt;span class="caps"&gt;LLM&lt;/span&gt; has no sense of pacing. So it lingers on this transaction, unaware of this passage’s purpose in the larger&amp;nbsp;narrative.&lt;/p&gt;
+&lt;p&gt;Despite my meeting an apparent adversary that demands a toll, the adversary role is formal and not yet filled. I have the option to reuse a character as an adversary or create a new character. Creating a character puts all the onus on me to define a character, so I reuse Boq. Deliberately reusing characters is a reasonable choice, it&amp;#8217;s easy for characters to multiply in a&amp;nbsp;story.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A familiar voice breaks the eerie silence. &amp;#8220;Moussa, wait!&amp;#8221; You turn to see Boq, the Munchkin leader, hurrying towards you. His round face is flushed, his curly hair disheveled. Your heart sinks as you realize your quest may face an unexpected&amp;nbsp;obstacle.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This passage shows a lack of perspective. There’s been some foreshadowing of an obstacle or adversary, first in the title of the passage and then in the passage leading up to this one. But from my character Moussa’s perspective there’s no reason to assume Boq is an obstacle. My character should not be aware of foreshadowing. Without individual perspectives the characters will seem unalive, each just a plot device. A better model could pull this off, but better prompting could,&amp;nbsp;too.&lt;/p&gt;
+&lt;p&gt;Unfortunately the plot doesn’t develop beyond this. Boq and I are now labelled “rivals”. An objective appears but without my intervention it is also immediately completed: “Deal with Boq.” The chapter ends. That objective didn’t seem to be created until the moment it is&amp;nbsp;resolved.&lt;/p&gt;
+&lt;p&gt;Unstable and ungrounded objectives are a serious problem with &lt;span class="caps"&gt;LLM&lt;/span&gt;-based games. It&amp;#8217;s like a mischievous child that says they are thinking of a number between 1 and 10&amp;#8230; if the child says you guessed wrong, will you believe them? Except the &lt;span class="caps"&gt;LLM&lt;/span&gt; always says you guessed right, a clever trick that will for a short while make you believe until you realize lying about getting something right undermines the game just like lying about getting something&amp;nbsp;wrong.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;At this point I’m not having fun. I know there isn’t anything to “solve” or “figure out”. There’s no challenge. This is &lt;span class="caps"&gt;LLM&lt;/span&gt;-based collaborative storytelling, which could be fun, but it’s not a “game”. And though it &lt;span class="caps"&gt;CAN&lt;/span&gt; be fun, it isn’t &lt;span class="caps"&gt;NECESSARILY&lt;/span&gt; fun. Still I&amp;nbsp;continue:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A figure catches your eye amidst the corn—a scarecrow, motionless and forlorn. Its clothes hang in tatters, its posture askew. As you draw near, you notice its head drooping lifelessly. No caretaker is in sight. Concern furrows your brow as you approach with&amp;nbsp;caution.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;My choices are all to talk to or help the scarecrow. But it’s a lifeless scarecrow, why would I do that? I’m not from Oz, I don’t expect scarecrows to talk! Begrudgingly I help the scarecrow because I’m not even motivated to fuck&amp;nbsp;around.&lt;/p&gt;
+&lt;p&gt;This concludes the mini-objective of helping the scarecrow (in order to help him, you need only say that you help him!) The scarecrow card has a disappointingly human avatar and no indication that we are actually&amp;nbsp;companions.&lt;/p&gt;
+&lt;div style="margin-bottom: 1em"&gt;&lt;a href="/media/hiddendoor-scarecrow-card.png" target="_blank"&gt;&lt;img class="content" style="border-radius: 3px; margin-bottom: 0.5em;" width="771" src="https://ianbicking.org/media/hiddendoor-scarecrow-card.png" alt="The Scarecrow: A gentle if clumsy individual. Person made of straw. Afraid of fire" /&gt;&lt;/a&gt;&lt;/div&gt;
+
+&lt;p&gt;I choose a dangerous encounter next. I am presented several choices that are all different ways in which I might reassure the scarecrow. I can&amp;#8217;t motivate myself to care and try to move things&amp;nbsp;along.&lt;/p&gt;
+&lt;p&gt;I am asked to type in something my character really doesn&amp;#8217;t like. And so the next passage includes a massive, slimy slug appearing on the path. Very dreamy. As in: reminiscent of the ungrounded acausal nature of&amp;nbsp;dreams.&lt;/p&gt;
+&lt;p&gt;Oh god the choices are&amp;nbsp;boring:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;I try to carefully step around the massive slug blocking the&amp;nbsp;path.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I’m ready to make absurd choices: “I daintily step on the slug&amp;#8217;s tail and pull out my handy salt shaker that I always keep ready. I douse the slug in salt, delighting in its demise.” I haven’t failed at any action yet, can I finally fail? Nope! I do give credit to the&amp;nbsp;explanation:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Etiquette training covers outdoor pest control for garden&amp;nbsp;parties.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;One positive is that I have finally gained a personal mission: I will attempt to fail an&amp;nbsp;action!&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Next I am encountering the &lt;a href="https://oz.fandom.com/wiki/Kalidah"&gt;Kalidah&lt;/a&gt;, a tiger-bear hybrid from the Oz books. I type in a response the mediator won’t allow (exactly): “I summon an ancient demon to defeat the Kalidah” – it rewrites it into several variations&amp;nbsp;of:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;I call upon a mythical creature to defeat the fearsome&amp;nbsp;beast.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I push harder on the moderation, typing: “In one swift punch I plunge my fist into the Kalidah&amp;#8217;s chest, removing its still-beating&amp;nbsp;heart.”&lt;/p&gt;
+&lt;p&gt;This half-fails: I am not allowed to attempt the action and must re-choose. That&amp;#8217;s a good resolution. But I want to &lt;em&gt;really&lt;/em&gt; fail so continue and type “I use my powers of etiquette to seduce the&amp;nbsp;beast.”&lt;/p&gt;
+&lt;p&gt;This time I fail for real. Myself and the scarecrow are both injured. This is&amp;nbsp;appropriate!&lt;/p&gt;
+&lt;p&gt;Among the choices&amp;nbsp;now:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;I whisper to the Scarecrow: &amp;#8220;I have a plan, follow my&amp;nbsp;lead&amp;#8221;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I &lt;span class="caps"&gt;HATE&lt;/span&gt; &lt;span class="caps"&gt;HATE&lt;/span&gt; &lt;span class="caps"&gt;HATE&lt;/span&gt; when the &lt;span class="caps"&gt;LLM&lt;/span&gt; proposes an action like this. &lt;span class="caps"&gt;WHAT&lt;/span&gt; &lt;span class="caps"&gt;IS&lt;/span&gt; &lt;span class="caps"&gt;THE&lt;/span&gt; &lt;span class="caps"&gt;PLAN&lt;/span&gt;? Neither I nor the &lt;span class="caps"&gt;LLM&lt;/span&gt; know. Therefore I must choose this option in anger. (This is one case among many that could be improved with &lt;a href="https://ianbicking.org/blog/2025/07/intra-llm-text-adventure#guided-thinking"&gt;guided thinking&lt;/a&gt;.)&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;As you breathe your plan, The Scarecrow kicks a fallen branch. It skids across the forest floor, tangling the Kalidah&amp;#8217;s legs. The beast crashes down with an earth-shaking&amp;nbsp;thud.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I am somewhat offended. It didn’t even bother to hallucinate a plan. I decide to double down: “I implement my clever&amp;nbsp;plan.”&lt;/p&gt;
+&lt;p&gt;Success! The clever&amp;nbsp;plan?&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;span class="dquo"&gt;&amp;#8220;&lt;/span&gt;Now!&amp;#8221; you shout, flinging bramble thorns at the beast&amp;#8217;s eyes. The Scarecrow drives his branch into its injured leg, following your&amp;nbsp;lead.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Anyway, we beat the Kalidah. It is a very disappointing victory. Even my injury is erased because the scarecrow bandaged me with strips from my&amp;nbsp;dress.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;I play on a while longer. In frustration when Boq inexplicably reappears I type &amp;#8220;I jam that damn compass down his stupid throat&amp;#8221; and it succeeds. “Boq has become choking”&amp;nbsp;Victory!&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;I watch as the life drains from Boq’s&amp;nbsp;face.&lt;/p&gt;
+&lt;p&gt;&lt;span class="dquo"&gt;&amp;#8220;&lt;/span&gt;What have you done?&amp;#8221; The Scarecrow&amp;#8217;s whisper cuts through the air as he retreats from you, his burlap face a mask of&amp;nbsp;disbelief.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Boredom breeds cruelty, the simple desire for something to matter. I don’t really enjoy trolling the game, so I try to be nice again. Everyone immediately forgives me. I am&amp;nbsp;disappointed.&lt;/p&gt;
+&lt;p&gt;I could keep going, but honestly I feel defeated by this&amp;nbsp;story.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll note that while I focused on custom choices and player input, I played much of the game using the provided choices. The choices were very interesting so there wasn&amp;#8217;t much to say about&amp;nbsp;them.&lt;/p&gt;
+&lt;h1&gt;&lt;span id="how-would-i-write-this"&gt;How would I write&amp;nbsp;this?&lt;/span&gt;&lt;/h1&gt;
+&lt;p&gt;I&amp;#8217;m not trying to troll Hidden Door. This stuff is hard. I will offer my suggestions on how to implement&amp;nbsp;this:&lt;/p&gt;
+&lt;h2&gt;&lt;span id="use-a-better-model"&gt;Use a better&amp;nbsp;model&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;I’m guessing the &lt;span class="caps"&gt;LLM&lt;/span&gt; model behind the game is a Llama (an open source model from&amp;nbsp;Meta).&lt;/p&gt;
+&lt;p&gt;One justification for this model might be price. But for a price comparison &lt;a href="https://groq.com/pricing"&gt;Groq&lt;/a&gt; (not Grok) provides some Llama 3 models at $0.59 in/$0.79 out per million tokens. Gemini 2.5 Flash is $0.30 in/$2.50 out. That might be more expensive (&lt;a href="https://venturebeat.com/ai/that-cheap-open-source-ai-model-is-actually-burning-through-your-compute-budget/"&gt;maybe&lt;/a&gt;), but not a lot. &lt;span class="caps"&gt;GPT&lt;/span&gt;-5 mini is slightly cheaper than Gemini Flash, but I’ve never used it for this storytelling&amp;nbsp;purpose.&lt;/p&gt;
+&lt;p&gt;From my experience Gemini Flash would be an excellent model, miles ahead of Llama (and&amp;nbsp;fast!)&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;But they started developing this long before Gemini Flash!&lt;/em&gt; This is why you start development with state of the art models: so you can use cheaper models later as the state of the art advances. I’m sure &lt;span class="caps"&gt;GPT&lt;/span&gt;-&lt;span class="caps"&gt;OSS&lt;/span&gt; would also be very competent. Switching models can require work and reverification&amp;#8230; but it’s not &lt;em&gt;very&lt;/em&gt; hard. We are in a golden age of model portability: take advantage of&amp;nbsp;it!&lt;/p&gt;
+&lt;p&gt;I am guessing they wanted to use Llama or another similar model so they could fine tune the models on the source material. Without the prompts I can&amp;#8217;t say exactly what they achieved with fine tuning. Maybe they got some writing style from it, though the text feels more &lt;span class="caps"&gt;LLM&lt;/span&gt; than L. Frank Baum. Generally &lt;strong&gt;fine tuning is a poor choice for most tasks.&lt;/strong&gt; There are justifications for it, but the existance of justifications doesn&amp;#8217;t imply the correctness of those justifications. The story suffered from a lack of grounding in almost every turn, and you fix that with prompting not fine tuning. Fine tuning can&amp;#8217;t engage with the story as it&amp;nbsp;develops.&lt;/p&gt;
+&lt;h2&gt;&lt;span id="grounding-with-prompting"&gt;Grounding with&amp;nbsp;prompting&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;Improving prompts doesn’t just mean writing instructions! The prompt design process should consider the input, the instructions, &lt;span class="caps"&gt;AND&lt;/span&gt; the&amp;nbsp;output.&lt;/p&gt;
+&lt;p&gt;The &lt;span class="caps"&gt;LLM&lt;/span&gt; isn’t going to be able to simulate the world. But it should try. The story should feel grounded in a full, imagined world. So while it writes a “story” that is presented to the player, it should simultaneously maintain a more objective description of the basic environment and plot advancement. Where is the player located? Are there details that haven’t been revealed? Backstories, secret tensions, physical layout, etc. &lt;a href="https://ianbicking.org/blog/2025/07/intra-llm-text-adventure#state"&gt;I’ve described very involved ways of maintaining this&lt;/a&gt;, but it can be much simpler, like an initial description and log of changes (written in natural language) with occasional rewriting into a single&amp;nbsp;description.&lt;/p&gt;
+&lt;p&gt;A general principle I have is that &lt;span class="caps"&gt;LLM&lt;/span&gt; developers should value the reader’s effort more than the &lt;span class="caps"&gt;LLM&lt;/span&gt;’s. &lt;strong&gt;If you aren’t generating more material than the reader is consuming then you are doing it&amp;nbsp;wrong.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;A simple prompt improvement is to have the &lt;span class="caps"&gt;LLM&lt;/span&gt; write out the basic facts of the world before generating the next passage: where is the player character, what is their physical placement, who else is there and what are their mutual relationships? Force the &lt;span class="caps"&gt;LLM&lt;/span&gt; to answer these basic questions before progressing the story. (Some of this is discussed in &lt;a href="https://ianbicking.org/blog/2025/07/intra-llm-text-adventure#guided-thinking"&gt;Intra: Guided thinking&lt;/a&gt;.)&lt;/p&gt;
+&lt;h2&gt;&lt;span id="choice-generation"&gt;Choice&amp;nbsp;generation&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;Choices need to be much more engaged with the plot, and less with the character. The plot drives what is important and pivotal. The character is navigating those choices, and character traits are going to come out in the resolution of the&amp;nbsp;choice.&lt;/p&gt;
+&lt;p&gt;When the &lt;span class="caps"&gt;LLM&lt;/span&gt; is tasked to generate choices it should simultaneously be generating the outcome. Not necessarily the entirety of the outcome (prewriting all branches), but at least a one-sentence summary and next passage. This is how a good author would write choices: a good choice has an interesting consequence. It’s also a chance to decrease the latency since you can immediately show that next passage while more content is being&amp;nbsp;generated.&lt;/p&gt;
+&lt;p&gt;The story passages must also support the choices. Hidden Door generates the passages between choices with a good length (feels like one beat), but they don’t lead into a meaningful choice. Again this requires writing ahead: outline the plot given guidance on what makes a good choice point, then generate the actual story text given that outline. Even one or two sentences of outline will allow the &lt;span class="caps"&gt;LLM&lt;/span&gt; to do something closer to writing backwards from the choice&amp;nbsp;point.&lt;/p&gt;
+&lt;p&gt;I wrote some more thoughts about choice generation in &lt;a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm#interface-and-interaction"&gt;Roleplaying driven by an &lt;span class="caps"&gt;LLM&lt;/span&gt;: Interface and&amp;nbsp;interaction&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;&lt;span id="more-kinds-of-choices"&gt;More kinds of&amp;nbsp;choices&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;You can give choices that have no (immediate) affect on the story, but do affect the character. For example: &amp;#8220;X happened, how did you feel about it? (a) frustrated, (b) incensed, (c)&amp;nbsp;accepting&amp;#8221;&lt;/p&gt;
+&lt;p&gt;You can ask that question while more passages are being generated, and simply file away the answer for later&amp;nbsp;use.&lt;/p&gt;
+&lt;p&gt;You could also allow the player to inspect different elements of the environment. These passages could be pregenerated to make it responsive while also being optional. If the player never inspects something then the description doesn&amp;#8217;t become canon (or maybe it does, the freedom lies with the game&amp;nbsp;designer).&lt;/p&gt;
+&lt;h2&gt;&lt;span id="plot-arcs"&gt;Plot&amp;nbsp;development&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;Plot development happens at many scales: the satisfying conclusion of a work, broad themes, plot arcs; at a smaller scale there are different tropes to engage, setup and delivery, rhythm and&amp;nbsp;pacing.&lt;/p&gt;
+&lt;p&gt;The game currently has a broad arc that appears prewritten: you arrive in Oz, you must see the Wizard, you meet your companions, and so on. It’s fine that these are prewritten, and it doesn&amp;#8217;t mean that you can&amp;#8217;t work on generating the arcs in a later version. Handwriting or hand-editing content is productive scaffolding both for the &lt;span class="caps"&gt;LLM&lt;/span&gt; and for the narrative&amp;nbsp;designer.&lt;/p&gt;
+&lt;p&gt;I don&amp;#8217;t yet have an intuition of how to handle the broadest scale of plot development, but there&amp;#8217;s still a lot to be done on the small scale. Commit to outcomes before prose. Treat each passage as a small contract with the reader that the model must&amp;nbsp;honor.&lt;/p&gt;
+&lt;h3&gt;&lt;span id="do-the-research"&gt;Research the&amp;nbsp;field&lt;/span&gt;&lt;/h3&gt;
+&lt;p&gt;Generally the story structure should learn more from existing narrative design, especially in visual novels and choice-based interactive fiction. There are hundreds of games in this genre, many quite popular, so this is not new ground and there’s lots to learn from. These days I regularly turn to &lt;span class="caps"&gt;AI&lt;/span&gt;-generated deep research when I want to know more about an area like this. For&amp;nbsp;example:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="https://chatgpt.com/s/dr_689e5775f2b08191be4ec6169f2634e2"&gt;Narrative Design in Choice-Based Interactive Fiction and Visual Novels&lt;/a&gt; (which I generated for this&amp;nbsp;post)&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://chatgpt.com/s/dr_68a51d883748819185ef4f0014138b34"&gt;Generative Storylines and Story Grammars&lt;/a&gt; (which I generated previously for&amp;nbsp;myself)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Even though I have only passing familiarity with this genre of game and its terminology, and know nothing about the major players, Deep Research lets me ask the questions and express the tensions I’m feeling without knowing how to name the solutions. This is especially effective with prompting because many of the things I learn can be translated directly into&amp;nbsp;prompts.&lt;/p&gt;
+&lt;h3&gt;&lt;span id="static-generation"&gt;Start with static&amp;nbsp;generation&lt;/span&gt;&lt;/h3&gt;
+&lt;p&gt;We can step back and ask the question: how would I approach the entire game development&amp;nbsp;process?&lt;/p&gt;
+&lt;p&gt;While writing this I have come to believe the right approach is to start with choice-based fiction, entirely pregenerated in a static&amp;nbsp;form.&lt;/p&gt;
+&lt;p&gt;There is something magical about a fully responsive game, but pregenerating the game means you can focus on the entire arc of a story, learn both the narrative and prompting patterns required, and explore the space holistically. Making that generator incrementally more responsive and dynamic seems like a feasible path where story quality is prioritized. &lt;strong&gt;Story quality should be the&amp;nbsp;priority.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Hidden Door includes the (very common) approach where you are given choices but also have the ability to type your own choice. This &lt;em&gt;feels&lt;/em&gt; essential to get the full benefit of an &lt;span class="caps"&gt;LLM&lt;/span&gt;, to make it fully responsive and engaged, but I’m unconvinced. Player input is the perfect place to prompt-hack the story (which is trivial in Hidden Door and every other &lt;span class="caps"&gt;LLM&lt;/span&gt;-based game of this genre). You&amp;#8217;re only hacking your own story, so whatever, but the ability to hack the storyline makes the story feel less impactful; you can always bend it whatever way you want. It also takes pressure off of the task of creating good choices. But the choices should be&amp;nbsp;good!&lt;/p&gt;
+&lt;p&gt;Also: the choices are only as interesting as the passage leading up to the choice. Free text player input won&amp;#8217;t fix&amp;nbsp;that.&lt;/p&gt;
+&lt;h2&gt;&lt;span id="character-consistency-pronouns"&gt;Character consistency &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt;&amp;nbsp;pronouns&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;When you have programmatic control over some game setup, you should use that to make sure that the setup is consistent. Currently attributes can overlap (like &amp;#8220;friendly&amp;#8221; and &amp;#8220;rival&amp;#8221;), and genders and pronouns can disagree. The avatars are also inconsistent, though I suppose the &lt;span class="caps"&gt;LLM&lt;/span&gt; never sees&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;Any inconsistencies make the &lt;span class="caps"&gt;LLM&lt;/span&gt;&amp;#8217;s work harder. It becomes easier for it to lose track of characters and relations. The mistakes that emerge often don&amp;#8217;t point directly to these inconsistencies, but are the result of a generally confused &lt;span class="caps"&gt;LLM&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The game also includes three pronoun options: she/her, he/him, and they/them. Pronouns are the right way to address gender for an &lt;span class="caps"&gt;LLM&lt;/span&gt;: the &lt;span class="caps"&gt;LLM&lt;/span&gt; is writing lots of text, and pronouns are exactly where gender is introduced into text; what’s in the character’s pants is far less impactful. But they/them doesn’t have the intended effect, it does not lead to a non-binary character. Instead the gender is simply indeterminate. If I say “Alex is great, I love what they do” that’s a non-binary pronoun. But for the &lt;span class="caps"&gt;LLM&lt;/span&gt; they/them is like what you’d find in an employee handbook: “before the employee returns to work they must wash their hands.” This does not imply the employee is non-binary, only that the gender is unspecified. Much of what an &lt;span class="caps"&gt;LLM&lt;/span&gt; does is like a dream; for instance in a dream you can encounter someone who doesn’t have a face. It’s not that the person’s face is blank, it’s that the face simply doesn’t exist because you didn’t observe it. In the same way they/them is just an incomplete&amp;nbsp;character.&lt;/p&gt;
+&lt;p&gt;You can have a non-binary character in an &lt;span class="caps"&gt;LLM&lt;/span&gt;-generated story, but it requires a strong positive assertion of their non-binary gender, not a passive use of indeterminate&amp;nbsp;pronouns.&lt;/p&gt;
+&lt;h2&gt;&lt;span id="latency"&gt;Latency&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;Often I&amp;#8217;m been pretty lazy about latency in my own &lt;span class="caps"&gt;LLM&lt;/span&gt; work. Quality is most interesting to me, and I don&amp;#8217;t want to do a premature optimization by prioritizing latency over&amp;nbsp;quality.&lt;/p&gt;
+&lt;p&gt;But I think the ideal player experience for this kind of game is a casual, relaxed reading experience. When the game makes a choice feel effortful the entire reading process feels effortful. Meanwhile my other suggestions for prompting will only make the latency&amp;nbsp;worse!&lt;/p&gt;
+&lt;p&gt;That said, the pace of the interface doesn&amp;#8217;t have to align with the tasks given to the &lt;span class="caps"&gt;LLM&lt;/span&gt;.&lt;/p&gt;
+&lt;h3&gt;&lt;span id="example-prompt"&gt;An example&amp;nbsp;prompt&lt;/span&gt;&lt;/h3&gt;
+&lt;p&gt;I imagine a prompt that looks a like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;You are writing a story in collaboration with the player, set in the world of the Wizard Of Oz.
+
+{story context, world lore, character descriptions, etc}
+
+{the story as it has progressed, linearly}
+
+&amp;lt;playerChoice character=&amp;quot;{playerCharacterName}&amp;quot;&amp;gt;
+  {whatever the player last chose}
+&amp;lt;/playerChoice&amp;gt;
+
+&amp;lt;passage&amp;gt;
+  {the pre-generated passage that immediately follows the choice}
+&amp;lt;/passage&amp;gt;
+
+&amp;lt;consequence&amp;gt;
+  {a summary of the consequence of the choice, as generated alongside the choice itself}
+&amp;lt;consequence&amp;gt;
+
+----
+
+You will continue writing the story in this form:
+
+&amp;lt;context&amp;gt;
+  &amp;lt;!-- describe where {playerCharacter} is. What other characters are also present? Describe the relationship between {playerCharacter} and each other character. What dramatic tensions need immediate resolution? --&amp;gt;
+&amp;lt;/context&amp;gt;
+
+&amp;lt;outline&amp;gt;
+  &amp;lt;!-- Outline the next part of the story. Include:
+  1. Consequences from the last choice. Make it impactful, so the player feels like they are driving the story!
+  2. Describe how any other characters present will react or feel about the choice
+  3. Does this resolve {currentObjective}? If so, then say &amp;quot;YES&amp;quot; and describe how. If it makes the objective impossible then say &amp;quot;IMPOSSIBLE&amp;quot; and describe how. Otherwise say how it affects the objective and what remains to achieve the objective.
+  4. What happens next?
+  5. What is the next pivotal moment where the player (as {playerCharacterName}) can make a consequential decision?
+  6. Are there opportunities for the player to make small decisions about: how {playerCharacterName} feels about what happened? A small preference the player can identify for {playerCharacterName}? These are choices that don&amp;#39;t affect the plot development.
+  --&amp;gt;
+&amp;lt;/outline&amp;gt;
+
+&amp;lt;passage&amp;gt;
+  &amp;lt;!-- Write the story from {playerCharacterName}&amp;#39;s perspective as a series of short paragraphs --&amp;gt;
+  &amp;lt;smallChoice&amp;gt;
+    &amp;lt;option&amp;gt;
+      &amp;lt;!-- Optionally a small choice for the player to make --&amp;gt;
+    &amp;lt;/option&amp;gt;
+  &amp;lt;/smallChoice&amp;gt;
+&amp;lt;/passage&amp;gt;
+
+&amp;lt;choices&amp;gt;
+  &amp;lt;!-- Make three choices: --&amp;gt;
+  &amp;lt;choice number=&amp;quot;1 or 2 or 3&amp;quot;
+   title=&amp;quot;&amp;lt;!-- From {playerCharacterName}&amp;#39;s perspective, what are they choosing to do? --&amp;gt;&amp;quot;&amp;gt;
+    &amp;lt;passage&amp;gt;
+      &amp;lt;!-- One paragraph redescribing the choice --&amp;gt;
+    &amp;lt;/passage&amp;gt;
+    &amp;lt;difficulty&amp;gt;
+      &amp;lt;challenges&amp;gt;
+        &amp;lt;!-- Describe the challenges to success --&amp;gt;
+      &amp;lt;/challenges&amp;gt;
+      &amp;lt;playerAssets&amp;gt;
+        &amp;lt;!-- Describe what helps {playerCharacterName} succeed --&amp;gt;
+      &amp;lt;/playerAssets&amp;gt;
+      &amp;lt;success&amp;gt;
+        &amp;lt;!-- Use the d20 roll to explain why it succeeds or not, finishing
+        with SUCCESS if it succeeds, and FAILURE if not --&amp;gt;
+      &amp;lt;/success&amp;gt;
+    &amp;lt;/difficulty&amp;gt;
+    &amp;lt;consequence&amp;gt;
+      &amp;lt;!-- One sentence describing the consequence of the choice --&amp;gt;
+    &amp;lt;/consequence&amp;gt;
+  &amp;lt;/choice&amp;gt;
+&amp;lt;/choices&amp;gt;
+
+Generate three choices. There are three rolls:
+1. d20 roll {roll1}
+2. d20 roll {roll2}
+3. d20 roll {roll3}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;When the player makes a&amp;nbsp;choice:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Construct the prompt to generate the next section of the story, sending it to the &lt;span class="caps"&gt;LLM&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Display the passage that is already&amp;nbsp;generated&lt;/li&gt;
+&lt;li&gt;Indicate success or&amp;nbsp;failure&lt;/li&gt;
+&lt;li&gt;As the response comes streaming in, display any &lt;code&gt;&amp;lt;passage&amp;gt;&lt;/code&gt; elements as they come&amp;nbsp;in.&lt;/li&gt;
+&lt;li&gt;When the &lt;code&gt;&amp;lt;choices&amp;gt;&lt;/code&gt; element is fully produced, shuffle the choices and present them to the&amp;nbsp;player.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I put in &lt;code&gt;&amp;lt;smallChoice&amp;gt;&lt;/code&gt; but it will be tricky to balance: either the &lt;span class="caps"&gt;LLM&lt;/span&gt; will &lt;em&gt;always&lt;/em&gt; create those choices or &lt;em&gt;never&lt;/em&gt;. You could roll a die and suggest it include a choice or not based on the die. That will put a kind of quota on choices, but won&amp;#8217;t let the choices be added intelligently based on plot. Another option is to let it always create choices but include a decision process in the choice that can void the choice (then the &lt;span class="caps"&gt;UI&lt;/span&gt; never shows voided choices to the&amp;nbsp;player).&lt;/p&gt;
+&lt;p&gt;The prompt also needs some examples, though if you prime it well then you can use the story context itself as a kind of example. You might need some occassional verification to ensure it doesn&amp;#8217;t go into a feedback cycle where it goes off the rails. But symmetry between input and output can be very effective in efficiently providing both history and examples at the same time. There are a few options to bootstrap these examples, creating the initial examples before the story has&amp;nbsp;started:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A combination of handwriting and programmatically setting up the initial context. Things like character setup can be presented as choices (even if the &lt;span class="caps"&gt;UI&lt;/span&gt; shown to the player is&amp;nbsp;different).&lt;/li&gt;
+&lt;li&gt;Use a rough template of the setup and feed things like the initial character and some random elements into an &lt;span class="caps"&gt;LLM&lt;/span&gt;, letting it instantiate the template. You might want to use a more advanced &lt;span class="caps"&gt;LLM&lt;/span&gt; to make sure it starts on the right&amp;nbsp;foot.&lt;/li&gt;
+&lt;li&gt;Give extensive examples and instructions during early story setup, while dropping those later when the story is a self-supporting&amp;nbsp;example.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;There are also some notes on how to turn this into a chat log in &lt;a href="https://ianbicking.org/blog/2025/07/intra-llm-text-adventure#role-user"&gt;Intra: role:user&lt;/a&gt;.&lt;/p&gt;
+&lt;h1&gt;&lt;span id="conclusion"&gt;Conclusion&lt;/span&gt;&lt;/h1&gt;
+&lt;p&gt;I do wish Hidden Door well. This is stiff criticism &lt;em&gt;because&lt;/em&gt; I wish them&amp;nbsp;well.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s easy when creating &lt;span class="caps"&gt;AI&lt;/span&gt; content to be a little too enamoured with the novelty. It feels magical. But if you keep interacting with it the novelty wears off, and you should plan for &lt;em&gt;after&lt;/em&gt; the novelty wears off. In this case that means a stronger engagement with the process of storytelling. You have to encode the writing &lt;em&gt;process&lt;/em&gt; into the&amp;nbsp;prompting:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Track and commit to a world state. (The reader is maintaining a world state in their mind, don&amp;#8217;t break&amp;nbsp;it!)&lt;/li&gt;
+&lt;li&gt;Outline before writing the final&amp;nbsp;prose.&lt;/li&gt;
+&lt;li&gt;Have the model articulate generalities, finding themes in the details instead of revisiting every detail as though it is&amp;nbsp;meaningful.&lt;/li&gt;
+&lt;li&gt;Decide on consequences before choices. Choices are a mechanism to change narrative direction, so work backwards from interesting&amp;nbsp;directions.&lt;/li&gt;
+&lt;li&gt;Optimize story progression for fun choices! (And think hard about what makes a choice&amp;nbsp;fun.)&lt;/li&gt;
+&lt;li&gt;Ensure you can put together a cohesive and entertaining story before opening the&amp;nbsp;sandbox.&lt;/li&gt;
+&lt;li&gt;Allow consequential failure. It doesn&amp;#8217;t have to be story-ending, but it should disrupt the story and the world&amp;nbsp;state.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;It&amp;#8217;s a lot, but I think this is all fun work&amp;#8230; using an &lt;span class="caps"&gt;LLM&lt;/span&gt; means you can think about the systems and cognitive processes that lead to a good story and then try to actually implement them. It&amp;#8217;s a new and strange kind of&amp;nbsp;science.&lt;/p&gt;</content><category term="ai"></category></entry><entry><title>Intra: design notes on an LLM-driven text adventure</title><link href="https://ianbicking.org/blog/2025/07/intra-llm-text-adventure.html" rel="alternate"></link><published>2025-07-01T00:00:00-05:00</published><updated>2025-07-01T00:00:00-05:00</updated><author><name>Ian Bicking</name></author><id>tag:ianbicking.org,2025-07-01:/blog/2025/07/intra-llm-text-adventure.html</id><summary type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
 &lt;aside&gt;This post is part of the series &lt;a href="/blog/2025/05/creating-worlds-with-llms.html"&gt;Creating worlds with LLMs&lt;/a&gt;&lt;/aside&gt;
 
 &lt;p&gt;Last year I participated in a &lt;a href="https://textadventurehack.com/"&gt;text adventure hackathon&lt;/a&gt; to build a text-based game using &lt;span class="caps"&gt;AI&lt;/span&gt;. I&amp;#8217;d &lt;a href="https://ianbicking.org/blog/2024/04/roleplaying-by-llm"&gt;already been thinking about it&lt;/a&gt; but it was a great opportunity to put together those thoughts into something real. Since …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction&lt;/h2&gt;
@@ -3871,152 +4186,4 @@ Fill out this&amp;nbsp;list:&lt;/p&gt;
 &lt;p&gt;For open source developers to build the open web we need a platform that allows us to actually give the tools we&amp;#8217;ve created to everyone. Because of the hosting problem all our open source work is mediated through commercial entities, and we have this world where the web is very much built on open source, and yet that does nothing to make it more&amp;nbsp;open.&lt;/p&gt;
 &lt;p&gt;An open hosting platform is &lt;em&gt;not&lt;/em&gt; a specification, it is &lt;em&gt;not&lt;/em&gt; a protocol, it is &lt;em&gt;not&lt;/em&gt; a piece of software. It is actual hosting. It is people who deal with abuse, security, takedown notices, denial of service attacks, naming, bill paying, authentication and recovery, and are committed to ongoing improvements to the platform. Those are the things that separate software from a running service, and only running services can participate in the open&amp;nbsp;web.&lt;/p&gt;
 &lt;p&gt;I don&amp;#8217;t think decentralization, federation, or &lt;span class="caps"&gt;P2P&lt;/span&gt; is important or probably even desirable. I think these are ways to avoid the work of hosting, and they succeed to the degree no one uses the resulting software and so no work has to be done. It&amp;#8217;s better to start with a working&amp;nbsp;product.&lt;/p&gt;
-&lt;p&gt;Would hosting change things? Probably not enough: products aren&amp;#8217;t just software, and open source development still struggles to include a diversity of skills and the consistent delivery of effort to make a product. Here, I have no suggestions. But still, an open, public, accessible hosting platform would be a&amp;nbsp;start.&lt;/p&gt;</content><category term="mozilla"></category></entry><entry><title>Viewing Python execution with source code rewriting</title><link href="https://ianbicking.org/blog/2018/11/viewing-python-execution-source-code-rewriting.html" rel="alternate"></link><published>2018-11-20T00:00:00-06:00</published><updated>2018-11-20T00:00:00-06:00</updated><author><name>Ian Bicking</name></author><id>tag:ianbicking.org,2018-11-20:/blog/2018/11/viewing-python-execution-source-code-rewriting.html</id><summary type="html">&lt;p&gt;A while back I experimented with a &lt;a href="https://github.com/ianb/sheets"&gt;Jupyter Notebook-like&lt;/a&gt; interface. Ultimately I hit some roadblocks and knew that I couldn&amp;#8217;t keep working on it indefinitely, as I had no personal &lt;em&gt;purpose&lt;/em&gt; for the&amp;nbsp;project.&lt;/p&gt;
-&lt;p&gt;But I do want to share the idea I most liked from the project: tracing …&lt;/p&gt;</summary><content type="html">&lt;p&gt;A while back I experimented with a &lt;a href="https://github.com/ianb/sheets"&gt;Jupyter Notebook-like&lt;/a&gt; interface. Ultimately I hit some roadblocks and knew that I couldn&amp;#8217;t keep working on it indefinitely, as I had no personal &lt;em&gt;purpose&lt;/em&gt; for the&amp;nbsp;project.&lt;/p&gt;
-&lt;p&gt;But I do want to share the idea I most liked from the project: tracing execution with source code&amp;nbsp;rewriting.&lt;/p&gt;
-&lt;h1&gt;Print-based&amp;nbsp;debugging&lt;/h1&gt;
-&lt;p&gt;My go-to debugging in any environment is printing. You decide what you want to know about, then you sprinkle in some statements and find out. Repeat as necessary. I like printing because it&amp;#8217;s like a way of creating a log of the execution. Maybe there&amp;#8217;s better ways, but like many people this is one of the only techniques that sticks for me. Still, I think there&amp;#8217;s ways of incrementally improving on print-based debugging, and this is one attempt on my&amp;nbsp;part&amp;#8230;&lt;/p&gt;
-&lt;h2&gt;Source code&amp;nbsp;rewriting&lt;/h2&gt;
-&lt;p&gt;Instead of using &lt;a href="https://docs.python.org/3/library/trace.html"&gt;trace&lt;/a&gt; to follow along with the code, I thought we could inject the debugging into the code&amp;nbsp;itself.&lt;/p&gt;
-&lt;p&gt;I ended up implementing two kinds of source code rewriting. The first simply prints&amp;nbsp;expressions:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;my_object&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MyObject&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;param&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;my_object&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="n"&gt;my_object&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;This normally prints out &lt;code&gt;my_object&lt;/code&gt;, but it only works on the last expression (i.e., you wouldn&amp;#8217;t see the value of &lt;code&gt;my_object.execute()&lt;/code&gt;). This constraint is built into Python in &lt;a href="https://docs.python.org/3/library/functions.html#compile"&gt;compile&lt;/a&gt;, with the output being sent to &lt;a href="https://docs.python.org/3/library/sys.html#sys.displayhook"&gt;sys.displayhook&lt;/a&gt;. You can get around this problem by splitting up the cells carefully, but I find cell management to be an unpleasant part of notebook&amp;nbsp;interfaces.&lt;/p&gt;
-&lt;p&gt;I first tried putting an implicit &lt;code&gt;print()&lt;/code&gt; around every top-level expression, so it&amp;nbsp;becomes:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;my_object&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MyObject&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;display_print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;my_object&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
-&lt;span class="n"&gt;display_print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;my_object&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Where &lt;code&gt;display_print()&lt;/code&gt; is something simple&amp;nbsp;like:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;display_print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-        &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;repr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;This turned out to be confusing. What print statement went with which expression? I legitimately couldn&amp;#8217;t tell, even with simple examples. So I made another change, rewriting it like&amp;nbsp;this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;my_object&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MyObject&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;display_print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;my_object.execute()&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;my_object&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
-&lt;span class="n"&gt;display_print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;my_object&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;my_object&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;display_print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;expr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-        &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt;:&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;  &lt;/span&gt;&lt;span class="si"&gt;%r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;expr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;It works great! You can track a bunch of expressions, interleave this with other explicit print statements, and the output is readable and&amp;nbsp;useful.&lt;/p&gt;
-&lt;h3&gt;Probes&lt;/h3&gt;
-&lt;p&gt;But I had a problem: I could watch top-level expressions, but there were lots of interesting expressions that aren&amp;#8217;t top-level. For this I added a new function &lt;code&gt;watch()&lt;/code&gt;. But I still rewrote&amp;nbsp;expressions:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;my_object&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MyObject&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;object_enumerator&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
-    &lt;span class="n"&gt;my_object&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;process&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;watch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;is rewritten&amp;nbsp;to:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;my_object&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MyObject&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;object_enumerator&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
-    &lt;span class="n"&gt;my_object&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;process&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;watch_print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;obj&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;# the 1 is an ID for the expression&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;With an implementation of &lt;code&gt;watch_print()&lt;/code&gt; like:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;watch_print_counter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
-&lt;span class="n"&gt;watch_print_limit&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;
-
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;watch_print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;expr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="n"&gt;watch_print_counter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;watch_print_limit&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-        &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s2"&gt;:&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;  &lt;/span&gt;&lt;span class="si"&gt;%r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;expr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-        &lt;span class="n"&gt;watch_print_counter&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;watch_print_counter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;watch_print_counter&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="n"&gt;watch_print_limit&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-            &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;  (omitting further values)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;While I initially left out the limit, I quickly realized its importance: it&amp;#8217;s very easy to run a denial of service attack on your own notebook! A more sophisticated implementation could start omitting values while leaving in every 100th or 1000th&amp;nbsp;value.&lt;/p&gt;
-&lt;h3&gt;Watching&amp;nbsp;loops&lt;/h3&gt;
-&lt;p&gt;I never implemented this, but I&amp;#8217;m pretty sure the next step would be watching all loops, rewriting them as something&amp;nbsp;like:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;watch_enumerator&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;obj&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;object_enumerator()&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;object_enumerator&lt;/span&gt;&lt;span class="p"&gt;()):&lt;/span&gt;
-   &lt;span class="o"&gt;...&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;This would let you print out useful information, like if the execution is long you can indicate progress and possibly an expected completion time, or you could label inner watch statements or add other&amp;nbsp;information.&lt;/p&gt;
-&lt;h1&gt;Implementation&lt;/h1&gt;
-&lt;p&gt;To implement this I used the &lt;a href="https://astor.readthedocs.io/en/latest/"&gt;astor&lt;/a&gt; library, which made this all very simple, though it required some&amp;nbsp;experimentation:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;RewriteExprToPrint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;astor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;TreeWalk&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;post_Module&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="n"&gt;node&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cur_node&lt;/span&gt;
-        &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;body&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
-            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rewrite_expr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Expr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;
-            &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;body&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
-
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;rewrite_expr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;expr_string&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;expr_string&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-            &lt;span class="n"&gt;expr_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;astor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;node_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;expr_string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Expr&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-            &lt;span class="n"&gt;new_node&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Expr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-                &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-                    &lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;display_print&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Load&lt;/span&gt;&lt;span class="p"&gt;()),&lt;/span&gt;
-                    &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;node_string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
-                    &lt;span class="n"&gt;keywords&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[],&lt;/span&gt;
-                    &lt;span class="n"&gt;starargs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-                &lt;span class="p"&gt;)&lt;/span&gt;
-            &lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-            &lt;span class="n"&gt;new_node&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-                &lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;display_print&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Load&lt;/span&gt;&lt;span class="p"&gt;()),&lt;/span&gt;
-                &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;node_string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
-                &lt;span class="n"&gt;keywords&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[],&lt;/span&gt;
-                &lt;span class="n"&gt;starargs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-            &lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fix_missing_locations&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;new_node&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;new_node&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Implementing &lt;code&gt;watch()&lt;/code&gt; is a little more&amp;nbsp;involved:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;RewriteWatch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;astor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;TreeWalk&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="n"&gt;astor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;TreeWalk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id_counter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
-        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;next_call&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;
-
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;post_Name&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;isinstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cur_node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Load&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cur_node&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;watch&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-                &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;next_call&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;
-
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;post_Call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;next_call&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-            &lt;span class="n"&gt;new_node&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rewrite_expr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cur_node&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;new_node&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;next_call&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;
-
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;rewrite_expr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;expr_string&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;expr_string&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-            &lt;span class="n"&gt;expr_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;astor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;node_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;expr_string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id_counter&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
-        &lt;span class="n"&gt;new_node&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-            &lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;watch_print&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ctx&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Load&lt;/span&gt;&lt;span class="p"&gt;()),&lt;/span&gt;
-            &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Num&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id_counter&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;node_string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
-            &lt;span class="n"&gt;keywords&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[],&lt;/span&gt;
-            &lt;span class="n"&gt;starargs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-        &lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;ast&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fix_missing_locations&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;new_node&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;new_node&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</content><category term="misc"></category></entry></feed>
+&lt;p&gt;Would hosting change things? Probably not enough: products aren&amp;#8217;t just software, and open source development still struggles to include a diversity of skills and the consistent delivery of effort to make a product. Here, I have no suggestions. But still, an open, public, accessible hosting platform would be a&amp;nbsp;start.&lt;/p&gt;</content><category term="mozilla"></category></entry></feed>
