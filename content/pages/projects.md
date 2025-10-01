@@ -4,8 +4,6 @@ slug: projects
 
 This is a list of projects I am working on, or have worked on. Most are open source.
 
-**Note:** As of December 2024 I am currently [looking for work](https://www.linkedin.com/feed/update/urn:li:activity:7265435901009231872/). I really [enjoy working with LLMs](/projects.html#llm), and I believe there is important work to be done at this moment; I want to find people who feel the same and are approaching this moment with both ambition and care.
-
 -   [LLM period](#llm)
     -   [Memory Atlas](#memory-atlas)
     -   [Intra: the game](#intra-game)
