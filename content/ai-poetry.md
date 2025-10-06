@@ -34,7 +34,7 @@ We can find meaning in that like the meaning like we might find when [casting th
 
 And yet we can make easy tasks harder. What is easy (but empty) for the LLM can also be turned into a harder process (as we also can do [with humor](https://ianbicking.org/blog/2024/05/ai-aita.html)).
 
-Here's a poem I guided GPT (4.5 Thinking) to write. I think it is competent:
+Here's a poem I guided GPT (4.1 Thinking) to write. I think it is competent:
 
 > ## The Thinking Mirror
 >
